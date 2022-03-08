@@ -72,7 +72,7 @@ enum AttrType {
 // todo 方案B: 全局持久化: 不同的实现类都持久化为不同的文档,对于calc同一个类的不同实例,其id含义为"不同版本的函数标识"
 // todo feat A: 为Func添加 tag属性,便于用户自己查询使用,提供默认的sys函数tag,用户自己也可以创建私有函数tag;可能需要单独建立tag表,用于保存对应关系
 abstract class BaseFunc {
-  final ObjectId id;
+  final ObjectId id; // id是有必要的,因为用户自己会定义函数,使得::name重复
   final String name;
   final Set<FuncScope> scopes; // 函数适用范围
   final Range argsLenRange; // 函数参数个数, -1表示无限制
