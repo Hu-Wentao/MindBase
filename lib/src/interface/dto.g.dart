@@ -8,7 +8,7 @@ part of 'dto.dart';
 
 RecordMetaDto _$RecordMetaDtoFromJson(Map<String, dynamic> json) =>
     RecordMetaDto(
-      json['id'] as String,
+      json['_id'] as String,
       json['name'] as String,
       json['memo'] as String,
       json['maxKey'] as int,
@@ -19,7 +19,7 @@ RecordMetaDto _$RecordMetaDtoFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$RecordMetaDtoToJson(RecordMetaDto instance) =>
     <String, dynamic>{
-      'id': instance.id,
+      '_id': instance.id,
       'name': instance.name,
       'memo': instance.memo,
       'maxKey': instance.maxKey,

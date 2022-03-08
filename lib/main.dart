@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/config/const.dart';
 import 'package:mind_base/src/mind_base_app.dart';
 
 void main() {
@@ -8,11 +9,7 @@ void main() {
     onApplicationRun: (g, c) async => runApp(const MyApp()),
   ).run(
     GetIt.I,
-    MindBaseConfig(
-        sign: EnvSign.dev,
-        name: "MindBase",
-        version: "0.0.1",
-        packAt: DateTime(2022, 3, 8)),
+    kEnvDev,
   );
 }
 
