@@ -42,6 +42,7 @@ dev_dependencies:
     sdk: flutter
   build_runner:
   pubspec_generator:
+  json_serializable: # 只需要添加这一个依赖即可
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

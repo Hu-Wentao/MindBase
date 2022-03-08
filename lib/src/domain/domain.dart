@@ -1,12 +1,18 @@
 import 'package:flutter/foundation.dart';
-import 'package:mongo_dart/mongo_dart.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'domain.g.dart';
 
 /// 字段  =======================================================================
 
 /// 分量/字段/属性: 元组的某个属性值叫做分量.(一行记录叫元组Tuple)
+@JsonSerializable()
 class Field {
+  @JsonKey()
   final int k; // 分量的id,(不代表分量在UI中的位置)
+  @JsonKey()
   final String v; // 字段存储值
+  @JsonKey()
   String? e; // 字段错误信息
 
   Field(this.k, this.v, this.e);
@@ -14,9 +20,15 @@ class Field {
   Field.of(this.k, this.v, [this.e]);
 
   Field.err(this.k, this.e) : v = "";
+
+  factory Field.fromJson(Map<String, dynamic> json) => _$FieldFromJson(json);
+
+  Map<String, dynamic> toJson() => _$FieldToJson(this);
+
+  @override
+  String toString() => toJson().toString();
 }
 
-/// 表头/属性: 关系/表的一列叫属性
 class Attribute {
   final int k; // 表头key,对应Field:k,需要从所在的TableMeat中获取
   final String name; // 表头名称
@@ -72,7 +84,7 @@ enum AttrType {
 // todo 方案B: 全局持久化: 不同的实现类都持久化为不同的文档,对于calc同一个类的不同实例,其id含义为"不同版本的函数标识"
 // todo feat A: 为Func添加 tag属性,便于用户自己查询使用,提供默认的sys函数tag,用户自己也可以创建私有函数tag;可能需要单独建立tag表,用于保存对应关系
 abstract class BaseFunc {
-  final ObjectId id; // id是有必要的,因为用户自己会定义函数,使得::name重复
+  final String id; // id是有必要的,因为用户自己会定义函数,使得::name重复
   final String name;
   final Set<FuncScope> scopes; // 函数适用范围
   final Range argsLenRange; // 函数参数个数, -1表示无限制
@@ -101,8 +113,11 @@ abstract class BaseFunc {
   Field onRun(List<Field> inputs);
 }
 
+@JsonSerializable()
 class Range {
+  @JsonKey()
   final int min;
+  @JsonKey()
   final int max;
 
   const Range(this.min, this.max);
@@ -112,6 +127,10 @@ class Range {
         max = n;
 
   bool inBound(int v) => v >= min && v <= max;
+
+  factory Range.fromJson(Map<String, dynamic> json) => _$RangeFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RangeToJson(this);
 }
 
 enum FuncScope {
@@ -124,7 +143,7 @@ enum FuncScope {
 class NoneFunc extends BaseFunc {
   NoneFunc()
       : super(
-          ObjectId.fromHexString("6226adf527b60ea31165e4e3"),
+          "6226adf527b60ea31165e4e3",
           'None',
           {FuncScope.input, FuncScope.check, FuncScope.output},
           const Range.equal(1),
@@ -138,21 +157,32 @@ class NoneFunc extends BaseFunc {
 
 /// 表 =========================================================================
 
-class TableMeta {
-  final ObjectId id;
+class TupleMeta {
+  final String id;
   final String name;
   final String memo;
   final int maxKey; // 等于Table中出现过key的数量, 用于新增Attr,只能增加
   final List<Attribute> attributes; // 表头
-  const TableMeta(this.id, this.name, this.memo, this.maxKey, this.attributes);
+  const TupleMeta(this.id, this.name, this.memo, this.maxKey, this.attributes);
 
   int nextKey() => maxKey + 1;
 
   // table新增Attr
-  TableMeta addAttr(Attribute attr) {
+  TupleMeta addAttr(Attribute attr) {
     if (attr.k != nextKey()) {
       throw "逻辑异常! 新增的Attr::k[${attr.k}] 不等于table[$name]的maxKey[$maxKey]+1";
     }
-    return TableMeta(id, name, memo, nextKey(), attributes..add(attr));
+    return TupleMeta(id, name, memo, nextKey(), attributes..add(attr));
   }
+}
+
+/// 一行记录:
+/// 即一个对象, id,fields+meta
+/// 默认添加 id
+class Tuple {
+  final String id;
+  final TupleMeta meta; // Aggregate组装得到
+  final List<Field> fields;
+
+  Tuple(this.id, this.meta, this.fields);
 }
