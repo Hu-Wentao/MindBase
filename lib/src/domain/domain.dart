@@ -60,7 +60,7 @@ enum AttrType {
   any, // 任意类型
   string,
   number,
-  boolean,
+  bool,
   date,
 }
 
