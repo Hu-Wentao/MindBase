@@ -1,4 +1,5 @@
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/config/injector.dart';
 
 class MindBaseConfig extends BaseConfig {
   MindBaseConfig({
@@ -16,9 +17,13 @@ class MindBasePackage extends BasePackage<MindBaseConfig> {
     Future<void> Function(MindBaseConfig config, Object e, StackTrace s)?
         onPkgInitError,
     Future<void> Function(MindBaseConfig config)? onPkgInitFinally,
-    Future<void> Function(GetIt getIt, MindBaseConfig config)? onPackageInit,
-  }) : super(onBeforePkgInit, onAfterPkgInit, onPkgInitError, onPkgInitFinally,
-            onPackageInit);
+  }) : super(
+          onBeforePkgInit,
+          onAfterPkgInit,
+          onPkgInitError,
+          onPkgInitFinally,
+          initPackageDI,
+        );
 }
 
 class MindBaseApplication extends MindBasePackage
