@@ -5,7 +5,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 
 /// 分量/字段/属性: 元组的某个属性值叫做分量.(一行记录叫元组Tuple)
 class Field {
-   final int k; // 分量的id,(不代表分量在UI中的位置)
+  final int k; // 分量的id,(不代表分量在UI中的位置)
   final String v; // 字段存储值
   String? e; // 字段错误信息
 
@@ -149,6 +149,10 @@ class TableMeta {
   int nextKey() => maxKey + 1;
 
   // table新增Attr
-  TableMeta addAttr(Attribute attr) =>
-      TableMeta(id, name, memo, nextKey(), attributes..add(attr));
+  TableMeta addAttr(Attribute attr) {
+    if (attr.k != nextKey()) {
+      throw "逻辑异常! 新增的Attr::k[${attr.k}] 不等于table[$name]的maxKey[$maxKey]+1";
+    }
+    return TableMeta(id, name, memo, nextKey(), attributes..add(attr));
+  }
 }
