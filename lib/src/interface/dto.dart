@@ -1,29 +1,55 @@
+import 'package:get_arch_core/get_arch_core.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:mind_base/src/domain/domain.dart';
+import 'package:mind_base/src/domain/value.dart';
+import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
 part 'dto.g.dart';
 
-@JsonSerializable()
-class TupleDto {
-  @JsonKey() // todo 检查是否覆盖了默认的 _id 属性
+///
+class RecordDto implements IDto {
+  // @JsonKey(name: "_id")
   final String id;
-  @JsonKey()
   final String metaId;
-  @JsonKey()
   final List<Field> fields;
 
-  TupleDto(this.id, this.metaId, this.fields);
+  RecordDto(this.id, this.metaId, this.fields);
 
-  factory TupleDto.fromJson(Map<String, dynamic> json) =>
-      _$TupleDtoFromJson(json);
+  factory RecordDto.fromDomain(
+    ObjectId id,
+    ObjectId metaId,
+    List<Field> fields,
+  ) =>
+      RecordDto(id.toString(), metaId.toString(), fields);
 
-  Map<String, dynamic> toJson() => _$TupleDtoToJson(this);
+  // {id: 6227568dda2194cb3589f5d4, metaId: 6227568dda2194cb3589f5d5, 1: {v: 123, e: null}, 2: {v: aaa, e: null}}
+  factory RecordDto.fromJson(Map<String, dynamic> json) => RecordDto(
+      json.remove('_id') as String,
+      json.remove('metaId') as String,
+      json.entries.map((entry) {
+        // 普通字段
+        final js2 = (entry.value as Map<String, dynamic>);
+        return Field(
+          int.parse(entry.key),
+          js2['v'] as String,
+          js2['e'] as String?,
+        );
+      }).toList());
+
+  @override
+  Map<String, dynamic> toJson() => {
+        "_id": id,
+        "metaId": metaId,
+      }..addEntries(
+          fields.map((e) => MapEntry("${e.k}", {"v": e.v, "e": e.e})));
+
+  @override
+  String toString() => toJson().toString();
 }
 
 /// 表头属性
 @JsonSerializable()
-class TupleMetaDto {
-  @JsonKey()
+class RecordMetaDto {
+  @JsonKey(name: "_id")
   final String id;
   @JsonKey()
   final String name;
@@ -34,12 +60,21 @@ class TupleMetaDto {
   @JsonKey()
   final List<AttributeDto> attributes;
 
-  TupleMetaDto(
-      this.id, this.name, this.memo, this.maxKey, this.attributes); // 表头
-  factory TupleMetaDto.fromJson(Map<String, dynamic> json) =>
-      _$TupleMetaDtoFromJson(json);
+  RecordMetaDto(this.id, this.name, this.memo, this.maxKey, this.attributes);
 
-  Map<String, dynamic> toJson() => _$TupleMetaDtoToJson(this);
+  factory RecordMetaDto.fromDomain(
+    ObjectId id,
+    String name,
+    String memo,
+    int maxKey,
+    List<AttributeDto> attributes,
+  ) =>
+      RecordMetaDto(id.toString(), name, memo, maxKey, attributes);
+
+  factory RecordMetaDto.fromJson(Map<String, dynamic> json) =>
+      _$RecordMetaDtoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RecordMetaDtoToJson(this);
 }
 
 /// 表头/属性: 关系/表的一列叫属性

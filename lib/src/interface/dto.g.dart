@@ -6,21 +6,8 @@ part of 'dto.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-TupleDto _$TupleDtoFromJson(Map<String, dynamic> json) => TupleDto(
-      json['id'] as String,
-      json['metaId'] as String,
-      (json['fields'] as List<dynamic>)
-          .map((e) => Field.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-
-Map<String, dynamic> _$TupleDtoToJson(TupleDto instance) => <String, dynamic>{
-      'id': instance.id,
-      'metaId': instance.metaId,
-      'fields': instance.fields,
-    };
-
-TupleMetaDto _$TupleMetaDtoFromJson(Map<String, dynamic> json) => TupleMetaDto(
+RecordMetaDto _$RecordMetaDtoFromJson(Map<String, dynamic> json) =>
+    RecordMetaDto(
       json['id'] as String,
       json['name'] as String,
       json['memo'] as String,
@@ -30,7 +17,7 @@ TupleMetaDto _$TupleMetaDtoFromJson(Map<String, dynamic> json) => TupleMetaDto(
           .toList(),
     );
 
-Map<String, dynamic> _$TupleMetaDtoToJson(TupleMetaDto instance) =>
+Map<String, dynamic> _$RecordMetaDtoToJson(RecordMetaDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
