@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+
 part 'value.g.dart';
 
 /// 字段  =======================================================================
@@ -7,17 +8,15 @@ part 'value.g.dart';
 @JsonSerializable()
 class Field {
   @JsonKey()
-  final int k; // 分量的id,由于持久化后格式变化,这里只能使用数值 (不代表分量在UI中的排序)
-  @JsonKey()
   final String v; // 字段存储值
   @JsonKey()
   String? e; // 字段错误信息
 
-  Field(this.k, this.v, this.e);
+  Field(this.v, this.e);
 
-  Field.of(this.k, this.v, [this.e]);
+  Field.of(this.v, [this.e]);
 
-  Field.err(this.k, this.e) : v = "";
+  Field.err(this.e) : v = "";
 
   factory Field.fromJson(Map<String, dynamic> json) => _$FieldFromJson(json);
 
@@ -35,7 +34,6 @@ enum AttrType {
   date,
   // todo 引用类型; 可能不必要，考虑使用 Func去获取外部关系
 }
-
 
 @JsonSerializable()
 class Range {

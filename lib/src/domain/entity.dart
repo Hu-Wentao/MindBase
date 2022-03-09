@@ -28,7 +28,7 @@ abstract class BaseFunc {
   // 对输入参数进行检查
   Field run(int k, List<Field> inputs) {
     if (argsLenRange.inBound(inputs.length)) {
-      return Field.err(k,
+      return Field.err(
           "函数[$runtimeType]输入参数数量[${inputs.length}]过多,最多只能输入[$argsLenRange]个参数");
     }
     return onRun(inputs);

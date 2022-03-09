@@ -7,13 +7,11 @@ part of 'value.dart';
 // **************************************************************************
 
 Field _$FieldFromJson(Map<String, dynamic> json) => Field(
-      json['k'] as int,
       json['v'] as String,
       json['e'] as String?,
     );
 
 Map<String, dynamic> _$FieldToJson(Field instance) => <String, dynamic>{
-      'k': instance.k,
       'v': instance.v,
       'e': instance.e,
     };

@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
-import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
+import 'package:mongo_dart/mongo_dart.dart' hide Field;
+import 'package:mongo_dart/mongo_dart.dart' as mg;
 
 import 'entity.dart';
 
@@ -12,7 +13,7 @@ import 'entity.dart';
 class Record {
   final ObjectId id;
   final RecordMeta meta; // Aggregate组装得到,实际只存储Id
-  final List<Field> fields;
+  final Map<int, Field> fields;
 
   Record(this.id, this.meta, this.fields);
 
@@ -64,7 +65,7 @@ class Attribute {
 
   // 用户输入值
   Field onSet(String value) {
-    return onInput(Field.of(k, value));
+    return onInput(Field.of(value));
   }
 
   // 先检查后输入

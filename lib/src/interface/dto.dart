@@ -5,42 +5,44 @@ import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
 part 'dto.g.dart';
 
-///
+// extension ObjectIdDto on ObjectId {
+//   Map<String, dynamic> toJson() => {r"$oid": toHexString()};
+// }
+
 class RecordDto implements IDto {
-  // @JsonKey(name: "_id")
-  final String id;
-  final String metaId;
-  final List<Field> fields;
+// @JsonKey(name: "_id")
+  final ObjectId id;
+  final ObjectId metaId;
+  final Map<int, Field> fields;
 
   RecordDto(this.id, this.metaId, this.fields);
 
   factory RecordDto.fromDomain(
     ObjectId id,
     ObjectId metaId,
-    List<Field> fields,
+    Map<int, Field> fields,
   ) =>
-      RecordDto(id.toString(), metaId.toString(), fields);
+      RecordDto(id, metaId, fields);
 
-  // {id: 6227568dda2194cb3589f5d4, metaId: 6227568dda2194cb3589f5d5, 1: {v: 123, e: null}, 2: {v: aaa, e: null}}
+// {id: 6227568dda2194cb3589f5d4, metaId: 6227568dda2194cb3589f5d5, 1: {v: 123, e: null}, 2: {v: aaa, e: null}}
   factory RecordDto.fromJson(Map<String, dynamic> json) => RecordDto(
-      json.remove('_id') as String,
-      json.remove('metaId') as String,
-      json.entries.map((entry) {
-        // 普通字段
-        final js2 = (entry.value as Map<String, dynamic>);
-        return Field(
-          int.parse(entry.key),
-          js2['v'] as String,
-          js2['e'] as String?,
-        );
-      }).toList());
+          ObjectId.fromHexString(json.remove('_id')),
+          ObjectId.fromHexString(json.remove('metaId')), json.map((key, value) {
+        final js2 = (value as Map<String, dynamic>); // 动态字段
+        return MapEntry(
+            int.parse(key),
+            Field(
+              js2['v'] as String,
+              js2['e'] as String?,
+            ));
+      }));
 
   @override
   Map<String, dynamic> toJson() => {
-        "_id": id,
-        "metaId": metaId,
-      }..addEntries(
-          fields.map((e) => MapEntry("${e.k}", {"v": e.v, "e": e.e})));
+        "_id": id.toJson(),
+        "metaId": metaId.toJson(),
+      }..addEntries(fields.entries
+          .map((e) => MapEntry(e.key.toString(), e.value.toJson())));
 
   @override
   String toString() => toJson().toString();
