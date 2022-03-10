@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:mind_base/src/domain/value.dart';
+import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
 /// 函数 ========================================================================
 
@@ -9,7 +10,7 @@ import 'package:mind_base/src/domain/value.dart';
 // todo 方案B: 全局持久化: 不同的实现类都持久化为不同的文档,对于calc同一个类的不同实例,其id含义为"不同版本的函数标识"
 // todo feat A: 为Func添加 tag属性,便于用户自己查询使用,提供默认的sys函数tag,用户自己也可以创建私有函数tag;可能需要单独建立tag表,用于保存对应关系
 abstract class BaseFunc {
-  final String id; // id是有必要的,因为用户自己会定义函数,使得::name重复
+  final ObjectId id; // id是有必要的,因为用户自己会定义函数,使得::name重复
   final String name;
   final Set<FuncScope> scopes; // 函数适用范围
   final Range argsLenRange; // 函数参数个数, -1表示无限制
@@ -26,7 +27,7 @@ abstract class BaseFunc {
   );
 
   // 对输入参数进行检查
-  Field run(int k, List<Field> inputs) {
+  Field run(List<Field> inputs) {
     if (argsLenRange.inBound(inputs.length)) {
       return Field.err(
           "函数[$runtimeType]输入参数数量[${inputs.length}]过多,最多只能输入[$argsLenRange]个参数");
@@ -42,7 +43,7 @@ abstract class BaseFunc {
 class NoneFunc extends BaseFunc {
   NoneFunc()
       : super(
-          "6226adf527b60ea31165e4e3",
+          ObjectId.fromHexString("6226adf527b60ea31165e4e3"),
           'None',
           {FuncScope.input, FuncScope.check, FuncScope.output},
           const Range.equal(1),

@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' hide Field;
-import 'package:mongo_dart/mongo_dart.dart' as mg;
 
 import 'entity.dart';
 
@@ -17,7 +16,7 @@ class Record {
 
   Record(this.id, this.meta, this.fields);
 
-  RecordDto toDto() => RecordDto.fromDomain(id, meta.id, fields);
+  RecordDto toDto() => RecordDto.fromDomain(this);
 }
 
 /// Meta信心
@@ -40,8 +39,7 @@ class RecordMeta {
     return RecordMeta(id, name, memo, nextKey(), attributes..add(attr));
   }
 
-  RecordMetaDto toDto() => RecordMetaDto.fromDomain(
-      id, name, memo, maxKey, attributes.map((a) => a.toDto()).toList());
+  RecordMetaDto toDto() => RecordMetaDto.fromDomain(this);
 }
 
 class Attribute {
@@ -52,16 +50,16 @@ class Attribute {
   // todo 读写权限等..
 
   // Func的默认值应当为 NoneFunc
-  final BaseFunc _inputFunc; // 预处理函数,可以用于设置默认值
-  final BaseFunc _checkFunc; // 校验函数, 如果出错则会将错误信息记录到e字段中
-  final BaseFunc _outputFunc; // 输出函数,
+  final BaseFunc inputFunc; // 预处理函数,可以用于设置默认值
+  final BaseFunc checkFunc; // 校验函数, 如果出错则会将错误信息记录到e字段中
+  final BaseFunc outputFunc; // 输出函数,
 
-  Attribute(this.k, this.name, this.memo, this.type, this._inputFunc,
-      this._checkFunc, this._outputFunc);
+  Attribute(this.k, this.name, this.memo, this.type, this.inputFunc,
+      this.checkFunc, this.outputFunc);
 
   // 检查当前函数值是否合法
   @protected
-  Field onCheck(Field f) => _checkFunc.run(k, [f]);
+  Field onCheck(Field f) => checkFunc.run( [f]);
 
   // 用户输入值
   Field onSet(String value) {
@@ -72,16 +70,15 @@ class Attribute {
   // Filed f 一般来自其他列,因此这里使用自带的 ::k
   Field onInput(Field f) {
     final r = onCheck(f);
-    return _inputFunc.run(k, [r]);
+    return inputFunc.run( [r]);
   }
 
   // 先输出后检查
   // 输出当前函数值(进行一些转换),最后进行检查
   Field onOutput(Field f) {
-    final r = _outputFunc.run(k, [f]);
+    final r = outputFunc.run( [f]);
     return onCheck(r);
   }
 
-  AttributeDto toDto() => AttributeDto(
-      k, name, memo, type, _inputFunc.id, _checkFunc.id, _outputFunc.id);
+  AttributeDto toDto() => AttributeDto.ofDomain(this);
 }

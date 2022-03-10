@@ -1,28 +1,34 @@
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:mind_base/src/domain/aggreagate.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
-
-part 'dto.g.dart';
 
 // extension ObjectIdDto on ObjectId {
 //   Map<String, dynamic> toJson() => {r"$oid": toHexString()};
 // }
+/// 实体类对应的Dto需要实现本类, 并添加`_id`字段/get方法
+abstract class IMongoEntityDto implements IMongoDto {
+  ObjectId get _id;
+}
 
-class RecordDto implements IDto {
-// @JsonKey(name: "_id")
+/// 普通的携带有ObjectId字段的Dto需要实现本类
+abstract class IMongoDto implements IDto {
+  // 返回的结果与json的Map相似,但 id是 ObjectId类型,而不是String
+  Map<String, dynamic> toMongoDto();
+}
+
+class RecordDto implements IDto, IMongoEntityDto {
+  @override
+  ObjectId get _id => id;
   final ObjectId id;
   final ObjectId metaId;
   final Map<int, Field> fields;
 
   RecordDto(this.id, this.metaId, this.fields);
 
-  factory RecordDto.fromDomain(
-    ObjectId id,
-    ObjectId metaId,
-    Map<int, Field> fields,
-  ) =>
-      RecordDto(id, metaId, fields);
+  factory RecordDto.fromDomain(Record record) =>
+      RecordDto(record.id, record.meta.id, record.fields);
 
 // {id: 6227568dda2194cb3589f5d4, metaId: 6227568dda2194cb3589f5d5, 1: {v: 123, e: null}, 2: {v: aaa, e: null}}
   factory RecordDto.fromJson(Map<String, dynamic> json) => RecordDto(
@@ -39,70 +45,118 @@ class RecordDto implements IDto {
 
   @override
   Map<String, dynamic> toJson() => {
-        "_id": id.toJson(),
+        "_id": _id.toJson(),
         "metaId": metaId.toJson(),
       }..addEntries(fields.entries
           .map((e) => MapEntry(e.key.toString(), e.value.toJson())));
 
   @override
   String toString() => toJson().toString();
+
+  // 适配 MongoDart的ObjectId
+  @override
+  Map<String, dynamic> toMongoDto() => toJson()
+    ..['_id'] = _id
+    ..['metaId'] = metaId;
 }
 
 /// 表头属性
-@JsonSerializable()
-class RecordMetaDto {
-  @JsonKey(name: "_id")
-  final String id;
-  @JsonKey()
+class RecordMetaDto with IMongoEntityDto {
+  @override
+  final ObjectId _id;
   final String name;
-  @JsonKey()
   final String memo;
-  @JsonKey()
   final int maxKey; // 等于Table中出现过key的数量, 用于新增Attr,只能增加
-  @JsonKey()
   final List<AttributeDto> attributes;
 
-  RecordMetaDto(this.id, this.name, this.memo, this.maxKey, this.attributes);
+  RecordMetaDto(this._id, this.name, this.memo, this.maxKey, this.attributes);
 
-  factory RecordMetaDto.fromDomain(
-    ObjectId id,
-    String name,
-    String memo,
-    int maxKey,
-    List<AttributeDto> attributes,
-  ) =>
-      RecordMetaDto(id.toString(), name, memo, maxKey, attributes);
+  factory RecordMetaDto.fromDomain(RecordMeta meta) => RecordMetaDto(
+      meta.id,
+      meta.name,
+      meta.memo,
+      meta.maxKey,
+      meta.attributes.map((e) => e.toDto()).toList());
 
-  factory RecordMetaDto.fromJson(Map<String, dynamic> json) =>
-      _$RecordMetaDtoFromJson(json);
+  factory RecordMetaDto.fromJson(Map<String, dynamic> json) => RecordMetaDto(
+        ObjectId.fromHexString(json['_id'] as String),
+        json['name'] as String,
+        json['memo'] as String,
+        json['maxKey'] as int,
+        (json['attributes'] as List<dynamic>)
+            .map((e) => AttributeDto.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
 
-  Map<String, dynamic> toJson() => _$RecordMetaDtoToJson(this);
+  @override
+  Map<String, dynamic> toJson() => {
+        '_id': _id.toHexString(),
+        'name': name,
+        'memo': memo,
+        'maxKey': maxKey,
+        'attributes': attributes.map((e) => e.toJson()).toList(),
+      };
+
+  @override
+  Map<String, dynamic> toMongoDto() => toJson()..['_id'] = _id;
 }
 
 /// 表头/属性: 关系/表的一列叫属性
 @JsonSerializable()
-class AttributeDto {
-  @JsonKey()
+class AttributeDto implements IMongoDto {
   final int k; // 表头key,对应Field:k,需要从所在的TableMeat中获取
-  @JsonKey()
   final String name; // 表头名称
-  @JsonKey()
   final String memo; // 表头备注
-  @JsonKey()
   final AttrType type;
 
-  @JsonKey()
-  final String inputFuncId;
-  @JsonKey()
-  final String checkFuncId;
-  @JsonKey()
-  final String outputFuncId;
+  final ObjectId inputFuncId;
+  final ObjectId checkFuncId;
+  final ObjectId outputFuncId;
 
-  AttributeDto(this.k, this.name, this.memo, this.type, this.inputFuncId,
-      this.checkFuncId, this.outputFuncId);
+  AttributeDto.ofDomain(Attribute attr)
+      : this(
+            k: attr.k,
+            name: attr.name,
+            memo: attr.memo,
+            type: attr.type,
+            inputFuncId: attr.inputFunc.id,
+            checkFuncId: attr.checkFunc.id,
+            outputFuncId: attr.outputFunc.id);
 
-  factory AttributeDto.fromJson(Map<String, dynamic> json) =>
-      _$AttributeDtoFromJson(json);
+  AttributeDto({
+    required this.k,
+    required this.name,
+    required this.memo,
+    required this.type,
+    required this.inputFuncId,
+    required this.checkFuncId,
+    required this.outputFuncId,
+  });
 
-  Map<String, dynamic> toJson() => _$AttributeDtoToJson(this);
+  factory AttributeDto.fromJson(Map<String, dynamic> json) => AttributeDto(
+        k: json['k'] as int,
+        name: json['name'] as String,
+        memo: json['memo'] as String,
+        type: AttrType.values.asNameMap()['type']!,
+        inputFuncId: ObjectId.fromHexString(json['inputFuncId'] as String),
+        checkFuncId: ObjectId.fromHexString(json['checkFuncId'] as String),
+        outputFuncId: ObjectId.fromHexString(json['outputFuncId'] as String),
+      );
+
+  @override
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'k': k,
+        'name': name,
+        'memo': memo,
+        'type': type.name,
+        'inputFuncId': inputFuncId,
+        'checkFuncId': checkFuncId,
+        'outputFuncId': outputFuncId,
+      };
+
+  @override
+  Map<String, dynamic> toMongoDto() => toJson()
+    ..['inputFuncId'] = inputFuncId
+    ..['checkFuncId'] = checkFuncId
+    ..['outputFuncId'] = outputFuncId;
 }
