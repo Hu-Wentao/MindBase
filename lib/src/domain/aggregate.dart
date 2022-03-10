@@ -14,7 +14,11 @@ class Record {
   final RecordMeta meta; // Aggregate组装得到,实际只存储Id
   final Map<int, Field> fields;
 
-  Record(this.id, this.meta, this.fields);
+  Record({
+    required this.id,
+    required this.meta,
+    required this.fields,
+  });
 
   RecordDto toDto() => RecordDto.fromDomain(this);
 }
@@ -27,7 +31,13 @@ class RecordMeta {
   final String memo;
   final int maxKey; // 等于Table中出现过key的数量, 用于新增Attr,只能增加
   final List<Attribute> attributes; // 表头
-  const RecordMeta(this.id, this.name, this.memo, this.maxKey, this.attributes);
+  const RecordMeta({
+    required this.id,
+    required this.name,
+    required this.memo,
+    required this.maxKey,
+    required this.attributes,
+  });
 
   int nextKey() => maxKey + 1;
 
@@ -36,7 +46,13 @@ class RecordMeta {
     if (attr.k != nextKey()) {
       throw "逻辑异常! 新增的Attr::k[${attr.k}] 不等于table[$name]的maxKey[$maxKey]+1";
     }
-    return RecordMeta(id, name, memo, nextKey(), attributes..add(attr));
+    return RecordMeta(
+      id: id,
+      name: name,
+      memo: memo,
+      maxKey: nextKey(),
+      attributes: attributes..add(attr),
+    );
   }
 
   RecordMetaDto toDto() => RecordMetaDto.fromDomain(this);
@@ -54,8 +70,15 @@ class Attribute {
   final BaseFunc checkFunc; // 校验函数, 如果出错则会将错误信息记录到e字段中
   final BaseFunc outputFunc; // 输出函数,
 
-  Attribute(this.k, this.name, this.memo, this.type, this.inputFunc,
-      this.checkFunc, this.outputFunc);
+  Attribute({
+    required this.k,
+    required this.name,
+    required this.memo,
+    required this.type,
+    required this.inputFunc,
+    required this.checkFunc,
+    required this.outputFunc,
+  });
 
   // 检查当前函数值是否合法
   @protected
