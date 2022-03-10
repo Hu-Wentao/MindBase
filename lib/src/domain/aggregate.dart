@@ -59,7 +59,7 @@ class Attribute {
 
   // 检查当前函数值是否合法
   @protected
-  Field onCheck(Field f) => checkFunc.run( [f]);
+  Field onCheck(Field f) => checkFunc.run([f]);
 
   // 用户输入值
   Field onSet(String value) {
@@ -70,13 +70,13 @@ class Attribute {
   // Filed f 一般来自其他列,因此这里使用自带的 ::k
   Field onInput(Field f) {
     final r = onCheck(f);
-    return inputFunc.run( [r]);
+    return inputFunc.run([r]);
   }
 
   // 先输出后检查
   // 输出当前函数值(进行一些转换),最后进行检查
   Field onOutput(Field f) {
-    final r = outputFunc.run( [f]);
+    final r = outputFunc.run([f]);
     return onCheck(r);
   }
 
