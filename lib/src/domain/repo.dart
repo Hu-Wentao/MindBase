@@ -50,11 +50,9 @@ class RecordRepo {
   /// 重点测试
   Stream<Record> watchAllByMeta(ObjectId metaId) async* {
     final sync = await mongoStorage.asyncDb;
-    // RecordMetaDto metaDto = (await RecordMetaAccessor(sync).findById(metaId))!;
-    RecordMetaAccessor(sync).watchById(metaId).map((metaDto) => RecordAccessor(
-            sync)
-        .watchAllByMetaId(metaId)
-        .map((rcd) => rcd.toDomain(metaDto.toDomain(
+    RecordMetaAccessor(sync).watchById(metaId).asyncExpand((metaDto) =>
+        RecordAccessor(sync).watchAllByMetaId(metaId).map((rcd) =>
+            rcd.toDomain(metaDto.toDomain(
               metaDto.attributes
                   .map((e) => e.toDomain(FuncManager.findBy(e.checkFuncName)))
                   .toList(),
