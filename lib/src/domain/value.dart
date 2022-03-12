@@ -37,6 +37,9 @@ enum AttrType {
 
 @JsonSerializable()
 class Range {
+  static const one = Range.equal(1);
+  static const two = Range.equal(2);
+
   @JsonKey()
   final int min;
   @JsonKey()

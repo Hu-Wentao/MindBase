@@ -1,16 +1,45 @@
 # mind_base
+## 函数设计
+### 要求
+- 能够通过参数组合`基本函数`,创造新函数,实现 元组(对象)的方法
+- `FunWrap` 对`基本函数`,`云函数等进行包装`,
+  - 可以展示函数执行进度
 
-A new Flutter project.
 
-## Getting Started
+### 实现
+- 创建一些基本功能的函数,如 `add`, `sub`, `mul`, `div`
+### 基本函数的内容
+- 入参类型, 数量
+- 出参类型(只有一个)
+- 函数ID: 类比"包名", 避免函数名冲突的情况
+- 函数名称: 调用时的名称
+- run 方法: 实现函数的具体功能
 
-This project is a starting point for a Flutter application.
+### 基本函数枚举
+- ADD
+- SUB
+- MUL
+- DIV
+- MAX
+- MIN
 
-A few resources to get you started if this is your first Flutter project:
+### 持久化
+#### 函数是没有状态, 持久化的意义是?
+- 不是持久化函数, 而是持久化一个方法, 内容包括一个函数运行的固定参数,
+  - 如 正则表达式方法,在某个关系(类)中,持久化的内容包括`regex`,`参数所在Attr`,等等
+  - 如 云函数方法, 
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+### 状态
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 设计方案2
+
+### 函数的处理
+- 程序内部构建无状态的纯函数, 如 `add`, `sub`, 特别是 `SHELL`, `HTTP_REQ`, `GRPC_CALL`, 等扩展性极强的特性
+- 添加逻辑控制函数, 如 `FOR`等等, 参考 `函数式编程`
+
+### 方法的处理(有状态的函数)
+- 新增一个 FUNC类型(与number等平行), 可以传入外部的参数,类比一个 实例的方法,可以从外部接收参数,并返回值
+
+

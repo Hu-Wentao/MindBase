@@ -1,7 +1,7 @@
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
-import 'package:mind_base/src/domain/entity.dart';
+import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
