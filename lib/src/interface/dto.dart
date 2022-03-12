@@ -1,5 +1,4 @@
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
@@ -24,7 +23,7 @@ class RecordDto implements IDto, IMongoEntityDto {
   ObjectId get _id => id;
   final ObjectId id;
   final ObjectId metaId;
-  final Map<int, Field> fields;
+  final Map<int, Value> fields;
 
   RecordDto(this.id, this.metaId, this.fields);
 
@@ -38,7 +37,7 @@ class RecordDto implements IDto, IMongoEntityDto {
         final js2 = (value as Map<String, dynamic>); // 动态字段
         return MapEntry(
             int.parse(key),
-            Field(
+            Value(
               js2['v'] as String,
               js2['e'] as String?,
             ));
@@ -57,7 +56,7 @@ class RecordDto implements IDto, IMongoEntityDto {
         final js2 = (value as Map<String, dynamic>); // 动态字段
         return MapEntry(
             int.parse(key),
-            Field(
+            Value(
               js2['v'] as String,
               js2['e'] as String?,
             ));
@@ -147,7 +146,6 @@ class RecordMetaDto with IMongoEntityDto {
 }
 
 /// 表头/属性: 关系/表的一列叫属性
-@JsonSerializable()
 class AttributeDto extends IMongoDto {
   final int k; // 表头key,对应Field:k,需要从所在的TableMeat中获取
   final String name; // 表头名称

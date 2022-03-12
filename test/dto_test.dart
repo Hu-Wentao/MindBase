@@ -10,9 +10,9 @@ main() {
     final dto = RecordDto(
         ObjectId.fromHexString('62275a65418db3d74941d6b3'),
         ObjectId.fromHexString('62275a65418db3d74941d6b4'), {
-      1: Field.of('123'),
-      2: Field.of('aaa'),
-      3: Field.of('ccc'),
+      1: Value.of('123'),
+      2: Value.of('aaa'),
+      3: Value.of('ccc'),
     });
 
     final js = dto.toJson();

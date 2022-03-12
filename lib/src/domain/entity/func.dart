@@ -128,7 +128,7 @@ abstract class IFunc {
 //   name: 'None',
 //   // {FuncScope.input, FuncScope.check, FuncScope.output},
 //   pRange: Range.one,
-//   pType: AttrType.any,
+//   pTypes: AttrType.any,
 //   rType: AttrType.any,
 //   onRun: (List<Field> params) => params.first,
 // );
@@ -137,7 +137,7 @@ abstract class IFunc {
 //     id: ObjectId(),
 //     name: "ADD",
 //     pRange: Range.one,
-//     pType: AttrType.number,
+//     pTypes: AttrType.number,
 //     rType: AttrType.number,
 //     onRun: (p) => Field(p.first, e)
 // )

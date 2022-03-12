@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' hide Field;
@@ -12,7 +11,7 @@ import 'entity/func.dart';
 class Record {
   final ObjectId id;
   final RecordMeta meta; // Aggregate组装得到,实际只存储Id
-  final Map<int, Field> fields;
+  final Map<int, Value> fields;
 
   Record({
     required this.id,
@@ -80,28 +79,28 @@ class Attribute {
     required this.outputFunc,
   });
 
-  // 检查当前函数值是否合法
-  @protected
-  Field onCheck(Field f) => checkFunc.run([f]);
-
-  // 用户输入值
-  Field onSet(String value) {
-    return onInput(Field.of(value));
-  }
-
-  // 先检查后输入
-  // Filed f 一般来自其他列,因此这里使用自带的 ::k
-  Field onInput(Field f) {
-    final r = onCheck(f);
-    return inputFunc.run([r]);
-  }
-
-  // 先输出后检查
-  // 输出当前函数值(进行一些转换),最后进行检查
-  Field onOutput(Field f) {
-    final r = outputFunc.run([f]);
-    return onCheck(r);
-  }
+  // // 检查当前函数值是否合法
+  // @protected
+  // Field onCheck(Field f) => checkFunc.run([f]);
+  //
+  // // 用户输入值
+  // Field onSet(String value) {
+  //   return onInput(Field.of(value));
+  // }
+  //
+  // // 先检查后输入
+  // // Filed f 一般来自其他列,因此这里使用自带的 ::k
+  // Field onInput(Field f) {
+  //   final r = onCheck(f);
+  //   return inputFunc.run([r]);
+  // }
+  //
+  // // 先输出后检查
+  // // 输出当前函数值(进行一些转换),最后进行检查
+  // Field onOutput(Field f) {
+  //   final r = outputFunc.run([f]);
+  //   return onCheck(r);
+  // }
 
   AttributeDto toDto() => AttributeDto.ofDomain(this);
 }
