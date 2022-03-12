@@ -20,8 +20,20 @@ class RecordAccessor extends IMongoAccessor<RecordDto> {
       .collection(collectionName)
       .findOne(where.id(id))
       .then((value) => value == null ? null : RecordDto.fromMongoJson(value));
+
+  Future<List<RecordDto>> findAllByMetaId(ObjectId metaId) => db
+      .collection(collectionName)
+      .find(where.eq('metaId', metaId))
+      .map((event) => RecordDto.fromMongoJson(event))
+      .toList();
+
+  Stream<RecordDto> watchAllByMetaId(ObjectId metaId) => db
+      .collection(collectionName)
+      .watch(where.eq('metaId', metaId))
+      .map((event) => RecordDto.fromMongoJson(event));
 }
 
+/// 即Schema
 class RecordMetaAccessor extends IMongoAccessor<RecordMetaDto> {
   RecordMetaAccessor(this.db);
 
@@ -33,6 +45,12 @@ class RecordMetaAccessor extends IMongoAccessor<RecordMetaDto> {
   Future<RecordMetaDto?> findById(ObjectId id) =>
       db.collection(collectionName).findOne(where.id(id)).then(
           (value) => value == null ? null : RecordMetaDto.fromMongoJson(value));
+
+  Stream<RecordMetaDto> watchById(ObjectId id) => db
+      .collection(collectionName)
+      .watch(where.id(id))
+      .where((event) => event != null)
+      .map((value) => RecordMetaDto.fromMongoJson(value));
 }
 
 // class BaseFuncAccessor extends IMongoAccessor<FuncWrap> {
