@@ -1,6 +1,7 @@
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:mind_base/src/domain/aggreagate.dart';
+import 'package:mind_base/src/domain/aggregate.dart';
+import 'package:mind_base/src/domain/entity.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
@@ -70,6 +71,12 @@ class RecordDto implements IDto, IMongoEntityDto {
 
   @override
   String toString() => toJson().toString();
+
+  Record toDomain(RecordMeta m) => Record(
+        id: id,
+        meta: m,
+        fields: fields,
+      );
 }
 
 /// 表头属性
@@ -129,6 +136,14 @@ class RecordMetaDto with IMongoEntityDto {
 
   @override
   Map<String, dynamic> toMongoDto() => toJson()..['_id'] = _id;
+
+  RecordMeta toDomain(List<Attribute> attrs) => RecordMeta(
+        id: id,
+        name: name,
+        memo: memo,
+        maxKey: maxKey,
+        attributes: attrs,
+      );
 }
 
 /// 表头/属性: 关系/表的一列叫属性
@@ -201,4 +216,19 @@ class AttributeDto extends IMongoDto {
     ..['inputFuncId'] = inputFuncId
     ..['checkFuncId'] = checkFuncId
     ..['outputFuncId'] = outputFuncId;
+
+  Attribute toDomain(
+    IFunc input,
+    IFunc check,
+    IFunc output,
+  ) =>
+      Attribute(
+        k: k,
+        name: name,
+        memo: memo,
+        type: type,
+        inputFunc: input,
+        checkFunc: check,
+        outputFunc: output,
+      );
 }
