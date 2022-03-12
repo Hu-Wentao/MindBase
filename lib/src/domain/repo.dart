@@ -47,15 +47,17 @@ class RecordRepo {
       });
 
   /// 通过MetaId监视聚合根的所有记录对应的实例的变更
+  /// 重点测试
   Stream<Record> watchAllByMeta(ObjectId metaId) async* {
     final sync = await mongoStorage.asyncDb;
-    RecordMetaDto metaDto = (await RecordMetaAccessor(sync).findById(metaId))!;
-    yield* RecordAccessor(sync)
+    // RecordMetaDto metaDto = (await RecordMetaAccessor(sync).findById(metaId))!;
+    RecordMetaAccessor(sync).watchById(metaId).map((metaDto) => RecordAccessor(
+            sync)
         .watchAllByMetaId(metaId)
         .map((rcd) => rcd.toDomain(metaDto.toDomain(
               metaDto.attributes
                   .map((e) => e.toDomain(FuncManager.findBy(e.checkFuncName)))
                   .toList(),
-            )));
+            ))));
   }
 }
