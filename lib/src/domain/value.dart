@@ -57,7 +57,7 @@ class Value with ITypeMx {
 
   Value(this.v, this.e);
 
-  Value.of(this.v, [this.e]);
+  Value.of(dynamic v, [this.e]):v = "$v";
 
   Value.err(String? e) : this.of("", e);
 
