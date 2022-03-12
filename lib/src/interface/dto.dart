@@ -4,9 +4,6 @@ import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
-// extension ObjectIdDto on ObjectId {
-//   Map<String, dynamic> toJson() => {r"$oid": toHexString()};
-// }
 /// 实体类对应的Dto需要实现本类, 并添加`_id`字段/get方法
 abstract class IMongoEntityDto implements IMongoDto {
   ObjectId get _id;
@@ -129,7 +126,7 @@ class RecordMetaDto with IMongoEntityDto {
           memo: mJs['memo'] as String,
           maxKey: mJs['maxKey'] as int,
           attributes: (mJs['attributes'] as List<dynamic>)
-              .map((e) => AttributeDto.fromMongoJson(e as Map<String, dynamic>))
+              .map((e) => AttributeDto.fromJson(e as Map<String, dynamic>))
               .toList(),
         );
 
@@ -146,34 +143,35 @@ class RecordMetaDto with IMongoEntityDto {
 }
 
 /// 表头/属性: 关系/表的一列叫属性
-class AttributeDto extends IMongoDto {
+class AttributeDto implements IDto {
   final int k; // 表头key,对应Field:k,需要从所在的TableMeat中获取
   final String name; // 表头名称
   final String memo; // 表头备注
   final AttrType type;
 
-  final ObjectId inputFuncId;
-  final ObjectId checkFuncId;
-  final ObjectId outputFuncId;
+  final String inputFuncName;
+  final String checkFuncName;
+  final String outputFuncName;
 
   AttributeDto.ofDomain(Attribute attr)
       : this(
-            k: attr.k,
-            name: attr.name,
-            memo: attr.memo,
-            type: attr.type,
-            inputFuncId: attr.inputFunc.id,
-            checkFuncId: attr.checkFunc.id,
-            outputFuncId: attr.outputFunc.id);
+          k: attr.k,
+          name: attr.name,
+          memo: attr.memo,
+          type: attr.type,
+          inputFuncName: attr.inputFunc.name,
+          checkFuncName: attr.checkFunc.name,
+          outputFuncName: attr.outputFunc.name,
+        );
 
   AttributeDto({
     required this.k,
     required this.name,
     required this.memo,
     required this.type,
-    required this.inputFuncId,
-    required this.checkFuncId,
-    required this.outputFuncId,
+    required this.inputFuncName,
+    required this.checkFuncName,
+    required this.outputFuncName,
   });
 
   AttributeDto.fromJson(Map<String, dynamic> json)
@@ -182,9 +180,9 @@ class AttributeDto extends IMongoDto {
           name: json['name'] as String,
           memo: json['memo'] as String,
           type: AttrType.values.asNameMap()['type']!,
-          inputFuncId: ObjectId.fromHexString(json['inputFuncId'] as String),
-          checkFuncId: ObjectId.fromHexString(json['checkFuncId'] as String),
-          outputFuncId: ObjectId.fromHexString(json['outputFuncId'] as String),
+          inputFuncName: json['inputFuncName'] as String,
+          checkFuncName: json['checkFuncName'] as String,
+          outputFuncName: json['outputFuncName'] as String,
         );
 
   @override
@@ -193,32 +191,15 @@ class AttributeDto extends IMongoDto {
         'name': name,
         'memo': memo,
         'type': type.name,
-        'inputFuncId': inputFuncId,
-        'checkFuncId': checkFuncId,
-        'outputFuncId': outputFuncId,
+        'inputFuncName': inputFuncName,
+        'checkFuncName': checkFuncName,
+        'outputFuncName': outputFuncName,
       };
 
-  AttributeDto.fromMongoJson(Map<String, dynamic> mJs)
-      : this(
-          k: mJs['k'] as int,
-          name: mJs['name'] as String,
-          memo: mJs['memo'] as String,
-          type: AttrType.values.asNameMap()['type']!,
-          inputFuncId: mJs['inputFuncId'] as ObjectId,
-          checkFuncId: mJs['checkFuncId'] as ObjectId,
-          outputFuncId: mJs['outputFuncId'] as ObjectId,
-        );
-
-  @override
-  Map<String, dynamic> toMongoDto() => toJson()
-    ..['inputFuncId'] = inputFuncId
-    ..['checkFuncId'] = checkFuncId
-    ..['outputFuncId'] = outputFuncId;
-
   Attribute toDomain(
-    IFunc input,
-    IFunc check,
-    IFunc output,
+    Func input,
+    Func check,
+    Func output,
   ) =>
       Attribute(
         k: k,
@@ -229,34 +210,4 @@ class AttributeDto extends IMongoDto {
         checkFunc: check,
         outputFunc: output,
       );
-}
-
-class FuncDto extends IMongoDto implements IFunc {
-  @override
-  final ObjectId id;
-  @override
-  final String name;
-  @override
-  final FunType type;
-  @override
-  final Range pRange;
-  @override
-  final AttrType pType;
-  @override
-  final AttrType rType;
-
-  FuncDto(this.id, this.name, this.type, this.pRange, this.pType, this.rType);
-
-  @override
-  Map<String, dynamic> toJson() => {
-        "_id": id.toJson(),
-        "name": name,
-        "type": type.name,
-        "pRange": pRange.toJson(),
-        "pType": pType.name,
-        "rType": rType.name,
-      };
-
-  @override
-  Map<String, dynamic> toMongoDto() => toJson()..["_id"] = id;
 }

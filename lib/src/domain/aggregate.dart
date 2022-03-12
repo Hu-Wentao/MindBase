@@ -1,3 +1,4 @@
+import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' hide Field;
@@ -65,9 +66,9 @@ class Attribute {
   // todo 读写权限等..
 
   // Func的默认值应当为 NoneFunc
-  final IFunc inputFunc; // 预处理函数,可以用于设置默认值
-  final IFunc checkFunc; // 校验函数, 如果出错则会将错误信息记录到e字段中
-  final IFunc outputFunc; // 输出函数,
+  final Func inputFunc; // 预处理函数,可以用于设置默认值
+  final Func checkFunc; // 校验函数, 如果出错则会将错误信息记录到e字段中
+  final Func outputFunc; // 输出函数,
 
   Attribute({
     required this.k,
