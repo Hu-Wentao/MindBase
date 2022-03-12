@@ -232,3 +232,33 @@ class AttributeDto extends IMongoDto {
         outputFunc: output,
       );
 }
+
+class FuncDto extends IMongoDto implements IFunc {
+  @override
+  final ObjectId id;
+  @override
+  final String name;
+  @override
+  final FunType type;
+  @override
+  final Range pRange;
+  @override
+  final AttrType pType;
+  @override
+  final AttrType rType;
+
+  FuncDto(this.id, this.name, this.type, this.pRange, this.pType, this.rType);
+
+  @override
+  Map<String, dynamic> toJson() => {
+        "_id": id.toJson(),
+        "name": name,
+        "type": type.name,
+        "pRange": pRange.toJson(),
+        "pType": pType.name,
+        "rType": rType.name,
+      };
+
+  @override
+  Map<String, dynamic> toMongoDto() => toJson()..["_id"] = id;
+}
