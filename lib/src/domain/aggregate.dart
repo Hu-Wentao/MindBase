@@ -66,18 +66,14 @@ class Attribute {
   // todo 读写权限等..
 
   // Func的默认值应当为 NoneFunc
-  final Func inputFunc; // 预处理函数,可以用于设置默认值
-  final Func checkFunc; // 校验函数, 如果出错则会将错误信息记录到e字段中
-  final Func outputFunc; // 输出函数,
+  final Func check; // 校验函数, 如果出错则会将错误信息记录到e字段中
 
   Attribute({
     required this.k,
     required this.name,
     required this.memo,
     required this.type,
-    required this.inputFunc,
-    required this.checkFunc,
-    required this.outputFunc,
+    required this.check,
   });
 
   // // 检查当前函数值是否合法

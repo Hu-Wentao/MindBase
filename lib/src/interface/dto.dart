@@ -144,14 +144,11 @@ class RecordMetaDto with IMongoEntityDto {
 
 /// 表头/属性: 关系/表的一列叫属性
 class AttributeDto implements IDto {
-  final int k; // 表头key,对应Field:k,需要从所在的TableMeat中获取
-  final String name; // 表头名称
-  final String memo; // 表头备注
+  final int k;
+  final String name;
+  final String memo;
   final AttrType type;
-
-  final String inputFuncName;
   final String checkFuncName;
-  final String outputFuncName;
 
   AttributeDto.ofDomain(Attribute attr)
       : this(
@@ -159,9 +156,7 @@ class AttributeDto implements IDto {
           name: attr.name,
           memo: attr.memo,
           type: attr.type,
-          inputFuncName: attr.inputFunc.name,
-          checkFuncName: attr.checkFunc.name,
-          outputFuncName: attr.outputFunc.name,
+          checkFuncName: attr.check.name,
         );
 
   AttributeDto({
@@ -169,9 +164,7 @@ class AttributeDto implements IDto {
     required this.name,
     required this.memo,
     required this.type,
-    required this.inputFuncName,
     required this.checkFuncName,
-    required this.outputFuncName,
   });
 
   AttributeDto.fromJson(Map<String, dynamic> json)
@@ -180,9 +173,7 @@ class AttributeDto implements IDto {
           name: json['name'] as String,
           memo: json['memo'] as String,
           type: AttrType.values.asNameMap()['type']!,
-          inputFuncName: json['inputFuncName'] as String,
           checkFuncName: json['checkFuncName'] as String,
-          outputFuncName: json['outputFuncName'] as String,
         );
 
   @override
@@ -191,23 +182,17 @@ class AttributeDto implements IDto {
         'name': name,
         'memo': memo,
         'type': type.name,
-        'inputFuncName': inputFuncName,
         'checkFuncName': checkFuncName,
-        'outputFuncName': outputFuncName,
       };
 
   Attribute toDomain(
-    Func input,
     Func check,
-    Func output,
   ) =>
       Attribute(
         k: k,
         name: name,
         memo: memo,
         type: type,
-        inputFunc: input,
-        checkFunc: check,
-        outputFunc: output,
+        check: check,
       );
 }
