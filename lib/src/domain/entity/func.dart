@@ -32,6 +32,8 @@ class Func {
 
 /// todo 添加test, 1.检查name唯一性, 2检查参数转换是否正常
 class FuncManager {
+  static get noneFuncName => "none";
+
   static Iterable<Func> get funcList =>
       methodMap.values.expand((element) => element);
 
