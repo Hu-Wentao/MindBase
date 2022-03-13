@@ -59,6 +59,12 @@ class FuncManager {
 /// 类型检查与转换表达式, 检查/转换失败则抛出异常
 final anyFunList = [
   Func(
+    name: 'none',
+    pTypes: [AttrType.any],
+    rType: AttrType.any,
+    onRun: (p) => p[0],
+  ),
+  Func(
       name: "toStr",
       pTypes: [AttrType.any],
       rType: AttrType.string,
