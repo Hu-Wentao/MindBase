@@ -89,10 +89,16 @@ class SchemaRepo {
         .map((event) => event.toDm(_attrDtoToAttr));
   }
 
-  void insert(RecordMeta entity) async {
-    await mongoStorage.withSyncAsync((sync) async {
-      RecordMetaDto metaDto = entity.toDto();
-      await RecordMetaAccessor(sync).insert(metaDto);
-    });
+  Future<void> insert(RecordMeta entity) async =>
+      await mongoStorage.withSyncAsync((sync) async {
+        RecordMetaDto metaDto = entity.toDto();
+        await RecordMetaAccessor(sync).insert(metaDto);
+      });
+
+  Stream<RecordMeta> watchAll() async* {
+    final sync = await mongoStorage.asyncDb;
+    yield* RecordMetaAccessor(sync)
+        .watchAll()
+        .map((event) => event.toDm(_attrDtoToAttr));
   }
 }
