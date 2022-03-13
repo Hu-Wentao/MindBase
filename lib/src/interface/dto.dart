@@ -6,7 +6,7 @@ import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
 /// 实体类对应的Dto需要实现本类, 并添加`_id`字段/get方法
 abstract class IMongoEntityDto implements IMongoDto {
-  ObjectId get _id;
+  ObjectId get id;
 }
 
 /// 普通的携带有ObjectId字段的Dto需要实现本类
@@ -17,7 +17,6 @@ abstract class IMongoDto implements IDto {
 
 class RecordDto implements IDto, IMongoEntityDto {
   @override
-  ObjectId get _id => id;
   final ObjectId id;
   final ObjectId metaId;
   final Map<int, Value> fields;
@@ -42,7 +41,7 @@ class RecordDto implements IDto, IMongoEntityDto {
 
   @override
   Map<String, dynamic> toJson() => {
-        "_id": _id.toJson(),
+        "_id": id.toJson(),
         "metaId": metaId.toJson(),
       }..addEntries(fields.entries
           .map((e) => MapEntry(e.key.toString(), e.value.toJson())));
@@ -62,7 +61,7 @@ class RecordDto implements IDto, IMongoEntityDto {
   // 适配 MongoDart的ObjectId
   @override
   Map<String, dynamic> toMongoDto() => toJson()
-    ..['_id'] = _id
+    ..['_id'] = id
     ..['metaId'] = metaId;
 
   @override
@@ -81,7 +80,6 @@ class RecordDto implements IDto, IMongoEntityDto {
 /// 表头属性
 class RecordMetaDto with IMongoEntityDto {
   @override
-  ObjectId get _id => id;
   final ObjectId id;
   final String name;
   final String memo;
@@ -115,7 +113,7 @@ class RecordMetaDto with IMongoEntityDto {
 
   @override
   Map<String, dynamic> toJson() => {
-        '_id': _id.toHexString(),
+        '_id': id.toHexString(),
         'name': name,
         'memo': memo,
         'maxKey': maxKey,
@@ -134,7 +132,7 @@ class RecordMetaDto with IMongoEntityDto {
         );
 
   @override
-  Map<String, dynamic> toMongoDto() => toJson()..['_id'] = _id;
+  Map<String, dynamic> toMongoDto() => toJson()..['_id'] = id;
 
   RecordMeta toDm(
     Attribute Function(AttributeDto dto) attrToDm,
