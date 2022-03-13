@@ -1,11 +1,24 @@
-import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/interface/dto.dart';
-import 'package:mongo_dart/mongo_dart.dart' show ObjectId, where, Db;
+import 'package:mongo_dart/mongo_dart.dart'
+    show ObjectId, where, Db, WriteResult;
 
 abstract class IMongoAccessor<T extends IMongoEntityDto> {
+  Db get db;
+
   String get collectionName;
 
   Future<T?> findById(ObjectId id);
+
+  // todo test 如果插入相同id的对象, 是否等同于更新?
+  // Future<void> insert(T dto);
+  Future<void> insert(T dto) async =>
+      await db.collection(collectionName).insertOne(dto.toMongoDto());
+
+  // Future<WriteResult> replace(T dto);
+  Future<WriteResult> replace(T dto) async => await db
+      .collection(collectionName)
+      .replaceOne(where.id(dto.id), dto.toMongoDto());
+// Future<T> replace(T dto);
 }
 
 class RecordAccessor extends IMongoAccessor<RecordDto> {
@@ -31,6 +44,17 @@ class RecordAccessor extends IMongoAccessor<RecordDto> {
       .collection(collectionName)
       .watch(where.eq('metaId', metaId))
       .map((event) => RecordDto.fromMongoJson(event));
+
+// @override
+// Future<void> insert(RecordDto dto) async =>
+//     await db.collection(collectionName).insertOne(dto.toMongoDto());
+
+// @override
+// Future<WriteResult> replace(RecordDto dto) async => await db
+//     .collection(collectionName)
+//     .replaceOne(where.id(dto.id), dto.toMongoDto());
+// .then((value) =>
+//     RecordDto.fromMongoJson(value.document as Map<String, dynamic>));
 }
 
 /// 即Schema
@@ -51,6 +75,15 @@ class RecordMetaAccessor extends IMongoAccessor<RecordMetaDto> {
       .watch(where.id(id))
       .where((event) => event != null)
       .map((value) => RecordMetaDto.fromMongoJson(value));
+
+// @override
+// Future<void> insert(RecordMetaDto dto) async =>
+//     await db.collection(collectionName).insertOne(dto.toMongoDto());
+
+// @override
+// Future<WriteResult> replace(RecordMetaDto dto) async => await db
+//     .collection(collectionName)
+//     .replaceOne(where.id(dto.id), dto.toMongoDto());
 }
 
 // class BaseFuncAccessor extends IMongoAccessor<FuncWrap> {
