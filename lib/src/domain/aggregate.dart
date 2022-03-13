@@ -1,7 +1,8 @@
+import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
-import 'package:mongo_dart/mongo_dart.dart' hide Field;
+import 'package:mongo_dart/mongo_dart.dart';
 
 import 'entity/func.dart';
 
@@ -9,7 +10,8 @@ import 'entity/func.dart';
 
 /// 记录
 /// 必须通过DTO转换 [RecordDto]
-class Record {
+class Record implements IEtt<ObjectId> {
+  @override
   final ObjectId id;
   final RecordMeta meta; // Aggregate组装得到,实际只存储Id
   final Map<int, Value> fields;
@@ -31,11 +33,24 @@ class Record {
         );
 
   RecordDto toDto() => RecordDto.fromDomain(this);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Record &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          meta == other.meta &&
+          fields == other.fields;
+
+  @override
+  int get hashCode => id.hashCode ^ meta.hashCode ^ fields.hashCode;
 }
 
 /// Meta信心
 /// 必须通过DTO转换 [RecordMetaDto]
-class RecordMeta {
+class RecordMeta implements IEtt<ObjectId> {
+  @override
   final ObjectId id;
   final String name;
   final String memo;
@@ -87,6 +102,25 @@ class RecordMeta {
   }
 
   RecordMetaDto toDto() => RecordMetaDto.fromDomain(this);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RecordMeta &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          name == other.name &&
+          memo == other.memo &&
+          maxKey == other.maxKey &&
+          attributes == other.attributes;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      name.hashCode ^
+      memo.hashCode ^
+      maxKey.hashCode ^
+      attributes.hashCode;
 }
 
 class AttrInMetaBuilder {
@@ -103,8 +137,21 @@ class AttrInMetaBuilder {
         memo: memo,
         type: type,
         checkFuncName: checkFuncName,
-      ).toDm((funName) =>
-          FuncManager.findBy(funName));
+      ).toDm((funName) => FuncManager.findBy(funName));
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AttrInMetaBuilder &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          memo == other.memo &&
+          type == other.type &&
+          checkFuncName == other.checkFuncName;
+
+  @override
+  int get hashCode =>
+      name.hashCode ^ memo.hashCode ^ type.hashCode ^ checkFuncName.hashCode;
 }
 
 class Attribute {
@@ -149,4 +196,23 @@ class Attribute {
   // }
 
   AttributeDto toDto() => AttributeDto.ofDomain(this);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Attribute &&
+          runtimeType == other.runtimeType &&
+          k == other.k &&
+          name == other.name &&
+          memo == other.memo &&
+          type == other.type &&
+          check == other.check;
+
+  @override
+  int get hashCode =>
+      k.hashCode ^
+      name.hashCode ^
+      memo.hashCode ^
+      type.hashCode ^
+      check.hashCode;
 }
