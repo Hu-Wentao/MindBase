@@ -40,11 +40,9 @@ class RecordDto implements IDto, IMongoEntityDto {
       }));
 
   @override
-  Map<String, dynamic> toJson() => {
-        "_id": id.toJson(),
-        "metaId": metaId.toJson(),
-      }..addEntries(fields.entries
-          .map((e) => MapEntry(e.key.toString(), e.value.toJson())));
+  Map<String, dynamic> toJson() => toMongoDto()
+    ..['_id'] = id
+    ..['metaId'] = metaId;
 
   factory RecordDto.fromMongoJson(Map<String, dynamic> json) => RecordDto(
           (json.remove('_id') as ObjectId), (json.remove('metaId') as ObjectId),
@@ -60,9 +58,11 @@ class RecordDto implements IDto, IMongoEntityDto {
 
   // 适配 MongoDart的ObjectId
   @override
-  Map<String, dynamic> toMongoDto() => toJson()
-    ..['_id'] = id
-    ..['metaId'] = metaId;
+  Map<String, dynamic> toMongoDto() => {
+        "_id": id,
+        "metaId": metaId,
+      }..addEntries(fields.entries
+          .map((e) => MapEntry(e.key.toString(), e.value.toJson())));
 
   @override
   String toString() => toJson().toString();
@@ -112,13 +112,7 @@ class RecordMetaDto with IMongoEntityDto {
       );
 
   @override
-  Map<String, dynamic> toJson() => {
-        '_id': id.toHexString(),
-        'name': name,
-        'memo': memo,
-        'maxKey': maxKey,
-        'attributes': attributes.map((e) => e.toJson()).toList(),
-      };
+  Map<String, dynamic> toJson() => toMongoDto()..['_id'] = id.toHexString();
 
   RecordMetaDto.fromMongoJson(Map<String, dynamic> mJs)
       : this(
@@ -132,7 +126,13 @@ class RecordMetaDto with IMongoEntityDto {
         );
 
   @override
-  Map<String, dynamic> toMongoDto() => toJson()..['_id'] = id;
+  Map<String, dynamic> toMongoDto() => {
+        '_id': id,
+        'name': name,
+        'memo': memo,
+        'maxKey': maxKey,
+        'attributes': attributes.map((e) => e.toJson()).toList(),
+      };
 
   RecordMeta toDm(
     Attribute Function(AttributeDto dto) attrToDm,
