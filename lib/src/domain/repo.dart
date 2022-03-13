@@ -14,37 +14,25 @@ import 'aggregate.dart';
 @lazySingleton
 class RecordRepo {
   final IMongoStorage mongoStorage;
+  final SchemaRepo schemaRepo;
 
-  RecordRepo(this.mongoStorage);
+  RecordRepo(this.mongoStorage, this.schemaRepo);
 
   /// 通过记录Id查询一条记录对应的实例
-  Future<Record> find(ObjectId id) async =>
+  Future<Record> findBy(ObjectId id) async =>
       await mongoStorage.withSyncAsync((sync) async {
         RecordDto rcdDto = (await RecordAccessor(sync).findById(id))!;
-        RecordMetaDto metaDto =
-            (await RecordMetaAccessor(sync).findById(rcdDto.metaId))!;
-        return rcdDto.toDomain(metaDto.toDomain(
-          metaDto.attributes
-              .map((e) => e.toDomain(FuncManager.findBy(e.checkFuncName)))
-              .toList(),
-        ));
+        RecordMeta meta = await schemaRepo.findBy(rcdDto.metaId);
+        return rcdDto.toDomain(meta);
       });
 
   /// 通过MetaId查找聚合根的所有记录对应的实例
   /// todo 添加limit,限制查询数量
   Future<List<Record>> findAllByMeta(ObjectId metaId) async =>
       await mongoStorage.withSyncAsync((sync) async {
-        RecordMetaDto metaDto =
-            (await RecordMetaAccessor(sync).findById(metaId))!;
-        List<RecordDto> rcdDtoList =
-            (await RecordAccessor(sync).findAllByMetaId(metaId));
-        return rcdDtoList
-            .map((rcd) => rcd.toDomain(metaDto.toDomain(
-                  metaDto.attributes
-                      .map((e) =>
-                          e.toDomain(FuncManager.findBy(e.checkFuncName)))
-                      .toList(),
-                )))
+        RecordMeta meta = await schemaRepo.findBy(metaId);
+        return (await RecordAccessor(sync).findAllByMetaId(metaId))
+            .map((rcd) => rcd.toDomain(meta))
             .toList();
       });
 
@@ -52,13 +40,9 @@ class RecordRepo {
   /// 重点测试
   Stream<Record> watchAllByMeta(ObjectId metaId) async* {
     final sync = await mongoStorage.asyncDb;
-    RecordMetaAccessor(sync).watchById(metaId).asyncExpand((metaDto) =>
-        RecordAccessor(sync).watchAllByMetaId(metaId).map((rcd) =>
-            rcd.toDomain(metaDto.toDomain(
-              metaDto.attributes
-                  .map((e) => e.toDomain(FuncManager.findBy(e.checkFuncName)))
-                  .toList(),
-            ))));
+    yield* schemaRepo.watchBy(metaId).asyncExpand((meta) => RecordAccessor(sync)
+        .watchAllByMetaId(metaId)
+        .map((rcd) => rcd.toDomain(meta)));
   }
 
   void insert(Record record) async {
@@ -67,6 +51,48 @@ class RecordRepo {
       RecordDto rcdDto = record.toDto();
       await RecordMetaAccessor(sync).insert(metaDto);
       await RecordAccessor(sync).insert(rcdDto);
+    });
+  }
+}
+
+@lazySingleton
+class SchemaRepo {
+  final IMongoStorage mongoStorage;
+
+  SchemaRepo(this.mongoStorage);
+
+  Attribute _attrDtoToAttr(AttributeDto dto) =>
+      dto.toDomain(FuncManager.findBy(dto.checkFuncName));
+
+  /// 通过记录Id查询一条记录对应的实例
+  Future<RecordMeta> findBy(ObjectId id) async =>
+      await mongoStorage.withSyncAsync(
+        (sync) async =>
+            (await RecordMetaAccessor(sync).findById(id))!.toDm(_attrDtoToAttr),
+      );
+
+  /// 通过MetaId查找聚合根的所有记录对应的实例
+  /// todo 添加limit,限制查询数量
+  Stream<RecordMeta> findAll() async* {
+    final db = await mongoStorage.asyncDb;
+    yield* RecordMetaAccessor(db)
+        .findAll()
+        .map((event) => event.toDm(_attrDtoToAttr));
+  }
+
+  /// 通过MetaId监视聚合根的所有记录对应的实例的变更
+  /// 重点测试
+  Stream<RecordMeta> watchBy(ObjectId metaId) async* {
+    final sync = await mongoStorage.asyncDb;
+    yield* RecordMetaAccessor(sync)
+        .watchById(metaId)
+        .map((event) => event.toDm(_attrDtoToAttr));
+  }
+
+  void insert(RecordMeta entity) async {
+    await mongoStorage.withSyncAsync((sync) async {
+      RecordMetaDto metaDto = entity.toDto();
+      await RecordMetaAccessor(sync).insert(metaDto);
     });
   }
 }

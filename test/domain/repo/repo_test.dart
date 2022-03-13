@@ -16,7 +16,13 @@ main() {
     final db = await mongoStorage.asyncDb;
     expect(db.isConnected, true);
 
-    final repo = RecordRepo(mongoStorage);
+    final schemaRepo = SchemaRepo(mongoStorage);
+    test("test schema", () {
+      // todo test schema
+      expect(1 + 2, 3);
+    });
+
+    final recordRepo = RecordRepo(mongoStorage, schemaRepo);
     final record = Record.of(
         id: ObjectId.fromHexString("622d8e7ab1e16c6095af898a"),
         meta: RecordMeta.of(
@@ -34,9 +40,9 @@ main() {
 
     /// 插入
     print("### ${RecordDto.fromDomain(record).toJson()}");
-    repo.insert(record);
+    recordRepo.insert(record);
 
-    final r = await repo.find(record.id);
+    final r = await recordRepo.findBy(record.id);
     print("##r ${r.toDto().toJson()}");
   });
 }

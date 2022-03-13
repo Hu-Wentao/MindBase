@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'1'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1647156713;
+const int timestamp = 1647159131;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -89,6 +89,9 @@ const Map<String, String> environment = <String, String>{
 /// Dependencies
 const Map<String, Object> dependencies = <String, Object>{
   'flutter': <String, Object>{
+    'sdk': r'flutter',
+  },
+  'flutter_localizations': <String, Object>{
     'sdk': r'flutter',
   },
   'cupertino_icons': r'^1.0.2',

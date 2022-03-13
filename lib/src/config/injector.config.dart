@@ -18,8 +18,10 @@ _i1.GetIt $initGetIt(_i1.GetIt get,
   final gh = _i2.GetItHelper(get, environment, environmentFilter);
   final configMongo = _$ConfigMongo();
   gh.factory<_i3.IMongoStorage>(() => configMongo.mongoStorage);
+  gh.lazySingleton<_i4.SchemaRepo>(
+      () => _i4.SchemaRepo(get<_i3.IMongoStorage>()));
   gh.lazySingleton<_i4.RecordRepo>(
-      () => _i4.RecordRepo(get<_i3.IMongoStorage>()));
+      () => _i4.RecordRepo(get<_i3.IMongoStorage>(), get<_i4.SchemaRepo>()));
   return get;
 }
 

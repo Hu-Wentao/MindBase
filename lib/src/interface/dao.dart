@@ -9,6 +9,8 @@ abstract class IMongoAccessor<T extends IMongoEntityDto> {
 
   Future<T?> findById(ObjectId id);
 
+  Stream<T> findAll();
+
   /// 当ObjectId已存在时,更新无效
   Future<WriteResult> insert(T dto) async =>
       await db.collection(collectionName).insertOne(dto.toMongoDto());
@@ -25,6 +27,7 @@ class RecordAccessor extends IMongoAccessor<RecordDto> {
 
   @override
   String get collectionName => 'record';
+  @override
   final Db db;
 
   @override
@@ -32,6 +35,12 @@ class RecordAccessor extends IMongoAccessor<RecordDto> {
       .collection(collectionName)
       .findOne(where.id(id))
       .then((value) => value == null ? null : RecordDto.fromMongoJson(value));
+
+  @override
+  Stream<RecordDto> findAll() => db
+      .collection(collectionName)
+      .find()
+      .map((event) => RecordDto.fromMongoJson(event));
 
   Future<List<RecordDto>> findAllByMetaId(ObjectId metaId) => db
       .collection(collectionName)
@@ -62,12 +71,19 @@ class RecordMetaAccessor extends IMongoAccessor<RecordMetaDto> {
 
   @override
   String get collectionName => 'record_meta';
+  @override
   final Db db;
 
   @override
   Future<RecordMetaDto?> findById(ObjectId id) =>
       db.collection(collectionName).findOne(where.id(id)).then(
           (value) => value == null ? null : RecordMetaDto.fromMongoJson(value));
+
+  @override
+  Stream<RecordMetaDto> findAll() => db
+      .collection(collectionName)
+      .find()
+      .map((event) => RecordMetaDto.fromMongoJson(event));
 
   Stream<RecordMetaDto> watchById(ObjectId id) => db
       .collection(collectionName)
