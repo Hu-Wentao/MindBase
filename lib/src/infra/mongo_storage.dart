@@ -22,27 +22,32 @@ import 'package:mongo_dart/mongo_dart.dart';
 // final result =
 //     await DbCollection(db, 'orders').modernAggregate(pipeline).toList();
 // result.forEach(print);
-
-class MongoStorageConfig {
+class MongoAuthBasic {
   final String user;
   final String password;
+
+  const MongoAuthBasic(this.user, this.password);
+
+  toAuthPreString() => "$user:$password@";
+}
+
+class MongoStorageConfig {
+  final MongoAuthBasic? auth;
   final String host;
   final int port;
   final String databaseName;
   final String authSource;
 
   MongoStorageConfig({
-    required this.user,
-    required this.password,
+    this.auth,
     this.host = "localhost",
     this.port = 27017,
     required this.databaseName,
     this.authSource = "admin",
   });
 
-// 'mongodb://root:example@localhost:27017/testdb?authSource=admin'
   String fullUri() =>
-      'mongodb://$user:$password@$host:$port/$databaseName?authSource=$authSource';
+      'mongodb://${auth?.toAuthPreString()}$host:$port/$databaseName?authSource=$authSource';
 }
 
 // 一个Storage表示一个数据库, 因此不需要泛型约束
