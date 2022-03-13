@@ -23,12 +23,12 @@ import 'package:mongo_dart/mongo_dart.dart';
 //     await DbCollection(db, 'orders').modernAggregate(pipeline).toList();
 // result.forEach(print);
 class MongoAuthBasic {
-  final String user;
+  final String username;
   final String password;
 
-  const MongoAuthBasic(this.user, this.password);
+  const MongoAuthBasic({required this.username, required this.password});
 
-  toAuthPreString() => "$user:$password@";
+  toAuthPreString() => "$username:$password@";
 }
 
 class MongoStorageConfig {
