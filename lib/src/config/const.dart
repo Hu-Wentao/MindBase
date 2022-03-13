@@ -1,6 +1,6 @@
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/constants/pubspec.yaml.g.dart' as spec;
-import 'package:mind_base/src/mind_base_app.dart';
+import 'package:mind_base/src/application.dart';
 
 const kName = spec.name;
 const kVersion = spec.version;

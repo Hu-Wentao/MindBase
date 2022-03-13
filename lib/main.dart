@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/config/const.dart';
-import 'package:mind_base/src/mind_base_app.dart';
+import 'package:mind_base/src/application.dart';
 
 void main() {
   MindBaseApplication(
