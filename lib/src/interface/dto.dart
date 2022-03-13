@@ -178,7 +178,7 @@ class AttributeDto implements IDto {
           k: json['k'] as int,
           name: json['name'] as String,
           memo: json['memo'] as String,
-          type: AttrType.values.asNameMap()['type']!,
+          type: AttrType.values.asNameMap()[json['type'] as String]!,
           checkFuncName: json['checkFuncName'] as String,
         );
 
