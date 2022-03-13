@@ -68,6 +68,9 @@ class RecordDto implements IDto, IMongoEntityDto {
   @override
   String toString() => toJson().toString();
 
+  Record toDm(RecordMeta Function(ObjectId metaId) getMeta) =>
+      toDomain(getMeta(metaId));
+
   Record toDomain(RecordMeta m) => Record(
         id: id,
         meta: m,
@@ -133,6 +136,11 @@ class RecordMetaDto with IMongoEntityDto {
   @override
   Map<String, dynamic> toMongoDto() => toJson()..['_id'] = _id;
 
+  RecordMeta toDm(
+    Attribute Function(AttributeDto dto) attrToDm,
+  ) =>
+      toDomain(attributes.map(attrToDm).toList());
+
   RecordMeta toDomain(List<Attribute> attrs) => RecordMeta(
         id: id,
         name: name,
@@ -184,6 +192,11 @@ class AttributeDto implements IDto {
         'type': type.name,
         'checkFuncName': checkFuncName,
       };
+
+  Attribute toDm(
+    Func Function(String funName) getCheck,
+  ) =>
+      toDomain(getCheck(checkFuncName));
 
   Attribute toDomain(
     Func check,
