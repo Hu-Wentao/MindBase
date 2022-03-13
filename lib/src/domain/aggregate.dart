@@ -5,7 +5,6 @@ import 'package:mongo_dart/mongo_dart.dart' hide Field;
 
 import 'entity/func.dart';
 
-// import 'package:mongo_dart/mongo_dart.dart' show;
 /// 表 ============================================ =============================
 
 /// 记录
@@ -50,6 +49,27 @@ class RecordMeta {
     required this.attributes,
   });
 
+  factory RecordMeta.of({
+    ObjectId? id,
+    required String name,
+    String memo = "",
+    List<AttrInMetaBuilder> attributes = const [],
+  }) {
+    if (name.isEmpty) {
+      throw ArgumentError("name cannot be empty");
+    }
+    return RecordMeta(
+        id: id ?? ObjectId(),
+        name: name,
+        memo: memo,
+        maxKey: attributes.length,
+        attributes: attributes
+            .asMap()
+            .entries
+            .map((e) => e.value.build(e.key))
+            .toList());
+  }
+
   int nextKey() => maxKey + 1;
 
   // table新增Attr
@@ -67,6 +87,24 @@ class RecordMeta {
   }
 
   RecordMetaDto toDto() => RecordMetaDto.fromDomain(this);
+}
+
+class AttrInMetaBuilder {
+  final String name; // 表头名称
+  final String memo; // 表头备注
+  final AttrType type; // 字段类型
+  final String checkFuncName;
+
+  AttrInMetaBuilder(this.name, this.memo, this.type, this.checkFuncName);
+
+  Attribute build(int key) => AttributeDto(
+        k: key,
+        name: name,
+        memo: memo,
+        type: type,
+        checkFuncName: checkFuncName,
+      ).toDm((funName) =>
+          FuncManager.findBy(funName));
 }
 
 class Attribute {
