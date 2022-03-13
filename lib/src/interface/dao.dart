@@ -7,9 +7,47 @@ abstract class IMongoAccessor<T extends IMongoEntityDto> {
 
   String get collectionName;
 
+  T mongoJsonToDto(Map<String, dynamic> mgJson);
+
+  T? mongoJsonToDtoOr(Map<String, dynamic>? mgJson);
+
   Future<T?> findById(ObjectId id);
 
   Stream<T> findAll();
+
+  Stream<T> watchById(ObjectId id);
+
+  // todo 性能优化： 监视所有的更新，会导致性能问题；后期考虑引入工作区的概念,即使改为 `watchBy`
+  Stream<T> watchAll();
+}
+
+abstract class BaseMongoAccessor<T extends IMongoEntityDto>
+    implements IMongoAccessor<T> {
+  @override
+  T? mongoJsonToDtoOr(Map<String, dynamic>? mgJson) =>
+      (mgJson == null) ? null : mongoJsonToDto(mgJson);
+
+  @override
+  Future<T?> findById(ObjectId id) => db
+      .collection(collectionName)
+      .findOne(where.id(id))
+      .then(mongoJsonToDtoOr);
+
+  @override
+  Stream<T> findAll() =>
+      db.collection(collectionName).find().map(mongoJsonToDto);
+
+  @override
+  Stream<T> watchAll() => db
+      .collection(collectionName)
+      .watch(where..exists('_id'))
+      .map((v) => mongoJsonToDto(v.document));
+
+  @override
+  Stream<T> watchById(ObjectId id) => db
+      .collection(collectionName)
+      .watch(where.id(id))
+      .map((value) => mongoJsonToDto(value.document));
 
   /// 当ObjectId已存在时,更新无效
   Future<WriteResult> insert(T dto) async =>
@@ -19,10 +57,9 @@ abstract class IMongoAccessor<T extends IMongoEntityDto> {
   Future<WriteResult> replace(T dto) async => await db
       .collection(collectionName)
       .replaceOne(where.id(dto.id), dto.toMongoDto());
-// Future<T> replace(T dto);
 }
 
-class RecordAccessor extends IMongoAccessor<RecordDto> {
+class RecordAccessor extends BaseMongoAccessor<RecordDto> {
   RecordAccessor(this.db);
 
   @override
@@ -31,16 +68,8 @@ class RecordAccessor extends IMongoAccessor<RecordDto> {
   final Db db;
 
   @override
-  Future<RecordDto?> findById(ObjectId id) => db
-      .collection(collectionName)
-      .findOne(where.id(id))
-      .then((value) => value == null ? null : RecordDto.fromMongoJson(value));
-
-  @override
-  Stream<RecordDto> findAll() => db
-      .collection(collectionName)
-      .find()
-      .map((event) => RecordDto.fromMongoJson(event));
+  RecordDto mongoJsonToDto(Map<String, dynamic> mgJson) =>
+      RecordDto.fromMongoJson(mgJson);
 
   Future<List<RecordDto>> findAllByMetaId(ObjectId metaId) => db
       .collection(collectionName)
@@ -52,21 +81,10 @@ class RecordAccessor extends IMongoAccessor<RecordDto> {
       .collection(collectionName)
       .watch(where.eq('metaId', metaId))
       .map((event) => RecordDto.fromMongoJson(event));
-
-// @override
-// Future<void> insert(RecordDto dto) async =>
-//     await db.collection(collectionName).insertOne(dto.toMongoDto());
-
-// @override
-// Future<WriteResult> replace(RecordDto dto) async => await db
-//     .collection(collectionName)
-//     .replaceOne(where.id(dto.id), dto.toMongoDto());
-// .then((value) =>
-//     RecordDto.fromMongoJson(value.document as Map<String, dynamic>));
 }
 
 /// 即Schema
-class RecordMetaAccessor extends IMongoAccessor<RecordMetaDto> {
+class RecordMetaAccessor extends BaseMongoAccessor<RecordMetaDto> {
   RecordMetaAccessor(this.db);
 
   @override
@@ -75,42 +93,6 @@ class RecordMetaAccessor extends IMongoAccessor<RecordMetaDto> {
   final Db db;
 
   @override
-  Future<RecordMetaDto?> findById(ObjectId id) =>
-      db.collection(collectionName).findOne(where.id(id)).then(
-          (value) => value == null ? null : RecordMetaDto.fromMongoJson(value));
-
-  @override
-  Stream<RecordMetaDto> findAll() => db
-      .collection(collectionName)
-      .find()
-      .map((event) => RecordMetaDto.fromMongoJson(event));
-
-  Stream<RecordMetaDto> watchById(ObjectId id) => db
-      .collection(collectionName)
-      .watch(where.id(id))
-      .where((event) => event != null)
-      .map((value) => RecordMetaDto.fromMongoJson(value));
-
-// @override
-// Future<void> insert(RecordMetaDto dto) async =>
-//     await db.collection(collectionName).insertOne(dto.toMongoDto());
-
-// @override
-// Future<WriteResult> replace(RecordMetaDto dto) async => await db
-//     .collection(collectionName)
-//     .replaceOne(where.id(dto.id), dto.toMongoDto());
+  RecordMetaDto mongoJsonToDto(Map<String, dynamic> mgJson) =>
+      RecordMetaDto.fromMongoJson(mgJson);
 }
-
-// class BaseFuncAccessor extends IMongoAccessor<FuncWrap> {
-//   BaseFuncAccessor(this.db);
-//
-//   @override
-//   String get collectionName => 'func';
-//   final Db db;
-//
-//   @override
-//   Future<FuncWrap?> findById(ObjectId id) => db
-//       .collection(collectionName)
-//       .findOne(where.id(id))
-//       .then((value) => value == null ? null : FuncWrap.fromMongoJson(value));
-// }
