@@ -1,5 +1,6 @@
 // repo 是对与聚合根而言的
 
+import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/infra/mongo_storage.dart';
 import 'package:mind_base/src/interface/dao.dart';
@@ -10,6 +11,7 @@ import 'aggregate.dart';
 
 ///
 /// 简单的Repo实现, 只能读取, 无法save聚合根
+@lazySingleton
 class RecordRepo {
   final IMongoStorage mongoStorage;
 
