@@ -46,22 +46,27 @@ class MongoStorageConfig {
     this.authSource = "admin",
   });
 
+  String get authStr => auth?.toAuthPreString() ?? "";
+
   String fullUri() =>
-      'mongodb://${auth?.toAuthPreString()}$host:$port/$databaseName?authSource=$authSource';
+      'mongodb://$authStr$host:$port/$databaseName?authSource=$authSource';
 }
 
 // 一个Storage表示一个数据库, 因此不需要泛型约束
 abstract class IMongoStorage {
   MongoStorageConfig get config; // 配置一个mongo database的信息
 
-  late final Db? _db;
+  Db? _db;
 
   Db get syncDb =>
       _db ??
       (throw "Please use [await $runtimeType::preInit()] to init Storage");
 
   /// see [withSyncBox] [withSyncAsync]
-  Future<Db> get asyncDb async => _db ??= await preInit();
+  Future<Db> get asyncDb async {
+    _db ??= await preInit();
+    return _db!;
+  }
 
   /// 如果在依赖注入时调用本方法,则可以使用 sync相关方法
   Future<Db> preInit() async {
