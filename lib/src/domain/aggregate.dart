@@ -5,7 +5,8 @@ import 'package:mongo_dart/mongo_dart.dart' hide Field;
 
 import 'entity/func.dart';
 
-/// 表 =========================================================================
+// import 'package:mongo_dart/mongo_dart.dart' show;
+/// 表 ============================================ =============================
 
 /// 记录
 /// 必须通过DTO转换 [RecordDto]
@@ -19,6 +20,16 @@ class Record {
     required this.meta,
     required this.fields,
   });
+
+  Record.of({
+    ObjectId? id,
+    required RecordMeta meta,
+    required Map<int, Value> fields,
+  }) : this(
+          id: id ?? ObjectId(),
+          meta: meta,
+          fields: fields,
+        );
 
   RecordDto toDto() => RecordDto.fromDomain(this);
 }
