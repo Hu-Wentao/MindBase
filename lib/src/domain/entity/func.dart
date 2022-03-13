@@ -32,14 +32,32 @@ class Func {
 
 /// todo 添加test, 1.检查name唯一性, 2检查参数转换是否正常
 class FuncManager {
-  static List<Func> get funcList => baseExpressions + convertExpressions;
+  static Iterable<Func> get funcList =>
+      methodMap.values.expand((element) => element);
+
+  /// 相关 [AttrType]所有用的方法
+  static Map<AttrType, Iterable<Func>> get methodMap => {
+        AttrType.any: anyFunList,
+        AttrType.bool: boolFunList,
+        AttrType.num: numFunList,
+        AttrType.string: strFunList,
+        // AttrType.date: dateFunList,
+      };
+
+  static Func findMethod(
+    AttrType type,
+    String name, {
+    Func Function()? orElse,
+  }) =>
+      methodMap[type]!
+          .firstWhere((element) => element.name == name, orElse: orElse);
 
   static Func findBy(String funcName, {Func Function()? orElse}) =>
       funcList.firstWhere((f) => f.name == funcName, orElse: orElse);
 }
 
 /// 类型检查与转换表达式, 检查/转换失败则抛出异常
-final convertExpressions = [
+final anyFunList = [
   Func(
       name: "ToString",
       pTypes: [AttrType.any],
@@ -60,10 +78,24 @@ final convertExpressions = [
       pTypes: [AttrType.any],
       rType: AttrType.date,
       onRun: (p) => Value.of(p[0].asDate)),
+  Func(
+    name: "EQ",
+    alias: "==",
+    pTypes: [AttrType.any, AttrType.any],
+    rType: AttrType.bool,
+    onRun: (p) => Value.of(p[0].asString == p[1].asString),
+  ),
+  Func(
+    name: "NEQ",
+    alias: "!=",
+    pTypes: [AttrType.any, AttrType.any],
+    rType: AttrType.bool,
+    onRun: (p) => Value.of(p[0].asString != p[1].asString),
+  ),
 ];
 
 /// 基础表达式
-final baseExpressions = [
+final numFunList = [
   Func(
     name: "ADD",
     alias: "+",
@@ -107,41 +139,6 @@ final baseExpressions = [
     onRun: (p) => Value.of(math.pow(p[0].asNum, p[1].asNum)),
   ),
   Func(
-    name: "AND",
-    alias: "&&",
-    pTypes: [AttrType.bool, AttrType.bool],
-    rType: AttrType.bool,
-    onRun: (p) => Value.of(p[0].asBool && p[1].asBool),
-  ),
-  Func(
-    name: "OR",
-    alias: "||",
-    pTypes: [AttrType.bool, AttrType.bool],
-    rType: AttrType.bool,
-    onRun: (p) => Value.of(p[0].asBool || p[1].asBool),
-  ),
-  Func(
-    name: "NOT",
-    alias: "!",
-    pTypes: [AttrType.bool],
-    rType: AttrType.bool,
-    onRun: (p) => Value.of(!p[0].asBool),
-  ),
-  Func(
-    name: "EQ",
-    alias: "==",
-    pTypes: [AttrType.any, AttrType.any],
-    rType: AttrType.bool,
-    onRun: (p) => Value.of(p[0].asString == p[1].asString),
-  ),
-  Func(
-    name: "NEQ",
-    alias: "!=",
-    pTypes: [AttrType.any, AttrType.any],
-    rType: AttrType.bool,
-    onRun: (p) => Value.of(p[0].asString != p[1].asString),
-  ),
-  Func(
     name: "GT",
     alias: ">",
     pTypes: [AttrType.num, AttrType.num],
@@ -169,4 +166,35 @@ final baseExpressions = [
     rType: AttrType.bool,
     onRun: (p) => Value.of(p[0].asNum <= p[1].asNum),
   ),
+];
+final boolFunList = [
+  Func(
+    name: "AND",
+    alias: "&&",
+    pTypes: [AttrType.bool, AttrType.bool],
+    rType: AttrType.bool,
+    onRun: (p) => Value.of(p[0].asBool && p[1].asBool),
+  ),
+  Func(
+    name: "OR",
+    alias: "||",
+    pTypes: [AttrType.bool, AttrType.bool],
+    rType: AttrType.bool,
+    onRun: (p) => Value.of(p[0].asBool || p[1].asBool),
+  ),
+  Func(
+    name: "NOT",
+    alias: "!",
+    pTypes: [AttrType.bool],
+    rType: AttrType.bool,
+    onRun: (p) => Value.of(!p[0].asBool),
+  ),
+];
+final strFunList = [
+  Func(
+    name: "Len",
+    pTypes: [AttrType.string],
+    rType: AttrType.num,
+    onRun: (p) => Value.of(p[0].v.length),
+  )
 ];
