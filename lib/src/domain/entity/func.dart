@@ -59,34 +59,34 @@ class FuncManager {
 /// 类型检查与转换表达式, 检查/转换失败则抛出异常
 final anyFunList = [
   Func(
-      name: "ToString",
+      name: "toStr",
       pTypes: [AttrType.any],
       rType: AttrType.string,
       onRun: (p) => Value.of(p[0].asString)),
   Func(
-      name: "ToNum",
+      name: "toNum",
       pTypes: [AttrType.any],
       rType: AttrType.num,
       onRun: (p) => Value.of(p[0].asNum)),
   Func(
-      name: "ToBool",
+      name: "toBool",
       pTypes: [AttrType.any],
       rType: AttrType.bool,
       onRun: (p) => Value.of(p[0].asBool)),
   Func(
-      name: "ToDate",
+      name: "toDate",
       pTypes: [AttrType.any],
       rType: AttrType.date,
       onRun: (p) => Value.of(p[0].asDate)),
   Func(
-    name: "EQ",
+    name: "eQ",
     alias: "==",
     pTypes: [AttrType.any, AttrType.any],
     rType: AttrType.bool,
     onRun: (p) => Value.of(p[0].asString == p[1].asString),
   ),
   Func(
-    name: "NEQ",
+    name: "nEQ",
     alias: "!=",
     pTypes: [AttrType.any, AttrType.any],
     rType: AttrType.bool,
@@ -97,70 +97,70 @@ final anyFunList = [
 /// 基础表达式
 final numFunList = [
   Func(
-    name: "ADD",
+    name: "add",
     alias: "+",
     pTypes: [AttrType.num, AttrType.num],
     rType: AttrType.num,
     onRun: (p) => Value.of(p[0].asNum + p[1].asNum),
   ),
   Func(
-    name: "SUB",
+    name: "sub",
     alias: "-",
     pTypes: [AttrType.num, AttrType.num],
     rType: AttrType.num,
     onRun: (p) => Value.of(p[0].asNum - p[1].asNum),
   ),
   Func(
-    name: "MUL",
+    name: "mul",
     alias: "*",
     pTypes: [AttrType.num, AttrType.num],
     rType: AttrType.num,
     onRun: (p) => Value.of(p[0].asNum * p[1].asNum),
   ),
   Func(
-    name: "DIV",
+    name: "div",
     alias: "/",
     pTypes: [AttrType.num, AttrType.num],
     rType: AttrType.num,
     onRun: (p) => Value.of(p[0].asNum / p[1].asNum),
   ),
   Func(
-    name: "MOD",
+    name: "mod",
     alias: "%",
     pTypes: [AttrType.num, AttrType.num],
     rType: AttrType.num,
     onRun: (p) => Value.of(p[0].asNum % p[1].asNum),
   ),
   Func(
-    name: "POW",
+    name: "pow",
     alias: "^",
     pTypes: [AttrType.num, AttrType.num],
     rType: AttrType.num,
     onRun: (p) => Value.of(math.pow(p[0].asNum, p[1].asNum)),
   ),
   Func(
-    name: "GT",
+    name: "gt",
     alias: ">",
     pTypes: [AttrType.num, AttrType.num],
     rType: AttrType.bool,
     onRun: (p) => Value.of(p[0].asNum > p[1].asNum),
   ),
   Func(
-    name: "GTE",
+    name: "gte",
     alias: ">=",
     pTypes: [AttrType.num, AttrType.num],
     rType: AttrType.bool,
     onRun: (p) => Value.of(p[0].asNum > p[1].asNum),
   ),
   Func(
-    name: "LT",
+    name: "lt",
     alias: "<",
     pTypes: [AttrType.num, AttrType.num],
     rType: AttrType.bool,
     onRun: (p) => Value.of(p[0].asNum < p[1].asNum),
   ),
   Func(
-    name: "LTE",
+    name: "lte",
     alias: "<=",
     pTypes: [AttrType.num, AttrType.num],
     rType: AttrType.bool,
@@ -169,21 +169,21 @@ final numFunList = [
 ];
 final boolFunList = [
   Func(
-    name: "AND",
+    name: "and",
     alias: "&&",
     pTypes: [AttrType.bool, AttrType.bool],
     rType: AttrType.bool,
     onRun: (p) => Value.of(p[0].asBool && p[1].asBool),
   ),
   Func(
-    name: "OR",
+    name: "or",
     alias: "||",
     pTypes: [AttrType.bool, AttrType.bool],
     rType: AttrType.bool,
     onRun: (p) => Value.of(p[0].asBool || p[1].asBool),
   ),
   Func(
-    name: "NOT",
+    name: "not",
     alias: "!",
     pTypes: [AttrType.bool],
     rType: AttrType.bool,
@@ -192,7 +192,7 @@ final boolFunList = [
 ];
 final strFunList = [
   Func(
-    name: "Len",
+    name: "len",
     pTypes: [AttrType.string],
     rType: AttrType.num,
     onRun: (p) => Value.of(p[0].v.length),
