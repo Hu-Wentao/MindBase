@@ -80,11 +80,11 @@ class RecordDto implements IDto, IMongoEntityDto {
 /// 表头属性
 class RecordMetaDto with IMongoEntityDto {
   @override
-  final ObjectId id;
-  final String name;
-  final String memo;
-  final int maxKey; // 等于Table中出现过key的数量, 用于新增Attr,只能增加
-  final List<AttributeDto> attributes;
+  ObjectId id;
+  String name;
+  String memo;
+  int maxKey; // 等于Table中出现过key的数量, 用于新增Attr,只能增加
+  List<AttributeDto> attributes;
 
   RecordMetaDto({
     required this.id,
@@ -93,6 +93,41 @@ class RecordMetaDto with IMongoEntityDto {
     required this.maxKey,
     required this.attributes,
   });
+
+  // 用于给Form提供初始值
+  RecordMetaDto.builder({
+    String? id,
+    String name = "",
+    String memo = "",
+    int maxKey = 0,
+    List<AttributeDto> attributes = const [],
+  }) : this(
+          id: id == null ? ObjectId() : ObjectId.fromHexString(id),
+          name: name,
+          memo: memo,
+          maxKey: maxKey,
+          attributes: attributes,
+        );
+
+  // 从Form中获取的Map
+  RecordMetaDto build(Map<String, String> map, List<AttributeDto> attributes) =>
+      RecordMetaDto(
+        id: ObjectId.fromHexString(map['id']!),
+        name: map['name']!,
+        memo: map['memo']!,
+        maxKey: int.parse(map['maxKey']!),
+        attributes: attributes,
+      );
+
+  factory RecordMetaDto.fromForm(
+          Map<String, dynamic> map, List<AttributeDto> attrs) =>
+      RecordMetaDto(
+        id: ObjectId.fromHexString(map['_id'] as String),
+        name: map['name'] as String,
+        memo: map['memo'] as String,
+        maxKey: int.parse(map['maxKey'] as String),
+        attributes: attrs,
+      );
 
   factory RecordMetaDto.fromDomain(RecordMeta meta) => RecordMetaDto(
       id: meta.id,
@@ -156,6 +191,31 @@ class AttributeDto implements IDto {
   final AttrType type;
   final String checkFuncName;
 
+  /// 供Form初始化
+  AttributeDto.builder({
+    int k = 0,
+    String name = "",
+    String memo = "",
+    AttrType type = AttrType.string,
+    String checkFuncName = "",
+  }) : this(
+          k: k,
+          name: name,
+          memo: memo,
+          type: type,
+          checkFuncName: checkFuncName,
+        );
+
+  AttributeDto build(Map<String, String> map) => AttributeDto.fromJson(map);
+
+  factory AttributeDto.fromFrom(Map<String, dynamic> attrMap) => AttributeDto(
+        k: int.parse(attrMap['k'] as String),
+        name: attrMap['name'] as String,
+        memo: attrMap['memo'] as String,
+        type: AttrType.values.asNameMap()[attrMap['type'] as String]!,
+        checkFuncName: attrMap['checkFuncName'] as String,
+      );
+
   AttributeDto.ofDomain(Attribute attr)
       : this(
           k: attr.k,
@@ -206,4 +266,7 @@ class AttributeDto implements IDto {
         type: type,
         check: check,
       );
+
+  @override
+  String toString() => toJson().toString();
 }
