@@ -59,7 +59,7 @@ class RecordRepo {
             ))));
   }
 
-  void save(Record record) async{
+  void insert(Record record) async {
     await mongoStorage.withSyncAsync((sync) async {
       RecordMetaDto metaDto = record.meta.toDto();
       RecordDto rcdDto = record.toDto();

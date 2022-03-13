@@ -9,9 +9,8 @@ abstract class IMongoAccessor<T extends IMongoEntityDto> {
 
   Future<T?> findById(ObjectId id);
 
-  // todo test 如果插入相同id的对象, 是否等同于更新?
-  // Future<void> insert(T dto);
-  Future<void> insert(T dto) async =>
+  /// 当ObjectId已存在时,更新无效
+  Future<WriteResult> insert(T dto) async =>
       await db.collection(collectionName).insertOne(dto.toMongoDto());
 
   // Future<WriteResult> replace(T dto);
