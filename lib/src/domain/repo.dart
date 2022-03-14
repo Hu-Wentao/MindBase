@@ -28,13 +28,12 @@ class RecordRepo {
 
   /// 通过MetaId查找聚合根的所有记录对应的实例
   /// todo 添加limit,限制查询数量
-  Future<List<Record>> findAllByMeta(ObjectId metaId) async =>
-      await mongoStorage.withSyncAsync((sync) async {
-        RecordMeta meta = await schemaRepo.findBy(metaId);
-        return (await RecordAccessor(sync).findAllByMetaId(metaId))
-            .map((rcd) => rcd.toDomain(meta))
-            .toList();
-      });
+  Stream<Record> findAllByMeta(ObjectId metaId) async* {
+    final sync = await mongoStorage.asyncDb;
+    RecordMeta meta = await schemaRepo.findBy(metaId);
+    yield* (RecordAccessor(sync).findAllByMetaId(metaId))
+        .map((rcd) => rcd.toDomain(meta));
+  }
 
   /// 通过MetaId监视聚合根的所有记录对应的实例的变更
   /// 重点测试
