@@ -28,15 +28,15 @@ class SchemaProvider extends ProviderSidecar {
     notifyListeners();
   }
 
-  actInsertSchema(RecordMeta schema) => actWrapper(() async {
+  Future<void> actInsertSchema(RecordMeta schema) => actWrapper(() async {
         await _schemaRepo.insert(schema);
       });
 
-  actSaveSchema(RecordMetaDto? dto) => actWrapper(() {
+  Future<void> actSaveSchema(RecordMetaDto? dto) => actWrapper(() async {
         if (dto == null) {
           return null;
         }
         final schema = dto.toDm((dto) => dto.toDm(FuncManager.findBy));
-        return _schemaRepo.save(schema);
+        return await _schemaRepo.save(schema);
       });
 }
