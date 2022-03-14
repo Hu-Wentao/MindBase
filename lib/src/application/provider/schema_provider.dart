@@ -12,7 +12,7 @@ class SchemaProvider extends ProviderSidecar {
   // 防止同一个对象状态更新后被重复缓存
   final Map<ObjectId, RecordMeta> _cache = {};
 
-  List<RecordMeta> get schemas => _cache.values.toList();
+  List<RecordMeta> get data => _cache.values.toList();
 
   @override
   onInitializing() {
