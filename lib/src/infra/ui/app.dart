@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:form_builder_validators/localization/l10n.dart';
+import 'package:mind_base/src/application/provider/schema_provider.dart';
 import 'package:mind_base/src/infra/ui/routes_config.gr.dart';
 import 'package:provider/provider.dart';
 
@@ -12,10 +13,8 @@ class MindBaseApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MultiProvider(
         providers: [
-          Provider.value(value: "value"),
-          // Provider.value(value: sl<Repo>()),
-          // ChangeNotifierProvider(create: (_) => sl<SchemaProvider>())
-          // ChangeNotifierProvider(create: (c) => sl<ShopEnvInfoProvider>()),
+          ChangeNotifierProvider(
+              create: (_) => SchemaProvider()..actInitializing())
         ],
         child: MaterialApp.router(
           routerDelegate: _router.delegate(),
