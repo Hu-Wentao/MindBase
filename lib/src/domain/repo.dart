@@ -65,10 +65,20 @@ class SchemaRepo {
       dto.toDomain(FuncManager.findBy(dto.checkFuncName));
 
   /// 通过记录Id查询一条记录对应的实例
-  Future<RecordMeta> findBy(ObjectId id) async =>
+  Future<RecordMeta> findBy(ObjectId id,
+          {RecordMeta Function()? onNull}) async =>
       await mongoStorage.withSyncAsync(
         (sync) async =>
-            (await RecordMetaAccessor(sync).findById(id))!.toDm(_attrDtoToAttr),
+            (await RecordMetaAccessor(sync).findById(id))
+                ?.toDm(_attrDtoToAttr) ??
+            onNull?.call() ??
+            (throw BaseException('Not found by id[$id]')),
+      );
+
+  Future<RecordMeta?> findByOr(ObjectId id) async =>
+      await mongoStorage.withSyncAsync(
+        (sync) async =>
+            (await RecordMetaAccessor(sync).findById(id))?.toDm(_attrDtoToAttr),
       );
 
   /// 通过MetaId查找聚合根的所有记录对应的实例
@@ -89,16 +99,27 @@ class SchemaRepo {
         .map((event) => event.toDm(_attrDtoToAttr));
   }
 
-  Future<void> insert(RecordMeta entity) async =>
-      await mongoStorage.withSyncAsync((sync) async {
-        RecordMetaDto metaDto = entity.toDto();
-        await RecordMetaAccessor(sync).insert(metaDto);
-      });
+  Future<WriteResult> insert(RecordMeta entity) async =>
+      await mongoStorage.withSyncAsync((sync) async =>
+          await RecordMetaAccessor(sync).insert(entity.toDto()));
+
+  Future<WriteResult> update(RecordMeta entity) async =>
+      await mongoStorage.withSyncAsync((sync) async =>
+          await RecordMetaAccessor(sync).updateBy(entity.id, entity.toDto()));
 
   Stream<RecordMeta> watchAll() async* {
     final sync = await mongoStorage.asyncDb;
     yield* RecordMetaAccessor(sync)
         .watchAll()
         .map((event) => event.toDm(_attrDtoToAttr));
+  }
+
+  Future<WriteResult> save(RecordMeta schema) async {
+    final exist = await findByOr(schema.id);
+    if (exist == null) {
+      return insert(schema);
+    } else {
+      return update(schema);
+    }
   }
 }
