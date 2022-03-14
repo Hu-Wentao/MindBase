@@ -75,11 +75,10 @@ class RecordAccessor extends BaseMongoAccessor<RecordDto> {
   RecordDto mongoJsonToDto(Map<String, dynamic> mgJson) =>
       RecordDto.fromMongoJson(mgJson);
 
-  Future<List<RecordDto>> findAllByMetaId(ObjectId metaId) => db
+  Stream<RecordDto> findAllByMetaId(ObjectId metaId) => db
       .collection(collectionName)
       .find(where.eq('metaId', metaId))
-      .map((event) => RecordDto.fromMongoJson(event))
-      .toList();
+      .map((event) => RecordDto.fromMongoJson(event));
 
   Stream<RecordDto> watchAllByMetaId(ObjectId metaId) => db
       .collection(collectionName)
