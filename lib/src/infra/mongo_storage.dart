@@ -1,27 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
-// final db = Db('mongodb://root:example@localhost:27017/testdb'
-//     '?authSource=admin');
-// final db = Db('mongodb://localhost:27017/testdb');
-// final db = Db('mongodb://root:example@localhost:27017/testdb');
-// // final db = Db('mongodb://127.0.0.1/testdb');
-// await db.open();
-// var collection = db.collection('orders');
-// await collection.drop();
-// await collection.insertMany([
-// {'status': 'A', 'cust_id': 3, 'amount': Rational.fromInt(128)},
-// {'status': 'B', 'cust_id': 2, 'amount': Rational.fromInt(100)},
-// {'status': 'A', 'cust_id': 1, 'amount': Rational.fromInt(80)},
-// {'status': 'A', 'cust_id': 3, 'amount': Rational.fromInt(72)},
-// ]);
-// final pipeline = AggregationPipelineBuilder()
-//     .addStage(Match(where.eq('status', 'A').map['\$query']))
-//     .addStage(
-//     Group(id: Field('cust_id'), fields: {'total': Sum(Field('amount'))}))
-//     .build();
-// final result =
-//     await DbCollection(db, 'orders').modernAggregate(pipeline).toList();
-// result.forEach(print);
 class MongoAuthBasic {
   final String username;
   final String password;
@@ -37,6 +15,7 @@ class MongoStorageConfig {
   final int port;
   final String databaseName;
   final String authSource;
+  final int retryAttempts;
 
   MongoStorageConfig({
     this.auth,
@@ -44,6 +23,7 @@ class MongoStorageConfig {
     this.port = 27017,
     required this.databaseName,
     this.authSource = "admin",
+    this.retryAttempts = 5,
   });
 
   String get authStr => auth?.toAuthPreString() ?? "";
@@ -68,10 +48,33 @@ abstract class IMongoStorage {
     return _db!;
   }
 
+  Future<void> close() async => await _db?.close();
+
   /// 如果在依赖注入时调用本方法,则可以使用 sync相关方法
+  /// Db如果已经连接过，重复连接会导致卡在 Opening状态，需要 await ::close, 然后再 ::open
+  /// see: https://github.com/mongo-dart/mongo_dart/issues/223#issuecomment-813872280
   Future<Db> preInit() async {
-    _db = Db(config.fullUri());
-    await _db!.open();
+    if (_db == null || !_db!.isConnected) {
+      await close();
+      var retry = 0;
+      while (true) {
+        try {
+          retry++;
+          var db = Db(config.fullUri());
+          await db.open();
+          _db = db;
+          // print('OK after "$retry" attempts');
+          break;
+        } catch (e) {
+          if (retry >= config.retryAttempts) {
+            // print('Exiting after "$retry" attempts');
+            rethrow;
+          }
+          // each time waits a little bit more before re-trying
+          await Future.delayed(Duration(milliseconds: 100 * retry));
+        }
+      }
+    }
     return _db!;
   }
 
