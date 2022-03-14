@@ -53,6 +53,10 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
   Future<WriteResult> insert(T dto) async =>
       await db.collection(collectionName).insertOne(dto.toMongoDto());
 
+  Future<WriteResult> updateBy(ObjectId id, T dto) async => await db
+      .collection(collectionName)
+      .updateOne(where.id(id), dto.toMongoDto());
+
   // Future<WriteResult> replace(T dto);
   Future<WriteResult> replace(T dto) async => await db
       .collection(collectionName)
