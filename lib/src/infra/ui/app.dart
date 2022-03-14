@@ -22,8 +22,7 @@ class MindBaseApp extends StatelessWidget {
           title: 'Mind Base',
           localizationsDelegates: const [
             FormBuilderLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
+            ...GlobalMaterialLocalizations.delegates,
           ],
           supportedLocales: const [
             Locale('zh', ''),
