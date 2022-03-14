@@ -1,6 +1,5 @@
 import 'package:mind_base/src/interface/dto.dart';
-import 'package:mongo_dart/mongo_dart.dart'
-    show ObjectId, where, Db, WriteResult;
+import 'package:mongo_dart/mongo_dart.dart';
 
 abstract class IMongoAccessor<T extends IMongoEntityDto> {
   Db get db;
@@ -40,13 +39,23 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
   @override
   Stream<T> watchAll() => db
       .collection(collectionName)
-      .watch(where..exists('_id'))
+      .watch(
+        AggregationPipelineBuilder()
+            .addStage(Match(where.exists('_id')))
+            .build(),
+      )
       .map((v) => mongoJsonToDto(v.document));
 
   @override
   Stream<T> watchById(ObjectId id) => db
       .collection(collectionName)
-      .watch(where.id(id))
+      .watch(
+        // fixed Not implemented for SelectorBuilder({$query: {_id: ObjectId("622ea6754aafc13ddd3d5cab")}})
+        // 从Selector中提取`$query` 对应的value, 即 `{_id: ObjectId("622ea6754aafc13ddd3d5cab")}`
+        AggregationPipelineBuilder()
+            .addStage(Match(where.id(id).map['\$query']))
+            .build(),
+      )
       .map((value) => mongoJsonToDto(value.document));
 
   /// 当ObjectId已存在时,更新无效
@@ -82,7 +91,11 @@ class RecordAccessor extends BaseMongoAccessor<RecordDto> {
 
   Stream<RecordDto> watchAllByMetaId(ObjectId metaId) => db
       .collection(collectionName)
-      .watch(where.eq('metaId', metaId))
+      .watch(
+        AggregationPipelineBuilder()
+            .addStage(Match(where.eq('metaId', metaId)))
+            .build(),
+      )
       .map((event) => RecordDto.fromMongoJson(event));
 }
 
