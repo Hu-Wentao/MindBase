@@ -1,6 +1,8 @@
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
+import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/repo.dart';
+import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
@@ -28,5 +30,13 @@ class SchemaProvider extends ProviderSidecar {
 
   actInsertSchema(RecordMeta schema) => actWrapper(() async {
         await _schemaRepo.insert(schema);
+      });
+
+  actSaveSchema(RecordMetaDto? dto) => actWrapper(() {
+        if (dto == null) {
+          return null;
+        }
+        final schema = dto.toDm((dto) => dto.toDm(FuncManager.findBy));
+        return _schemaRepo.save(schema);
       });
 }
