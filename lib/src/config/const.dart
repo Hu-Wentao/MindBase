@@ -4,7 +4,7 @@ import 'package:mind_base/src/application.dart';
 
 const kName = spec.name;
 const kVersion = spec.version;
-final kPackAt = DateTime.fromMicrosecondsSinceEpoch(spec.timestamp * 1000);
+final kPackAt = DateTime.fromMillisecondsSinceEpoch(spec.timestamp * 1000);
 
 final kEnvDev = MindBaseConfig(
     sign: EnvSign.dev, name: kName, version: kVersion, packAt: kPackAt);
