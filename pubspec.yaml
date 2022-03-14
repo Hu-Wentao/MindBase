@@ -45,6 +45,9 @@ dependencies:
   flutter_form_builder:
   form_builder_validators:
   auto_route:
+  adaptive_navigation:
+  line_icons:
+  ndialog:
 
 dev_dependencies:
   flutter_test:
