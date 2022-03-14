@@ -1,5 +1,13 @@
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/src/database/commands/aggreagation_commands/aggregate/return_classes/change_event.dart'
+    as mg;
+
+extension SelectorBuilderX on SelectorBuilder {
+  // fixed Not implemented for SelectorBuilder({$query: {_id: ObjectId("622ea6754aafc13ddd3d5cab")}})
+  // 从Selector中提取`$query` 对应的value, 即 `{_id: ObjectId("622ea6754aafc13ddd3d5cab")}`
+  toQuery() => map['\$query'];
+}
 
 abstract class IMongoAccessor<T extends IMongoEntityDto> {
   Db get db;
@@ -8,7 +16,7 @@ abstract class IMongoAccessor<T extends IMongoEntityDto> {
 
   T mongoJsonToDto(Map<String, dynamic> mgJson);
 
-  T? mongoJsonToDtoOr(Map<String, dynamic>? mgJson);
+  T? mongoJsonToDtoOr(Map<String, Object?>? mgJson);
 
   Future<T?> findById(ObjectId id);
 
@@ -41,22 +49,24 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
       .collection(collectionName)
       .watch(
         AggregationPipelineBuilder()
-            .addStage(Match(where.exists('_id')))
+            .addStage(Match(where.exists('_id').toQuery()))
             .build(),
       )
-      .map((v) => mongoJsonToDto(v.document));
+      .map<mg.ChangeEvent>((e) => e as mg.ChangeEvent)
+      // todo 这里默认所有的事件都是正确的, 所以添加了`!`
+      .map((v) => mongoJsonToDtoOr((v.fullDocument))!);
 
   @override
   Stream<T> watchById(ObjectId id) => db
       .collection(collectionName)
       .watch(
-        // fixed Not implemented for SelectorBuilder({$query: {_id: ObjectId("622ea6754aafc13ddd3d5cab")}})
-        // 从Selector中提取`$query` 对应的value, 即 `{_id: ObjectId("622ea6754aafc13ddd3d5cab")}`
         AggregationPipelineBuilder()
-            .addStage(Match(where.id(id).map['\$query']))
+            .addStage(Match(where.id(id).toQuery()))
             .build(),
       )
-      .map((value) => mongoJsonToDto(value.document));
+      .map<mg.ChangeEvent>((e) => e as mg.ChangeEvent)
+      // todo 这里默认所有的事件都是正确的, 所以添加了`!`
+      .map((v) => mongoJsonToDtoOr((v.fullDocument))!);
 
   /// 当ObjectId已存在时,更新无效
   Future<WriteResult> insert(T dto) async =>
@@ -109,6 +119,6 @@ class RecordMetaAccessor extends BaseMongoAccessor<RecordMetaDto> {
   final Db db;
 
   @override
-  RecordMetaDto mongoJsonToDto(Map<String, dynamic> mgJson) =>
+  RecordMetaDto mongoJsonToDto(Map<String, Object?> mgJson) =>
       RecordMetaDto.fromMongoJson(mgJson);
 }
