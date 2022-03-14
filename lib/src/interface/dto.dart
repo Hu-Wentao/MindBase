@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
@@ -122,10 +124,12 @@ class RecordMetaDto with IMongoEntityDto {
   factory RecordMetaDto.fromForm(
           Map<String, dynamic> map, List<AttributeDto> attrs) =>
       RecordMetaDto(
-        id: ObjectId.fromHexString(map['_id'] as String),
+        // form中是'id', 而不是'_id'
+        id: ObjectId.fromHexString(map['id'] as String),
         name: map['name'] as String,
         memo: map['memo'] as String,
-        maxKey: int.parse(map['maxKey'] as String),
+        // todo 后期考虑将k移动到form中
+        maxKey: attrs.map((e) => e.k).reduce(math.max),
         attributes: attrs,
       );
 
