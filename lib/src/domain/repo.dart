@@ -9,7 +9,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 
 import 'aggregate.dart';
 
-/// 当前是照抄mongoDB的event [MongoEventType]
+/// 当前是照抄mongoDB的event [WatchEventType]
 enum RepoEventType {
   insert, // 元素插入
   delete, // 某个元素被移除 - 只返回id
@@ -36,7 +36,7 @@ class RepoEvent<Ett extends IEtt<ObjectId>> {
   ) =>
           RepoEvent(
             RepoEventType.values.asNameMap()[event.type.name]!,
-            event.documentId,
+            event.ettId,
             mapper(event.document),
           );
 }

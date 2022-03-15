@@ -10,7 +10,7 @@ extension SelectorBuilderX on SelectorBuilder {
   toQuery() => map['\$query'];
 }
 
-enum MongoEventType {
+enum WatchEventType {
   insert, // 元素插入
   delete, // 某个元素被移除 - 只返回id
   replace, // 某个元素被替换 - 返回新的完整对象
@@ -28,10 +28,10 @@ class WatchEvent<T extends IMongoEntityDto> {
 
   WatchEvent(this._changeEvent, this.mongoJsonToDtoOr);
 
-  MongoEventType get type =>
-      MongoEventType.values.asNameMap()[_changeEvent.operationType]!;
+  WatchEventType get type =>
+      WatchEventType.values.asNameMap()[_changeEvent.operationType]!;
 
-  ObjectId get documentId => (_changeEvent.serverResponse['documentKey']
+  ObjectId get ettId => (_changeEvent.serverResponse['documentKey']
       as Map<String, dynamic>)['_id'] as ObjectId;
 
   T? get document => mongoJsonToDtoOr(_changeEvent.fullDocument);

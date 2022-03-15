@@ -6,7 +6,7 @@
 
 import 'package:get_it/get_it.dart' as _i1;
 import 'package:injectable/injectable.dart' as _i2;
- import 'package:mongo_dart/mongo_dart.dart' as _i3;
+import 'package:mongo_dart/mongo_dart.dart' as _i3;
 
 import '../domain/repo.dart' as _i6;
 import '../infra/mongo_storage.dart' as _i4;
