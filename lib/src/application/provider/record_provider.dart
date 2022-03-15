@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/repo.dart';
+import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
@@ -30,6 +31,13 @@ class RecordProvider extends ProviderSidecar {
           () => _watchSchema(schema),
         ),
       );
+
+  Future<void> actSaveRecord(RecordDto? dto) => actWrapper(() {
+    log("actSaveRecord ${dto?.toJson()}");
+        // 无需set,因为插入成功后, watch会监听到新的变更
+        if (dto == null) return;
+        _recordRepo.save(dto.toDomain(selectedSchema!));
+      });
 
   void _watchSchema(RecordMeta schema) {
     if (schema == selectedSchema) return;
