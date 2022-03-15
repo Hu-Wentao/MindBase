@@ -9,6 +9,41 @@ import 'package:mongo_dart/mongo_dart.dart';
 
 import 'aggregate.dart';
 
+/// 当前是照抄mongoDB的event [MongoEventType]
+enum RepoEventType {
+  insert, // 元素插入
+  delete, // 某个元素被移除 - 只返回id
+  replace, // 某个元素被替换 - 返回新的完整对象
+  update, // 某个元素被更新
+  drop,
+  rename,
+  dropDatabase,
+  invalidate,
+}
+
+/// 某个 MongoEntityDto对应的collection的 watch事件
+class RepoEvent<Ett extends IEtt<ObjectId>> {
+  final RepoEventType type;
+  final ObjectId ettId;
+  final Ett? entity;
+
+  RepoEvent(this.type, this.ettId, this.entity);
+
+  static RepoEvent<Ett>
+      of<Ett extends IEtt<ObjectId>, Dto extends IMongoEntityDto>(
+    WatchEvent<Dto> event,
+    Ett? Function(Dto? dto) mapper,
+  ) =>
+          RepoEvent(
+            RepoEventType.values.asNameMap()[event.type.name]!,
+            event.documentId,
+            mapper(event.document),
+          );
+// final WatchEvent<Dto> event;
+// final Ett Function(Dto dto) mapper;
+// RepoEvent(this.event, this.mapper);
+}
+
 ///
 /// 简单的Repo实现, 只能读取, 无法save聚合根
 @lazySingleton
@@ -37,11 +72,15 @@ class RecordRepo {
 
   /// 通过MetaId监视聚合根的所有记录对应的实例的变更
   /// 重点测试
-  Stream<Record> watchAllByMeta(ObjectId metaId) async* {
+  /// watch Schema对应的Record 集合.
+  Stream<RepoEvent<Record>> watchAllByMeta(ObjectId metaId) async* {
     final sync = await mongoStorage.asyncDb;
-    yield* schemaRepo.watchBy(metaId).asyncExpand((meta) => RecordAccessor(sync)
-        .watchAllByMetaId(metaId)
-        .map((rcd) => rcd.toDomain(meta)));
+    yield* schemaRepo
+        .watchBy(metaId) // 返回Schema事件流
+        .asyncExpand((meta) => RecordAccessor(sync)
+            .watchAllByMetaId(metaId)
+            .map((rcd) => RepoEvent.of<Record, RecordDto>(
+                rcd, (dto) => dto?.toDomainOr(meta.entity))));
   }
 
   void insert(Record record) async {
@@ -91,11 +130,11 @@ class SchemaRepo {
 
   /// 通过MetaId监视聚合根的所有记录对应的实例的变更
   /// 重点测试
-  Stream<RecordMeta> watchBy(ObjectId metaId) async* {
+  Stream<RepoEvent<RecordMeta>> watchBy(ObjectId metaId) async* {
     final sync = await mongoStorage.asyncDb;
-    yield* RecordMetaAccessor(sync)
-        .watchById(metaId)
-        .map((event) => event.toDm(_attrDtoToAttr));
+    yield* RecordMetaAccessor(sync).watchById(metaId).map((event) =>
+        RepoEvent.of<RecordMeta, RecordMetaDto>(
+            event, (dto) => dto?.toDm(_attrDtoToAttr)));
   }
 
   Future<WriteResult> insert(RecordMeta entity) async =>
@@ -106,11 +145,12 @@ class SchemaRepo {
       await mongoStorage.withSyncAsync((sync) async =>
           await RecordMetaAccessor(sync).updateBy(entity.id, entity.toDto()));
 
-  Stream<RecordMeta> watchAll() async* {
+  Stream<RepoEvent<RecordMeta>> watchAll() async* {
     final sync = await mongoStorage.asyncDb;
-    yield* RecordMetaAccessor(sync)
-        .watchAll()
-        .map((event) => event.toDm(_attrDtoToAttr));
+    yield* RecordMetaAccessor(sync).watchAll().map(
+          (event) => RepoEvent.of<RecordMeta, RecordMetaDto>(
+              event, (dto) => dto?.toDm(_attrDtoToAttr)),
+        );
   }
 
   Future<WriteResult> save(RecordMeta schema) async {
