@@ -57,9 +57,16 @@ class RecordRepo {
   Future<Record> findBy(ObjectId id) async =>
       await mongoStorage.withSyncAsync((sync) async {
         RecordDto rcdDto = (await RecordAccessor(sync).findById(id))!;
-        RecordMeta meta = await schemaRepo.findBy(rcdDto.metaId);
-        return rcdDto.toDomain(meta);
+        return rcdDto.toDomain(await schemaRepo.findBy(rcdDto.metaId));
       });
+
+  Future<Record?> findByOr(ObjectId id) async =>
+      await mongoStorage.withSyncAsync(
+        (sync) async {
+          RecordDto? rcdDto = (await RecordAccessor(sync).findById(id));
+          return rcdDto?.toDomain(await schemaRepo.findBy(rcdDto.metaId));
+        },
+      );
 
   /// 通过MetaId查找聚合根的所有记录对应的实例
   /// todo 添加limit,限制查询数量
@@ -83,13 +90,27 @@ class RecordRepo {
                 rcd, (dto) => dto?.toDomainOr(meta.entity))));
   }
 
-  void insert(Record record) async {
-    await mongoStorage.withSyncAsync((sync) async {
-      RecordMetaDto metaDto = record.meta.toDto();
-      RecordDto rcdDto = record.toDto();
-      await RecordMetaAccessor(sync).insert(metaDto);
-      await RecordAccessor(sync).insert(rcdDto);
-    });
+  Future<WriteResult> insert(Record entity) async =>
+      await mongoStorage.withSyncAsync((sync) async {
+        RecordMetaDto metaDto = entity.meta.toDto();
+        RecordDto rcdDto = entity.toDto();
+        final rMeta = await RecordMetaAccessor(sync).insert(metaDto);
+        if (rMeta.writeError != null) return rMeta;
+        final rRecord = await RecordAccessor(sync).insert(rcdDto);
+        return rRecord;
+      });
+
+  Future<WriteResult> update(Record entity) async =>
+      await mongoStorage.withSyncAsync((sync) async =>
+          await RecordAccessor(sync).updateBy(entity.id, entity.toDto()));
+
+  Future<WriteResult> save(Record record) async {
+    final exist = await findByOr(record.id);
+    if (exist == null) {
+      return insert(record);
+    } else {
+      return update(record);
+    }
   }
 }
 
