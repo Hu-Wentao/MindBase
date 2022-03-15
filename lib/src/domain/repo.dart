@@ -39,9 +39,75 @@ class RepoEvent<Ett extends IEtt<ObjectId>> {
             event.documentId,
             mapper(event.document),
           );
-// final WatchEvent<Dto> event;
-// final Ett Function(Dto dto) mapper;
-// RepoEvent(this.event, this.mapper);
+}
+
+abstract class IMongoRepo<Ett extends IEtt<ObjectId>,
+    Dto extends IMongoEntityDto> {
+  Future<IMongoAccessor<Dto>> get asyncAccessor;
+}
+
+/// 如果某个聚合根可以直接实现[dtoToEtt], 则其Repo可以混入本Mixin
+abstract class BaseMongoRepo<Ett extends IEtt<ObjectId>,
+    Dto extends IMongoEntityDto> extends IMongoRepo<Ett, Dto> {
+  Ett dtoToEtt(Dto dto);
+
+  Ett? dtoToEttOr(Dto? dto) => dto == null ? null : dtoToEtt(dto);
+
+  Dto ettToDto(Ett ett);
+
+  Future<WriteResult> insert(Ett entity) async =>
+      await (await asyncAccessor).insert(ettToDto(entity));
+
+// fixme update需要逐个更新字段
+// Future<WriteResult> update(RecordMeta entity) async =>
+//     await mongoStorage.withSyncAsync((sync) async =>
+//         await (await accessor).updateBy(entity.id, ettToDto(entity)));
+  Future<WriteResult> replace(Ett entity) async =>
+      await (await asyncAccessor).replace(ettToDto(entity));
+
+  Future<Ett?> findByOr(ObjectId id) async {
+    final dto = (await (await asyncAccessor).findById(id));
+    return dtoToEttOr(dto);
+  }
+
+  /// 通过记录Id查询一条记录对应的实例
+  Future<Ett> findBy(
+    ObjectId id, {
+    Ett Function()? onNull,
+  }) async =>
+      await findByOr(id) ??
+      onNull?.call() ??
+      (throw BaseException('Not found by id[$id]'));
+
+  /// 通过MetaId查找聚合根的所有记录对应的实例
+  /// todo 添加limit,限制查询数量
+  Stream<Ett> findAll() async* {
+    yield* (await asyncAccessor).findAll().map(dtoToEtt);
+  }
+
+  /// 通过MetaId监视聚合根的所有记录对应的实例的变更
+  /// 重点测试
+  Stream<RepoEvent<Ett>> watchBy(ObjectId metaId) async* {
+    yield* (await asyncAccessor)
+        .watchById(metaId)
+        .map((event) => RepoEvent.of<Ett, Dto>(event, dtoToEttOr));
+  }
+
+  Stream<RepoEvent<Ett>> watchAll() async* {
+    yield* (await asyncAccessor)
+        .watchAll()
+        .map((event) => RepoEvent.of<Ett, Dto>(event, dtoToEttOr));
+  }
+
+  Future<WriteResult> save(Ett entity) async {
+    final exist = await findByOr(entity.id);
+    if (exist == null) {
+      return insert(entity);
+    } else {
+      return replace(entity);
+// return update(schema);
+    }
+  }
 }
 
 ///
@@ -115,71 +181,21 @@ class RecordRepo {
 }
 
 @lazySingleton
-class SchemaRepo {
+class SchemaRepo extends BaseMongoRepo<RecordMeta, RecordMetaDto> {
   final IMongoStorage mongoStorage;
 
   SchemaRepo(this.mongoStorage);
 
-  Attribute _attrDtoToAttr(AttributeDto dto) =>
-      dto.toDomain(FuncManager.findBy(dto.checkFuncName));
+  @override
+  RecordMeta dtoToEtt(RecordMetaDto dto) =>
+      dto.toDm((attr) => attr.toDomain(FuncManager.findBy(attr.checkFuncName)));
 
-  /// 通过记录Id查询一条记录对应的实例
-  Future<RecordMeta> findBy(ObjectId id,
-          {RecordMeta Function()? onNull}) async =>
-      await mongoStorage.withSyncAsync(
-        (sync) async =>
-            (await RecordMetaAccessor(sync).findById(id))
-                ?.toDm(_attrDtoToAttr) ??
-            onNull?.call() ??
-            (throw BaseException('Not found by id[$id]')),
-      );
+  @override
+  RecordMetaDto ettToDto(RecordMeta ett) => ett.toDto();
 
-  Future<RecordMeta?> findByOr(ObjectId id) async =>
-      await mongoStorage.withSyncAsync(
-        (sync) async =>
-            (await RecordMetaAccessor(sync).findById(id))?.toDm(_attrDtoToAttr),
-      );
-
-  /// 通过MetaId查找聚合根的所有记录对应的实例
-  /// todo 添加limit,限制查询数量
-  Stream<RecordMeta> findAll() async* {
-    final db = await mongoStorage.asyncDb;
-    yield* RecordMetaAccessor(db)
-        .findAll()
-        .map((event) => event.toDm(_attrDtoToAttr));
-  }
-
-  /// 通过MetaId监视聚合根的所有记录对应的实例的变更
-  /// 重点测试
-  Stream<RepoEvent<RecordMeta>> watchBy(ObjectId metaId) async* {
+  @override
+  Future<BaseMongoAccessor<RecordMetaDto>> get asyncAccessor async {
     final sync = await mongoStorage.asyncDb;
-    yield* RecordMetaAccessor(sync).watchById(metaId).map((event) =>
-        RepoEvent.of<RecordMeta, RecordMetaDto>(
-            event, (dto) => dto?.toDm(_attrDtoToAttr)));
-  }
-
-  Future<WriteResult> insert(RecordMeta entity) async =>
-      await mongoStorage.withSyncAsync((sync) async =>
-          await RecordMetaAccessor(sync).insert(entity.toDto()));
-
-  Future<WriteResult> update(RecordMeta entity) async =>
-      await mongoStorage.withSyncAsync((sync) async =>
-          await RecordMetaAccessor(sync).updateBy(entity.id, entity.toDto()));
-
-  Stream<RepoEvent<RecordMeta>> watchAll() async* {
-    final sync = await mongoStorage.asyncDb;
-    yield* RecordMetaAccessor(sync).watchAll().map(
-          (event) => RepoEvent.of<RecordMeta, RecordMetaDto>(
-              event, (dto) => dto?.toDm(_attrDtoToAttr)),
-        );
-  }
-
-  Future<WriteResult> save(RecordMeta schema) async {
-    final exist = await findByOr(schema.id);
-    if (exist == null) {
-      return insert(schema);
-    } else {
-      return update(schema);
-    }
+    return RecordMetaAccessor(sync);
   }
 }
