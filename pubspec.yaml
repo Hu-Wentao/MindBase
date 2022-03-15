@@ -48,6 +48,9 @@ dependencies:
   adaptive_navigation:
   line_icons:
   ndialog:
+#  data_table2:
+  responsive_table:
+  logging:
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +71,8 @@ dev_dependencies:
 dependency_overrides:
   get_arch_core:
     path: ../get_arch/get_arch_core
+  provider_sidecar:
+    path: ../provider_sidecar
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

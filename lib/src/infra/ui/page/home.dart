@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:mind_base/src/application/provider/record_provider.dart';
 import 'package:mind_base/src/application/provider/schema_provider.dart';
 import 'package:mind_base/src/infra/ui/form/schema_form.dart';
+import 'package:mind_base/src/infra/ui/widget/data_frame.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_table/responsive_table.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -19,30 +22,46 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-      ),
-      body: Row(
-        children: [
-          /// 展示 schema List
-          Consumer<SchemaProvider>(
-            builder: (c, t, _) => Container(
-              width: 200,
-              child: ListView.builder(
-                itemCount: t.schemas.length,
-                itemBuilder: (c, i) => ListTile(
-                  title: Text(t.schemas[i].name),
-                  onTap: () {
-                    // todo
-                  },
-                ),
-              ),
-            ),
-          ),
+      appBar: AppBar(title: const Text('Home')),
+      body: Consumer<RecordProvider>(
+          builder: (c, pRecord, _) => Row(
+                children: [
+                  /// 展示 schema List
+                  Consumer<SchemaProvider>(
+                    builder: (c, t, _) => Container(
+                      width: 200,
+                      child: ListView.builder(
+                        itemCount: t.data.length,
+                        itemBuilder: (c, i) => ListTile(
+                          title: Text(t.data[i].name),
+                          onTap: () => pRecord.actWatchSchema(t.data[i]),
+                        ),
+                      ),
+                    ),
+                  ),
 
-          /// 展示对应的表
-        ],
-      ),
+                  /// table
+                  if (pRecord.selectedSchema == null)
+                    const Expanded(
+                      child: Center(child: Text("请选择/创建 一个Schema")),
+                    ),
+                  if (pRecord.selectedSchema != null)
+                    Expanded(
+                      child: DataFrame2(
+                        headers: pRecord.selectedSchema!.attributes
+                            .map((attr) => DatatableHeader(
+                                  text: attr.name,
+                                  value: "${attr.k}",
+                                ))
+                            .toList()
+                          ..insert(0, DatatableHeader(text: 'ID', value: "id")),
+                        data: pRecord.data
+                            .map((e) => e.toDto().toTableMap())
+                            .toList(),
+                      ),
+                    ),
+                ],
+              )),
       floatingActionButton: Consumer<SchemaProvider>(
         builder: (c, t, _) => FloatingActionButton(
           child: const Icon(Icons.add),
