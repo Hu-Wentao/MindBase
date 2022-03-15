@@ -9,6 +9,33 @@ extension SelectorBuilderX on SelectorBuilder {
   toQuery() => map['\$query'];
 }
 
+enum MongoEventType {
+  insert, // 元素插入
+  delete, // 某个元素被移除 - 只返回id
+  replace, // 某个元素被替换 - 返回新的完整对象
+  update, // 某个元素被更新
+  drop,
+  rename,
+  dropDatabase,
+  invalidate,
+}
+
+/// 某个 MongoEntityDto对应的collection的 watch事件
+class WatchEvent<T extends IMongoEntityDto> {
+  final mg.ChangeEvent _changeEvent;
+  final T? Function(Map<String, Object?>? mgJson) mongoJsonToDtoOr;
+
+  WatchEvent(this._changeEvent, this.mongoJsonToDtoOr);
+
+  MongoEventType get type =>
+      MongoEventType.values.asNameMap()[_changeEvent.operationType]!;
+
+  ObjectId get documentId => (_changeEvent.serverResponse['documentKey']
+      as Map<String, ObjectId>)['_id'] as ObjectId;
+
+  T? get document => mongoJsonToDtoOr(_changeEvent.fullDocument);
+}
+
 abstract class IMongoAccessor<T extends IMongoEntityDto> {
   Db get db;
 
@@ -22,10 +49,10 @@ abstract class IMongoAccessor<T extends IMongoEntityDto> {
 
   Stream<T> findAll();
 
-  Stream<T> watchById(ObjectId id);
+  Stream<WatchEvent<T>> watchById(ObjectId id);
 
   // todo 性能优化： 监视所有的更新，会导致性能问题；后期考虑引入工作区的概念,即使改为 `watchBy`
-  Stream<T> watchAll();
+  Stream<WatchEvent<T>> watchAll();
 }
 
 abstract class BaseMongoAccessor<T extends IMongoEntityDto>
@@ -45,19 +72,22 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
       db.collection(collectionName).find().map(mongoJsonToDto);
 
   @override
-  Stream<T> watchAll() => db
-      .collection(collectionName)
-      .watch(
-        AggregationPipelineBuilder()
-            .addStage(Match(where.exists('_id').toQuery()))
-            .build(),
-      )
-      .map<mg.ChangeEvent>((e) => e as mg.ChangeEvent)
-      // todo 这里默认所有的事件都是正确的, 所以添加了`!`
-      .map((v) => mongoJsonToDtoOr((v.fullDocument))!);
+  Stream<WatchEvent<T>> watchAll() => db
+          .collection(collectionName)
+          .watch(
+            AggregationPipelineBuilder()
+                .addStage(Match(where.exists('_id').toQuery()))
+                .build(),
+          )
+          .map<mg.ChangeEvent>((e) => e as mg.ChangeEvent)
+          // todo 这里默认所有的事件都是正确的, 所以添加了`!`
+          .map((v) {
+        final v2 = v;
+        return WatchEvent<T>(v, mongoJsonToDtoOr);
+      });
 
   @override
-  Stream<T> watchById(ObjectId id) => db
+  Stream<WatchEvent<T>> watchById(ObjectId id) => db
       .collection(collectionName)
       .watch(
         AggregationPipelineBuilder()
@@ -65,8 +95,7 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
             .build(),
       )
       .map<mg.ChangeEvent>((e) => e as mg.ChangeEvent)
-      // todo 这里默认所有的事件都是正确的, 所以添加了`!`
-      .map((v) => mongoJsonToDtoOr((v.fullDocument))!);
+      .map((v) => WatchEvent<T>(v, mongoJsonToDtoOr));
 
   /// 当ObjectId已存在时,更新无效
   Future<WriteResult> insert(T dto) async =>
@@ -99,14 +128,14 @@ class RecordAccessor extends BaseMongoAccessor<RecordDto> {
       .find(where.eq('metaId', metaId))
       .map((event) => RecordDto.fromMongoJson(event));
 
-  Stream<RecordDto> watchAllByMetaId(ObjectId metaId) => db
+  Stream<WatchEvent<RecordDto>> watchAllByMetaId(ObjectId metaId) => db
       .collection(collectionName)
       .watch(
         AggregationPipelineBuilder()
             .addStage(Match(where.eq('metaId', metaId)))
             .build(),
       )
-      .map((event) => RecordDto.fromMongoJson(event));
+      .map((e) => WatchEvent<RecordDto>(e, mongoJsonToDtoOr));
 }
 
 /// 即Schema
