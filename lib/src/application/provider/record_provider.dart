@@ -2,27 +2,27 @@ import 'dart:async';
 
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
-import 'package:mind_base/src/domain/repo.dart';
+import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
 class RecordProvider extends ProviderSidecar {
-  late final RecordRepo _recordRepo;
+  late final RecordAccessor _recordAccessor;
 
   // 防止同一个对象状态更新后被重复缓存
-  final Map<ObjectId, Record> _cache = {};
+  final Map<ObjectId, RecordDto> _cache = {};
   RecordMeta? selectedSchema;
-  StreamSubscription<RepoEvent<Record>>? _recordSub;
+  StreamSubscription<WatchEvent<RecordDto>>? _recordSub;
 
-  List<Record> get data => _cache.values.toList();
+  List<RecordDto> get data => _cache.values.toList();
 
   int get dataLength => _cache.length;
 
   @override
   onInitializing() => setInitialized(
-        "初始化Repo",
-        () => _recordRepo = sl<RecordRepo>(),
+        "初始化 Accessor",
+        () => _recordAccessor = sl<RecordAccessor>(),
       );
 
   Future<void> actWatchSchema(RecordMeta schema) => actWrapper(
@@ -32,11 +32,13 @@ class RecordProvider extends ProviderSidecar {
         ),
       );
 
-  Future<void> actSaveRecord(RecordDto? dto) => actWrapper(() {
-    log("actSaveRecord ${dto?.toJson()}");
+  Future<void> actSaveRecord(RecordDto? dto) => actWrapper(() async {
+        log("actSaveRecord ${dto?.toJson()}");
         // 无需set,因为插入成功后, watch会监听到新的变更
         if (dto == null) return;
-        _recordRepo.save(dto.toDomain(selectedSchema!));
+        await _recordAccessor.save(dto.id, dto).then((value) {
+          log("actSaveRecord 插入成功");
+        });
       });
 
   void _watchSchema(RecordMeta schema) {
@@ -46,32 +48,32 @@ class RecordProvider extends ProviderSidecar {
 
     selectedSchema = schema;
     // 查询
-    _recordRepo.findAllByMeta(schema.id).listen(_onInsert);
+    _recordAccessor.findAllByMetaId(schema.id).listen(_onInsert);
     // 监听
-    _recordSub = _recordRepo.watchAllByMeta(schema.id).listen(_onUpdate);
+    _recordSub = _recordAccessor.watchAllByMetaId(schema.id).listen(_onUpdate);
   }
 
-  void _onInsert(Record event) => setInitialized("初始化缓存", () {
+  void _onInsert(RecordDto event) => setInitialized("初始化缓存", () {
         _cache[event.id] = event;
       });
 
-  void _onUpdate(RepoEvent<Record> event) => setInitialized("缓存更新", () {
+  void _onUpdate(WatchEvent<RecordDto> event) => setInitialized("缓存更新", () {
         switch (event.type) {
-          case RepoEventType.insert:
-          case RepoEventType.replace:
-          case RepoEventType.update:
-            _cache[event.ettId] = (event.entity!);
+          case WatchEventType.insert:
+          case WatchEventType.replace:
+          case WatchEventType.update:
+            _cache[event.ettId] = (event.document!);
             break;
-          case RepoEventType.delete:
+          case WatchEventType.delete:
             _cache.remove(event.ettId);
             break;
-          case RepoEventType.drop:
+          case WatchEventType.drop:
             print("###debug drop 尚未确认 '${event.type}'事件的机制, 按照delete处理");
             _cache.remove(event.ettId);
             break;
-          case RepoEventType.rename:
-          case RepoEventType.dropDatabase:
-          case RepoEventType.invalidate:
+          case WatchEventType.rename:
+          case WatchEventType.dropDatabase:
+          case WatchEventType.invalidate:
             print("###debug drop 尚未确认 '${event.type}'事件的机制");
             break;
         }
