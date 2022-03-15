@@ -127,6 +127,7 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
       .collection(collectionName)
       .replaceOne(where.id(dto.id), dto.toMongoDto());
 }
+
 @lazySingleton
 class RecordAccessor extends BaseMongoAccessor<RecordDto> {
   RecordAccessor(this.db);
@@ -142,19 +143,12 @@ class RecordAccessor extends BaseMongoAccessor<RecordDto> {
   RecordDto mongoJsonToDto(Map<String, dynamic> mgJson) =>
       RecordDto.fromMongoJson(mgJson);
 
-  Stream<RecordDto> findAllByMetaId(ObjectId metaId) => db
-      .collection(collectionName)
-      .find(where.eq('metaId', metaId))
-      .map((event) => RecordDto.fromMongoJson(event));
+  Stream<RecordDto> findAllByMetaId(ObjectId metaId) =>
+      findAll(selector: where.eq('metaId', metaId));
 
-  Stream<WatchEvent<RecordDto>> watchAllByMetaId(ObjectId metaId) => db
-      .collection(collectionName)
-      .watch(
-        AggregationPipelineBuilder()
-            .addStage(Match(where.eq('metaId', metaId)))
-            .build(),
-      )
-      .map((e) => WatchEvent<RecordDto>(e, mongoJsonToDtoOr));
+  Stream<WatchEvent<RecordDto>> watchAllByMetaId(ObjectId metaId) => watchAll(
+      builder: AggregationPipelineBuilder()
+          .addStage(Match(where.eq('metaId', metaId).toQuery())));
 }
 
 /// 即Schema
