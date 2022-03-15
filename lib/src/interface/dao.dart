@@ -31,7 +31,7 @@ class WatchEvent<T extends IMongoEntityDto> {
       MongoEventType.values.asNameMap()[_changeEvent.operationType]!;
 
   ObjectId get documentId => (_changeEvent.serverResponse['documentKey']
-      as Map<String, ObjectId>)['_id'] as ObjectId;
+      as Map<String, dynamic>)['_id'] as ObjectId;
 
   T? get document => mongoJsonToDtoOr(_changeEvent.fullDocument);
 }
