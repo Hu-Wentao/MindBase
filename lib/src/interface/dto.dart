@@ -66,9 +66,6 @@ class RecordDto implements IDto, IMongoEntityDto {
       }..addEntries(fields.entries
           .map((e) => MapEntry(e.key.toString(), e.value.toJson())));
 
-  @override
-  String toString() => toJson().toString();
-
   Record toDm(RecordMeta Function(ObjectId metaId) getMeta) =>
       toDomain(getMeta(metaId));
 
@@ -77,6 +74,13 @@ class RecordDto implements IDto, IMongoEntityDto {
         meta: m,
         fields: fields,
       );
+
+  Record? toDomainOr(RecordMeta? m) => m == null ? null : toDomain(m);
+
+  /// 向Table提供Map
+  Map<String, dynamic> toTableMap() =>
+      fields.map((key, value) => MapEntry("$key", "${value.toJson()}"))
+        ..['id'] = id.toHexString();
 }
 
 /// 表头属性
