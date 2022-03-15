@@ -5,7 +5,9 @@ import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_frame.dart';
 import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
+import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:provider_sidecar/provider_sidecar.dart';
+import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 /// Record数据本身将缓存在DataSource中, Provider只用于创建和持有StreamSubscription
 class RecordProvider extends ProviderSidecar {
@@ -15,6 +17,10 @@ class RecordProvider extends ProviderSidecar {
 
   // List<RecordDto> get data => _cache.values.toList();
   // int get dataLength => _cache.length;
+
+  final Map<ObjectId, RecordDataGridSource> _streamCache = {};
+
+  // final Map<ObjectId, Stream<WatchEvent<RecordDto>>> _streamCache = {};
 
   @override
   onInitializing() => setInitialized(
@@ -38,23 +44,18 @@ class RecordProvider extends ProviderSidecar {
         });
       });
 
-  void _watchSchema(RecordMeta schema) {
-    if (schema == selectedSchema) return;
-    // // 取消已有监听
-    // _recordSub?.cancel();
+  RecordDataGridSource _watchSchema(RecordMeta schema) {
     selectedSchema = schema;
-    // // 查询
-    // _recordAccessor.findAllByMetaId(schema.id).listen(_onInsert);
-    // // 监听
-    // _recordSub = _recordAccessor.watchAllByMetaId(schema.id).listen(_onUpdate);
+    if (_streamCache[schema.id] == null) {
+      _streamCache[schema.id] = RecordDataGridSource(
+        schema,
+        _recordAccessor.findAllByMetaId(schema.id).listen(null),
+        _recordAccessor.watchAllByMetaId(schema.id).listen(null),
+      );
+    }
+    return _streamCache[schema.id]!;
   }
 
-  RecordDataGridSource actGetDataSource({RecordMeta? schema}) {
-    schema ??= selectedSchema!;
-    return RecordDataGridSource(
-      schema,
-      _recordAccessor.findAllByMetaId(schema.id).listen(null),
-      _recordAccessor.watchAllByMetaId(schema.id).listen(null),
-    );
-  }
+  RecordDataGridSource actGetDataSource({RecordMeta? schema}) =>
+      _watchSchema(schema ?? selectedSchema!);
 }

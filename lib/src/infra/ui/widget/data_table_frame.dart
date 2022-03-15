@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:logging/logging.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/infra/ui/form/record_form.dart';
 import 'package:mind_base/src/interface/dao.dart';
@@ -11,6 +12,8 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 /// 用于构建一张表的数据源, 包含Schema和Rows的数据, 相关Rows的Stream
 class RecordDataGridSource extends DataGridSource {
+  late final Logger log;
+
   final RecordMeta schema;
   final StreamSubscription<RecordDto> initDataSub;
   final StreamSubscription<WatchEvent<RecordDto>> recordSub;
@@ -25,6 +28,7 @@ class RecordDataGridSource extends DataGridSource {
     recordSub.onData(_onUpdate);
     _schemaDto = schema.toDto();
     _attrKeyList = _schemaDto.toGridKeyNameMap().keys.toList();
+    log = Logger("$runtimeType");
   }
 
   // 防止同一个对象状态更新后被重复缓存
@@ -36,6 +40,7 @@ class RecordDataGridSource extends DataGridSource {
 
   // 更新一整行
   _notifyDataRow(int rowIndex, RecordDto entity) {
+    log.info("刷新一行数据");
     schema.attributes.map((e) {
       final colIndex = _attrKeyList.indexOf("${e.k}");
       // 更新指定单元格
@@ -46,7 +51,10 @@ class RecordDataGridSource extends DataGridSource {
   }
 
   // 更新全体数据, 当row新增或移除时调用
-  _notifyAll() => notifyListeners();
+  _notifyAll() {
+    log.info("刷新全部数据");
+    notifyListeners();
+  }
 
   void _onInsertDto(RecordDto entity) {
     _cache.add(entity);
