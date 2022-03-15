@@ -114,6 +114,8 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
 class RecordAccessor extends BaseMongoAccessor<RecordDto> {
   RecordAccessor(this.db);
 
+  // todo 当前是将不同schema对应的record集合都存放在同一个集合(record)中
+  // todo 后期考虑将不同schema对应的record存放在各自的${record_xxx}集合中
   @override
   String get collectionName => 'record';
   @override

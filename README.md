@@ -1,16 +1,22 @@
-# Mind Base
+# Mind Base 设计
 
 > MindBase更像是另一种"Java语言", dart语言类比构建JVM的"C语言"
 
+## 标志:
+
+- # dev 设计中的实现功能选项(尚未确定是否要实现)
+- # todo 预备实现的功能(确定下一步要实现)
+- # check 当前已实现的功能
+
 ## RecordMeta 记录模式设计(Schema)
 
-## Meta v2 todo
+### Meta v2 (重命名为Schema) #todo 
 
-- 将 List<Attribute> 改为 Map<int,Attrbute>. 即,将Attr存储的`k`提取到Meta内部.
+- 将 List<Attribute> 改为 Map<int,Attribute>. 即,将Attr存储的`k`提取到Meta内部.
 
     - 优点: 便于序列化, 便于分类key值
 
-- 类重命名为 Sechma
+- 类重命名为 Schema
 
 ## Attr 属性设计
 
@@ -40,15 +46,21 @@
 
     - 缺点: 可能存在比较大的性能损耗问题 (考虑参考Dart,引入native关键字...)
 
-### 属性v2
+### 属性v2 #check
 
 - 值检查表达式: 在set值时,检查值是否符合Attribute的Type要求
+
+## Record 记录设计
+
+### 记录 v2 (独立collection) #todo
+
+- 当前所有的 Record都存放在同一个collection`record`中, 考虑将不同schema对应的record存放到对应的`record_${schema.id}`集合中
 
 ## Value 字段值设计
 
 - 关于转换整列字段类型: 可以考虑新增一列,等待转换完成后,切换列的k
 
-### 字段值 v2A (Value, String)
+### 字段值 v2A (Value, String) #check
 
 > 可以允许用户输入不符合要求的值
 
@@ -58,13 +70,13 @@
 
     - (`mongo_dart`自带支持这两个类型, 此外还有bson.TimeStamp类型)
 
-### 字段值 v2B (Value, dynamic)
+### 字段值 v2B (Value, dynamic) #dev
 
 > 存储了实际的值类型, 列类型变更时,需要遍历,转换对应字段的类型
 
 - 使用`Mongo_Dart` 返回的 dynamic Map操作Value, 包括但不限于 Object,DataTime, 和int,bool等类型
 
-### 字段值 v2C (Value, T)
+### 字段值 v2C (Value, T) #dev
 
 > <考虑后期实现> 要求严格, 存储了实际的值类型, 列类型变更时,需要遍历,转换对应字段的类型
 
@@ -111,6 +123,21 @@
 - 优) 新增一个Attribute类型为Method
 
 ---
+
+# 实现细节
+
+## Record的存放
+
+### 是否应该将属于不同schema(record_meta)的record存放在同一个collection中?
+
+### 当前方案: 存放在同一个集合.
+
+- 优点:
+- 缺点: 造成record集合太大
+
+  ### 不同schema的record存放在 "tb_${schemaId}"集合中
+- 优点:
+- 缺点:
 
 ---
 
@@ -167,7 +194,3 @@
 ### 方法的处理(有状态的函数)
 
 - 新增一个 FUNC类型(与number等平行), 可以传入外部的参数,类比一个 实例的方法,可以从外部接收参数,并返回值
-
-
-
-
