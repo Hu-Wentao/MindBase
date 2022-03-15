@@ -49,7 +49,7 @@ class _HomePageState extends State<HomePage> {
                     Expanded(
                       child: DataTableFrame(
                         schema: pRecord.selectedSchema!,
-                        onCreate: pRecord.actSaveRecord,
+                        onSaveRecord: pRecord.actSaveRecord,
                         headers: pRecord.selectedSchema!.attributes
                             .map((attr) => DatatableHeader(
                                   text: attr.name,
@@ -57,9 +57,7 @@ class _HomePageState extends State<HomePage> {
                                 ))
                             .toList()
                           ..insert(0, DatatableHeader(text: 'ID', value: "id")),
-                        data: pRecord.data
-                            .map((e) => e.toDto().toTableMap())
-                            .toList(),
+                        data: pRecord.data.map((e) => e.toTableMap()).toList(),
                       ),
                     ),
                 ],

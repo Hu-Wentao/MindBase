@@ -10,26 +10,26 @@ import 'package:responsive_table/responsive_table.dart';
 
 class DataFrameTitle extends StatelessWidget {
   final RecordMeta schema;
-  final Future<void> Function(RecordDto? dto) onCreate;
+  final Future<void> Function(RecordDto? dto) onSaveRecord;
   final _kRecordBuilder = GlobalKey<FormBuilderState>();
 
   DataFrameTitle({
     Key? key,
     required this.schema,
-    required this.onCreate,
+    required this.onSaveRecord,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) => TextButton.icon(
-        onPressed: () async => await onCreate(
-          await _onCreateRecord(context, schema),
+        onPressed: () async => await onSaveRecord(
+          await _createRecord(context, schema),
         ),
         icon: const Icon(Icons.add),
         label: const Text("new item"),
       );
 
   //
-  Future<RecordDto?> _onCreateRecord(
+  Future<RecordDto?> _createRecord(
     BuildContext c,
     RecordMeta schema,
   ) =>
@@ -46,7 +46,6 @@ class DataFrameTitle extends StatelessWidget {
               onPressed: () {
                 final checkAttr =
                     _kRecordBuilder.currentState?.saveAndValidate() ?? false;
-                _kRecordBuilder.currentState?.save();
                 if (checkAttr) {
                   final map = _kRecordBuilder.currentState!.value;
                   final dto = RecordDto.fromForm(map);
@@ -63,9 +62,9 @@ class DataFrameTitle extends StatelessWidget {
       ).show(c);
 }
 
-class DataTableFrame extends StatelessWidget {
+class DataTableFrame extends StatefulWidget {
   final RecordMeta schema;
-  final Future<void> Function(RecordDto? dto) onCreate;
+  final Future<void> Function(RecordDto? dto) onSaveRecord;
 
   // todo 改为Function schema::attr->DatatableHeader
   final List<DatatableHeader> headers;
@@ -76,8 +75,28 @@ class DataTableFrame extends StatelessWidget {
     required this.schema,
     required this.headers,
     required this.data,
-    required this.onCreate,
+    required this.onSaveRecord,
   }) : super(key: key);
+
+  @override
+  State<DataTableFrame> createState() => _DataTableFrameState();
+}
+
+class _DataTableFrameState extends State<DataTableFrame> {
+  late List<Map<String, dynamic>> _selectedList;
+  late List<bool> _expandedList;
+  final bool _showSelect = true;
+
+  @override
+  initState() {
+    super.initState();
+    _selectedList = [];
+    // fixme _expandedList 的长度必须与data长度相同,但问题在于data长度会变化,而初始值总是0
+    // fixme 原因未知, 可尝试不用 data.length,而是手动输入一个较大数值,会有效果
+    _expandedList = List.generate(widget.data.length, (i) => false);
+    print(
+        "initState data ${widget.data} expandedList: $_expandedList, selectedList: $_selectedList");
+  }
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
@@ -95,53 +114,56 @@ class DataTableFrame extends StatelessWidget {
                 clipBehavior: Clip.none,
                 child: ResponsiveDatatable(
                   title: DataFrameTitle(
-                    schema: schema,
-                    onCreate: onCreate,
+                    schema: widget.schema,
+                    onSaveRecord: widget.onSaveRecord,
                   ),
                   reponseScreenSizes: const [ScreenSize.xs],
                   // actions: [
-                    // if (_isSearch)
-                    //   Expanded(
-                    //       child: TextField(
-                    //     decoration: InputDecoration(
-                    //         hintText: 'Enter search term based on ' +
-                    //             _searchKey!
-                    //                 .replaceAll(new RegExp('[\\W_]+'), ' ')
-                    //                 .toUpperCase(),
-                    //         prefixIcon: IconButton(
-                    //             icon: const Icon(Icons.cancel),
-                    //             onPressed: () {
-                    //               setState(() {
-                    //                 _isSearch = false;
-                    //               });
-                    //               _initializeData();
-                    //             }),
-                    //         suffixIcon: IconButton(
-                    //             icon: const Icon(Icons.search),
-                    //             onPressed: () {})),
-                    //     onSubmitted: (value) {
-                    //       _filterData(value);
-                    //     },
-                    //   )),
-                    // if (!_isSearch)
-                    //   IconButton(
-                    //       icon: const Icon(Icons.search),
-                    //       onPressed: () {
-                    //         setState(() {
-                    //           _isSearch = true;
-                    //         });
-                    //       })
+                  // if (_isSearch)
+                  //   Expanded(
+                  //       child: TextField(
+                  //     decoration: InputDecoration(
+                  //         hintText: 'Enter search term based on ' +
+                  //             _searchKey!
+                  //                 .replaceAll(new RegExp('[\\W_]+'), ' ')
+                  //                 .toUpperCase(),
+                  //         prefixIcon: IconButton(
+                  //             icon: const Icon(Icons.cancel),
+                  //             onPressed: () {
+                  //               setState(() {
+                  //                 _isSearch = false;
+                  //               });
+                  //               _initializeData();
+                  //             }),
+                  //         suffixIcon: IconButton(
+                  //             icon: const Icon(Icons.search),
+                  //             onPressed: () {})),
+                  //     onSubmitted: (value) {
+                  //       _filterData(value);
+                  //     },
+                  //   )),
+                  // if (!_isSearch)
+                  //   IconButton(
+                  //       icon: const Icon(Icons.search),
+                  //       onPressed: () {
+                  //         setState(() {
+                  //           _isSearch = true;
+                  //         });
+                  //       })
                   // ],
-                  headers: headers,
-                  source: data,
-                  // selecteds: _selecteds,
-                  // showSelect: _showSelect,
+                  headers: widget.headers,
+                  source: widget.data,
+                  selecteds: _selectedList,
+                  // 被选中的data
+                  showSelect: _showSelect,
                   autoHeight: false,
                   dropContainer: (data) {
-                    if (int.tryParse(data['id'].toString())!.isEven) {
-                      return const Text("is Even");
-                    }
-                    return _DropDownContainer(data: data);
+                    print("dropContainer data: $data");
+                    // if (int.tryParse(data['id'].toString())!.isEven) {
+                    //   return const Text("is Even");
+                    // }
+                    // return _DropDownContainer(data: data);
+                    return Container();
                   },
                   onChangedRow: (value, header) {
                     /// print(value);
@@ -177,7 +199,7 @@ class DataTableFrame extends StatelessWidget {
                     //   _isLoading = false;
                     // });
                   },
-                  // expanded: _expanded,
+                  expanded: _expandedList,
                   // sortAscending: _sortAscending,
                   // sortColumn: _sortColumn,
                   // isLoading: _isLoading,
