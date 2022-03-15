@@ -52,7 +52,12 @@ abstract class IMongoAccessor<T extends IMongoEntityDto> {
   Stream<WatchEvent<T>> watchById(ObjectId id);
 
   // todo 性能优化： 监视所有的更新，会导致性能问题；后期考虑引入工作区的概念,即使改为 `watchBy`
-  Stream<WatchEvent<T>> watchAll();
+  // builder==null表示监听集合内所有更新
+  Stream<WatchEvent<T>> watchAll({AggregationPipelineBuilder? builder});
+
+  Future<WriteResult> insert(T dto);
+
+  Future<WriteResult> replace(T dto);
 }
 
 abstract class BaseMongoAccessor<T extends IMongoEntityDto>
@@ -68,23 +73,19 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
       .then(mongoJsonToDtoOr);
 
   @override
-  Stream<T> findAll() =>
-      db.collection(collectionName).find().map(mongoJsonToDto);
+  Stream<T> findAll({SelectorBuilder? selector}) =>
+      db.collection(collectionName).find(selector).map(mongoJsonToDto);
 
   @override
-  Stream<WatchEvent<T>> watchAll() => db
-          .collection(collectionName)
-          .watch(
-            AggregationPipelineBuilder()
-                .addStage(Match(where.exists('_id').toQuery()))
-                .build(),
-          )
-          .map<mg.ChangeEvent>((e) => e as mg.ChangeEvent)
-          // todo 这里默认所有的事件都是正确的, 所以添加了`!`
-          .map((v) {
-        final v2 = v;
-        return WatchEvent<T>(v, mongoJsonToDtoOr);
-      });
+  Stream<WatchEvent<T>> watchAll({AggregationPipelineBuilder? builder}) => db
+      .collection(collectionName)
+      .watch(
+        builder?.build() ??
+            AggregationPipelineBuilder().addStage(
+              Match(where.exists('_id').toQuery()),
+            ),
+      )
+      .map((e) => WatchEvent<T>(e, mongoJsonToDtoOr));
 
   @override
   Stream<WatchEvent<T>> watchById(ObjectId id) => db
@@ -98,14 +99,29 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
       .map((v) => WatchEvent<T>(v, mongoJsonToDtoOr));
 
   /// 当ObjectId已存在时,更新无效
+  @override
   Future<WriteResult> insert(T dto) async =>
       await db.collection(collectionName).insertOne(dto.toMongoDto());
 
+  /// 如果已存在,
+  Future<WriteResult> save(ObjectId id, T dto) async {
+    final exist = await findById(id);
+    if (exist == null) {
+      return await db.collection(collectionName).insertOne(dto.toMongoDto());
+    } else {
+      // fixme ... 目前只能实现替换,更新需要指定字段
+      return await replace(dto);
+      // return await updateBy(id, dto);
+    }
+  }
+
+  @Deprecated("实现错误! 更新方法需要指定更新的属性, 使用 ModifierBuilder")
   Future<WriteResult> updateBy(ObjectId id, T dto) async => await db
       .collection(collectionName)
       .updateOne(where.id(id), dto.toMongoDto());
 
   // Future<WriteResult> replace(T dto);
+  @override
   Future<WriteResult> replace(T dto) async => await db
       .collection(collectionName)
       .replaceOne(where.id(dto.id), dto.toMongoDto());
