@@ -23,15 +23,34 @@ class RecordDto implements IDto, IMongoEntityDto {
   final ObjectId metaId;
   final Map<int, Value> fields;
 
-  RecordDto(this.id, this.metaId, this.fields);
+  const RecordDto({
+    required this.id,
+    required this.metaId,
+    required this.fields,
+  });
 
-  factory RecordDto.fromDomain(Record record) =>
-      RecordDto(record.id, record.meta.id, record.fields);
+  factory RecordDto.builder({
+    ObjectId? id,
+    required ObjectId schemaId,
+    Map<int, Value>? fields,
+  }) =>
+      RecordDto(
+        id: id ?? ObjectId(),
+        metaId: schemaId,
+        fields: fields ?? {},
+      );
+
+  factory RecordDto.fromDomain(Record record) => RecordDto(
+        id: record.id,
+        metaId: record.meta.id,
+        fields: record.fields,
+      );
 
 // {id: 6227568dda2194cb3589f5d4, metaId: 6227568dda2194cb3589f5d5, 1: {v: 123, e: null}, 2: {v: aaa, e: null}}
   factory RecordDto.fromJson(Map<String, dynamic> json) => RecordDto(
-          ObjectId.fromHexString(json.remove('_id')),
-          ObjectId.fromHexString(json.remove('metaId')), json.map((key, value) {
+      id: ObjectId.fromHexString(json.remove('_id')),
+      metaId: ObjectId.fromHexString(json.remove('metaId')),
+      fields: json.map((key, value) {
         final js2 = (value as Map<String, dynamic>); // 动态字段
         return MapEntry(
             int.parse(key),
@@ -47,8 +66,9 @@ class RecordDto implements IDto, IMongoEntityDto {
     ..['metaId'] = metaId;
 
   factory RecordDto.fromMongoJson(Map<String, dynamic> json) => RecordDto(
-          (json.remove('_id') as ObjectId), (json.remove('metaId') as ObjectId),
-          json.map((key, value) {
+      id: (json.remove('_id') as ObjectId),
+      metaId: (json.remove('metaId') as ObjectId),
+      fields: json.map((key, value) {
         final js2 = (value as Map<String, dynamic>); // 动态字段
         return MapEntry(
             int.parse(key),

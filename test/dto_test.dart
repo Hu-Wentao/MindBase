@@ -8,12 +8,13 @@ import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 main() {
   test("RecordDto", () {
     final dto = RecordDto(
-        ObjectId.fromHexString('62275a65418db3d74941d6b3'),
-        ObjectId.fromHexString('62275a65418db3d74941d6b4'), {
-      1: Value.of('123'),
-      2: Value.of('aaa'),
-      3: Value.of('ccc'),
-    });
+        id: ObjectId.fromHexString('62275a65418db3d74941d6b3'),
+        metaId: ObjectId.fromHexString('62275a65418db3d74941d6b4'),
+        fields: {
+          1: Value.of('123'),
+          2: Value.of('aaa'),
+          3: Value.of('ccc'),
+        });
 
     final js = dto.toJson();
     final jsStr = json.encode(js);
