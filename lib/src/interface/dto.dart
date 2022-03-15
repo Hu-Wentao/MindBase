@@ -65,6 +65,27 @@ class RecordDto implements IDto, IMongoEntityDto {
     ..['_id'] = id
     ..['metaId'] = metaId;
 
+  factory RecordDto.fromForm(Map<String, dynamic> form) {
+    final map = Map.of(form);
+    return RecordDto(
+      // form中是'id', 而不是'_id'
+      id: ObjectId.fromHexString(map.remove('id') as String),
+      metaId: ObjectId.fromHexString(map.remove('metaId') as String),
+      fields: map.map((key, value) {
+        final js2 = (value as String); // 动态字段
+        // fixme 没有处理error的情况
+        return MapEntry(
+            int.parse(key),
+            Value(
+              js2,
+              null,
+              // js2['v'] as String,
+              // js2['e'],
+            ));
+      }),
+    );
+  }
+
   factory RecordDto.fromMongoJson(Map<String, dynamic> json) => RecordDto(
       id: (json.remove('_id') as ObjectId),
       metaId: (json.remove('metaId') as ObjectId),
