@@ -19,15 +19,36 @@ class SchemaProvider extends ProviderSidecar {
     _schemaRepo = sl<SchemaRepo>();
 
     // 先查询有所元素
-    _schemaRepo.findAll().listen(_onUpdate);
+    _schemaRepo.findAll().listen(_onInsert);
     // 然后开始监听变更
-    // todo test 如果时删除了元素，watch是否也会产生事件?
     _schemaRepo.watchAll().listen(_onUpdate);
     setInitialized();
   }
 
-  void _onUpdate(RecordMeta event) => setInitialized("刷新缓存", () {
-        _cache[event.id] = event;
+  void _onInsert(RecordMeta meta) => setInitialized("初始化缓存", () {
+        _cache[meta.id] = meta;
+      });
+
+  void _onUpdate(RepoEvent<RecordMeta> event) => setInitialized("刷新缓存", () {
+        switch (event.type) {
+          case RepoEventType.insert:
+          case RepoEventType.replace:
+          case RepoEventType.update:
+            _cache[event.ettId] = (event.entity!);
+            break;
+          case RepoEventType.delete:
+            _cache.remove(event.ettId);
+            break;
+          case RepoEventType.drop:
+            print("###debug drop 尚未确认 '${event.type}'事件的机制, 按照delete处理");
+            _cache.remove(event.ettId);
+            break;
+          case RepoEventType.rename:
+          case RepoEventType.dropDatabase:
+          case RepoEventType.invalidate:
+            print("###debug drop 尚未确认 '${event.type}'事件的机制");
+            break;
+        }
       });
 
   Future<void> actInsertSchema(RecordMeta schema) =>
