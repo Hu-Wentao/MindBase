@@ -1,3 +1,4 @@
+import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/commands/aggreagation_commands/aggregate/return_classes/change_event.dart'
@@ -126,7 +127,7 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
       .collection(collectionName)
       .replaceOne(where.id(dto.id), dto.toMongoDto());
 }
-
+@lazySingleton
 class RecordAccessor extends BaseMongoAccessor<RecordDto> {
   RecordAccessor(this.db);
 
@@ -157,6 +158,7 @@ class RecordAccessor extends BaseMongoAccessor<RecordDto> {
 }
 
 /// 即Schema
+@lazySingleton
 class RecordMetaAccessor extends BaseMongoAccessor<RecordMetaDto> {
   RecordMetaAccessor(this.db);
 

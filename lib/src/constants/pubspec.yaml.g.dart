@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'1'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1647159131;
+const int timestamp = 1647346558;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -109,6 +109,9 @@ const Map<String, Object> devDependencies = <String, Object>{
 const Map<String, Object> dependencyOverrides = <String, Object>{
   'get_arch_core': <String, Object>{
     'path': r'../get_arch/get_arch_core',
+  },
+  'provider_sidecar': <String, Object>{
+    'path': r'../provider_sidecar',
   },
 };
 

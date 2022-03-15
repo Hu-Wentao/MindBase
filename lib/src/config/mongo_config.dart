@@ -1,5 +1,6 @@
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:mind_base/src/infra/mongo_storage.dart';
+import 'package:mongo_dart/mongo_dart.dart';
 
 @module
 abstract class ConfigMongo {
@@ -8,4 +9,7 @@ abstract class ConfigMongo {
         port: 30001,
         databaseName: "dev_mind_base",
       ));
+
+  @preResolve
+  Future<Db> get db async => await mongoStorage.asyncDb;
 }
