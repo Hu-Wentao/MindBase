@@ -3,7 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:mind_base/src/application/provider/record_provider.dart';
 import 'package:mind_base/src/application/provider/schema_provider.dart';
 import 'package:mind_base/src/infra/ui/form/schema_form.dart';
-import 'package:mind_base/src/infra/ui/widget/data_frame.dart';
+import 'package:mind_base/src/infra/ui/widget/data_table_frame.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +47,9 @@ class _HomePageState extends State<HomePage> {
                     ),
                   if (pRecord.selectedSchema != null)
                     Expanded(
-                      child: DataFrame2(
+                      child: DataTableFrame(
+                        schema: pRecord.selectedSchema!,
+                        onCreate: pRecord.actSaveRecord,
                         headers: pRecord.selectedSchema!.attributes
                             .map((attr) => DatatableHeader(
                                   text: attr.name,
