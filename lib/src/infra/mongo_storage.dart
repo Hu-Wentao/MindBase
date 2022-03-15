@@ -44,38 +44,52 @@ abstract class IMongoStorage {
       (throw "Please use [await $runtimeType::preInit()] to init Storage");
 
   /// see [withSyncBox] [withSyncAsync]
-  Future<Db> get asyncDb async {
-    _db ??= await preInit();
-    return _db!;
-  }
+  Future<Db> get asyncDb async => await preInit();
 
-  Future<void> close() async => await _db?.close();
+  var _tryGet = 0;
 
+  /// todo 已确认解决Future期间重复调用出错问题, 但需要优化代码
   /// 如果在依赖注入时调用本方法,则可以使用 sync相关方法
-  /// Db如果已经连接过，重复连接会导致卡在 Opening状态，需要 await ::close, 然后再 ::open
-  /// see: https://github.com/mongo-dart/mongo_dart/issues/223#issuecomment-813872280
   Future<Db> preInit() async {
-    if (_db == null || !_db!.isConnected) {
-      await close();
-      var retry = 0;
+    if (_db == null) {
+      // 解决网络等原因 导致连接失败的问题
+      var _tryConnect = 0;
       while (true) {
         try {
-          retry++;
-          var db = Db(config.fullUri());
-          await db.open();
-          _db = db;
-          // print('OK after "$retry" attempts');
+          _tryConnect++;
+          _db = Db(config.fullUri());
+          await _db!.open();
           break;
         } catch (e) {
-          if (kDebugMode) print('Failed to connect to mongoDB, retry "$retry"');
-          if (retry >= config.retryAttempts) {
+          if (kDebugMode) {
+            print('Failed to connect to mongoDB, retry "$_tryConnect"');
+          }
+          if (_tryConnect >= config.retryAttempts) {
             rethrow;
           }
-          await Future.delayed(Duration(milliseconds: 100 * retry));
+          await Future.delayed(Duration(milliseconds: 100 * _tryConnect));
         }
       }
+      return await preInit();
+    } else {
+      // 解决并发请求问题
+      if (!_db!.isConnected) {
+        while (true) {
+          await Future.delayed(Duration(milliseconds: 100 * _tryGet));
+          _tryGet++;
+          if (_db!.isConnected) {
+            return _db!;
+          }
+          if (_tryGet > config.retryAttempts) {
+            // 持续出错,可能是连接异常,close后重试
+            await _db?.close();
+            return await preInit();
+          }
+        }
+      } else {
+        return _db!;
+      }
     }
-    return _db!;
   }
 
   /// 在实现类内部创建 静态inject方法,内部调用本方法即可实现无@module, @preResolve注入
