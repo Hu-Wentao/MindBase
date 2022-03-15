@@ -118,8 +118,8 @@ class RecordDto implements IDto, IMongoEntityDto {
 
   Record? toDomainOr(RecordMeta? m) => m == null ? null : toDomain(m);
 
-  /// 向Table提供Map
-  Map<String, dynamic> toTableMap() =>
+  /// 向Table提供Map <schemaKey值,Filed Value>
+  Map<String, String> toGridKeyNameMap() =>
       fields.map((key, value) => MapEntry("$key", "${value.toJson()}"))
         ..['id'] = id.toHexString();
 }
@@ -230,6 +230,19 @@ class RecordMetaDto with IMongoEntityDto {
         maxKey: maxKey,
         attributes: attrs,
       );
+
+  // key序列, <字段key,UI展示名>/<字段key,Header名>, 例如 <"id","Record ID">
+  Map<String, String> toGridKeyNameMap() => {
+        "id": "ID",
+      }..addEntries(
+          attributes.map((e) => MapEntry("${e.k}", e.name)),
+        );
+
+  AttributeDto getAttrByKey(int key) =>
+      attributes.firstWhere((element) => element.k == key);
+
+  AttributeDto? getAttrByKeyOr(int? key) =>
+      key == null ? null : getAttrByKey(key);
 }
 
 /// 表头/属性: 关系/表的一列叫属性

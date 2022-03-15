@@ -22,13 +22,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.0.5"
-  adaptivex:
-    dependency: transitive
-    description:
-      name: adaptivex
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.0.1+3"
   analyzer:
     dependency: transitive
     description:
@@ -126,7 +119,7 @@ packages:
       name: build_runner
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.1.7"
+    version: "2.1.8"
   build_runner_core:
     dependency: transitive
     description:
@@ -295,7 +288,7 @@ packages:
       name: form_builder_validators
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "7.6.1"
+    version: "7.7.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -562,13 +555,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.2.1"
-  responsive_table:
-    dependency: "direct main"
-    description:
-      name: responsive_table
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.2.0+2"
   rxdart:
     dependency: transitive
     description:
@@ -665,6 +651,20 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.1.1"
+  syncfusion_flutter_core:
+    dependency: transitive
+    description:
+      name: syncfusion_flutter_core
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "19.4.56"
+  syncfusion_flutter_datagrid:
+    dependency: "direct main"
+    description:
+      name: syncfusion_flutter_datagrid
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "19.4.56"
   term_glyph:
     dependency: transitive
     description:

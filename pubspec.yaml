@@ -37,6 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   get_arch_core:
   mongo_dart:
+  logging:
   # provider
   provider:
   provider_sidecar:
@@ -49,8 +50,8 @@ dependencies:
   line_icons:
   ndialog:
 #  data_table2:
-  responsive_table:
-  logging:
+#  responsive_table:
+  syncfusion_flutter_datagrid:
 
 dev_dependencies:
   flutter_test:

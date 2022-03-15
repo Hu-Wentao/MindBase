@@ -34,7 +34,7 @@ class WatchEvent<T extends IMongoEntityDto> {
   ObjectId get ettId => (_changeEvent.serverResponse['documentKey']
       as Map<String, dynamic>)['_id'] as ObjectId;
 
-  T? get document => mongoJsonToDtoOr(_changeEvent.fullDocument);
+  T? get entity => mongoJsonToDtoOr(_changeEvent.fullDocument);
 }
 
 abstract class IMongoAccessor<T extends IMongoEntityDto> {

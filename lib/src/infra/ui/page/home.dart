@@ -7,7 +7,6 @@ import 'package:mind_base/src/infra/ui/widget/data_table_frame.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_table/responsive_table.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -46,19 +45,8 @@ class _HomePageState extends State<HomePage> {
                       child: Center(child: Text("请选择/创建 一个Schema")),
                     ),
                   if (pRecord.selectedSchema != null)
-                    Expanded(
-                      child: DataTableFrame(
-                        schema: pRecord.selectedSchema!,
-                        onSaveRecord: pRecord.actSaveRecord,
-                        headers: pRecord.selectedSchema!.attributes
-                            .map((attr) => DatatableHeader(
-                                  text: attr.name,
-                                  value: "${attr.k}",
-                                ))
-                            .toList()
-                          ..insert(0, DatatableHeader(text: 'ID', value: "id")),
-                        data: pRecord.data.map((e) => e.toTableMap()).toList(),
-                      ),
+                    RecordDataGrid(
+                      dataGridSource: pRecord.actGetDataSource(),
                     ),
                 ],
               )),

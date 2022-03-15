@@ -37,7 +37,7 @@ class RepoEvent<Ett extends IEtt<ObjectId>> {
           RepoEvent(
             RepoEventType.values.asNameMap()[event.type.name]!,
             event.ettId,
-            mapper(event.document),
+            mapper(event.entity),
           );
 }
 
