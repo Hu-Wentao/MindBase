@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 class MongoAuthBasic {
@@ -66,11 +67,10 @@ abstract class IMongoStorage {
           // print('OK after "$retry" attempts');
           break;
         } catch (e) {
+          if (kDebugMode) print('Failed to connect to mongoDB, retry "$retry"');
           if (retry >= config.retryAttempts) {
-            // print('Exiting after "$retry" attempts');
             rethrow;
           }
-          // each time waits a little bit more before re-trying
           await Future.delayed(Duration(milliseconds: 100 * retry));
         }
       }
