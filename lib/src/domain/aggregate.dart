@@ -45,6 +45,8 @@ class Record implements IEtt<ObjectId> {
 
   @override
   int get hashCode => id.hashCode ^ meta.hashCode ^ fields.hashCode;
+  @override
+  String toString() => toDto().toString();
 }
 
 /// Meta信心
@@ -121,6 +123,9 @@ class RecordMeta implements IEtt<ObjectId> {
       memo.hashCode ^
       maxKey.hashCode ^
       attributes.hashCode;
+
+  @override
+  String toString() => toDto().toString();
 }
 
 class AttrInMetaBuilder {

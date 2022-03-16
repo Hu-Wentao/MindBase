@@ -9,12 +9,17 @@ import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 /// 实体类对应的Dto需要实现本类, 并添加`_id`字段/get方法
 abstract class IMongoEntityDto implements IMongoDto {
   ObjectId get id;
+  @override
+  String toString() => toMongoDto().toString();
 }
 
 /// 普通的携带有ObjectId字段的Dto需要实现本类
 abstract class IMongoDto implements IDto {
   // 返回的结果与json的Map相似,但 id是 ObjectId类型,而不是String
   Map<String, dynamic> toMongoDto();
+
+  @override
+  String toString() => toMongoDto().toString();
 }
 
 class RecordDto implements IDto, IMongoEntityDto {
