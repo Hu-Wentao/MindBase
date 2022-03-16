@@ -11,5 +11,6 @@ abstract class ConfigMongo {
       ));
 
   @preResolve
-  Future<Db> get db async => await mongoStorage.asyncDb;
+  Future<Db> getDb(IMongoStorage mongoStorage) async =>
+      await mongoStorage.asyncDb;
 }
