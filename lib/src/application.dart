@@ -46,7 +46,7 @@ class MindBaseApplication extends MindBasePackage
       onBeforeAppInit;
 
   @override
-  final Future<void> Function()? onBeforeAppRun;
+  final Future<void> Function(GetIt g)? onBeforeAppRun;
 
   @override
   final Iterable<IPackage<IConfig>> packages;

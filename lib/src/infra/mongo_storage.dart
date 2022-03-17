@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:mind_base/src/config/common_config.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 class MongoAuthBasic {
@@ -78,6 +79,7 @@ abstract class IMongoStorage {
           await Future.delayed(Duration(milliseconds: 100 * _tryGet));
           _tryGet++;
           if (_db!.isConnected) {
+            slLogger.config("return db state:${_db!.state}");
             return _db!;
           }
           if (_tryGet > config.retryAttempts) {
@@ -87,6 +89,7 @@ abstract class IMongoStorage {
           }
         }
       } else {
+        slLogger.config("return db state:${_db!.state}");
         return _db!;
       }
     }
