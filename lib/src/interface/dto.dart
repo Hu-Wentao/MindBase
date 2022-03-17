@@ -94,6 +94,8 @@ class RecordDto extends IMongoEntityDto {
     );
   }
 
+  /// 注意, 本方法会修改json内容, 如果传入的json被再次解析,将会导致解析出错
+  ///   (例如,将同一个json连续两次调用本方法)
   factory RecordDto.fromMongoJson(Map<String, dynamic> json) => RecordDto(
       id: (json.remove('_id') as ObjectId),
       metaId: (json.remove('metaId') as ObjectId),
