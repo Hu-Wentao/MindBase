@@ -7,7 +7,7 @@ import 'package:mind_base/src/domain/value.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
 /// 实体类对应的Dto需要实现本类, 并添加`_id`字段/get方法
-abstract class IMongoEntityDto implements IMongoDto {
+abstract class IMongoEntityDto extends IMongoDto {
   const IMongoEntityDto();
 
   ObjectId get id;
@@ -17,9 +17,14 @@ abstract class IMongoEntityDto implements IMongoDto {
 }
 
 /// 普通的携带有ObjectId字段的Dto需要实现本类
-abstract class IMongoDto implements IDto {
+abstract class IMongoDto extends Equatable implements IDto {
+  const IMongoDto();
+
   // 返回的结果与json的Map相似,但 id是 ObjectId类型,而不是String
   Map<String, dynamic> toMongoDto();
+
+  @override
+  bool? get stringify => true;
 
   @override
   String toString() => toMongoDto().toString();
@@ -36,6 +41,13 @@ class RecordDto extends IMongoEntityDto {
     required this.metaId,
     required this.fields,
   });
+
+  @override
+  List<Object?> get props => [
+        id,
+        metaId,
+        fields,
+      ];
 
   factory RecordDto.builder({
     ObjectId? id,
@@ -150,6 +162,15 @@ class RecordMetaDto extends IMongoEntityDto {
     required this.maxKey,
     required this.attributes,
   });
+
+  @override
+  List<Object?> get props => [
+        id,
+        name,
+        memo,
+        maxKey,
+        attributes,
+      ];
 
   // 用于给Form提供初始值
   RecordMetaDto.builder({
