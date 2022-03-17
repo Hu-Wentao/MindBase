@@ -23,18 +23,24 @@ enum WatchEventType {
 
 /// 某个 MongoEntityDto对应的collection的 watch事件
 class WatchEvent<T extends IMongoEntityDto> {
-  final mg.ChangeEvent _changeEvent;
-  final T? Function(Map<String, Object?>? mgJson) mongoJsonToDtoOr;
+  final ObjectId ettId;
+  final WatchEventType type;
+  final T? entity;
 
-  WatchEvent(this._changeEvent, this.mongoJsonToDtoOr);
+  WatchEvent(this.type, this.ettId, this.entity);
 
-  WatchEventType get type =>
-      WatchEventType.values.asNameMap()[_changeEvent.operationType]!;
+  static of<T extends IMongoEntityDto>(mg.ChangeEvent _changeEvent,
+          T? Function(Map<String, Object?>? mgJson) mongoJsonToDtoOr) =>
+      WatchEvent<T>(
+        WatchEventType.values.asNameMap()[_changeEvent.operationType]!,
+        (_changeEvent.serverResponse['documentKey']
+            as Map<String, dynamic>)['_id'] as ObjectId,
+        mongoJsonToDtoOr(_changeEvent.fullDocument),
+      );
 
-  ObjectId get ettId => (_changeEvent.serverResponse['documentKey']
-      as Map<String, dynamic>)['_id'] as ObjectId;
-
-  T? get entity => mongoJsonToDtoOr(_changeEvent.fullDocument);
+  @override
+  String toString() =>
+      'WatchEvent{ettId: $ettId, type: $type, entity: $entity, }';
 }
 
 abstract class IMongoAccessor<T extends IMongoEntityDto> {
@@ -86,7 +92,7 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
               Match(where.exists('_id').toQuery()),
             ),
       )
-      .map((e) => WatchEvent<T>(e, mongoJsonToDtoOr));
+      .map((e) => WatchEvent.of<T>(e, mongoJsonToDtoOr));
 
   @override
   Stream<WatchEvent<T>> watchById(ObjectId id) => db
@@ -97,7 +103,7 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
             .build(),
       )
       .map<mg.ChangeEvent>((e) => e as mg.ChangeEvent)
-      .map((v) => WatchEvent<T>(v, mongoJsonToDtoOr));
+      .map((v) => WatchEvent.of<T>(v, mongoJsonToDtoOr));
 
   /// 当ObjectId已存在时,更新无效
   @override
@@ -146,9 +152,12 @@ class RecordAccessor extends BaseMongoAccessor<RecordDto> {
   Stream<RecordDto> findAllByMetaId(ObjectId metaId) =>
       findAll(selector: where.eq('metaId', metaId));
 
-  Stream<WatchEvent<RecordDto>> watchAllByMetaId(ObjectId metaId) => watchAll(
-      builder: AggregationPipelineBuilder()
-          .addStage(Match(where.eq('metaId', metaId).toQuery())));
+  // fixme [性能] 无法按照条件监听指定record,只能watchAll然后过滤
+  Stream<WatchEvent<RecordDto>> watchAllByMetaId(ObjectId metaId) =>
+      watchAll().where((event) => event.entity?.metaId == metaId);
+// Stream<WatchEvent<RecordDto>> watchAllByMetaId(ObjectId metaId) => watchAll(
+//     builder: AggregationPipelineBuilder()
+//         .addStage(Match(where.eq('metaId', metaId).toQuery())));
 }
 
 /// 即Schema
