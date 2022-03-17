@@ -1,5 +1,4 @@
-import 'package:flutter/foundation.dart';
-import 'package:mind_base/src/config/common_config.dart';
+import 'package:logging/logging.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 class MongoAuthBasic {
@@ -36,6 +35,8 @@ class MongoStorageConfig {
 
 // 一个Storage表示一个数据库, 因此不需要泛型约束
 abstract class IMongoStorage {
+  Logger logger = Logger("IMongoStorage");
+
   MongoStorageConfig get config; // 配置一个mongo database的信息
 
   Db? _db;
@@ -62,9 +63,7 @@ abstract class IMongoStorage {
           await _db!.open();
           break;
         } catch (e) {
-          if (kDebugMode) {
-            print('Failed to connect to mongoDB, retry "$_tryConnect"');
-          }
+          logger.config("Failed to connect to mongoDB, retry $_tryConnect");
           if (_tryConnect >= config.retryAttempts) {
             rethrow;
           }
@@ -79,7 +78,7 @@ abstract class IMongoStorage {
           await Future.delayed(Duration(milliseconds: 100 * _tryGet));
           _tryGet++;
           if (_db!.isConnected) {
-            slLogger.config("return db state:${_db!.state}");
+            logger.config("db state:${_db!.state}");
             return _db!;
           }
           if (_tryGet > config.retryAttempts) {
@@ -89,7 +88,6 @@ abstract class IMongoStorage {
           }
         }
       } else {
-        slLogger.config("return db state:${_db!.state}");
         return _db!;
       }
     }
