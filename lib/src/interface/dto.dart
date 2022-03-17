@@ -8,7 +8,10 @@ import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
 /// 实体类对应的Dto需要实现本类, 并添加`_id`字段/get方法
 abstract class IMongoEntityDto implements IMongoDto {
+  const IMongoEntityDto();
+
   ObjectId get id;
+
   @override
   String toString() => toMongoDto().toString();
 }
@@ -22,7 +25,7 @@ abstract class IMongoDto implements IDto {
   String toString() => toMongoDto().toString();
 }
 
-class RecordDto implements IDto, IMongoEntityDto {
+class RecordDto extends IMongoEntityDto {
   @override
   final ObjectId id;
   final ObjectId metaId;
@@ -130,7 +133,7 @@ class RecordDto implements IDto, IMongoEntityDto {
 }
 
 /// 表头属性
-class RecordMetaDto with IMongoEntityDto {
+class RecordMetaDto extends IMongoEntityDto {
   @override
   ObjectId id;
   String name;
