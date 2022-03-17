@@ -56,8 +56,6 @@
 
 - 值检查表达式: 在set值时,检查值是否符合Attribute的Type要求
 
-
-
 ---
 
 ## Record 记录设计
@@ -73,8 +71,6 @@
 ### Dto v2 为对应的key添加 `json key name`  #todo
 
 - 如 `name`字段新增变量 `const String name_js`,值= "name", 以便`Form`等使用
-
-
 
 ---
 
@@ -115,6 +111,8 @@
 - 表达式需要有集合操作函数, 参考 `Kotlin Collection`设计
 
 - 为Attr添加相关的函数,即 `Attr自带的方法`, 例如 num类型自带加减乘除等等
+
+- 单个字段值也是表达式, 类比kotlin的 dsl返回值`
 
 #### Func
 

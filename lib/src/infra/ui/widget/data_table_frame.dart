@@ -24,8 +24,8 @@ class RecordDataGridSource extends DataGridSource {
   late final List<String> _attrKeyList;
 
   RecordDataGridSource(this.schema, this.initDataSub, this.recordSub) {
-    initDataSub.onData(_onInsertDto);
-    recordSub.onData(_onUpdate);
+    initDataSub.onData(_eventInsertDto);
+    recordSub.onData(_onEvent);
     _schemaDto = schema.toDto();
     _attrKeyList = _schemaDto.toGridKeyNameMap().keys.toList();
     log = Logger("$runtimeType");
@@ -56,15 +56,17 @@ class RecordDataGridSource extends DataGridSource {
     notifyListeners();
   }
 
-  void _onInsertDto(RecordDto entity) {
+  void _eventInsertDto(RecordDto entity) {
     _cache.add(entity);
     _cacheRows.add(entityToRow(entity));
     _notifyAll();
   }
 
-  void _onInsert(WatchEvent<RecordDto> event) => _onInsertDto(event.entity!);
+  void _onInsert(WatchEvent<RecordDto> event) => _eventInsertDto(event.entity!);
 
-  void _onUpdate(WatchEvent<RecordDto> event) {
+  void _onEvent(WatchEvent<RecordDto> event) {
+    log.fine("_onEvent 数据刷新\n$event");
+
     // todo 本方法会在首次初始化时被调用, 短时间内连续刷新可能会造成卡顿...,
     //todo 考虑首次加载转换为Future,然后一次性转为Row后再notify / 直接为Stream做缓存节流每次返回一个List<>
     switch (event.type) {
@@ -137,10 +139,14 @@ class RecordDataGridSource extends DataGridSource {
 }
 
 class RecordDataGrid extends StatefulWidget {
-  const RecordDataGrid({Key? key, required this.dataGridSource})
-      : super(key: key);
+  const RecordDataGrid({
+    Key? key,
+    required this.dataGridSource,
+    required this.onSaveRecord,
+  }) : super(key: key);
 
   final RecordDataGridSource dataGridSource;
+  final Future<void> Function(RecordDto? dto) onSaveRecord;
 
   @override
   _RecordDataGridState createState() => _RecordDataGridState();
@@ -162,19 +168,22 @@ class _RecordDataGridState extends State<RecordDataGrid> {
 
   @override
   Widget build(BuildContext context) => Expanded(
-        child: SfDataGrid(
-          source: widget.dataGridSource,
-          columnWidthMode: ColumnWidthMode.fill, // todo 使用 Column Resizeing
-          columns: widget.dataGridSource.buildColumn(),
-          // columns: <GridColumn>[
-          //   GridColumn(
-          //       columnName: 'symbol',
-          //       width: 150.0, // todo 数据列的宽度, 数据UI参数, 后期实现
-          //       label: Container(
-          //         alignment: Alignment.center,
-          //         child: const Text('Symbol'),
-          //       )),
-          // ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0, bottom: 8),
+              child: DataFrameTitle(
+                onSaveRecord: widget.onSaveRecord,
+                schema: widget.dataGridSource.schema,
+              ),
+            ),
+            SfDataGrid(
+              source: widget.dataGridSource,
+              columnWidthMode: ColumnWidthMode.fill, // todo 使用 Column Resizeing
+              columns: widget.dataGridSource.buildColumn(),
+            ),
+          ],
         ),
       );
 

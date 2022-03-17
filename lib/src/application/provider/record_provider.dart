@@ -7,7 +7,6 @@ import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:provider_sidecar/provider_sidecar.dart';
-import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 /// Record数据本身将缓存在DataSource中, Provider只用于创建和持有StreamSubscription
 class RecordProvider extends ProviderSidecar {
@@ -15,12 +14,7 @@ class RecordProvider extends ProviderSidecar {
 
   RecordMeta? selectedSchema;
 
-  // List<RecordDto> get data => _cache.values.toList();
-  // int get dataLength => _cache.length;
-
   final Map<ObjectId, RecordDataGridSource> _streamCache = {};
-
-  // final Map<ObjectId, Stream<WatchEvent<RecordDto>>> _streamCache = {};
 
   @override
   onInitializing() => setInitialized(
@@ -58,4 +52,10 @@ class RecordProvider extends ProviderSidecar {
 
   RecordDataGridSource actGetDataSource({RecordMeta? schema}) =>
       _watchSchema(schema ?? selectedSchema!);
+
+  @override
+  void dispose() {
+    _streamCache.values.map((e) => e.dispose());
+    super.dispose();
+  }
 }

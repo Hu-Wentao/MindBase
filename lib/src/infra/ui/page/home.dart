@@ -47,6 +47,7 @@ class _HomePageState extends State<HomePage> {
                   if (pRecord.selectedSchema != null)
                     RecordDataGrid(
                       dataGridSource: pRecord.actGetDataSource(),
+                      onSaveRecord: pRecord.actSaveRecord,
                     ),
                 ],
               )),

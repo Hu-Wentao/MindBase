@@ -1,4 +1,5 @@
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:mongo_dart/src/database/commands/aggreagation_commands/aggregate/return_classes/change_event.dart'
@@ -85,14 +86,18 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
 
   @override
   Stream<WatchEvent<T>> watchAll({AggregationPipelineBuilder? builder}) => db
-      .collection(collectionName)
-      .watch(
-        builder?.build() ??
-            AggregationPipelineBuilder().addStage(
-              Match(where.exists('_id').toQuery()),
-            ),
-      )
-      .map((e) => WatchEvent.of<T>(e, mongoJsonToDtoOr));
+          .collection(collectionName)
+          .watch(
+            builder?.build() ??
+                AggregationPipelineBuilder().addStage(
+                  Match(where.exists('_id').toQuery()),
+                ),
+          )
+          .map((e) => WatchEvent.of<T>(e, mongoJsonToDtoOr))
+          .map((e) {
+        slLogger.info("[$runtimeType::watchAll] $e");
+        return e;
+      });
 
   @override
   Stream<WatchEvent<T>> watchById(ObjectId id) => db
@@ -153,6 +158,7 @@ class RecordAccessor extends BaseMongoAccessor<RecordDto> {
       findAll(selector: where.eq('metaId', metaId));
 
   // fixme [性能] 无法按照条件监听指定record,只能watchAll然后过滤
+  // fixme [功能] 由于删除事件没有entity,无法检查metaId,导致无法监听
   Stream<WatchEvent<RecordDto>> watchAllByMetaId(ObjectId metaId) =>
       watchAll().where((event) => event.entity?.metaId == metaId);
 // Stream<WatchEvent<RecordDto>> watchAllByMetaId(ObjectId metaId) => watchAll(
