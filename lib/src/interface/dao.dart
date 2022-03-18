@@ -139,14 +139,19 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
       .replaceOne(where.id(dto.id), dto.toMongoDto());
 }
 
-@lazySingleton
+// @lazySingleton
 class RecordAccessor extends BaseMongoAccessor<RecordDto> {
-  RecordAccessor(this.db);
+  final String metaId;
 
-  // todo 当前是将不同schema对应的record集合都存放在同一个集合(record)中
-  // todo 后期考虑将不同schema对应的record存放在各自的${record_xxx}集合中
+  RecordAccessor(this.db, this.metaId);
+
+  factory RecordAccessor.of(ObjectId metaId, {Db? db}) {
+    db ??= sl<Db>();
+    return RecordAccessor(db, metaId.toHexString());
+  }
+
   @override
-  String get collectionName => 'record';
+  String get collectionName => 'record_$metaId';
   @override
   final Db db;
 
@@ -154,13 +159,13 @@ class RecordAccessor extends BaseMongoAccessor<RecordDto> {
   RecordDto mongoJsonToDto(Map<String, dynamic> mgJson) =>
       RecordDto.fromMongoJson(mgJson);
 
-  Stream<RecordDto> findAllByMetaId(ObjectId metaId) =>
-      findAll(selector: where.eq('metaId', metaId));
+  // Stream<RecordDto> findAllByMetaId(ObjectId metaId) =>
+  //     findAll(selector: where.eq('metaId', metaId));
 
   // fixme [性能] 无法按照条件监听指定record,只能watchAll然后过滤
   // fixme [功能] 由于删除事件没有entity,无法检查metaId,导致无法监听
-  Stream<WatchEvent<RecordDto>> watchAllByMetaId(ObjectId metaId) =>
-      watchAll().where((event) => event.entity?.metaId == metaId);
+  // Stream<WatchEvent<RecordDto>> watchAllByMetaId(ObjectId metaId) =>
+  //     watchAll().where((event) => event.entity?.metaId == metaId);
 // Stream<WatchEvent<RecordDto>> watchAllByMetaId(ObjectId metaId) => watchAll(
 //     builder: AggregationPipelineBuilder()
 //         .addStage(Match(where.eq('metaId', metaId).toQuery())));

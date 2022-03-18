@@ -22,20 +22,19 @@ main() {
       expect(1 + 2, 3);
     });
 
-    final recordRepo = RecordRepo(mongoStorage, schemaRepo);
+    final metaId = ObjectId.fromHexString("622d8e7ab1e16c6095af8989");
+    final recordRepo =
+        RecordRepo(mongoStorage, schemaRepo, metaId.toHexString());
     final record = Record.of(
         id: ObjectId.fromHexString("622d8e7ab1e16c6095af898a"),
-        meta: RecordMeta.of(
-            id: ObjectId.fromHexString("622d8e7ab1e16c6095af8989"),
-            name: 'test',
-            attributes: [
-              AttrInMetaBuilder(
-                "name2",
-                "...",
-                AttrType.string,
-                "none",
-              ),
-            ]),
+        meta: RecordMeta.of(id: metaId, name: 'test', attributes: [
+          AttrInMetaBuilder(
+            "name2",
+            "...",
+            AttrType.string,
+            "none",
+          ),
+        ]),
         fields: {});
 
     /// 插入
