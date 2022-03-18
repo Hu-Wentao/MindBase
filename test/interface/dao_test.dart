@@ -6,7 +6,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 
 final dto1 = RecordDto.builder(
     // id: ObjectId.fromHexString("6232ae5d5c918fa41061f449"),
-    schemaId: ObjectId.fromHexString("62314b932f929ede7dfebc8f"));
+    metaId: ObjectId.fromHexString("62314b932f929ede7dfebc8f"));
 
 main() {
   var flowSign = 1;

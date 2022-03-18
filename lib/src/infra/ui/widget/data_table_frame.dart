@@ -3,10 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:logging/logging.dart';
+import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
+import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/infra/ui/form/record_form.dart';
 import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
+import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:ndialog/ndialog.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -14,34 +17,292 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 class RecordDataGridSource extends DataGridSource {
   late final Logger log;
 
-  final RecordMeta schema;
+  final RecordMeta meta;
   final StreamSubscription<RecordDto> initDataSub;
   final StreamSubscription<WatchEvent<RecordDto>> recordSub;
+  final Future<void> Function(RecordDto? dto) actSaveRecord;
 
-  late RecordMetaDto _schemaDto;
-
-  // 用于查询 Attr的Key 在Grid中的index
-  late final List<String> _attrKeyList;
-
-  RecordDataGridSource(this.schema, this.initDataSub, this.recordSub) {
-    initDataSub.onData(_eventInsertDto);
-    recordSub.onData(_onEvent);
-    _schemaDto = schema.toDto();
-    _attrKeyList = _schemaDto.toGridKeyNameMap().keys.toList();
-    log = Logger("$runtimeType");
-  }
+  late RecordMetaDto _metaDto;
 
   // 防止同一个对象状态更新后被重复缓存
   final List<RecordDto> _cache = [];
   final List<DataGridRow> _cacheRows = [];
 
+  // 用于查询 Attr的Key 在Grid中的index
+  late final List<String> _attrKeyList;
+
+  void saveRecordDto(RecordDto entity, int? rowIndex, {bool notify = true}) {
+    if (rowIndex == null) {
+      _cache.add(entity);
+      _cacheRows.add(_entityToRow(entity));
+      if (notify) _notifyAll();
+    } else {
+      _cache[rowIndex] = entity;
+      _cacheRows[rowIndex] = _entityToRow(entity);
+      if (notify) _notifyDataRow(rowIndex, entity);
+    }
+  }
+
+  void removeRecordBy(ObjectId ettId) {
+    final index = _cache.indexWhere((element) => element.id == ettId);
+    _cache.removeAt(index);
+    _cacheRows.removeAt(index);
+    _notifyAll();
+  }
+
+  RecordDataGridSource(
+      this.meta, this.initDataSub, this.recordSub, this.actSaveRecord) {
+    initDataSub.onData((e) => saveRecordDto(e, null));
+    recordSub.onData(_onEvent);
+    _metaDto = meta.toDto();
+    _attrKeyList = _metaDto.toGridKeyNameMap().keys.toList();
+    log = Logger("$runtimeType");
+  }
+
   @override
   List<DataGridRow> get rows => _cacheRows;
+
+  /// 构建Header
+  List<GridColumn> buildColumn() => _metaDto
+      .toGridKeyNameMap()
+      .entries
+      .map((e) => GridColumn(
+            columnName: e.key,
+            label: Container(
+                padding: const EdgeInsets.all(4),
+                alignment: Alignment.center,
+                child: Text(e.value, overflow: TextOverflow.ellipsis)),
+            columnWidthMode: ColumnWidthMode.fill,
+          ))
+      .toList();
+
+  /// DataGridRow -> Widget
+  /// todo 在这里为不同Attr的数据返回不同类型的Widget
+  @override
+  DataGridRowAdapter? buildRow(DataGridRow row) => DataGridRowAdapter(
+      cells: row
+          .getCells()
+          .map((e) => Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  e.value.toString(),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ))
+          .toList());
+
+  /// todo 可编辑的单元格
+  /// Help to control the editable text in [TextField] widget.
+  TextEditingController editingController = TextEditingController();
+  String? newCellValue;
+
+  @override
+  Widget? buildEditWidget(
+    DataGridRow dataGridRow,
+    RowColumnIndex rowColumnIndex,
+    GridColumn column,
+    CellSubmit submitCell,
+  ) {
+    final sourceValue = _cache[rowColumnIndex.rowIndex];
+    // 这个值作为 EditWidget的初始值
+    // final String displayText = dataGridRow
+    //     .getCells()
+    //     .firstWhere(
+    //       (DataGridCell cell) => cell.columnName == column.columnName,
+    //       orElse: () =>
+    //           DataGridCell<String>(columnName: column.columnName, value: ''),
+    //     )
+    //     .value
+    //     .toString();
+
+    final displayText = sourceValue.toGridKeyValueMap()[column.columnName]!.v;
+    slLogger.info("buildEditWidget:displayText# $displayText");
+
+    // The new cell value must be reset.
+    // To avoid committing the [DataGridCell] value that was previously edited
+    // into the current non-modified [DataGridCell].
+    newCellValue = null;
+
+    // if (column.columnName == 'Shipped Date') {
+    //   return _buildDateTimePicker(displayText, submitCell);
+    // } else if (column.columnName == 'Ship Country') {
+    //   return _buildDropDownWidget(displayText, submitCell, _shipCountry);
+    // } else if (column.columnName == 'Ship City') {
+    //   final String shipCountry = dataGridRow
+    //           .getCells()
+    //           .firstWhereOrNull((DataGridCell dataGridCell) =>
+    //               dataGridCell.columnName == 'Ship Country')
+    //           ?.value
+    //           ?.toString() ??
+    //       '';
+    //   return _buildDropDownWidget(displayText == '' ? null : displayText,
+    //       submitCell, _shipCity[shipCountry]!);
+    // } else {
+    return _buildTextFieldWidget(
+      displayText,
+      rowColumnIndex,
+      column,
+      submitCell,
+    );
+    // }
+  }
+
+  /// Building a [TextField] for numeric and text column.
+  Widget _buildTextFieldWidget(
+    String displayText,
+    RowColumnIndex rowColumnIndex,
+    GridColumn column,
+    CellSubmit submitCell,
+  ) {
+    // final bool isTextAlignRight = column.columnName == 'Product No' ||
+    //     column.columnName == 'Shipped Date' ||
+    //     column.columnName == 'Price';
+
+    // final bool isNumericKeyBoardType =
+    //     column.columnName == 'Product No' || column.columnName == 'Price';
+    //
+    // // Holds regular expression pattern based on the column type.
+    // final RegExp regExp = _getRegExp(isNumericKeyBoardType, column.columnName);
+
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      alignment: Alignment.centerLeft, // 文本居左
+      // isTextAlignRight ? Alignment.centerRight : Alignment.centerLeft,
+      child: TextField(
+        autofocus: true,
+        controller: editingController..text = displayText,
+        textAlign: TextAlign.left,
+        // 文本居左
+        // textAlign: isTextAlignRight ? TextAlign.right : TextAlign.left,
+        autocorrect: false,
+        // 键盘 日间/夜间模式
+        // keyboardAppearance: sampleModel.themeData.colorScheme.brightness,
+        decoration: const InputDecoration(
+          contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 16.0),
+          // 主题: 下划线
+          focusedBorder: UnderlineInputBorder(
+              // 主题色
+              borderSide: BorderSide(color: Colors.black)),
+        ),
+        // style: textStyle,
+        // cursorColor: sampleModel.backgroundColor,
+        // todo 文本格式化输入, 自动过滤字符,只保留数值等等, regex仅仅针对输入的单个字符,如 "[0-9]"表示只能输入数值
+        // inputFormatters: <TextInputFormatter>[
+        //   FilteringTextInputFormatter.allow(regExp)
+        // ],
+        keyboardType: TextInputType.text,
+        // todo 输入类型
+        // isNumericKeyBoardType ? TextInputType.number : TextInputType.text,
+        onChanged: (String value) {
+          print("debug #onchange # $value");
+
+          if (value.isNotEmpty) {
+            // if (isNumericKeyBoardType) {
+            //   newCellValue = column.columnName == 'Price'
+            //       ? double.parse(value)
+            //       : int.parse(value);
+            // } else {
+            //   newCellValue = value;
+            // }
+            newCellValue = value;
+          } else {
+            newCellValue = null;
+          }
+        },
+        onSubmitted: (String value) {
+          slLogger.info("buildEditWidget:onSubmitted# $value");
+
+          /// Call [CellSubmit] callback to fire the canSubmitCell and
+          /// onCellSubmit to commit the new value in single place.
+          submitCell();
+        },
+      ),
+    );
+  }
+
+  /// todo 单元格数据提交
+  /// 本方法结束后将会自动刷新指定[RowColumnIndex]对应的Cell
+  /// fixme 当前是假设 [_cache]和[_cacheRows]对视index一一对应的,
+  /// 一旦后期允许row重排序,对应关系将只能依赖::firstWhere遍历查询得到,详见官方示例代码
+  @override
+  void onCellSubmit(
+    DataGridRow dataGridRow,
+    RowColumnIndex rowColumnIndex,
+    GridColumn col,
+  ) {
+    final RecordDto oldEntity = _cache[rowColumnIndex.rowIndex];
+    // final String oldValue = dataGridRow
+    //     .getCells()
+    //     .firstWhere((DataGridCell cell) => cell.columnName == col.columnName,
+    //         orElse: () =>
+    //             DataGridCell<String>(columnName: col.columnName, value: ''))
+    //     .value
+    //     .toString();
+    // slLogger.info("onCellSubmit: oldValue# $oldValue");
+
+    // final int dataRowIndex = _cacheRows.indexOf(dataGridRow);
+
+    final oldGridMap = oldEntity.toGridKeyValueMap();
+    final oldValue = oldGridMap[col.columnName];
+    if (newCellValue == null || oldValue!.v == newCellValue) {
+      return;
+    }
+    final nGridMap = oldGridMap
+      ..[col.columnName] = Value.of(newCellValue, oldValue.e);
+
+    final entity = RecordDto.fromGridKeyValueMap(oldEntity, nGridMap);
+
+    // 替换单元格内的值 (会面会自动notify)
+    saveRecordDto(entity, rowColumnIndex.rowIndex, notify: false);
+    // fixme 没有检查保存是否成功， 考虑添加保存失败时回滚初始值的逻辑
+    actSaveRecord(entity);
+    // _cacheRows[dataRowIndex].getCells()[rowColumnIndex.columnIndex] =
+    //     DataGridCell<String>(
+    //   columnName: col.columnName,
+    //   value: newCellValue,
+    // );
+
+    // if (column.columnName == 'Shipped Date') {
+    //   _cacheRows[dataRowIndex].getCells()[rowColumnIndex.columnIndex] =
+    //       DataGridCell<DateTime>(
+    //           columnName: 'Shipped Date', value: newCellValue);
+    //   dealers[dataRowIndex].shippedDate = newCellValue as DateTime;
+    // } else if (column.columnName == 'Product No') {
+    //   _cacheRows[dataRowIndex].getCells()[rowColumnIndex.columnIndex] =
+    //       DataGridCell<int>(columnName: 'Product No', value: newCellValue);
+    //   dealers[dataRowIndex].productNo = newCellValue as int;
+    // } else if (column.columnName == 'Price') {
+    //   _cacheRows[dataRowIndex].getCells()[rowColumnIndex.columnIndex] =
+    //       DataGridCell<double>(columnName: 'Price', value: newCellValue);
+    //   dealers[dataRowIndex].productPrice = newCellValue as double;
+    // } else if (column.columnName == 'Dealer Name') {
+    //   _cacheRows[dataRowIndex].getCells()[rowColumnIndex.columnIndex] =
+    //       DataGridCell<String>(columnName: 'Dealer Name', value: newCellValue);
+    //   dealers[dataRowIndex].dealerName = newCellValue.toString();
+    // } else if (column.columnName == 'Ship Country') {
+    //   _cacheRows[dataRowIndex].getCells()[rowColumnIndex.columnIndex] =
+    //       DataGridCell<String>(columnName: 'Ship Country', value: newCellValue);
+    //   final dynamic dataGridCell = _cacheRows[dataRowIndex]
+    //       .getCells()
+    //       .firstWhereOrNull(
+    //           (DataGridCell element) => element.columnName == 'Ship City');
+    //   final int dataCellIndex =
+    //       _cacheRows[dataRowIndex].getCells().indexOf(dataGridCell);
+    //   _cacheRows[dataRowIndex].getCells()[dataCellIndex] =
+    //       const DataGridCell<String>(columnName: 'Ship City', value: '');
+    //   dealers[dataRowIndex].shipCountry = newCellValue.toString();
+    // } else {
+    //   _cacheRows[dataRowIndex].getCells()[rowColumnIndex.columnIndex] =
+    //       DataGridCell<String>(columnName: 'Ship City', value: newCellValue);
+    //   dealers[dataRowIndex].shipCity = newCellValue.toString();
+    // }
+  }
 
   // 更新一整行
   _notifyDataRow(int rowIndex, RecordDto entity) {
     log.info("刷新一行数据");
-    schema.attributes.map((e) {
+    meta.attributes.map((e) {
       final colIndex = _attrKeyList.indexOf("${e.k}");
       // 更新指定单元格
       notifyDataSourceListeners(
@@ -56,14 +317,6 @@ class RecordDataGridSource extends DataGridSource {
     notifyListeners();
   }
 
-  void _eventInsertDto(RecordDto entity) {
-    _cache.add(entity);
-    _cacheRows.add(entityToRow(entity));
-    _notifyAll();
-  }
-
-  void _onInsert(WatchEvent<RecordDto> event) => _eventInsertDto(event.entity!);
-
   void _onEvent(WatchEvent<RecordDto> event) {
     log.fine("_onEvent 数据刷新\n$event");
 
@@ -71,14 +324,12 @@ class RecordDataGridSource extends DataGridSource {
     //todo 考虑首次加载转换为Future,然后一次性转为Row后再notify / 直接为Stream做缓存节流每次返回一个List<>
     switch (event.type) {
       case WatchEventType.insert:
-        _onInsert(event);
+        saveRecordDto(event.entity!, null);
         break;
       case WatchEventType.update: // todo      update
       case WatchEventType.replace:
         final index = _cache.indexWhere((element) => element.id == event.ettId);
-        _cache[index] = event.entity!;
-        _cacheRows[index] = entityToRow(event.entity!);
-        _notifyDataRow(index, event.entity!);
+        saveRecordDto(event.entity!, index);
         break;
       case WatchEventType.drop: // todo         drop
       case WatchEventType.rename: // todo       rename
@@ -87,45 +338,21 @@ class RecordDataGridSource extends DataGridSource {
       case WatchEventType.delete:
         if (event.type != WatchEventType.delete)
           print("###debug drop 尚未确认 '${event.type}'事件的机制, 按照delete处理");
-        final index = _cache.indexWhere((element) => element.id == event.ettId);
-        _cache.removeAt(index);
-        _cacheRows.removeAt(index);
-        _notifyAll();
+        removeRecordBy(event.ettId);
         break;
     }
   }
 
-  /// 构建Header
-  List<GridColumn> buildColumn() => _schemaDto
-      .toGridKeyNameMap()
-      .entries
-      .map((e) => GridColumn(
-            columnName: e.key,
-            label: Text(e.value),
-            columnWidthMode: ColumnWidthMode.fill,
-            // tooltip: _schemaDto.getAttrByKeyOr(int.tryParse(e.key))?.memo,
-          ))
-      .toList();
-
-  /// DataGridRow -> Widget
-  @override
-  DataGridRowAdapter? buildRow(DataGridRow row) => DataGridRowAdapter(
-      cells: row
-          .getCells()
-          .map((e) => Container(
-                alignment: Alignment.center,
-                child: Text(e.value.toString()),
-              ))
-          .toList());
-
-  DataGridRow entityToRow(RecordDto recordDto) {
-    final dtoMap = recordDto.toGridKeyNameMap();
+  DataGridRow _entityToRow(RecordDto recordDto) {
+    final valueMap = recordDto.toGridKeyValueMap();
     return DataGridRow(
-      cells: _schemaDto
+      cells: _metaDto
           .toGridKeyNameMap()
           .entries
-          .map((e) =>
-              DataGridCell<String>(columnName: e.key, value: dtoMap[e.key]))
+          .map((meta) => DataGridCell<String>(
+                columnName: meta.key,
+                value: "${valueMap[meta.key]?.toJson()}",
+              ))
           .toList(),
     );
   }
@@ -176,7 +403,7 @@ class _RecordDataGridState extends State<RecordDataGrid> {
               padding: const EdgeInsets.only(top: 8.0, bottom: 8),
               child: DataFrameTitle(
                 onSaveRecord: widget.onSaveRecord,
-                schema: widget.dataGridSource.schema,
+                meta: widget.dataGridSource.meta,
               ),
             ),
             Expanded(
@@ -185,11 +412,12 @@ class _RecordDataGridState extends State<RecordDataGrid> {
                 columnWidthMode: ColumnWidthMode.fill,
                 // todo 使用 Column Resizing 以便调整列宽
                 columns: widget.dataGridSource.buildColumn(),
-                selectionMode: SelectionMode.single,
+                allowEditing: true,
+                editingGestureType: EditingGestureType.doubleTap,
                 // 单击选中
-                navigationMode: GridNavigationMode.cell,
+                selectionMode: SelectionMode.single,
                 // 选中单元格
-                editingGestureType: EditingGestureType.doubleTap, // 双击编辑
+                navigationMode: GridNavigationMode.cell,
               ),
             ),
           ],
@@ -205,20 +433,20 @@ class _RecordDataGridState extends State<RecordDataGrid> {
 }
 
 class DataFrameTitle extends StatelessWidget {
-  final RecordMeta schema;
+  final RecordMeta meta;
   final Future<void> Function(RecordDto? dto) onSaveRecord;
   final _kRecordBuilder = GlobalKey<FormBuilderState>();
 
   DataFrameTitle({
     Key? key,
-    required this.schema,
+    required this.meta,
     required this.onSaveRecord,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) => TextButton.icon(
         onPressed: () async => await onSaveRecord(
-          await _createRecord(context, schema),
+          await _createRecord(context, meta),
         ),
         icon: const Icon(Icons.add),
         label: const Text("new item"),

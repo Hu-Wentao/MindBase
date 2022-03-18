@@ -51,12 +51,12 @@ class RecordDto extends IMongoEntityDto {
 
   factory RecordDto.builder({
     ObjectId? id,
-    required ObjectId schemaId,
+    required ObjectId metaId,
     Map<int, Value>? fields,
   }) =>
       RecordDto(
         id: id ?? ObjectId(),
-        metaId: schemaId,
+        metaId: metaId,
         fields: fields ?? {},
       );
 
@@ -140,10 +140,19 @@ class RecordDto extends IMongoEntityDto {
 
   Record? toDomainOr(RecordMeta? m) => m == null ? null : toDomain(m);
 
-  /// 向Table提供Map <schemaKey值,Filed Value>
-  Map<String, String> toGridKeyNameMap() =>
-      fields.map((key, value) => MapEntry("$key", "${value.toJson()}"))
-        ..['id'] = id.toHexString();
+  /// 向Table提供Map <metaKey值,Filed Value>
+  Map<String, Value> toGridKeyValueMap() =>
+      fields.map((key, value) => MapEntry("$key", value))
+        ..['id'] = Value.of(id.toHexString());
+
+  static RecordDto fromGridKeyValueMap(
+    RecordDto oldEntity,
+    Map<String, Value> nGridMap,
+  ) =>
+      RecordDto(
+          id: oldEntity.id,
+          metaId: oldEntity.metaId,
+          fields: nGridMap.map((k, v) => MapEntry(int.tryParse(k) ?? -1, v)));
 }
 
 /// 表头属性
@@ -262,13 +271,15 @@ class RecordMetaDto extends IMongoEntityDto {
         attributes: attrs,
       );
 
-  // key序列, <字段key,UI展示名>/<字段key,Header名>, 例如 <"id","Record ID">
+  // key序列, <字段key,UI展示名>/<字段key,Header名>, 例如 <"id":"ID">, <"2","年龄">等
+  // todo #改造Meta->Map:1 将id作为 Attr,且k为 "0"; 返回值改为 [AttributeDto]类型,
   Map<String, String> toGridKeyNameMap() => {
         "id": "ID",
-      }..addEntries(
-          attributes.map((e) => MapEntry("${e.k}", e.name)),
-        );
+      }..addEntries(attributes.map(
+          (e) => MapEntry("${e.k}", e.name),
+        ));
 
+  // todo #改造Meta->Map:2 将id作为 Attr,且k为 "0";
   AttributeDto getAttrByKey(int key) =>
       attributes.firstWhere((element) => element.k == key);
 

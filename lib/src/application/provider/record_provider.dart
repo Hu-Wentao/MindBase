@@ -50,6 +50,7 @@ class RecordProvider extends ProviderSidecar {
         meta,
         _recordAccessor(meta.id).findAll().listen(null),
         _recordAccessor(meta.id).watchAll().listen(null),
+          actSaveRecord,
       );
     }
     return _sourceCache[meta.id]!;

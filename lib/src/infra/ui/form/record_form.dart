@@ -27,7 +27,7 @@ class _RecordFormState extends State<RecordForm> {
 
   @override
   initState() {
-    _origin = widget.origin ?? RecordDto.builder(schemaId: widget.meta.id);
+    _origin = widget.origin ?? RecordDto.builder(metaId: widget.meta.id);
     _kRecordBuilder = widget.kRecordBuilder ?? GlobalKey<FormBuilderState>();
     super.initState();
   }
