@@ -10,6 +10,7 @@ import 'entity/func.dart';
 
 /// 记录
 /// 必须通过DTO转换 [RecordDto]
+/// fields[0] 始终为 [id]
 class Record implements IEtt<ObjectId> {
   @override
   final ObjectId id;
@@ -22,15 +23,18 @@ class Record implements IEtt<ObjectId> {
     required this.fields,
   });
 
-  Record.of({
+  factory Record.of({
     ObjectId? id,
     required RecordMeta meta,
     required Map<int, Value> fields,
-  }) : this(
-          id: id ?? ObjectId(),
-          meta: meta,
-          fields: fields,
-        );
+  }) {
+    final recordId = id ?? ObjectId();
+    return Record(
+      id: recordId,
+      meta: meta,
+      fields: fields..[0] = Value.of(recordId.toHexString()),
+    );
+  }
 
   RecordDto toDto() => RecordDto.fromDomain(this);
 
@@ -45,6 +49,7 @@ class Record implements IEtt<ObjectId> {
 
   @override
   int get hashCode => id.hashCode ^ meta.hashCode ^ fields.hashCode;
+
   @override
   String toString() => toDto().toString();
 }

@@ -32,19 +32,19 @@ abstract class IMongoDto extends Equatable implements IDto {
 
 class RecordDto extends IMongoEntityDto {
   @override
-  final ObjectId id;
+  ObjectId get id => ObjectId.fromHexString(hexId);
+
+  String get hexId => fields[0]!.v;
   final ObjectId metaId;
   final Map<int, Value> fields;
 
   const RecordDto({
-    required this.id,
     required this.metaId,
     required this.fields,
   });
 
   @override
   List<Object?> get props => [
-        id,
         metaId,
         fields,
       ];
@@ -52,23 +52,23 @@ class RecordDto extends IMongoEntityDto {
   factory RecordDto.builder({
     ObjectId? id,
     required ObjectId metaId,
-    Map<int, Value>? fields,
-  }) =>
-      RecordDto(
-        id: id ?? ObjectId(),
-        metaId: metaId,
-        fields: fields ?? {},
-      );
+    Map<int, Value> fields = const {},
+  }) {
+    fields[0] ??= Value.of((id ?? ObjectId()).toHexString());
+    return RecordDto(
+      metaId: metaId,
+      fields: fields,
+    );
+  }
 
   factory RecordDto.fromDomain(Record record) => RecordDto(
-        id: record.id,
         metaId: record.meta.id,
         fields: record.fields,
       );
 
 // {id: 6227568dda2194cb3589f5d4, metaId: 6227568dda2194cb3589f5d5, 1: {v: 123, e: null}, 2: {v: aaa, e: null}}
   factory RecordDto.fromJson(Map<String, dynamic> json) => RecordDto(
-      id: ObjectId.fromHexString(json.remove('_id')),
+      // id: ObjectId.fromHexString(json.remove('_id')),
       metaId: ObjectId.fromHexString(json.remove('metaId')),
       fields: json.map((key, value) {
         final js2 = (value as Map<String, dynamic>); // 动态字段
@@ -89,9 +89,10 @@ class RecordDto extends IMongoEntityDto {
     final map = Map.of(form);
     return RecordDto(
       // form中是'id', 而不是'_id'
-      id: ObjectId.fromHexString(map.remove('id') as String),
+      // id: ObjectId.fromHexString(map.remove('id') as String),
       metaId: ObjectId.fromHexString(map.remove('metaId') as String),
       fields: map.map((key, value) {
+        // fixme 尚未处理 id->[0]的变更， 可能会导致id赋值错误， 待单元测试
         final js2 = (value as String); // 动态字段
         // fixme 没有处理error的情况
         return MapEntry(
@@ -109,7 +110,7 @@ class RecordDto extends IMongoEntityDto {
   /// 注意, 本方法会修改json内容, 如果传入的json被再次解析,将会导致解析出错
   ///   (例如,将同一个json连续两次调用本方法)
   factory RecordDto.fromMongoJson(Map<String, dynamic> json) => RecordDto(
-      id: (json.remove('_id') as ObjectId),
+      // id: (json.remove('_id') as ObjectId),
       metaId: (json.remove('metaId') as ObjectId),
       fields: json.map((key, value) {
         final js2 = (value as Map<String, dynamic>); // 动态字段
@@ -150,7 +151,6 @@ class RecordDto extends IMongoEntityDto {
     Map<String, Value> nGridMap,
   ) =>
       RecordDto(
-          id: oldEntity.id,
           metaId: oldEntity.metaId,
           fields: nGridMap.map((k, v) => MapEntry(int.tryParse(k) ?? -1, v)));
 }
