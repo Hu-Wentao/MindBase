@@ -47,23 +47,11 @@ abstract class IMongoRepo<Ett extends IEtt<ObjectId>,
 }
 
 /// 如果某个聚合根可以直接实现[dtoToEtt], 则其Repo可以混入本Mixin
-abstract class BaseMongoRepo<Ett extends IEtt<ObjectId>,
-    Dto extends IMongoEntityDto> extends IMongoRepo<Ett, Dto> {
+mixin QueryMx<Ett extends IEtt<ObjectId>, Dto extends IMongoEntityDto>
+    on IMongoRepo<Ett, Dto> {
   Ett dtoToEtt(Dto dto);
 
   Ett? dtoToEttOr(Dto? dto) => dto == null ? null : dtoToEtt(dto);
-
-  Dto ettToDto(Ett ett);
-
-  Future<WriteResult> insert(Ett entity) async =>
-      await (await asyncAccessor).insert(ettToDto(entity));
-
-// fixme update需要逐个更新字段
-// Future<WriteResult> update(RecordMeta entity) async =>
-//     await mongoStorage.withSyncAsync((sync) async =>
-//         await (await accessor).updateBy(entity.id, ettToDto(entity)));
-  Future<WriteResult> replace(Ett entity) async =>
-      await (await asyncAccessor).replace(ettToDto(entity));
 
   Future<Ett?> findByOr(ObjectId id) async {
     final dto = (await (await asyncAccessor).findById(id));
@@ -98,6 +86,22 @@ abstract class BaseMongoRepo<Ett extends IEtt<ObjectId>,
         .watchAll()
         .map((event) => RepoEvent.of<Ett, Dto>(event, dtoToEttOr));
   }
+}
+
+abstract class BaseMongoRepo<Ett extends IEtt<ObjectId>,
+        Dto extends IMongoEntityDto> extends IMongoRepo<Ett, Dto>
+    with QueryMx<Ett, Dto> {
+  Dto ettToDto(Ett ett);
+
+  Future<WriteResult> insert(Ett entity) async =>
+      await (await asyncAccessor).insert(ettToDto(entity));
+
+// fixme update需要逐个更新字段
+// Future<WriteResult> update(RecordMeta entity) async =>
+//     await mongoStorage.withSyncAsync((sync) async =>
+//         await (await accessor).updateBy(entity.id, ettToDto(entity)));
+  Future<WriteResult> replace(Ett entity) async =>
+      await (await asyncAccessor).replace(ettToDto(entity));
 
   Future<WriteResult> save(Ett entity) async {
     final exist = await findByOr(entity.id);
