@@ -6,8 +6,8 @@ import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
-class SchemaProvider extends ProviderSidecar {
-  late final SchemaRepo _schemaRepo;
+class MetaProvider extends ProviderSidecar {
+  late final MetaRepo _metaRepo;
 
   // 防止同一个对象状态更新后被重复缓存
   final Map<ObjectId, RecordMeta> _cache = {};
@@ -16,12 +16,12 @@ class SchemaProvider extends ProviderSidecar {
 
   @override
   onInitializing() {
-    _schemaRepo = sl<SchemaRepo>();
+    _metaRepo = sl<MetaRepo>();
 
     // 先查询有所元素
-    _schemaRepo.findAll().listen(_onInsert);
+    _metaRepo.findAll().listen(_onInsert);
     // 然后开始监听变更
-    _schemaRepo.watchAll().listen(_onUpdate);
+    _metaRepo.watchAll().listen(_onUpdate);
     setInitialized();
   }
 
@@ -51,17 +51,17 @@ class SchemaProvider extends ProviderSidecar {
         }
       });
 
-  Future<void> actInsertSchema(RecordMeta schema) =>
-      actWrapper(() => setInitialized("新增Schema", () async {
-            await _schemaRepo.insert(schema);
+  Future<void> actInsertMeta(RecordMeta schema) =>
+      actWrapper(() => setInitialized("新增Meta", () async {
+            await _metaRepo.insert(schema);
           }));
 
-  Future<void> actSaveSchema(RecordMetaDto? dto) =>
+  Future<void> actSaveMeta(RecordMetaDto? dto) =>
       actWrapper(() => setInitialized("保存元素", () async {
             if (dto == null) {
               return null;
             }
             final schema = dto.toDm((dto) => dto.toDm(FuncManager.findBy));
-            await _schemaRepo.save(schema);
+            await _metaRepo.save(schema);
           }));
 }

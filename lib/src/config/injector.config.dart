@@ -25,16 +25,15 @@ Future<_i1.GetIt> $initGetIt(_i1.GetIt get,
   final configCommon = _$ConfigCommon();
   gh.factory<_i3.IMongoStorage>(() => configMongo.mongoStorage);
   gh.factory<_i4.Logger>(() => configCommon.logger(get<_i5.MindBaseConfig>()));
-  gh.lazySingleton<_i6.SchemaRepo>(
-      () => _i6.SchemaRepo(get<_i3.IMongoStorage>()));
+  gh.lazySingleton<_i6.MetaRepo>(() => _i6.MetaRepo(get<_i3.IMongoStorage>()));
+  gh.lazySingleton<_i6.RecordRepo>(
+      () => _i6.RecordRepo(get<_i3.IMongoStorage>(), get<_i6.MetaRepo>()));
   await gh.factoryAsync<_i7.Db>(
       () => configMongo.getDb(get<_i3.IMongoStorage>()),
       preResolve: true);
   gh.lazySingleton<_i8.RecordAccessor>(() => _i8.RecordAccessor(get<_i7.Db>()));
   gh.lazySingleton<_i8.RecordMetaAccessor>(
       () => _i8.RecordMetaAccessor(get<_i7.Db>()));
-  gh.lazySingleton<_i6.RecordRepo>(
-      () => _i6.RecordRepo(get<_i3.IMongoStorage>(), get<_i6.SchemaRepo>()));
   return get;
 }
 

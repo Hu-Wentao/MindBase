@@ -16,7 +16,7 @@ main() {
     final db = await mongoStorage.asyncDb;
     expect(db.isConnected, true);
 
-    final schemaRepo = SchemaRepo(mongoStorage);
+    final schemaRepo = MetaRepo(mongoStorage);
     test("test schema", () {
       // todo test schema
       expect(1 + 2, 3);

@@ -5,52 +5,52 @@ import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
 
-class SchemaForm extends StatelessWidget {
-  const SchemaForm(
-      {Key? key, required this.kSchemaBuilder, required this.kAttrBuilder})
+class MetaForm extends StatelessWidget {
+  const MetaForm(
+      {Key? key, required this.kMetaBuilder, required this.kAttrBuilder})
       : super(key: key);
-  final GlobalKey<FormBuilderState> kSchemaBuilder;
+  final GlobalKey<FormBuilderState> kMetaBuilder;
   final GlobalKey<FormBuilderState> kAttrBuilder;
 
   @override
   Widget build(BuildContext context) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SchemaMainForm(kSchemaBuilder: kSchemaBuilder),
+          MetaMainForm(kMetaBuilder: kMetaBuilder),
           AttributeListForm(kAttrBuilder: kAttrBuilder),
         ],
       );
 }
 
-class SchemaMainForm extends StatefulWidget {
+class MetaMainForm extends StatefulWidget {
   final RecordMetaDto? origin;
 
-  final GlobalKey<FormBuilderState>? kSchemaBuilder;
+  final GlobalKey<FormBuilderState>? kMetaBuilder;
 
-  const SchemaMainForm({
+  const MetaMainForm({
     Key? key,
     this.origin,
-    this.kSchemaBuilder,
+    this.kMetaBuilder,
   }) : super(key: key);
 
   @override
-  State<SchemaMainForm> createState() => _SchemaMainFormState();
+  State<MetaMainForm> createState() => _MetaMainFormState();
 }
 
-class _SchemaMainFormState extends State<SchemaMainForm> {
+class _MetaMainFormState extends State<MetaMainForm> {
   late RecordMetaDto _origin;
-  late GlobalKey<FormBuilderState> _kSchemaBuilder;
+  late GlobalKey<FormBuilderState> _kMetaBuilder;
 
   @override
   initState() {
     _origin = widget.origin ?? RecordMetaDto.builder();
-    _kSchemaBuilder = widget.kSchemaBuilder ?? GlobalKey<FormBuilderState>();
+    _kMetaBuilder = widget.kMetaBuilder ?? GlobalKey<FormBuilderState>();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) => FormBuilder(
-        key: _kSchemaBuilder,
+        key: _kMetaBuilder,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: SizedBox(
           // height: 800,

@@ -10,7 +10,7 @@ import 'package:mind_base/src/interface/dto.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-/// 用于构建一张表的数据源, 包含Schema和Rows的数据, 相关Rows的Stream
+/// 用于构建一张表的数据源, 包含Meta和Rows的数据, 相关Rows的Stream
 class RecordDataGridSource extends DataGridSource {
   late final Logger log;
 
@@ -224,7 +224,7 @@ class DataFrameTitle extends StatelessWidget {
         dialogStyle: DialogStyle(titleDivider: true),
         title: const Text("插入新的记录"),
         content: RecordForm(
-          schema: schema,
+          meta: schema,
           kRecordBuilder: _kRecordBuilder,
         ),
         actions: <Widget>[

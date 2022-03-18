@@ -12,7 +12,7 @@ import 'package:provider_sidecar/provider_sidecar.dart';
 class RecordProvider extends ProviderSidecar {
   late final RecordAccessor _recordAccessor;
 
-  RecordMeta? selectedSchema;
+  RecordMeta? selectedMeta;
 
   final Map<ObjectId, RecordDataGridSource> _streamCache = {};
 
@@ -22,10 +22,10 @@ class RecordProvider extends ProviderSidecar {
         () => _recordAccessor = sl<RecordAccessor>(),
       );
 
-  Future<void> actWatchSchema(RecordMeta schema) => actWrapper(
+  Future<void> actWatchMeta(RecordMeta schema) => actWrapper(
         () => setInitialized(
-          "开始监听Schema[${schema.name}]",
-          () => _watchSchema(schema),
+          "开始监听Meta[${schema.name}]",
+          () => _watchMeta(schema),
         ),
       );
 
@@ -38,8 +38,8 @@ class RecordProvider extends ProviderSidecar {
         });
       });
 
-  RecordDataGridSource _watchSchema(RecordMeta schema) {
-    selectedSchema = schema;
+  RecordDataGridSource _watchMeta(RecordMeta schema) {
+    selectedMeta = schema;
     if (_streamCache[schema.id] == null) {
       _streamCache[schema.id] = RecordDataGridSource(
         schema,
@@ -51,7 +51,7 @@ class RecordProvider extends ProviderSidecar {
   }
 
   RecordDataGridSource actGetDataSource({RecordMeta? schema}) =>
-      _watchSchema(schema ?? selectedSchema!);
+      _watchMeta(schema ?? selectedMeta!);
 
   @override
   void dispose() {

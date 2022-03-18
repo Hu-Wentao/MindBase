@@ -166,7 +166,7 @@ class RecordAccessor extends BaseMongoAccessor<RecordDto> {
 //         .addStage(Match(where.eq('metaId', metaId).toQuery())));
 }
 
-/// 即Schema
+/// 即Meta
 @lazySingleton
 class RecordMetaAccessor extends BaseMongoAccessor<RecordMetaDto> {
   RecordMetaAccessor(this.db);

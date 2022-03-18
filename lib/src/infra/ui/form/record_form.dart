@@ -4,15 +4,15 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/interface/dto.dart';
 
-/// 创建指定Schema对应的Record
+/// 创建指定[RecordMeta]对应的Record
 class RecordForm extends StatefulWidget {
-  final RecordMeta schema; // Record对应的Schema的Id
+  final RecordMeta meta; // Record对应的Meta的Id
   final RecordDto? origin;
   final GlobalKey<FormBuilderState>? kRecordBuilder;
 
   const RecordForm({
     Key? key,
-    required this.schema,
+    required this.meta,
     this.origin,
     this.kRecordBuilder,
   }) : super(key: key);
@@ -27,7 +27,7 @@ class _RecordFormState extends State<RecordForm> {
 
   @override
   initState() {
-    _origin = widget.origin ?? RecordDto.builder(schemaId: widget.schema.id);
+    _origin = widget.origin ?? RecordDto.builder(schemaId: widget.meta.id);
     _kRecordBuilder = widget.kRecordBuilder ?? GlobalKey<FormBuilderState>();
     super.initState();
   }
@@ -55,12 +55,12 @@ class _RecordFormState extends State<RecordForm> {
               FormBuilderTextField(
                 name: 'metaId',
                 initialValue: _origin.metaId.toHexString(),
-                decoration: const InputDecoration(labelText: 'SchemaId'),
+                decoration: const InputDecoration(labelText: 'MetaId'),
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(context),
                 ]),
               ),
-              ...widget.schema.attributes.map((attr) {
+              ...widget.meta.attributes.map((attr) {
                 final field = _origin.fields[attr.k];
                 return FormBuilderTextField(
                   name: attr.k.toString(), // Attribute::k作为Map的key

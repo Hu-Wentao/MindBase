@@ -115,7 +115,7 @@ abstract class BaseMongoRepo<Ett extends IEtt<ObjectId>,
 @lazySingleton
 class RecordRepo {
   final IMongoStorage mongoStorage;
-  final SchemaRepo schemaRepo;
+  final MetaRepo schemaRepo;
 
   RecordRepo(this.mongoStorage, this.schemaRepo);
 
@@ -145,11 +145,11 @@ class RecordRepo {
 
   /// 通过MetaId监视聚合根的所有记录对应的实例的变更
   /// 重点测试
-  /// watch Schema对应的Record 集合.
+  /// watch Meta对应的Record 集合.
   Stream<RepoEvent<Record>> watchAllByMeta(ObjectId metaId) async* {
     final sync = await mongoStorage.asyncDb;
     yield* schemaRepo
-        .watchBy(metaId) // 返回Schema事件流
+        .watchBy(metaId) // 返回Meta事件流
         .asyncExpand((meta) => RecordAccessor(sync)
             .watchAllByMetaId(metaId)
             .map((rcd) => RepoEvent.of<Record, RecordDto>(
@@ -181,10 +181,10 @@ class RecordRepo {
 }
 
 @lazySingleton
-class SchemaRepo extends BaseMongoRepo<RecordMeta, RecordMetaDto> {
+class MetaRepo extends BaseMongoRepo<RecordMeta, RecordMetaDto> {
   final IMongoStorage mongoStorage;
 
-  SchemaRepo(this.mongoStorage);
+  MetaRepo(this.mongoStorage);
 
   @override
   RecordMeta dtoToEtt(RecordMetaDto dto) =>

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:mind_base/src/application/provider/record_provider.dart';
-import 'package:mind_base/src/application/provider/schema_provider.dart';
-import 'package:mind_base/src/infra/ui/form/schema_form.dart';
+import 'package:mind_base/src/application/provider/meta_provider.dart';
+import 'package:mind_base/src/infra/ui/form/meta_form.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_frame.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:ndialog/ndialog.dart';
@@ -16,7 +16,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final _kSchemaBuilder = GlobalKey<FormBuilderState>();
+  final _kMetaBuilder = GlobalKey<FormBuilderState>();
   final _kAttrBuilder = GlobalKey<FormBuilderState>();
 
   @override
@@ -26,44 +26,44 @@ class _HomePageState extends State<HomePage> {
           builder: (c, pRecord, _) => Row(
                 children: [
                   /// 展示 schema List
-                  Consumer<SchemaProvider>(
+                  Consumer<MetaProvider>(
                     builder: (c, t, _) => Container(
                       width: 200,
                       child: ListView.builder(
                         itemCount: t.data.length,
                         itemBuilder: (c, i) => ListTile(
                           title: Text(t.data[i].name),
-                          onTap: () => pRecord.actWatchSchema(t.data[i]),
+                          onTap: () => pRecord.actWatchMeta(t.data[i]),
                         ),
                       ),
                     ),
                   ),
 
                   /// table
-                  if (pRecord.selectedSchema == null)
+                  if (pRecord.selectedMeta == null)
                     const Expanded(
-                      child: Center(child: Text("请选择/创建 一个Schema")),
+                      child: Center(child: Text("请选择/创建 一个Meta")),
                     ),
-                  if (pRecord.selectedSchema != null)
+                  if (pRecord.selectedMeta != null)
                     RecordDataGrid(
                       dataGridSource: pRecord.actGetDataSource(),
                       onSaveRecord: pRecord.actSaveRecord,
                     ),
                 ],
               )),
-      floatingActionButton: Consumer<SchemaProvider>(
+      floatingActionButton: Consumer<MetaProvider>(
         builder: (c, t, _) => FloatingActionButton(
           child: const Icon(Icons.add),
-          onPressed: () async => await t.actSaveSchema(await _onEditSchema(c)),
+          onPressed: () async => await t.actSaveMeta(await _onEditMeta(c)),
         ),
       ));
 
-  Future<RecordMetaDto?> _onEditSchema(BuildContext c) async =>
+  Future<RecordMetaDto?> _onEditMeta(BuildContext c) async =>
       await NAlertDialog(
         dialogStyle: DialogStyle(titleDivider: true),
         title: const Text("添加新的表"),
-        content: SchemaForm(
-          kSchemaBuilder: _kSchemaBuilder,
+        content: MetaForm(
+          kMetaBuilder: _kMetaBuilder,
           kAttrBuilder: _kAttrBuilder,
         ),
         actions: <Widget>[
@@ -73,10 +73,10 @@ class _HomePageState extends State<HomePage> {
                 final checkAttr =
                     _kAttrBuilder.currentState?.saveAndValidate() ?? false;
                 _kAttrBuilder.currentState?.save();
-                final checkSchema =
-                    _kSchemaBuilder.currentState?.saveAndValidate() ?? false;
-                if (checkAttr && checkSchema) {
-                  final schemaMap = _kSchemaBuilder.currentState!.value;
+                final checkMeta =
+                    _kMetaBuilder.currentState?.saveAndValidate() ?? false;
+                if (checkAttr && checkMeta) {
+                  final schemaMap = _kMetaBuilder.currentState!.value;
                   final attrMap = _kAttrBuilder.currentState!.value;
                   // <key,<field,value>>
                   final attrFormatMap = <int, Map<String, String>>{};
