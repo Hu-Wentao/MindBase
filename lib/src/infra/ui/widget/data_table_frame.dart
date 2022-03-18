@@ -171,6 +171,7 @@ class _RecordDataGridState extends State<RecordDataGrid> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 标题栏按钮
             Padding(
               padding: const EdgeInsets.only(top: 8.0, bottom: 8),
               child: DataFrameTitle(
@@ -178,10 +179,18 @@ class _RecordDataGridState extends State<RecordDataGrid> {
                 schema: widget.dataGridSource.schema,
               ),
             ),
-            SfDataGrid(
-              source: widget.dataGridSource,
-              columnWidthMode: ColumnWidthMode.fill, // todo 使用 Column Resizeing
-              columns: widget.dataGridSource.buildColumn(),
+            Expanded(
+              child: SfDataGrid(
+                source: widget.dataGridSource,
+                columnWidthMode: ColumnWidthMode.fill,
+                // todo 使用 Column Resizing 以便调整列宽
+                columns: widget.dataGridSource.buildColumn(),
+                selectionMode: SelectionMode.single,
+                // 单击选中
+                navigationMode: GridNavigationMode.cell,
+                // 选中单元格
+                editingGestureType: EditingGestureType.doubleTap, // 双击编辑
+              ),
             ),
           ],
         ),
