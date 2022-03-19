@@ -10,6 +10,8 @@ import 'package:mind_base/src/interface/dto.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:provider/provider.dart';
 
+import '../dialog/record_meta_edit_dialog.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -56,54 +58,13 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: Consumer<MetaProvider>(
         builder: (c, t, _) => FloatingActionButton(
           child: const Icon(Icons.add),
-          onPressed: () async => await t.actSaveMeta(await _onEditMeta(c)),
+          onPressed: () async => await t.actSaveMeta(
+            await showRecordMetaEditDialog(
+              context: c,
+              kAttrBuilder: _kAttrBuilder,
+              kMetaBuilder: _kMetaBuilder,
+            ),
+          ),
         ),
       ));
-
-  Future<RecordMetaDto?> _onEditMeta(BuildContext c) async =>
-      await NAlertDialog(
-        dialogStyle: DialogStyle(titleDivider: true),
-        title: const Text("添加新的表"),
-        content: MetaForm.create(
-          kMetaBuilder: _kMetaBuilder,
-          kAttrBuilder: _kAttrBuilder,
-        ),
-        actions: <Widget>[
-          TextButton(
-              child: const Text("确认"),
-              onPressed: () {
-                final checkAttr =
-                    _kAttrBuilder.currentState?.saveAndValidate() ?? false;
-                _kAttrBuilder.currentState?.save();
-                final checkMeta =
-                    _kMetaBuilder.currentState?.saveAndValidate() ?? false;
-                if (checkAttr && checkMeta) {
-                  final metaMap = _kMetaBuilder.currentState!.value;
-                  final attrMap = _kAttrBuilder.currentState!.value;
-                  // <key,<field,value>>
-                  final attrFormatMap = <int, Map<String, String>>{};
-                  for (final e in attrMap.entries) {
-                    final k = e.key.split("@");
-                    final ik = int.parse(k[0]);
-                    final fk = k[1];
-                    final v = e.value;
-                    attrFormatMap[ik] ??= {};
-                    attrFormatMap[ik]![fk] = v;
-                  }
-                  final attrs = attrFormatMap.entries.map((e) {
-                    final json = e.value;
-                    return AttributeDto.fromFrom(json);
-                  }).toList();
-                  final dto = RecordMetaDto.fromForm(metaMap, attrs);
-                  Navigator.pop<RecordMetaDto>(c, dto);
-                } else {
-                  ScaffoldMessenger.of(c).showSnackBar(
-                    const SnackBar(content: Text("请检查表单")),
-                  );
-                }
-              }),
-          TextButton(
-              child: const Text("取消"), onPressed: () => Navigator.pop(c)),
-        ],
-      ).show(context);
 }
