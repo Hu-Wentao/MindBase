@@ -32,7 +32,10 @@ class Record implements IEtt<ObjectId> {
     return Record(
       id: recordId,
       meta: meta,
-      fields: fields..[0] = Value.of(recordId.toHexString()),
+      fields: {
+        0: Value.of(recordId.toHexString()),
+        1: Value.of(meta.id.toHexString()),
+      }..addAll(fields),
     );
   }
 
