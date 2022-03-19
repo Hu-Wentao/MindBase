@@ -106,7 +106,8 @@ class RecordDto extends IMongoEntityDto {
   /// 这里直接使用json,无需将value转换为String
   @override
   Map<String, dynamic> toMongoDto({AttrType type = AttrType.string}) =>
-      fields.map((key, value) => MapEntry("$key", value.toMongoDto()));
+      fields.map((key, value) => MapEntry("$key", value.toMongoDto()))
+        ..['_id'] = id;
 
   Record toDm(RecordMeta Function(ObjectId metaId) getMeta) =>
       toDomain(getMeta(metaId));
