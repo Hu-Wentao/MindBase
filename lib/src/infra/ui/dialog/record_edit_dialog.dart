@@ -1,0 +1,42 @@
+import 'package:flutter/material.dart';
+import 'package:mind_base/src/domain/aggregate.dart';
+import 'package:mind_base/src/infra/ui/form/record_form.dart';
+import 'package:mind_base/src/interface/dto.dart';
+import 'package:ndialog/ndialog.dart';
+
+Future<RecordDto?> showRecordEditDialog({
+  required BuildContext context,
+  required RecordMeta meta,
+  required kRecordBuilder,
+  RecordDto? origin,
+}) =>
+    NAlertDialog(
+      dialogStyle: DialogStyle(titleDivider: true),
+      title: origin == null ? const Text("插入新的记录") : const Text("编辑记录"),
+      content: RecordForm(
+        meta: meta,
+        origin: origin,
+        kRecordBuilder: kRecordBuilder,
+      ),
+      actions: <Widget>[
+        TextButton(
+            child: const Text("确认"),
+            onPressed: () {
+              final checkAttr =
+                  kRecordBuilder.currentState?.saveAndValidate() ?? false;
+              if (checkAttr) {
+                final map = kRecordBuilder.currentState!.value;
+                final dto = RecordDto.fromForm(meta, map);
+                Navigator.pop<RecordDto>(context, dto);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("请检查表单")),
+                );
+              }
+            }),
+        TextButton(
+          child: const Text("取消"),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ],
+    ).show(context);

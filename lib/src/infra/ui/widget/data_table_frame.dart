@@ -6,11 +6,10 @@ import 'package:logging/logging.dart';
 import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/value.dart';
-import 'package:mind_base/src/infra/ui/form/record_form.dart';
+import 'package:mind_base/src/infra/ui/dialog/record_edit_dialog.dart';
 import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
-import 'package:ndialog/ndialog.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 /// 用于构建一张表的数据源, 包含Meta和Rows的数据, 相关Rows的Stream
@@ -44,7 +43,8 @@ class RecordDataGridSource extends DataGridSource {
   }
 
   void removeRecordBy(ObjectId ettId) {
-    final index = _cache.indexWhere((element) => element.id == ettId);
+    final ettIdHex = ettId.toHexString();
+    final index = _cache.indexWhere((element) => element.idHex == ettIdHex);
     _cache.removeAt(index);
     _cacheRows.removeAt(index);
     _notifyAll();
@@ -446,42 +446,13 @@ class DataFrameTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) => TextButton.icon(
         onPressed: () async => await onSaveRecord(
-          await _createRecord(context, meta),
+          await showRecordEditDialog(
+            context: context,
+            meta: meta,
+            kRecordBuilder: _kRecordBuilder,
+          ),
         ),
         icon: const Icon(Icons.add),
-        label: const Text("new item"),
+        label: const Text("新增记录"),
       );
-
-  //
-  Future<RecordDto?> _createRecord(
-    BuildContext c,
-    RecordMeta schema,
-  ) =>
-      NAlertDialog(
-        dialogStyle: DialogStyle(titleDivider: true),
-        title: const Text("插入新的记录"),
-        content: RecordForm(
-          meta: schema,
-          kRecordBuilder: _kRecordBuilder,
-        ),
-        actions: <Widget>[
-          TextButton(
-              child: const Text("确认"),
-              onPressed: () {
-                final checkAttr =
-                    _kRecordBuilder.currentState?.saveAndValidate() ?? false;
-                if (checkAttr) {
-                  final map = _kRecordBuilder.currentState!.value;
-                  final dto = RecordDto.fromForm(meta, map);
-                  Navigator.pop<RecordDto>(c, dto);
-                } else {
-                  ScaffoldMessenger.of(c).showSnackBar(
-                    const SnackBar(content: Text("请检查表单")),
-                  );
-                }
-              }),
-          TextButton(
-              child: const Text("取消"), onPressed: () => Navigator.pop(c)),
-        ],
-      ).show(c);
 }
