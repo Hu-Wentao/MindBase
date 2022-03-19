@@ -174,7 +174,7 @@ class _AttributeListFormState extends State<AttributeListForm> {
                 // name: 'type',
                 name: '${a.k}@type',
                 decoration: const InputDecoration(labelText: '属性类型'),
-                initialValue: AttrType.string.name,
+                initialValue: a.type.name,
                 items: AttrType.values
                     .map((e) => DropdownMenuItem<String>(
                           value: e.name,
@@ -189,7 +189,7 @@ class _AttributeListFormState extends State<AttributeListForm> {
                 // name: 'checkFuncName',
                 name: '${a.k}@checkFuncName',
                 decoration: const InputDecoration(labelText: '值校验函数'),
-                initialValue: FuncManager.noneFuncName,
+                initialValue: a.checkFuncName,
                 items: FuncManager.funcList
                     .map((e) => DropdownMenuItem<String>(
                           value: e.name,
