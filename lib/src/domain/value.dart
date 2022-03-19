@@ -104,7 +104,7 @@ class Value extends IMongoDto with ITypeMx {
 
   // 返回值可以是 json， 也可以是[ObjectId]
   @override
-  dynamic toMongoDto({AttrType type = AttrType.string}) {
+  dynamic toMongoJson({AttrType type = AttrType.string}) {
     switch (type) {
       case AttrType.objectId:
         return ObjectId.fromHexString(v);

@@ -115,13 +115,13 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
   /// 当ObjectId已存在时,更新无效
   @override
   Future<WriteResult> insert(T dto) async =>
-      await db.collection(collectionName).insertOne(dto.toMongoDto());
+      await db.collection(collectionName).insertOne(dto.toMongoJson());
 
   /// 如果已存在,
   Future<WriteResult> save(ObjectId id, T dto) async {
     final exist = await findById(id);
     if (exist == null) {
-      return await db.collection(collectionName).insertOne(dto.toMongoDto());
+      return await db.collection(collectionName).insertOne(dto.toMongoJson());
     } else {
       // fixme ... 目前只能实现替换,更新需要指定字段
       return await replace(dto);
@@ -132,13 +132,13 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
   @Deprecated("实现错误! 更新方法需要指定更新的属性, 使用 ModifierBuilder")
   Future<WriteResult> updateBy(ObjectId id, T dto) async => await db
       .collection(collectionName)
-      .updateOne(where.id(id), dto.toMongoDto());
+      .updateOne(where.id(id), dto.toMongoJson());
 
   // Future<WriteResult> replace(T dto);
   @override
   Future<WriteResult> replace(T dto) async => await db
       .collection(collectionName)
-      .replaceOne(where.id(dto.id), dto.toMongoDto());
+      .replaceOne(where.id(dto.id), dto.toMongoJson());
 }
 
 // @lazySingleton

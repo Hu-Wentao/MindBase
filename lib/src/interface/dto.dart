@@ -13,7 +13,7 @@ abstract class IMongoEntityDto extends IMongoDto {
   ObjectId get id;
 
   @override
-  String toString() => toMongoDto().toString();
+  String toString() => toMongoJson().toString();
 }
 
 /// 普通的携带有ObjectId字段的Dto需要实现本类
@@ -22,13 +22,13 @@ abstract class IMongoDto extends Equatable implements IDto {
 
   // 返回的结果与json的Map相似,但 id是 ObjectId类型,而不是String
   // todo 可以在这里实现保存 int， bool， 等原始类型的需求
-  dynamic toMongoDto({AttrType type = AttrType.string});
+  dynamic toMongoJson({AttrType type = AttrType.string});
 
   @override
   bool? get stringify => true;
 
   @override
-  String toString() => toMongoDto().toString();
+  String toString() => toMongoJson().toString();
 }
 
 ///
@@ -77,7 +77,7 @@ class RecordDto extends IMongoEntityDto {
       );
 
   @override
-  Map<String, dynamic> toJson() => toMongoDto()..['_id'] = idHex;
+  Map<String, dynamic> toJson() => toMongoJson()..['_id'] = idHex;
 
   /// 从表单输入
   factory RecordDto.fromForm(RecordMeta meta, Map<String, dynamic> formMap) {
@@ -104,8 +104,8 @@ class RecordDto extends IMongoEntityDto {
   /// 适配 MongoDart的ObjectId
   /// 这里直接使用json,无需将value转换为String
   @override
-  Map<String, dynamic> toMongoDto({AttrType type = AttrType.string}) =>
-      fields.map((key, value) => MapEntry("$key", value.toMongoDto()))
+  Map<String, dynamic> toMongoJson({AttrType type = AttrType.string}) =>
+      fields.map((key, value) => MapEntry("$key", value.toMongoJson()))
         ..['_id'] = id;
 
   Record toDm(RecordMeta Function(ObjectId metaId) getMeta) =>
@@ -227,7 +227,7 @@ class RecordMetaDto extends IMongoEntityDto {
       );
 
   @override
-  Map<String, dynamic> toJson() => toMongoDto()..['_id'] = id.toHexString();
+  Map<String, dynamic> toJson() => toMongoJson()..['_id'] = id.toHexString();
 
   RecordMetaDto.fromMongoJson(Map<String, dynamic> mJs)
       : this(
@@ -241,7 +241,7 @@ class RecordMetaDto extends IMongoEntityDto {
         );
 
   @override
-  Map<String, dynamic> toMongoDto({AttrType type = AttrType.string}) => {
+  Map<String, dynamic> toMongoJson({AttrType type = AttrType.string}) => {
         '_id': id, // 必须要有 '_id'
         'name': name,
         'memo': memo,
@@ -370,5 +370,5 @@ class AttributeDto extends IMongoDto {
   String toString() => toJson().toString();
 
   @override
-  toMongoDto({AttrType type = AttrType.string}) => toJson();
+  toMongoJson({AttrType type = AttrType.string}) => toJson();
 }
