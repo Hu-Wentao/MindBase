@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
+import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/repo.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/infra/mongo_storage.dart';
@@ -27,14 +28,17 @@ main() {
         RecordRepo(mongoStorage, schemaRepo, metaId.toHexString());
     final record = Record.of(
         id: ObjectId.fromHexString("622d8e7ab1e16c6095af898a"),
-        meta: RecordMeta.of(id: metaId, name: 'test', attributes: [
-          AttrInMetaBuilder(
-            "name2",
-            "...",
-            AttrType.string,
-            "none",
-          ),
-        ]),
+        meta: RecordMeta(
+            id: metaId,
+            name: 'test',
+            memo: "..",
+            maxKey: 3,
+            attributes: [
+              const AttributeDto.builder(
+                k: 3,
+                name: "test",
+              ).toDm(FuncManager.findBy),
+            ]),
         fields: {});
 
     /// 插入

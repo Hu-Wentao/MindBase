@@ -65,7 +65,6 @@ class RecordDto extends IMongoEntityDto {
       );
 
   factory RecordDto.fromDomain(Record record) => RecordDto(
-        // metaId: record.meta.id,
         fields: record.fields,
       );
 

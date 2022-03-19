@@ -30,8 +30,10 @@ class WatchEvent<T extends IMongoEntityDto> {
 
   WatchEvent(this.type, this.ettId, this.entity);
 
-  static of<T extends IMongoEntityDto>(mg.ChangeEvent _changeEvent,
-          T? Function(Map<String, Object?>? mgJson) mongoJsonToDtoOr) =>
+  static of<T extends IMongoEntityDto>(
+    mg.ChangeEvent _changeEvent,
+    T? Function(Map<String, Object?>? mgJson) mongoJsonToDtoOr,
+  ) =>
       WatchEvent<T>(
         WatchEventType.values.asNameMap()[_changeEvent.operationType]!,
         (_changeEvent.serverResponse['documentKey']
@@ -159,13 +161,13 @@ class RecordAccessor extends BaseMongoAccessor<RecordDto> {
   RecordDto mongoJsonToDto(Map<String, dynamic> mgJson) =>
       RecordDto.fromMongoJson(mgJson);
 
-  // Stream<RecordDto> findAllByMetaId(ObjectId metaId) =>
-  //     findAll(selector: where.eq('metaId', metaId));
+// Stream<RecordDto> findAllByMetaId(ObjectId metaId) =>
+//     findAll(selector: where.eq('metaId', metaId));
 
-  // fixme [性能] 无法按照条件监听指定record,只能watchAll然后过滤
-  // fixme [功能] 由于删除事件没有entity,无法检查metaId,导致无法监听
-  // Stream<WatchEvent<RecordDto>> watchAllByMetaId(ObjectId metaId) =>
-  //     watchAll().where((event) => event.entity?.metaId == metaId);
+// fixme [性能] 无法按照条件监听指定record,只能watchAll然后过滤
+// fixme [功能] 由于删除事件没有entity,无法检查metaId,导致无法监听
+// Stream<WatchEvent<RecordDto>> watchAllByMetaId(ObjectId metaId) =>
+//     watchAll().where((event) => event.entity?.metaId == metaId);
 // Stream<WatchEvent<RecordDto>> watchAllByMetaId(ObjectId metaId) => watchAll(
 //     builder: AggregationPipelineBuilder()
 //         .addStage(Match(where.eq('metaId', metaId).toQuery())));

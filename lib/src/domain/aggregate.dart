@@ -6,7 +6,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 
 import 'entity/func.dart';
 
-/// 表 ============================================ =============================
+/// 表 =========================================================================
 
 /// 记录
 /// 必须通过DTO转换 [RecordDto]
@@ -71,30 +71,6 @@ class RecordMeta implements IEtt<ObjectId> {
     required this.attributes,
   });
 
-
-  /// fixme 没什么用, 可能导致Bug, 考虑移除
-  @Deprecated("移除")
-  factory RecordMeta.of({
-    ObjectId? id,
-    required String name,
-    String memo = "",
-    List<AttrInMetaBuilder> attributes = const [],
-  }) {
-    if (name.isEmpty) {
-      throw ArgumentError("name cannot be empty");
-    }
-    return RecordMeta(
-        id: id ?? ObjectId(),
-        name: name,
-        memo: memo,
-        maxKey: attributes.length,
-        attributes: attributes
-            .asMap()
-            .entries
-            .map((e) => e.value.build(e.key))
-            .toList());
-  }
-
   int nextKey() => maxKey + 1;
 
   // table新增Attr
@@ -134,38 +110,6 @@ class RecordMeta implements IEtt<ObjectId> {
 
   @override
   String toString() => toDto().toString();
-}
-
-/// fixme 合并到DTO[AttributeDto]中
-class AttrInMetaBuilder {
-  final String name; // 表头名称
-  final String memo; // 表头备注
-  final AttrType type; // 字段类型
-  final String checkFuncName;
-
-  AttrInMetaBuilder(this.name, this.memo, this.type, this.checkFuncName);
-
-  Attribute build(int key) => AttributeDto(
-        k: key,
-        name: name,
-        memo: memo,
-        type: type,
-        checkFuncName: checkFuncName,
-      ).toDm((funName) => FuncManager.findBy(funName));
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AttrInMetaBuilder &&
-          runtimeType == other.runtimeType &&
-          name == other.name &&
-          memo == other.memo &&
-          type == other.type &&
-          checkFuncName == other.checkFuncName;
-
-  @override
-  int get hashCode =>
-      name.hashCode ^ memo.hashCode ^ type.hashCode ^ checkFuncName.hashCode;
 }
 
 class Attribute {
