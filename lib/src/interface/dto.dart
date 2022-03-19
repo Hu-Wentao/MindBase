@@ -301,7 +301,7 @@ class AttributeDto implements IDto {
     String name = "",
     String memo = "",
     AttrType type = AttrType.string,
-    String checkFuncName = "",
+    String checkFuncName = FuncManager.noneFuncName,
   }) : this(
           k: k,
           name: name,
