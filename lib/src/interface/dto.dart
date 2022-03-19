@@ -21,7 +21,8 @@ abstract class IMongoDto extends Equatable implements IDto {
   const IMongoDto();
 
   // 返回的结果与json的Map相似,但 id是 ObjectId类型,而不是String
-  Map<String, dynamic> toMongoDto();
+  // todo 可以在这里实现保存 int， bool， 等原始类型的需求
+  dynamic toMongoDto({AttrType type = AttrType.string});
 
   @override
   bool? get stringify => true;
@@ -30,105 +31,82 @@ abstract class IMongoDto extends Equatable implements IDto {
   String toString() => toMongoDto().toString();
 }
 
+///
+/// fields[0] 表示ID : ObjectId
+/// fields[1] 表示MetaID ObjectId
 class RecordDto extends IMongoEntityDto {
   @override
-  ObjectId get id => ObjectId.fromHexString(hexId);
+  ObjectId get id => ObjectId.fromHexString(idHex);
 
-  String get hexId => fields[0]!.v;
-  final ObjectId metaId;
+  ObjectId get metaId => ObjectId.fromHexString(metaIdHex);
+
+  String get idHex => fields[0]!.v;
+
+  String get metaIdHex => fields[1]!.v;
+
   final Map<int, Value> fields;
 
-  const RecordDto({
-    required this.metaId,
-    required this.fields,
-  });
+  const RecordDto({required this.fields});
 
   @override
-  List<Object?> get props => [
-        metaId,
-        fields,
-      ];
+  List<Object?> get props => [fields];
 
   factory RecordDto.builder({
     ObjectId? id,
     required ObjectId metaId,
     Map<int, Value> fields = const {},
-  }) {
-    fields[0] ??= Value.of((id ?? ObjectId()).toHexString());
-    return RecordDto(
-      metaId: metaId,
-      fields: fields,
-    );
-  }
+  }) =>
+      RecordDto(
+        fields: {
+          //      填入默认值
+          0: Value.of((id ?? ObjectId()).toHexString()),
+          1: Value.of(metaId.toHexString()),
+        }..addAll(fields),
+      );
 
   factory RecordDto.fromDomain(Record record) => RecordDto(
-        metaId: record.meta.id,
+        // metaId: record.meta.id,
         fields: record.fields,
       );
 
-// {id: 6227568dda2194cb3589f5d4, metaId: 6227568dda2194cb3589f5d5, 1: {v: 123, e: null}, 2: {v: aaa, e: null}}
   factory RecordDto.fromJson(Map<String, dynamic> json) => RecordDto(
-      // id: ObjectId.fromHexString(json.remove('_id')),
-      metaId: ObjectId.fromHexString(json.remove('metaId')),
-      fields: json.map((key, value) {
-        final js2 = (value as Map<String, dynamic>); // 动态字段
-        return MapEntry(
-            int.parse(key),
-            Value(
-              js2['v'] as String,
-              js2['e'] as String?,
-            ));
-      }));
+        fields: Map.fromEntries(
+          json.entries
+              .where((element) => element.value is Map<String, dynamic>)
+              .map((e) => MapEntry(int.parse(e.key), Value.fromJson(e.value))),
+        ),
+      );
 
   @override
-  Map<String, dynamic> toJson() => toMongoDto()
-    ..['_id'] = id
-    ..['metaId'] = metaId;
+  Map<String, dynamic> toJson() => toMongoDto()..['_id'] = idHex;
 
-  factory RecordDto.fromForm(Map<String, dynamic> form) {
-    final map = Map.of(form);
+  /// 从表单输入
+  factory RecordDto.fromForm(RecordMeta meta, Map<String, dynamic> formMap) {
     return RecordDto(
-      // form中是'id', 而不是'_id'
-      // id: ObjectId.fromHexString(map.remove('id') as String),
-      metaId: ObjectId.fromHexString(map.remove('metaId') as String),
-      fields: map.map((key, value) {
-        // fixme 尚未处理 id->[0]的变更， 可能会导致id赋值错误， 待单元测试
-        final js2 = (value as String); // 动态字段
-        // fixme 没有处理error的情况
-        return MapEntry(
-            int.parse(key),
-            Value(
-              js2,
-              null,
-              // js2['v'] as String,
-              // js2['e'],
-            ));
-      }),
+      fields: Map.fromEntries(meta.attributes.map((attr) {
+        final value = formMap["${attr.k}"];
+        return MapEntry(attr.k, Value.of(value));
+      })),
     );
   }
 
   /// 注意, 本方法会修改json内容, 如果传入的json被再次解析,将会导致解析出错
   ///   (例如,将同一个json连续两次调用本方法)
   factory RecordDto.fromMongoJson(Map<String, dynamic> json) => RecordDto(
-      // id: (json.remove('_id') as ObjectId),
-      metaId: (json.remove('metaId') as ObjectId),
-      fields: json.map((key, value) {
-        final js2 = (value as Map<String, dynamic>); // 动态字段
-        return MapEntry(
-            int.parse(key),
-            Value(
-              js2['v'] as String,
-              js2['e'] as String?,
-            ));
-      }));
+          fields: Map.fromEntries(
+        json.entries
+            .where((element) => element.value is Map<String, dynamic>)
+            .map((e) => MapEntry(
+                  int.parse(e.key),
+                  Value.fromJson(e.value),
+                )),
+      ));
 
-  // 适配 MongoDart的ObjectId
+  /// 适配 MongoDart的ObjectId
+  /// 这里直接使用json,无需将value转换为String
   @override
-  Map<String, dynamic> toMongoDto() => {
-        "_id": id,
-        "metaId": metaId,
-      }..addEntries(fields.entries
-          .map((e) => MapEntry(e.key.toString(), e.value.toJson())));
+  Map<String, dynamic> toMongoDto({AttrType type = AttrType.string}) =>
+      fields.map((key, value) => MapEntry("$key", value.toMongoDto()));
 
   Record toDm(RecordMeta Function(ObjectId metaId) getMeta) =>
       toDomain(getMeta(metaId));
@@ -143,19 +121,18 @@ class RecordDto extends IMongoEntityDto {
 
   /// 向Table提供Map <metaKey值,Filed Value>
   Map<String, Value> toGridKeyValueMap() =>
-      fields.map((key, value) => MapEntry("$key", value))
-        ..['id'] = Value.of(id.toHexString());
+      fields.map((key, value) => MapEntry("$key", value));
 
   static RecordDto fromGridKeyValueMap(
     RecordDto oldEntity,
     Map<String, Value> nGridMap,
   ) =>
       RecordDto(
-          metaId: oldEntity.metaId,
           fields: nGridMap.map((k, v) => MapEntry(int.tryParse(k) ?? -1, v)));
 }
 
 /// 表头属性
+/// attributes固定 0:表示Record的ID, 1:表示Record的metaId
 class RecordMetaDto extends IMongoEntityDto {
   @override
   ObjectId id;
@@ -181,18 +158,32 @@ class RecordMetaDto extends IMongoEntityDto {
         attributes,
       ];
 
+  int nextKey() => maxKey + 1;
+
   // 用于给Form提供初始值
   RecordMetaDto.builder({
     String? id,
     String name = "",
     String memo = "",
-    int maxKey = 0,
-    List<AttributeDto> attributes = const [],
+    List<AttributeDto> attributes = const [
+      AttributeDto.builder(
+        k: 0,
+        name: "ID",
+        memo: "系统生成的唯一ID",
+        type: AttrType.objectId,
+      ),
+      AttributeDto.builder(
+        k: 1,
+        name: "metaId",
+        memo: "元数据ID",
+        type: AttrType.objectId,
+      ),
+    ],
   }) : this(
           id: id == null ? ObjectId() : ObjectId.fromHexString(id),
           name: name,
           memo: memo,
-          maxKey: maxKey,
+          maxKey: attributes.length,
           attributes: attributes,
         );
 
@@ -250,8 +241,8 @@ class RecordMetaDto extends IMongoEntityDto {
         );
 
   @override
-  Map<String, dynamic> toMongoDto() => {
-        '_id': id,
+  Map<String, dynamic> toMongoDto({AttrType type = AttrType.string}) => {
+        '_id': id, // 必须要有 '_id'
         'name': name,
         'memo': memo,
         'maxKey': maxKey,
@@ -271,15 +262,10 @@ class RecordMetaDto extends IMongoEntityDto {
         attributes: attrs,
       );
 
-  // key序列, <字段key,UI展示名>/<字段key,Header名>, 例如 <"id":"ID">, <"2","年龄">等
-  // todo #改造Meta->Map:1 将id作为 Attr,且k为 "0"; 返回值改为 [AttributeDto]类型,
-  Map<String, String> toGridKeyNameMap() => {
-        "id": "ID",
-      }..addEntries(attributes.map(
-          (e) => MapEntry("${e.k}", e.name),
-        ));
+  // key序列, <字段key,UI展示名>/<字段key,Header名>, 例如 <"0":"ID">, <"2","年龄">等
+  Map<String, String> toGridKeyNameMap() =>
+      Map.fromEntries(attributes.map((e) => MapEntry("${e.k}", e.name)));
 
-  // todo #改造Meta->Map:2 将id作为 Attr,且k为 "0";
   AttributeDto getAttrByKey(int key) =>
       attributes.firstWhere((element) => element.k == key);
 
@@ -288,7 +274,7 @@ class RecordMetaDto extends IMongoEntityDto {
 }
 
 /// 表头/属性: 关系/表的一列叫属性
-class AttributeDto implements IDto {
+class AttributeDto extends IMongoDto {
   final int k;
   final String name;
   final String memo;
@@ -296,7 +282,7 @@ class AttributeDto implements IDto {
   final String checkFuncName;
 
   /// 供Form初始化
-  AttributeDto.builder({
+  const AttributeDto.builder({
     int k = 0,
     String name = "",
     String memo = "",
@@ -329,13 +315,22 @@ class AttributeDto implements IDto {
           checkFuncName: attr.check.name,
         );
 
-  AttributeDto({
+  const AttributeDto({
     required this.k,
     required this.name,
     required this.memo,
     required this.type,
     required this.checkFuncName,
   });
+
+  @override
+  List<Object?> get props => [
+        k,
+        name,
+        memo,
+        type,
+        checkFuncName,
+      ];
 
   AttributeDto.fromJson(Map<String, dynamic> json)
       : this(
@@ -373,4 +368,7 @@ class AttributeDto implements IDto {
 
   @override
   String toString() => toJson().toString();
+
+  @override
+  toMongoDto({AttrType type = AttrType.string}) => toJson();
 }

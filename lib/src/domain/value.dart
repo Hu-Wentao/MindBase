@@ -1,5 +1,7 @@
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:mind_base/src/interface/dto.dart';
+import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
 part 'value.g.dart';
 
@@ -51,13 +53,16 @@ class Error {
 }
 
 // /// 无类型(String)方案
-class Value with ITypeMx {
+class Value extends IMongoDto with ITypeMx {
   final String v; // 字段存储值
-  String? e; // 字段错误信息
+  final String? e; // 字段错误信息
 
-  Value(this.v, this.e);
+  const Value(this.v, this.e);
 
-  Value.of(dynamic v, [this.e]):v = "$v";
+  @override
+  List<Object?> get props => [v, e];
+
+  Value.of(dynamic v, [this.e]) : v = "$v";
 
   Value.err(String? e) : this.of("", e);
 
@@ -67,6 +72,7 @@ class Value with ITypeMx {
           json['e'] as String?,
         );
 
+  @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'v': v,
         'e': e,
@@ -95,6 +101,17 @@ class Value with ITypeMx {
   String get asString => v;
 
   bool equals(Value input) => v == input.v;
+
+  // 返回值可以是 json， 也可以是[ObjectId]
+  @override
+  dynamic toMongoDto({AttrType type = AttrType.string}) {
+    switch (type) {
+      case AttrType.objectId:
+        return ObjectId.fromHexString(v);
+      default:
+        return toJson();
+    }
+  }
 }
 
 /// dynamic方案
@@ -163,6 +180,7 @@ class Value with ITypeMx {
 // }
 
 enum AttrType {
+  objectId, // 特殊处理
   any, // 任意类型
   string,
   num,

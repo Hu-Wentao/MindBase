@@ -44,31 +44,14 @@ class _RecordFormState extends State<RecordForm> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              FormBuilderTextField(
-                name: 'id',
-                initialValue: _origin.id.toHexString(),
-                decoration: const InputDecoration(labelText: 'ID'),
-                validator: FormBuilderValidators.compose([
-                  FormBuilderValidators.required(context),
-                ]),
-              ),
-              FormBuilderTextField(
-                name: 'metaId',
-                initialValue: _origin.metaId.toHexString(),
-                decoration: const InputDecoration(labelText: 'MetaId'),
-                validator: FormBuilderValidators.compose([
-                  FormBuilderValidators.required(context),
-                ]),
-              ),
               ...widget.meta.attributes.map((attr) {
                 final field = _origin.fields[attr.k];
                 return FormBuilderTextField(
-                  name: attr.k.toString(), // Attribute::k作为Map的key
+                  name: "${attr.k}", // Attribute::k作为Map的key
                   initialValue: field?.v,
                   decoration: InputDecoration(
                     labelText: attr.name,
                     hintText: attr.type.toString(),
-                    // hintText: "${field?.v}  ${field?.e}",
                   ),
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(context),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:mind_base/src/application/provider/record_provider.dart';
 import 'package:mind_base/src/application/provider/meta_provider.dart';
+import 'package:mind_base/src/domain/entity/func.dart';
+import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/infra/ui/form/meta_form.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_frame.dart';
 import 'package:mind_base/src/interface/dto.dart';
@@ -62,7 +64,7 @@ class _HomePageState extends State<HomePage> {
       await NAlertDialog(
         dialogStyle: DialogStyle(titleDivider: true),
         title: const Text("添加新的表"),
-        content: MetaForm(
+        content: MetaForm.create(
           kMetaBuilder: _kMetaBuilder,
           kAttrBuilder: _kAttrBuilder,
         ),
@@ -76,7 +78,7 @@ class _HomePageState extends State<HomePage> {
                 final checkMeta =
                     _kMetaBuilder.currentState?.saveAndValidate() ?? false;
                 if (checkAttr && checkMeta) {
-                  final schemaMap = _kMetaBuilder.currentState!.value;
+                  final metaMap = _kMetaBuilder.currentState!.value;
                   final attrMap = _kAttrBuilder.currentState!.value;
                   // <key,<field,value>>
                   final attrFormatMap = <int, Map<String, String>>{};
@@ -92,7 +94,7 @@ class _HomePageState extends State<HomePage> {
                     final json = e.value;
                     return AttributeDto.fromFrom(json);
                   }).toList();
-                  final dto = RecordMetaDto.fromForm(schemaMap, attrs);
+                  final dto = RecordMetaDto.fromForm(metaMap, attrs);
                   Navigator.pop<RecordMetaDto>(c, dto);
                 } else {
                   ScaffoldMessenger.of(c).showSnackBar(

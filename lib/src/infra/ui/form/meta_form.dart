@@ -6,18 +6,55 @@ import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
 
 class MetaForm extends StatelessWidget {
-  const MetaForm(
-      {Key? key, required this.kMetaBuilder, required this.kAttrBuilder})
-      : super(key: key);
+  final bool isCreate;
+  final RecordMetaDto origin;
   final GlobalKey<FormBuilderState> kMetaBuilder;
   final GlobalKey<FormBuilderState> kAttrBuilder;
+
+  const MetaForm({
+    Key? key,
+    required this.isCreate,
+    required this.kMetaBuilder,
+    required this.kAttrBuilder,
+    required this.origin,
+  }) : super(key: key);
+
+  factory MetaForm.create({
+    required GlobalKey<FormBuilderState> kMetaBuilder,
+    required GlobalKey<FormBuilderState> kAttrBuilder,
+  }) =>
+      MetaForm(
+        isCreate: true,
+        kMetaBuilder: kMetaBuilder,
+        kAttrBuilder: kAttrBuilder,
+        origin: RecordMetaDto.builder(),
+      );
+
+  factory MetaForm.modify({
+    required GlobalKey<FormBuilderState> kMetaBuilder,
+    required GlobalKey<FormBuilderState> kAttrBuilder,
+    required RecordMetaDto origin,
+  }) =>
+      MetaForm(
+        isCreate: false,
+        kMetaBuilder: kMetaBuilder,
+        kAttrBuilder: kAttrBuilder,
+        origin: origin,
+      );
 
   @override
   Widget build(BuildContext context) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          MetaMainForm(kMetaBuilder: kMetaBuilder),
-          AttributeListForm(kAttrBuilder: kAttrBuilder),
+          MetaMainForm(
+            kMetaBuilder: kMetaBuilder,
+            origin: origin,
+          ),
+          AttributeListForm.build(
+            isCreate: isCreate,
+            kAttrBuilder: kAttrBuilder,
+            origin: origin,
+          ),
         ],
       );
 }
@@ -93,15 +130,30 @@ class _MetaMainFormState extends State<MetaMainForm> {
 }
 
 class AttributeListForm extends StatefulWidget {
-  final int kStartAt; // ::nextKey()
-  final List<AttributeDto> origin;
+  final bool isCreate; // true:表单将会新增一个待编辑的属性
+  final int nextKey; // ::nextKey()
+  final List<AttributeDto> originList;
 
   final GlobalKey<FormBuilderState>? kAttrBuilder;
 
+  factory AttributeListForm.build({
+    Key? key,
+    required isCreate,
+    required RecordMetaDto origin,
+    GlobalKey<FormBuilderState>? kAttrBuilder,
+  }) =>
+      AttributeListForm(
+        isCreate: isCreate,
+        nextKey: origin.nextKey(),
+        originList: origin.attributes,
+        kAttrBuilder: kAttrBuilder,
+      );
+
   const AttributeListForm({
     Key? key,
-    this.kStartAt = 0,
-    this.origin = const [],
+    required this.isCreate,
+    required this.originList,
+    required this.nextKey,
     this.kAttrBuilder,
   }) : super(key: key);
 
@@ -115,15 +167,16 @@ class _AttributeListFormState extends State<AttributeListForm> {
 
   @override
   initState() {
-    _origin = widget.origin.isNotEmpty
-        ? widget.origin
-        : [AttributeDto.builder(k: widget.kStartAt)];
+    _origin = [
+      ...widget.originList,
+      if (widget.isCreate) AttributeDto.builder(k: widget.nextKey),
+    ];
     _kAttrBuilder = widget.kAttrBuilder ?? GlobalKey<FormBuilderState>();
     super.initState();
   }
 
   _addNewAttr() => setState(() =>
-      _origin.add(AttributeDto.builder(k: widget.kStartAt + _origin.length)));
+      _origin.add(AttributeDto.builder(k: widget.nextKey + _origin.length)));
 
   _removeAttr(AttributeDto a) => setState(() => _origin.remove(a));
 
@@ -140,7 +193,7 @@ class _AttributeListFormState extends State<AttributeListForm> {
   /// 特殊处理： 对所有的键添加 ”${a.k}@“开头，以区别不同的Attribute
   Widget _buildAttributeForm(BuildContext context, AttributeDto a) => ListTile(
       leading: SizedBox(
-        width: 45, // todo debug
+        width: 45,
         child: FormBuilderTextField(
           // name: 'k',
           name: '${a.k}@k',

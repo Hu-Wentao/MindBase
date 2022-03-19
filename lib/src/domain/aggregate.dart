@@ -54,7 +54,7 @@ class Record implements IEtt<ObjectId> {
   String toString() => toDto().toString();
 }
 
-/// Meta信心
+/// Meta信息
 /// 必须通过DTO转换 [RecordMetaDto]
 class RecordMeta implements IEtt<ObjectId> {
   @override
@@ -71,6 +71,9 @@ class RecordMeta implements IEtt<ObjectId> {
     required this.attributes,
   });
 
+
+  /// fixme 没什么用, 可能导致Bug, 考虑移除
+  @Deprecated("移除")
   factory RecordMeta.of({
     ObjectId? id,
     required String name,
@@ -133,6 +136,7 @@ class RecordMeta implements IEtt<ObjectId> {
   String toString() => toDto().toString();
 }
 
+/// fixme 合并到DTO[AttributeDto]中
 class AttrInMetaBuilder {
   final String name; // 表头名称
   final String memo; // 表头备注
@@ -206,6 +210,9 @@ class Attribute {
   // }
 
   AttributeDto toDto() => AttributeDto.ofDomain(this);
+
+  @override
+  String toString() => toDto().toString();
 
   @override
   bool operator ==(Object other) =>

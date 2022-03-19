@@ -27,7 +27,8 @@ main() {
 
     print("start");
 
-    RecordAccessor acc = RecordAccessor(db,dto1.metaId.toHexString());
+    RecordAccessor acc = RecordAccessor(db,ObjectId().toHexString());
+    // RecordAccessor acc = RecordAccessor(db,dto1.metaId.toHexString());
 
     acc.watchAll().listen((event) {
       print("receive:$event");

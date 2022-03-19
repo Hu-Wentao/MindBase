@@ -472,7 +472,7 @@ class DataFrameTitle extends StatelessWidget {
                     _kRecordBuilder.currentState?.saveAndValidate() ?? false;
                 if (checkAttr) {
                   final map = _kRecordBuilder.currentState!.value;
-                  final dto = RecordDto.fromForm(map);
+                  final dto = RecordDto.fromForm(meta, map);
                   Navigator.pop<RecordDto>(c, dto);
                 } else {
                   ScaffoldMessenger.of(c).showSnackBar(
