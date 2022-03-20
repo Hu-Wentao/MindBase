@@ -94,8 +94,7 @@ class Expression extends BaseCallable {
     final mtId = attrMap['metaId'] as String?;
     return Expression(
       metaId: mtId == null ? null : ObjectId.fromHexString(mtId),
-      pKeys:
-          (attrMap['pKeys'] as List<dynamic>).map((e) => e as int).toList(),
+      pKeys: (attrMap['pKeys'] as List<dynamic>).map((e) => e as int).toList(),
       calls: (attrMap['calls'] as List<dynamic>)
           .map((e) => BaseCallable.fromTypedJson(e as Map<String, dynamic>))
           .toList(),
@@ -160,7 +159,12 @@ class Func extends BaseCallable {
 class FuncManager {
   static const String noneFuncName = "none";
   static const String selfFuncName = "self";
-  static final Func noneFunc = selfFunc;
+  static final Func noneFunc = Func(
+    name: noneFuncName,
+    pTypes: const [AttrType.any],
+    rType: AttrType.any,
+    onRun: (p) => p[0],
+  );
   static final Func selfFunc = Func(
     name: selfFuncName,
     pTypes: const [AttrType.any],
