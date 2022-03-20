@@ -390,7 +390,7 @@
         <entry key="js">
           <value>
             <list>
-              <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/js-0.6.4/lib" />
+              <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/js-0.6.3/lib" />
             </list>
           </value>
         </entry>
@@ -819,7 +819,7 @@
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/injectable_generator-1.5.3/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/intl-0.17.0/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/io-1.0.3/lib" />
-      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/js-0.6.4/lib" />
+      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/js-0.6.3/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/json_annotation-4.4.0/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/json_serializable-6.1.5/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/line_icons-2.0.1/lib" />
