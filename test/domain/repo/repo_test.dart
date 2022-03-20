@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/repo.dart';
-import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/infra/mongo_storage.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
@@ -34,7 +33,7 @@ main() {
             memo: "..",
             maxKey: 3,
             attributes: [
-              const AttributeDto.builder(
+              AttributeDto.builder(
                 k: 3,
                 name: "test",
               ).toDm(FuncManager.findBy),

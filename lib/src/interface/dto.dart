@@ -161,31 +161,35 @@ class RecordMetaDto extends IMongoEntityDto {
   int nextKey() => maxKey + 1;
 
   // 用于给Form提供初始值
-  RecordMetaDto.builder({
+  factory RecordMetaDto.builder({
     String? id,
     String name = "",
     String memo = "",
-    List<AttributeDto> attributes = const [
-      AttributeDto.builder(
-        k: 0,
-        name: "ID",
-        memo: "系统生成的唯一ID",
-        type: AttrType.objectId,
-      ),
-      AttributeDto.builder(
-        k: 1,
-        name: "metaId",
-        memo: "元数据ID",
-        type: AttrType.objectId,
-      ),
-    ],
-  }) : this(
-          id: id == null ? ObjectId() : ObjectId.fromHexString(id),
-          name: name,
-          memo: memo,
-          maxKey: attributes.length,
-          attributes: attributes,
-        );
+    List<AttributeDto>? attributes,
+  }) {
+    final attrs = attributes ??
+        [
+          AttributeDto.builder(
+            k: 0,
+            name: "ID",
+            memo: "系统生成的唯一ID",
+            expr: Expression.field(AttrType.objectId),
+          ),
+          AttributeDto.builder(
+            k: 1,
+            name: "metaId",
+            memo: "元数据ID",
+            expr: Expression.field(AttrType.objectId),
+          ),
+        ];
+    return RecordMetaDto(
+      id: id == null ? ObjectId() : ObjectId.fromHexString(id),
+      name: name,
+      memo: memo,
+      maxKey: attrs.length,
+      attributes: attrs,
+    );
+  }
 
   // 从Form中获取的Map
   RecordMetaDto build(Map<String, String> map, List<AttributeDto> attributes) =>
@@ -278,21 +282,21 @@ class AttributeDto extends IMongoDto {
   final int k;
   final String name;
   final String memo;
-  final AttrType type;
+  final Expression expr;
   final String checkFuncName;
 
   /// 供Form初始化
-  const AttributeDto.builder({
+  AttributeDto.builder({
     int k = 0,
     String name = "",
     String memo = "",
-    AttrType type = AttrType.string,
+    Expression? expr,
     String checkFuncName = FuncManager.noneFuncName,
   }) : this(
           k: k,
           name: name,
           memo: memo,
-          type: type,
+          expr: expr ?? Expression.field(AttrType.string),
           checkFuncName: checkFuncName,
         );
 
@@ -302,7 +306,7 @@ class AttributeDto extends IMongoDto {
         k: int.parse(attrMap['k'] as String),
         name: attrMap['name'] as String,
         memo: attrMap['memo'] as String,
-        type: AttrType.values.asNameMap()[attrMap['type'] as String]!,
+        expr: Expression.fromJson(attrMap['expr'] as Map<String, dynamic>),
         checkFuncName: attrMap['checkFuncName'] as String,
       );
 
@@ -311,7 +315,7 @@ class AttributeDto extends IMongoDto {
           k: attr.k,
           name: attr.name,
           memo: attr.memo,
-          type: attr.type,
+          expr: attr.expr,
           checkFuncName: attr.check.name,
         );
 
@@ -319,7 +323,7 @@ class AttributeDto extends IMongoDto {
     required this.k,
     required this.name,
     required this.memo,
-    required this.type,
+    required this.expr,
     required this.checkFuncName,
   });
 
@@ -328,7 +332,7 @@ class AttributeDto extends IMongoDto {
         k,
         name,
         memo,
-        type,
+        expr,
         checkFuncName,
       ];
 
@@ -337,7 +341,7 @@ class AttributeDto extends IMongoDto {
           k: json['k'] as int,
           name: json['name'] as String,
           memo: json['memo'] as String,
-          type: AttrType.values.asNameMap()[json['type'] as String]!,
+          expr: Expression.fromJson(json['expr'] as Map<String, dynamic>),
           checkFuncName: json['checkFuncName'] as String,
         );
 
@@ -346,7 +350,7 @@ class AttributeDto extends IMongoDto {
         'k': k,
         'name': name,
         'memo': memo,
-        'type': type.name,
+        'expr': expr.toJson(),
         'checkFuncName': checkFuncName,
       };
 
@@ -362,7 +366,7 @@ class AttributeDto extends IMongoDto {
         k: k,
         name: name,
         memo: memo,
-        type: type,
+        expr: expr,
         check: check,
       );
 

@@ -1,6 +1,6 @@
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:mind_base/src/interface/dto.dart';
+import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
 part 'value.g.dart';
@@ -53,9 +53,12 @@ class Error {
 }
 
 // /// 无类型(String)方案
-class Value extends IMongoDto with ITypeMx {
+class Value extends BaseCallable with ITypeMx {
   final String v; // 字段存储值
   final String? e; // 字段错误信息
+
+  @override
+  ICallable call(List<ICallable> p) => this;
 
   const Value(this.v, this.e);
 

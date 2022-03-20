@@ -7,7 +7,7 @@ abstract class ConfigMongo {
   IMongoStorage get mongoStorage => BaseMongoStorage(MongoStorageConfig(
         host: "localhost",
         port: 30001,
-        databaseName: "dev_mind_base_2",
+        databaseName: "dev_mind_base_3",
       ));
 
   @preResolve

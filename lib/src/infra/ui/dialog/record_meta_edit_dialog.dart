@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/infra/ui/form/meta_form.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:ndialog/ndialog.dart';
 
 Future<RecordMetaDto?> showRecordMetaEditDialog({
   required BuildContext context,
-  required kMetaBuilder,
-  required kAttrBuilder,
+  required GlobalKey<FormBuilderState> kMetaBuilder,
+  required GlobalKey<FormBuilderState> kAttrBuilder,
 }) async =>
     await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: true),
@@ -19,29 +21,12 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
         TextButton(
             child: const Text("确认"),
             onPressed: () {
-              final checkAttr =
-                  kAttrBuilder.currentState?.saveAndValidate() ?? false;
-              kAttrBuilder.currentState?.save();
-              final checkMeta =
-                  kMetaBuilder.currentState?.saveAndValidate() ?? false;
-              if (checkAttr && checkMeta) {
-                final metaMap = kMetaBuilder.currentState!.value;
-                final attrMap = kAttrBuilder.currentState!.value;
-                // <key,<field,value>>
-                final attrFormatMap = <int, Map<String, String>>{};
-                for (final e in attrMap.entries) {
-                  final k = e.key.split("@");
-                  final ik = int.parse(k[0]);
-                  final fk = k[1];
-                  final v = e.value;
-                  attrFormatMap[ik] ??= {};
-                  attrFormatMap[ik]![fk] = v;
-                }
-                final attrs = attrFormatMap.entries.map((e) {
-                  final json = e.value;
-                  return AttributeDto.fromFrom(json);
-                }).toList();
-                final dto = RecordMetaDto.fromForm(metaMap, attrs);
+              if (MetaForm.checkBy(kMetaBuilder, kAttrBuilder)) {
+                final dto = MetaForm.fetchDtoBy(
+                  kMetaBuilder: kMetaBuilder,
+                  kAttrBuilder: kAttrBuilder,
+                );
+                slLogger.info("debug meta dto: $dto");
                 Navigator.pop<RecordMetaDto>(context, dto);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(

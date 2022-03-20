@@ -115,23 +115,26 @@ class RecordMeta implements IEtt<ObjectId> {
   String toString() => toDto().toString();
 }
 
-class Attribute {
+class Attribute extends Equatable{
   final int k; // 表头key,对应Field:k,需要从所在的TableMeat中获取
   final String name; // 表头名称
   final String memo; // 表头备注
-  final AttrType type; // 字段类型
+  final Expression expr; // 包含当前字段的类型，值等等
   // todo 读写权限等..
 
   // Func的默认值应当为 NoneFunc
+  @Deprecated('可能是不必要的')
   final Func check; // 校验函数, 如果出错则会将错误信息记录到e字段中
 
-  Attribute({
+  const Attribute({
     required this.k,
     required this.name,
     required this.memo,
-    required this.type,
+    required this.expr,
     required this.check,
   });
+  @override
+  List<Object?> get props => [k, name, memo, expr, check];
 
   // // 检查当前函数值是否合法
   // @protected
@@ -161,22 +164,4 @@ class Attribute {
   @override
   String toString() => toDto().toString();
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Attribute &&
-          runtimeType == other.runtimeType &&
-          k == other.k &&
-          name == other.name &&
-          memo == other.memo &&
-          type == other.type &&
-          check == other.check;
-
-  @override
-  int get hashCode =>
-      k.hashCode ^
-      name.hashCode ^
-      memo.hashCode ^
-      type.hashCode ^
-      check.hashCode;
 }

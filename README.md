@@ -56,6 +56,32 @@
 
 - 值检查表达式: 在set值时,检查值是否符合Attribute的Type要求
 
+
+
+## Method方法设计
+
+### Method v1A （与Attr合并方案）
+
+- 方法是一种特殊的Attr，存在于RecordMeta中。新增一种 type”method”来表示，
+  
+  - 方法的返回值： 如果Method无需参数，则展示为Value，否则为空  
+  
+  - 方法的参数存放在Attr中。
+    
+    - 方法的参数可以来自其他表，如果没有进行处理，则可以表示引用
+
+
+
+### Method v1B （独立Metod方案）
+
+- 方法与Attr平行， 存在与RecordMeta中。无需新增AttrType枚举
+  
+  - 方法的返回值： 同 v1A
+  
+  - 方法的参数存放在Attr中
+
+
+
 ---
 
 ## Record 记录设计
@@ -132,7 +158,9 @@
 
 - 表达式是对`Func`的包装, 包装了参数等
 
--
+
+
+
 
 #### 函数 Func
 
@@ -148,21 +176,52 @@
 
 # 实现细节
 
-## Record的存放
+## MongoDB相关
 
-### 是否应该将属于不同schema(record_meta)的record存放在同一个collection中?
 
-### 当前方案: 存放在同一个集合.
+
+### Record的存放
+
+#### 将属于不同schema的record存放在同一个collection中 #check
 
 - 优点:
 
 - 缺点: 造成record集合太大
-  
-  ### 不同schema的record存放在 "tb_${schemaId}"集合中
+
+- 
+
+
+#### 不同schema的record存放在 "tb_${schemaId}"集合中 #dev
 
 - 优点:
 
 - 缺点:
+
+
+
+## mongo_dart的watch
+
+对于副本集, 可以watch单个集合 `collection`的变更
+
+对于集群, 可以watch单个`database`的变更
+
+
+
+### Record持久化样式
+
+### v3 `#todo`
+
+
+
+#### v2 将`_id`,`metaId`存储到 `fields`中，
+
+- 所有fields都展开存储到Record的document中
+
+#### v1 单独存储`_id`,`metaId`
+
+- 所有fields都展开存储到Record的document中
+
+
 
 ---
 
@@ -182,8 +241,8 @@
 
 ### 基本函数的内容
 
-- 入参类型, 数量
-- 出参类型(只有一个)
+- 入参类型 数量
+- 出参类型 (只有一个)
 - 函数ID: 类比"包名", 避免函数名冲突的情况
 - 函数名称: 调用时的名称
 - run 方法: 实现函数的具体功能
