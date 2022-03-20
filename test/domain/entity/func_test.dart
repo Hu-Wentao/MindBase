@@ -25,11 +25,11 @@ main() {
     final js = expression.toJson();
     print("expression: $js");
     expect(js, {
-      "pTypes": [],
+      'pKeys': [],
       "calls": [
         {
           "type": "Func",
-          "real": {"name": 'none'}
+          "real": {"name": 'self'}
         }
       ],
       'rType': 'objectId'
