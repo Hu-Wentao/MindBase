@@ -40,8 +40,8 @@ abstract class BaseCallable extends IMongoDto implements ICallable {
 class Expression extends BaseCallable {
   static Expression field(AttrType rType, {List<BaseCallable>? calls}) =>
       Expression(
-        pTypes: const [],
-        calls: calls ?? [FuncManager.noneFunc],
+        pTypes: const [AttrType.any], // 单个入参
+        calls: calls ?? [FuncManager.selfFunc], // 不做处理返回自身
         rType: rType,
       );
 
@@ -148,8 +148,10 @@ class Func extends BaseCallable {
 /// todo 添加test, 1.检查name唯一性, 2检查参数转换是否正常
 class FuncManager {
   static const String noneFuncName = "none";
-  static Func noneFunc = Func(
-    name: noneFuncName,
+  static const String selfFuncName = "self";
+  static final Func noneFunc = selfFunc;
+  static final Func selfFunc = Func(
+    name: selfFuncName,
     pTypes: const [AttrType.any],
     rType: AttrType.any,
     onRun: (p) => p[0],
@@ -181,8 +183,9 @@ class FuncManager {
 }
 
 /// 类型检查与转换表达式, 检查/转换失败则抛出异常
-final anyFunList = [
+final anyFunList = <Func>[
   FuncManager.noneFunc,
+  FuncManager.selfFunc,
   Func(
       name: "toStr",
       pTypes: const [AttrType.any],
