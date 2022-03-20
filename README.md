@@ -32,7 +32,7 @@
   
   - 限定 String的长度，内容， regex
   
-  - 限定 num的范围，大小。。
+  - 限定 num的范围，大小
   
   - 等等
 
@@ -56,8 +56,6 @@
 
 - 值检查表达式: 在set值时,检查值是否符合Attribute的Type要求
 
-
-
 ## Method方法设计
 
 ### Method v1A （与Attr合并方案）
@@ -70,8 +68,6 @@
     
     - 方法的参数可以来自其他表，如果没有进行处理，则可以表示引用
 
-
-
 ### Method v1B （独立Metod方案）
 
 - 方法与Attr平行， 存在与RecordMeta中。无需新增AttrType枚举
@@ -79,8 +75,6 @@
   - 方法的返回值： 同 v1A
   
   - 方法的参数存放在Attr中
-
-
 
 ---
 
@@ -148,7 +142,23 @@
 
 #### Method
 
-- 参照 Python的函数, 直接引用Func, 并且将首个参数设为 `self`
+- 将Expr作为 Attribute 的属性 ::expr
+- Expression 属性设计
+  - List<int> pKeys：Expr执行参数列的`k`
+- 应用场景 以 `Person`类(`name`, `age`, `::hello`, `::tags`), `Tag`类(`name`,`type`)为例
+  - 本类引用：在`hello`列 引用当前类的`name`列值
+    - 实现: `pKeys`存储 `Person::name`列的k, Value存储本类`ObjectId`, 或者存null 
+  - 外部类关联: 在 `::tags` 列 存储  Tag类的多个元素
+    - 实现: 
+      - Expression:: `pKeys`存储 Tage类的 `name`列的`k`, 表示本列展示的值是`name` , 
+      
+      - Expression::`ref` 存储`metaId`
+      
+      - Value存储 `Tage`类的`id`
+
+
+
+
 
 ### 表达式v3
 
@@ -157,10 +167,6 @@
 #### 表达式 Expression #todo
 
 - 表达式是对`Func`的包装, 包装了参数等
-
-
-
-
 
 #### 函数 Func
 
@@ -178,8 +184,6 @@
 
 ## MongoDB相关
 
-
-
 ### Record的存放
 
 #### 将属于不同schema的record存放在同一个collection中 #check
@@ -190,14 +194,11 @@
 
 - 
 
-
 #### 不同schema的record存放在 "tb_${schemaId}"集合中 #dev
 
 - 优点:
 
 - 缺点:
-
-
 
 ## mongo_dart的watch
 
@@ -205,13 +206,9 @@
 
 对于集群, 可以watch单个`database`的变更
 
-
-
 ### Record持久化样式
 
 ### v3 `#todo`
-
-
 
 #### v2 将`_id`,`metaId`存储到 `fields`中，
 
@@ -220,8 +217,6 @@
 #### v1 单独存储`_id`,`metaId`
 
 - 所有fields都展开存储到Record的document中
-
-
 
 ---
 

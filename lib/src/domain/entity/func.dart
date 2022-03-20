@@ -2,6 +2,7 @@ import 'package:mind_base/src/domain/value.dart';
 import 'dart:math' as math;
 
 import 'package:mind_base/src/interface/dto.dart';
+import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
 /// 函数 ========================================================================
 abstract class ICallable extends IMongoDto {
@@ -40,7 +41,8 @@ abstract class BaseCallable extends IMongoDto implements ICallable {
 class Expression extends BaseCallable {
   static Expression field(AttrType rType, {List<BaseCallable>? calls}) =>
       Expression(
-        pTypes: const [AttrType.any], // 单个入参
+        metaId: null, // 对于字段,无需引用 其他类 的属性,
+        pKeys: const [], // 单个入参
         calls: calls ?? [FuncManager.selfFunc], // 不做处理返回自身
         rType: rType,
       );
@@ -48,17 +50,23 @@ class Expression extends BaseCallable {
   /// [pThisType] 表示改列对应的Value的类型
   static Expression method(
     AttrType pThisType, {
+    required ObjectId metaId,
     required AttrType rType,
-    required List<AttrType> pTypes,
+    required List<int> pAttrKeys,
     required List<BaseCallable> calls,
   }) =>
       Expression(
-        pTypes: [pThisType, ...pTypes],
+        metaId: metaId,
+        pKeys: pAttrKeys,
         calls: calls,
         rType: rType,
       );
 
-  final List<AttrType> pTypes;
+  /// Expression 所在列的Value必须是[AttrType.objectId]类型
+  /// Expression 所在
+  /// Value持有的ObjectId对应的
+  final ObjectId? metaId; // null表示引用当前类的meta
+  final List<int> pKeys;
   final List<BaseCallable> calls;
   final AttrType rType;
 
@@ -73,28 +81,31 @@ class Expression extends BaseCallable {
   }
 
   const Expression({
-    required this.pTypes,
+    required this.metaId,
+    required this.pKeys,
     required this.calls,
     required this.rType,
   });
 
   @override
-  List<Object?> get props => [pTypes, calls, rType];
+  List<Object?> get props => [pKeys, calls, rType];
 
-  static Expression fromJson(Map<String, dynamic> attrMap) => Expression(
-        pTypes: (attrMap['pTypes'] as List<dynamic>)
-            .map((e) => e as String)
-            .map((AttrType.values.byName))
-            .toList(),
-        calls: (attrMap['calls'] as List<dynamic>)
-            .map((e) => BaseCallable.fromTypedJson(e as Map<String, dynamic>))
-            .toList(),
-        rType: AttrType.values.byName(attrMap['rType'] as String),
-      );
+  static Expression fromJson(Map<String, dynamic> attrMap) {
+    final mtId = attrMap['metaId'] as String?;
+    return Expression(
+      metaId: mtId == null ? null : ObjectId.fromHexString(mtId),
+      pKeys:
+          (attrMap['pKeys'] as List<dynamic>).map((e) => e as int).toList(),
+      calls: (attrMap['calls'] as List<dynamic>)
+          .map((e) => BaseCallable.fromTypedJson(e as Map<String, dynamic>))
+          .toList(),
+      rType: AttrType.values.byName(attrMap['rType'] as String),
+    );
+  }
 
   @override
   Map<String, dynamic> toJson() => {
-        'pTypes': pTypes.map((e) => e.name).toList(growable: false),
+        'pKeys': pKeys.map((e) => e).toList(growable: false),
         'calls': calls.map((e) => e.toJsonWithType()).toList(growable: false),
         'rType': rType.name,
       };
