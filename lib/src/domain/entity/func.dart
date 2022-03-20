@@ -179,7 +179,13 @@ class FuncManager {
           .firstWhere((element) => element.name == name, orElse: orElse);
 
   static Func findBy(String funcName, {Func Function()? orElse}) =>
+      findByName(funcName, orElse: () => findByAlias(funcName, orElse: orElse));
+
+  static Func findByName(String funcName, {Func Function()? orElse}) =>
       funcList.firstWhere((f) => f.name == funcName, orElse: orElse);
+
+  static Func findByAlias(String funcName, {Func Function()? orElse}) =>
+      funcList.firstWhere((f) => f.alias == funcName, orElse: orElse);
 }
 
 /// 类型检查与转换表达式, 检查/转换失败则抛出异常
