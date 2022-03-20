@@ -51,13 +51,13 @@ class MetaProvider extends ProviderSidecar {
         }
       });
 
-  Future<void> actInsertMeta(RecordMeta schema) =>
-      actWrapper(() => setInitialized("新增Meta", () async {
-            await _metaRepo.insert(schema);
+  Future<void> actInsertMeta(RecordMeta meta) =>
+      actWrapper(() => setInitialized("新增Meta [$meta]", () async {
+            await _metaRepo.insert(meta);
           }));
 
   Future<void> actSaveMeta(RecordMetaDto? dto) =>
-      actWrapper(() => setInitialized("保存元素", () async {
+      actWrapper(() => setInitialized("保存元素 [$dto]", () async {
             if (dto == null) {
               return null;
             }
