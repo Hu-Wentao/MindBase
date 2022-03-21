@@ -45,6 +45,7 @@ class MetaForm extends StatelessWidget {
     return metaState && attrState;
   }
 
+  /// 通过 k获取 MetaForm和AttrForm 中的数据, 最后转换成DTO
   static RecordMetaDto? fetchDtoBy({
     required GlobalKey<FormBuilderState> kMetaBuilder,
     required GlobalKey<FormBuilderState> kAttrBuilder,
@@ -81,6 +82,7 @@ class MetaForm extends StatelessWidget {
     })
         // .map((e) => AttributeDto.fromFrom(e.value))
         .toList();
+    print("debug # attrs: $attrs");
     return RecordMetaDto.fromForm(metaMap, attrs);
   }
 }
@@ -204,7 +206,18 @@ class _AttributeListFormState extends State<AttributeListForm> {
   _addNewAttr() => setState(() =>
       _origin.add(AttributeDto.builder(k: widget.nextKey + _origin.length)));
 
-  _removeAttr(AttributeDto a) => setState(() => _origin.remove(a));
+  _removeAttr(AttributeDto a) {
+    setState(() {
+      // 从数据源移除
+      _origin.remove(a);
+      // 选中表单中相关的字段名
+      final targetFields = _kAttrBuilder.currentState?.instantValue.keys
+          .where((element) => element.startsWith("${a.k}@"));
+      // 从表单中移除相关键值对 (由于_origin已移除, 因此无需在这里 setState)
+      targetFields?.forEach((fieldNames) => _kAttrBuilder.currentState
+          ?.removeInternalFieldValue(fieldNames, isSetState: false));
+    });
+  }
 
   @override
   Widget build(BuildContext context) => FormBuilder(
