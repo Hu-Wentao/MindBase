@@ -13,7 +13,10 @@ class RecordProvider extends ProviderSidecar {
   RecordAccessor _recordAccessor(ObjectId metaId) =>
       RecordAccessor(sl<Db>(), metaId.toHexString());
 
-  RecordMeta? selectedMeta;
+  ObjectId? selectedMetaId;
+
+  RecordMeta? getSelectedMeta(RecordMeta? Function(ObjectId? metaId) getMeta) =>
+      getMeta(selectedMetaId);
 
   // todo 后期添加 actCloseSourceByMetaId,
   // todo 注意要检查 opendRecord中关联RecordMeta, 如果有则忽略调用, 但可以从UI中移除
@@ -44,16 +47,21 @@ class RecordProvider extends ProviderSidecar {
       });
 
   RecordDataGridSource _watchMeta(RecordMeta meta) {
-    selectedMeta = meta;
+    selectedMetaId = meta.id;
+    RecordDataGridSource rst;
     if (_sourceCache[meta.id] == null) {
-      _sourceCache[meta.id] = RecordDataGridSource(
-        meta,
-        _recordAccessor(meta.id).findAll().listen(null),
-        _recordAccessor(meta.id).watchAll().listen(null),
-        actSaveRecord,
-      );
+      rst = _newDataSource(meta);
+      _sourceCache[meta.id] = rst;
+    } else {
+      // 如果已缓存,则检查是否需要更新meta
+      rst = _sourceCache[meta.id]!;
+      if (rst.meta != meta) {
+        // 更新缓存
+        rst = _newDataSource(meta);
+        _sourceCache[meta.id] = rst;
+      }
     }
-    return _sourceCache[meta.id]!;
+    return rst;
   }
 
   Future<void> actSaveMeta(RecordMetaDto? dto) => actWrapper(() async {
@@ -63,12 +71,20 @@ class RecordProvider extends ProviderSidecar {
         });
       });
 
-  RecordDataGridSource actGetDataSource({RecordMeta? schema}) =>
-      _watchMeta(schema ?? selectedMeta!);
+  RecordDataGridSource actGetDataSource(
+          RecordMeta? Function(ObjectId? metaId) getMeta) =>
+      _watchMeta(getMeta(selectedMetaId)!);
 
   @override
   void dispose() {
     _sourceCache.values.map((e) => e.dispose());
     super.dispose();
   }
+
+  RecordDataGridSource _newDataSource(RecordMeta meta) => RecordDataGridSource(
+        meta,
+        _recordAccessor(meta.id).findAll().listen(null),
+        _recordAccessor(meta.id).watchAll().listen(null),
+        actSaveRecord,
+      );
 }

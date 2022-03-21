@@ -14,6 +14,8 @@ class MetaProvider extends ProviderSidecar {
 
   List<RecordMeta> get data => _cache.values.toList();
 
+  RecordMeta? getMeta(ObjectId? id) => id == null ? null : _cache[id];
+
   @override
   onInitializing() {
     _metaRepo = sl<MetaRepo>();
@@ -35,6 +37,7 @@ class MetaProvider extends ProviderSidecar {
           case RepoEventType.replace:
           case RepoEventType.update:
             _cache[event.ettId] = (event.entity!);
+            print("debug 监听到meta更新 $event");
             break;
           case RepoEventType.delete:
             _cache.remove(event.ettId);
