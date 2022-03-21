@@ -81,21 +81,35 @@ class RecordDataGridSource extends DataGridSource {
           ))
       .toList();
 
+  /// 实体类-> Row对象
+  /// todo 在这里指定Row的类型
+  DataGridRow _entityToRow(RecordDto recordDto) => DataGridRow(
+        cells: _metaDto.attributes.map((attr) {
+          // todo 在 orElse中根据 Attr::k 创建一个填充null的Value 实例
+          final value = recordDto.getValueBy(
+            attr.k,
+            orElse: (k) => Value.of(''),
+          );
+          return DataGridCell(columnName: "${attr.k}", value: value);
+        }).toList(),
+      );
+
   /// DataGridRow -> Widget
   /// todo 在这里为不同Attr的数据返回不同类型的Widget
   @override
-  DataGridRowAdapter? buildRow(DataGridRow row) => DataGridRowAdapter(
-      cells: row
-          .getCells()
-          .map((e) => Container(
-                padding: const EdgeInsets.all(8.0),
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  e.value.toString(),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ))
-          .toList());
+  DataGridRowAdapter? buildRow(DataGridRow row) {
+    return DataGridRowAdapter(
+        cells: row.getCells().map((e) {
+      return Container(
+        padding: const EdgeInsets.all(8.0),
+        alignment: Alignment.centerLeft,
+        child: Text(
+          e.value.toString(),
+          overflow: TextOverflow.ellipsis,
+        ),
+      );
+    }).toList());
+  }
 
   /// todo 可编辑的单元格
   /// Help to control the editable text in [TextField] widget.
@@ -109,6 +123,7 @@ class RecordDataGridSource extends DataGridSource {
     GridColumn column,
     CellSubmit submitCell,
   ) {
+    // 选择指定行的数据
     final sourceValue = _cache[rowColumnIndex.rowIndex];
     // 这个值作为 EditWidget的初始值
     // final String displayText = dataGridRow
@@ -121,6 +136,7 @@ class RecordDataGridSource extends DataGridSource {
     //     .value
     //     .toString();
 
+    // fixme 如果动态新增了列,则原有对象是没有与新列对应的value的
     final displayText = sourceValue.toGridKeyValueMap()[column.columnName]!.v;
     slLogger.info("buildEditWidget:displayText# $displayText");
 
@@ -295,20 +311,6 @@ class RecordDataGridSource extends DataGridSource {
         removeRecordBy(event.ettId);
         break;
     }
-  }
-
-  DataGridRow _entityToRow(RecordDto recordDto) {
-    final valueMap = recordDto.toGridKeyValueMap();
-    return DataGridRow(
-      cells: _metaDto
-          .toGridKeyNameMap()
-          .entries
-          .map((meta) => DataGridCell<String>(
-                columnName: meta.key,
-                value: "${valueMap[meta.key]?.toJson()}",
-              ))
-          .toList(),
-    );
   }
 
   @override

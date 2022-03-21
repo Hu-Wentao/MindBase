@@ -51,6 +51,15 @@ class RecordDto extends IMongoEntityDto {
   @override
   List<Object?> get props => [fields];
 
+  Value getValueBy(int k, {required Value Function(int k) orElse}) {
+    var rst = fields[k];
+    if (rst == null) {
+      rst = orElse(k);
+      fields[k] = rst;
+    }
+    return rst;
+  }
+
   factory RecordDto.builder({
     ObjectId? id,
     required ObjectId metaId,
@@ -120,15 +129,18 @@ class RecordDto extends IMongoEntityDto {
   Record? toDomainOr(RecordMeta? m) => m == null ? null : toDomain(m);
 
   /// 向Table提供Map <metaKey值,Filed Value>
+  @Deprecated("考虑新增更内聚的方法")
   Map<String, Value> toGridKeyValueMap() =>
       fields.map((key, value) => MapEntry("$key", value));
 
+  @Deprecated("考虑新增更内聚的方法")
   static RecordDto fromGridKeyValueMap(
     RecordDto oldEntity,
     Map<String, Value> nGridMap,
   ) =>
       RecordDto(
-          fields: nGridMap.map((k, v) => MapEntry(int.tryParse(k) ?? -1, v)));
+        fields: nGridMap.map((k, v) => MapEntry(int.tryParse(k) ?? -1, v)),
+      );
 }
 
 /// 表头属性
@@ -267,6 +279,7 @@ class RecordMetaDto extends IMongoEntityDto {
       );
 
   // key序列, <字段key,UI展示名>/<字段key,Header名>, 例如 <"0":"ID">, <"2","年龄">等
+  @Deprecated("考虑新增更内聚的方法")
   Map<String, String> toGridKeyNameMap() =>
       Map.fromEntries(attributes.map((e) => MapEntry("${e.k}", e.name)));
 
