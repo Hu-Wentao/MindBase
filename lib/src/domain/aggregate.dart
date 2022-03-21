@@ -59,7 +59,7 @@ class Record implements IEtt<ObjectId> {
 
 /// Meta信息
 /// 必须通过DTO转换 [RecordMetaDto]
-class RecordMeta implements IEtt<ObjectId> {
+class RecordMeta extends Equatable implements IEtt<ObjectId> {
   @override
   final ObjectId id;
   final String name;
@@ -73,6 +73,9 @@ class RecordMeta implements IEtt<ObjectId> {
     required this.maxKey,
     required this.attributes,
   });
+
+  @override
+  List<Object?> get props => [id, name, memo, maxKey, attributes];
 
   int nextKey() => maxKey + 1;
 
@@ -93,29 +96,10 @@ class RecordMeta implements IEtt<ObjectId> {
   RecordMetaDto toDto() => RecordMetaDto.fromDomain(this);
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is RecordMeta &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          name == other.name &&
-          memo == other.memo &&
-          maxKey == other.maxKey &&
-          attributes == other.attributes;
-
-  @override
-  int get hashCode =>
-      id.hashCode ^
-      name.hashCode ^
-      memo.hashCode ^
-      maxKey.hashCode ^
-      attributes.hashCode;
-
-  @override
   String toString() => toDto().toString();
 }
 
-class Attribute extends Equatable{
+class Attribute extends Equatable {
   final int k; // 表头key,对应Field:k,需要从所在的TableMeat中获取
   final String name; // 表头名称
   final String memo; // 表头备注
@@ -133,6 +117,7 @@ class Attribute extends Equatable{
     required this.expr,
     required this.check,
   });
+
   @override
   List<Object?> get props => [k, name, memo, expr, check];
 
@@ -163,5 +148,4 @@ class Attribute extends Equatable{
 
   @override
   String toString() => toDto().toString();
-
 }

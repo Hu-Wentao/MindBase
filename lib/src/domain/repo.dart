@@ -22,12 +22,15 @@ enum RepoEventType {
 }
 
 /// 某个 MongoEntityDto对应的collection的 watch事件
-class RepoEvent<Ett extends IEtt<ObjectId>> {
+class RepoEvent<Ett extends IEtt<ObjectId>> extends Equatable {
   final RepoEventType type;
   final ObjectId ettId;
   final Ett? entity;
 
-  RepoEvent(this.type, this.ettId, this.entity);
+  const RepoEvent(this.type, this.ettId, this.entity);
+
+  @override
+  List<Object?> get props => [type, ettId, entity];
 
   static RepoEvent<Ett>
       of<Ett extends IEtt<ObjectId>, Dto extends IMongoEntityDto>(
