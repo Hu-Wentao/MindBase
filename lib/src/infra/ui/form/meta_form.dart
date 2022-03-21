@@ -20,29 +20,6 @@ class MetaForm extends StatelessWidget {
     required this.origin,
   }) : super(key: key);
 
-  factory MetaForm.create({
-    required GlobalKey<FormBuilderState> kMetaBuilder,
-    required GlobalKey<FormBuilderState> kAttrBuilder,
-  }) =>
-      MetaForm(
-        isCreate: true,
-        kMetaBuilder: kMetaBuilder,
-        kAttrBuilder: kAttrBuilder,
-        origin: RecordMetaDto.builder(),
-      );
-
-  factory MetaForm.modify({
-    required GlobalKey<FormBuilderState> kMetaBuilder,
-    required GlobalKey<FormBuilderState> kAttrBuilder,
-    required RecordMetaDto origin,
-  }) =>
-      MetaForm(
-        isCreate: false,
-        kMetaBuilder: kMetaBuilder,
-        kAttrBuilder: kAttrBuilder,
-        origin: origin,
-      );
-
   @override
   Widget build(BuildContext context) => Column(
         mainAxisSize: MainAxisSize.min,
@@ -65,8 +42,6 @@ class MetaForm extends StatelessWidget {
   ) {
     final metaState = kMetaBuilder.currentState?.saveAndValidate() ?? false;
     final attrState = kAttrBuilder.currentState?.saveAndValidate() ?? false;
-    slLogger.info(
-        "MetaForm.checkBy # metaState: $metaState, attrState: $attrState");
     return metaState && attrState;
   }
 
@@ -94,7 +69,8 @@ class MetaForm extends StatelessWidget {
       final json = e.value;
       // todo 手动修正 expr
       return AttributeDto(
-        k: int.parse(json['k'] as String), // 与原序列化不同
+        k: int.parse(json['k'] as String),
+        // 与原序列化不同
         name: json['name'] as String,
         memo: json['memo'] as String,
         expr: Expression.field(
@@ -241,105 +217,102 @@ class _AttributeListFormState extends State<AttributeListForm> {
       );
 
   /// 特殊处理： 对所有的键添加 ”${a.k}@“开头，以区别不同的Attribute
-  Widget _buildAttributeForm(BuildContext context, AttributeDto a) {
-    print("debug _buildAttributeForm attr# $a");
-    return ListTile(
-        leading: SizedBox(
-          width: 45,
-          child: FormBuilderTextField(
-            // name: 'k',
-            name: '${a.k}@k',
-            initialValue: a.k.toString(),
-            decoration: const InputDecoration(labelText: 'Key'),
-            validator: FormBuilderValidators.compose([
-              FormBuilderValidators.required(context),
-            ]),
-          ),
+  Widget _buildAttributeForm(BuildContext context, AttributeDto a) => ListTile(
+      leading: SizedBox(
+        width: 45,
+        child: FormBuilderTextField(
+          // name: 'k',
+          name: '${a.k}@k',
+          initialValue: a.k.toString(),
+          decoration: const InputDecoration(labelText: 'Key'),
+          validator: FormBuilderValidators.compose([
+            FormBuilderValidators.required(context),
+          ]),
         ),
-        title: SizedBox(
-          // todo debug 必须设定高度
-          width: 800,
-          child: Row(
-            children: [
-              SizedBox(
-                width: 200,
-                child: FormBuilderTextField(
-                  // name: 'name',
-                  name: '${a.k}@name',
-                  initialValue: a.name,
-                  decoration: const InputDecoration(labelText: '属性名称'),
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(context),
-                  ]),
-                ),
+      ),
+      title: SizedBox(
+        // todo debug 必须设定高度
+        width: 800,
+        child: Row(
+          children: [
+            SizedBox(
+              width: 200,
+              child: FormBuilderTextField(
+                // name: 'name',
+                name: '${a.k}@name',
+                initialValue: a.name,
+                decoration: const InputDecoration(labelText: '属性名称'),
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(context),
+                ]),
               ),
-              SizedBox(
-                width: 200,
-                // child: FormBuilderSearchableDropdown<String>(
-                //   name: '${a.k}@expr',
-                //   // items: allCountries,
-                //   // onChanged: _onChanged,
-                //   showSearchBox: true,
-                //   isFilteredOnline: true,
-                //   compareFn: (item, selectedItem) =>
-                //       item.toLowerCase() == selectedItem.toLowerCase(),
-                //   onFind: (text) async {
-                //     await Future.delayed(const Duration(seconds: 1));
-                //     return allCountries
-                //         .where((element) =>
-                //             element.toLowerCase().contains(text.toLowerCase()))
-                //         .toList();
-                //   },
-                //   decoration: const InputDecoration(
-                //       labelText: 'Searchable Dropdown Online'),
-                // ),
-                // fixme 如何通过下拉配置表达式?
-                /// 非引用型字段
-                child: FormBuilderDropdown(
-                  name: '${a.k}@expr.rType',
-                  decoration: const InputDecoration(labelText: '属性/表达式 类型'),
-                  initialValue: a.expr.rType.name,
-                  items: AttrType.values
-                      .map((e) => DropdownMenuItem<String>(
-                            value: e.name,
-                            child: Text(e.name),
-                          ))
-                      .toList(),
-                ),
+            ),
+            SizedBox(
+              width: 200,
+              // child: FormBuilderSearchableDropdown<String>(
+              //   name: '${a.k}@expr',
+              //   // items: allCountries,
+              //   // onChanged: _onChanged,
+              //   showSearchBox: true,
+              //   isFilteredOnline: true,
+              //   compareFn: (item, selectedItem) =>
+              //       item.toLowerCase() == selectedItem.toLowerCase(),
+              //   onFind: (text) async {
+              //     await Future.delayed(const Duration(seconds: 1));
+              //     return allCountries
+              //         .where((element) =>
+              //             element.toLowerCase().contains(text.toLowerCase()))
+              //         .toList();
+              //   },
+              //   decoration: const InputDecoration(
+              //       labelText: 'Searchable Dropdown Online'),
+              // ),
+              // fixme 如何通过下拉配置表达式?
+              /// 非引用型字段
+              child: FormBuilderDropdown(
+                name: '${a.k}@expr.rType',
+                decoration: const InputDecoration(labelText: '属性/表达式 类型'),
+                initialValue: a.expr.rType.name,
+                items: AttrType.values
+                    .map((e) => DropdownMenuItem<String>(
+                          value: e.name,
+                          child: Text(e.name),
+                        ))
+                    .toList(),
               ),
-              SizedBox(
-                width: 150,
-                child: FormBuilderDropdown(
-                  name: '${a.k}@checkFuncName',
-                  decoration: const InputDecoration(labelText: '值校验函数'),
-                  initialValue: a.checkFuncName,
-                  items: FuncManager.funcList
-                      .map((e) => DropdownMenuItem<String>(
-                            value: e.name,
-                            child: Text(e.name),
-                          ))
-                      .toList(),
-                ),
+            ),
+            SizedBox(
+              width: 150,
+              child: FormBuilderDropdown(
+                name: '${a.k}@checkFuncName',
+                decoration: const InputDecoration(labelText: '值校验函数'),
+                initialValue: a.checkFuncName,
+                items: FuncManager.funcList
+                    .map((e) => DropdownMenuItem<String>(
+                          value: e.name,
+                          child: Text(e.name),
+                        ))
+                    .toList(),
               ),
-              SizedBox(
-                width: 150,
-                child: FormBuilderTextField(
-                  name: '${a.k}@memo',
-                  initialValue: a.memo,
-                  decoration: const InputDecoration(labelText: '备注'),
-                  validator: FormBuilderValidators.compose([
-                    // FormBuilderValidators.required(context),
-                  ]),
-                ),
+            ),
+            SizedBox(
+              width: 150,
+              child: FormBuilderTextField(
+                name: '${a.k}@memo',
+                initialValue: a.memo,
+                decoration: const InputDecoration(labelText: '备注'),
+                validator: FormBuilderValidators.compose([
+                  // FormBuilderValidators.required(context),
+                ]),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        trailing: IconButton(
-          icon: const Icon(Icons.delete),
-          onPressed: () => _removeAttr(a),
-        ));
-  }
+      ),
+      trailing: IconButton(
+        icon: const Icon(Icons.delete),
+        onPressed: () => _removeAttr(a),
+      ));
 }
 
 // /// 用于创建表达式[Expression]

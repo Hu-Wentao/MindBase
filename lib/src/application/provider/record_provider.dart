@@ -50,11 +50,18 @@ class RecordProvider extends ProviderSidecar {
         meta,
         _recordAccessor(meta.id).findAll().listen(null),
         _recordAccessor(meta.id).watchAll().listen(null),
-          actSaveRecord,
+        actSaveRecord,
       );
     }
     return _sourceCache[meta.id]!;
   }
+
+  Future<void> actSaveMeta(RecordMetaDto? dto) => actWrapper(() async {
+        if (dto == null) return;
+        await sl<RecordMetaAccessor>().save(dto.id, dto).then((value) {
+          log("actSaveMeta 成功");
+        });
+      });
 
   RecordDataGridSource actGetDataSource({RecordMeta? schema}) =>
       _watchMeta(schema ?? selectedMeta!);

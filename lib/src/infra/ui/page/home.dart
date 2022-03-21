@@ -52,6 +52,7 @@ class _HomePageState extends State<HomePage> {
                     RecordDataGrid(
                       dataGridSource: pRecord.actGetDataSource(),
                       onSaveRecord: pRecord.actSaveRecord,
+                      onSaveMeta: pRecord.actSaveMeta,
                     ),
                 ],
               )),

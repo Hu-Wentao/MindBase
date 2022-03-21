@@ -7,6 +7,7 @@ import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_edit_dialog.dart';
+import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
 import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
@@ -51,7 +52,11 @@ class RecordDataGridSource extends DataGridSource {
   }
 
   RecordDataGridSource(
-      this.meta, this.initDataSub, this.recordSub, this.actSaveRecord) {
+    this.meta,
+    this.initDataSub,
+    this.recordSub,
+    this.actSaveRecord,
+  ) {
     initDataSub.onData((e) => saveRecordDto(e, null));
     recordSub.onData(_onEvent);
     _metaDto = meta.toDto();
@@ -232,17 +237,6 @@ class RecordDataGridSource extends DataGridSource {
     GridColumn col,
   ) {
     final RecordDto oldEntity = _cache[rowColumnIndex.rowIndex];
-    // final String oldValue = dataGridRow
-    //     .getCells()
-    //     .firstWhere((DataGridCell cell) => cell.columnName == col.columnName,
-    //         orElse: () =>
-    //             DataGridCell<String>(columnName: col.columnName, value: ''))
-    //     .value
-    //     .toString();
-    // slLogger.info("onCellSubmit: oldValue# $oldValue");
-
-    // final int dataRowIndex = _cacheRows.indexOf(dataGridRow);
-
     final oldGridMap = oldEntity.toGridKeyValueMap();
     final oldValue = oldGridMap[col.columnName];
     if (newCellValue == null || oldValue!.v == newCellValue) {
@@ -257,46 +251,6 @@ class RecordDataGridSource extends DataGridSource {
     saveRecordDto(entity, rowColumnIndex.rowIndex, notify: false);
     // fixme 没有检查保存是否成功， 考虑添加保存失败时回滚初始值的逻辑
     actSaveRecord(entity);
-    // _cacheRows[dataRowIndex].getCells()[rowColumnIndex.columnIndex] =
-    //     DataGridCell<String>(
-    //   columnName: col.columnName,
-    //   value: newCellValue,
-    // );
-
-    // if (column.columnName == 'Shipped Date') {
-    //   _cacheRows[dataRowIndex].getCells()[rowColumnIndex.columnIndex] =
-    //       DataGridCell<DateTime>(
-    //           columnName: 'Shipped Date', value: newCellValue);
-    //   dealers[dataRowIndex].shippedDate = newCellValue as DateTime;
-    // } else if (column.columnName == 'Product No') {
-    //   _cacheRows[dataRowIndex].getCells()[rowColumnIndex.columnIndex] =
-    //       DataGridCell<int>(columnName: 'Product No', value: newCellValue);
-    //   dealers[dataRowIndex].productNo = newCellValue as int;
-    // } else if (column.columnName == 'Price') {
-    //   _cacheRows[dataRowIndex].getCells()[rowColumnIndex.columnIndex] =
-    //       DataGridCell<double>(columnName: 'Price', value: newCellValue);
-    //   dealers[dataRowIndex].productPrice = newCellValue as double;
-    // } else if (column.columnName == 'Dealer Name') {
-    //   _cacheRows[dataRowIndex].getCells()[rowColumnIndex.columnIndex] =
-    //       DataGridCell<String>(columnName: 'Dealer Name', value: newCellValue);
-    //   dealers[dataRowIndex].dealerName = newCellValue.toString();
-    // } else if (column.columnName == 'Ship Country') {
-    //   _cacheRows[dataRowIndex].getCells()[rowColumnIndex.columnIndex] =
-    //       DataGridCell<String>(columnName: 'Ship Country', value: newCellValue);
-    //   final dynamic dataGridCell = _cacheRows[dataRowIndex]
-    //       .getCells()
-    //       .firstWhereOrNull(
-    //           (DataGridCell element) => element.columnName == 'Ship City');
-    //   final int dataCellIndex =
-    //       _cacheRows[dataRowIndex].getCells().indexOf(dataGridCell);
-    //   _cacheRows[dataRowIndex].getCells()[dataCellIndex] =
-    //       const DataGridCell<String>(columnName: 'Ship City', value: '');
-    //   dealers[dataRowIndex].shipCountry = newCellValue.toString();
-    // } else {
-    //   _cacheRows[dataRowIndex].getCells()[rowColumnIndex.columnIndex] =
-    //       DataGridCell<String>(columnName: 'Ship City', value: newCellValue);
-    //   dealers[dataRowIndex].shipCity = newCellValue.toString();
-    // }
   }
 
   // 更新一整行
@@ -370,10 +324,12 @@ class RecordDataGrid extends StatefulWidget {
     Key? key,
     required this.dataGridSource,
     required this.onSaveRecord,
+    required this.onSaveMeta,
   }) : super(key: key);
 
   final RecordDataGridSource dataGridSource;
   final Future<void> Function(RecordDto? dto) onSaveRecord;
+  final Future<void> Function(RecordMetaDto? dto) onSaveMeta;
 
   @override
   _RecordDataGridState createState() => _RecordDataGridState();
@@ -402,6 +358,7 @@ class _RecordDataGridState extends State<RecordDataGrid> {
             Padding(
               padding: const EdgeInsets.only(top: 8.0, bottom: 8),
               child: DataFrameTitle(
+                onSaveMeta: widget.onSaveMeta,
                 onSaveRecord: widget.onSaveRecord,
                 meta: widget.dataGridSource.meta,
               ),
@@ -435,24 +392,44 @@ class _RecordDataGridState extends State<RecordDataGrid> {
 class DataFrameTitle extends StatelessWidget {
   final RecordMeta meta;
   final Future<void> Function(RecordDto? dto) onSaveRecord;
+  final Future<void> Function(RecordMetaDto? dto) onSaveMeta;
   final _kRecordBuilder = GlobalKey<FormBuilderState>();
+  final kMetaBuilder = GlobalKey<FormBuilderState>();
+  final kAttrBuilder = GlobalKey<FormBuilderState>();
 
   DataFrameTitle({
     Key? key,
     required this.meta,
+    required this.onSaveMeta,
     required this.onSaveRecord,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => TextButton.icon(
-        onPressed: () async => await onSaveRecord(
-          await showRecordEditDialog(
-            context: context,
-            meta: meta,
-            kRecordBuilder: _kRecordBuilder,
+  Widget build(BuildContext context) => Row(
+        children: [
+          TextButton.icon(
+            onPressed: () async => await onSaveMeta(
+              await showRecordMetaEditDialog(
+                context: context,
+                originMeta: meta.toDto(),
+                kMetaBuilder: kMetaBuilder,
+                kAttrBuilder: kAttrBuilder,
+              ),
+            ),
+            icon: const Icon(Icons.edit),
+            label: const Text("修改结构"),
           ),
-        ),
-        icon: const Icon(Icons.add),
-        label: const Text("新增记录"),
+          TextButton.icon(
+            onPressed: () async => await onSaveRecord(
+              await showRecordEditDialog(
+                context: context,
+                meta: meta,
+                kRecordBuilder: _kRecordBuilder,
+              ),
+            ),
+            icon: const Icon(Icons.add),
+            label: const Text("新增记录"),
+          ),
+        ],
       );
 }
