@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:logging/logging.dart';
+import 'package:mind_base/src/application/provider/meta_provider.dart';
 import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/value.dart';
@@ -11,6 +12,7 @@ import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
 import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 /// 用于构建一张表的数据源, 包含Meta和Rows的数据, 相关Rows的Stream
@@ -68,18 +70,96 @@ class RecordDataGridSource extends DataGridSource {
   List<DataGridRow> get rows => _cacheRows;
 
   /// 构建Header
-  List<GridColumn> buildColumn() => _metaDto
-      .toGridKeyNameMap()
-      .entries
-      .map((e) => GridColumn(
-            columnName: e.key,
-            label: Container(
-                padding: const EdgeInsets.all(4),
-                alignment: Alignment.center,
-                child: Text(e.value, overflow: TextOverflow.ellipsis)),
-            columnWidthMode: ColumnWidthMode.fill,
-          ))
-      .toList();
+  List<GridColumn> buildColumn(BuildContext context, MetaProvider pMeta) =>
+      _metaDto.attributes
+          .map((attr) => GridColumn(
+                columnName: "${attr.k}",
+                label: ListTile(
+                  // todo ToolTip 展示部分memo内容
+                  title: Text(attr.name, overflow: TextOverflow.ellipsis),
+                  trailing: PopupMenuButton<String>(
+                    itemBuilder: (BuildContext context) => [
+                      PopupMenuItem(
+                          onTap: () {
+                            // todo 修改类型
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("敬请期待..")));
+                          },
+                          padding: EdgeInsets.zero,
+                          child: const ListTile(
+                            leading: Icon(Icons.edit),
+                            title: Text("修改类型"),
+                            // trailing: Text("( ${attr.expr.rType.name} )"),
+                            dense: true,
+                          )),
+                      PopupMenuItem(
+                          onTap: () {
+
+                            // todo 修改描述
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("敬请期待..")));
+                          },
+                          padding: EdgeInsets.zero,
+                          child: const ListTile(
+                            leading: Icon(Icons.notes),
+                            title: Text("修改描述"),
+                            // trailing: Text(attr.expr.rType.name),
+                            dense: true,
+                          )),
+                      const PopupMenuDivider(),
+                      PopupMenuItem(
+                          onTap: () {
+                            // todo 插入一列
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("敬请期待..")));
+                          },
+                          padding: EdgeInsets.zero,
+                          child: const ListTile(
+                            leading: Icon(Icons.chevron_right),
+                            title: Text("插入一列"),
+                            // trailing: Text(attr.expr.rType.name),
+                            dense: true,
+                          )),
+                      // PopupMenuItem(
+                      //     child: ListTile(
+                      //   leading: const Text("列类型"),
+                      //   title: Text(attr.expr.rType.name),
+                      // )),
+                      const PopupMenuDivider(),
+                      PopupMenuItem(
+                          onTap: () {
+                            // todo 隐藏一列
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("敬请期待..")));
+                          },
+                          padding: EdgeInsets.zero,
+                          child: const ListTile(
+                            leading: Icon(Icons.visibility_outlined),
+                            title: Text("隐藏本列"),
+                            // trailing: Text(attr.expr.rType.name),
+                            dense: true,
+                          )),
+                      const PopupMenuDivider(),
+                      PopupMenuItem(
+                        onTap: () {
+
+                          // todo 删除一列
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBar(content: Text("敬请期待..")));
+                        }, // enabled: false, // 针对ID等类型,禁止删除
+                        padding: EdgeInsets.zero,
+                        child: const ListTile(
+                          leading: Icon(Icons.delete),
+                          title: Text("删除"),
+                          dense: true,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                columnWidthMode: ColumnWidthMode.fill,
+              ))
+          .toList();
 
   /// 实体类-> Row对象
   /// todo 在这里指定Row的类型
@@ -352,34 +432,36 @@ class _RecordDataGridState extends State<RecordDataGrid> {
   }
 
   @override
-  Widget build(BuildContext context) => Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 标题栏按钮
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0, bottom: 8),
-              child: DataFrameTitle(
-                onSaveMeta: widget.onSaveMeta,
-                onSaveRecord: widget.onSaveRecord,
-                meta: widget.dataGridSource.meta,
+  Widget build(BuildContext context) => Consumer<MetaProvider>(
+        builder: (c, pMeta, _) => Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 标题栏按钮
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8),
+                child: DataFrameTitle(
+                  onSaveMeta: widget.onSaveMeta,
+                  onSaveRecord: widget.onSaveRecord,
+                  meta: widget.dataGridSource.meta,
+                ),
               ),
-            ),
-            Expanded(
-              child: SfDataGrid(
-                source: widget.dataGridSource,
-                columnWidthMode: ColumnWidthMode.fill,
-                // todo 使用 Column Resizing 以便调整列宽
-                columns: widget.dataGridSource.buildColumn(),
-                allowEditing: true,
-                editingGestureType: EditingGestureType.doubleTap,
-                // 单击选中
-                selectionMode: SelectionMode.single,
-                // 选中单元格
-                navigationMode: GridNavigationMode.cell,
+              Expanded(
+                child: SfDataGrid(
+                  source: widget.dataGridSource,
+                  columnWidthMode: ColumnWidthMode.fill,
+                  // todo 使用 Column Resizing 以便调整列宽
+                  columns: widget.dataGridSource.buildColumn(context, pMeta),
+                  allowEditing: true,
+                  editingGestureType: EditingGestureType.doubleTap,
+                  // 单击选中
+                  selectionMode: SelectionMode.single,
+                  // 选中单元格
+                  navigationMode: GridNavigationMode.cell,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
 
