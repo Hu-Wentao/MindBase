@@ -11,17 +11,20 @@ import 'entity/func.dart';
 /// 记录
 /// 必须通过DTO转换 [RecordDto]
 /// fields[0] 始终为 [id]
-class Record implements IEtt<ObjectId> {
+class Record extends Equatable implements IEtt<ObjectId> {
   @override
   final ObjectId id;
   final RecordMeta meta; // Aggregate组装得到,实际只存储Id
   final Map<int, Value> fields;
 
-  Record({
+  const Record({
     required this.id,
     required this.meta,
     required this.fields,
   });
+
+  @override
+  get props => [id, meta, fields];
 
   factory Record.of({
     ObjectId? id,
