@@ -19,7 +19,7 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
 }) async =>
     await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: true),
-      title: const Text("添加新的表"),
+      title: Text(originMeta == null ? "创建新的表" : "编辑表结构"),
       content: MetaForm(
         isCreate: originMeta == null,
         kMetaBuilder: kMetaBuilder,
