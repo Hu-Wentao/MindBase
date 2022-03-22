@@ -525,7 +525,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
 
   @override
   final RecordMeta meta;
-  final StreamSubscription<RepoEvent<Record>> recordSub2;
+  final StreamSubscription<RepoEvent<Record>> repoRecordSub;
   @override
   final Future<void> Function(RecordDto? dto) actSaveRecord;
 
@@ -563,15 +563,19 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
   RecordDataGridSource2(
     this.meta,
     List<RecordDto> cache,
-    this.recordSub2,
+    this.repoRecordSub,
     this.actSaveRecord,
   ) {
-    _cache = cache;
-    // initDataSub.onData((e) => saveRecordDto(e, null));
-    recordSub2.onData(_onEvent);
-    _metaDto = meta.toDto();
-    _attrKeyList = _metaDto.toGridKeyNameMap().keys.toList();
     log = Logger("$runtimeType");
+    _metaDto = meta.toDto();
+
+    // _cache = cache;
+    for (var element in cache) {
+      saveRecordDto(element, null);
+    }
+    // initDataSub.onData((e) => saveRecordDto(e, null));
+    repoRecordSub.onData(_onEvent);
+    _attrKeyList = _metaDto.toGridKeyNameMap().keys.toList();
   }
 
   @override
@@ -911,7 +915,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
 
   @override
   void dispose() {
-    recordSub2.cancel();
+    repoRecordSub.cancel();
     super.dispose();
   }
 }
