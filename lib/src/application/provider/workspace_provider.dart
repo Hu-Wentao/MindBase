@@ -53,6 +53,9 @@ class WorkspaceProvider extends ProviderSidecar {
 
   void _actUpdateMeta(RecordMeta meta) => setInitialized("更新/替换Meta", () {
         _cacheMeta[meta.id] = meta;
+        if(watchedMeta?.id == meta.id) {
+          watchedMeta = meta; // 提示UI可以刷新
+        }
       });
 
   void _actRemoveMeta(ObjectId ettId) => setInitialized("移除Meta", () {
