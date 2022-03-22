@@ -63,7 +63,7 @@ Future<AttributeDto?> showAttributeEditDialog({
 }) async {
 // 表示被编辑、新增的 Attr属性
   final attr = origin ?? AttributeDto.builder(metaId: selfMeta.id);
-  // final expr = attr.expr;
+  var currentAttrName = attr.name;
   final kAttrBuilder = GlobalKey<FormBuilderState>();
   final kExprBuilder = GlobalKey<FormBuilderState>();
 
@@ -90,6 +90,8 @@ Future<AttributeDto?> showAttributeEditDialog({
               child: FormBuilderTextField(
                 name: 'name',
                 initialValue: attr.name,
+                onChanged: (value) =>
+                    value != null ? (currentAttrName = value) : null,
                 decoration: const InputDecoration(labelText: '属性名称'),
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(context),
@@ -390,6 +392,7 @@ Future<AttributeDto?> showAttributeEditDialog({
                   rType: currentType);
 
               AttributeDto rst = attr.copyWith(
+                name: currentAttrName,
                 expr: currentExpr,
               );
 
