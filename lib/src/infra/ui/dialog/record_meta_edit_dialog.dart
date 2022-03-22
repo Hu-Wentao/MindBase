@@ -62,7 +62,7 @@ Future<AttributeDto?> showAttributeEditDialog({
   // required GlobalKey<FormBuilderState> kAttrBuilder,
 }) async {
 // 表示被编辑、新增的 Attr属性
-  final attr = origin ?? AttributeDto.builder();
+  final attr = origin ?? AttributeDto.builder(metaId: selfMeta.id);
   // final expr = attr.expr;
   final kAttrBuilder = GlobalKey<FormBuilderState>();
   final kExprBuilder = GlobalKey<FormBuilderState>();
@@ -71,7 +71,7 @@ Future<AttributeDto?> showAttributeEditDialog({
   var allMetaInWorkspace = sl<RecordMetaAccessor>().findAll().toList();
   var currentMeta = selfMeta; // 选中的引用目标Meta
   // 表达式的参数<AttributeDto>, 暂时只支持输入单个参数, 默认首个参数为当前列
-  AttributeDto currentArg = origin ?? AttributeDto.builder();
+  AttributeDto currentArg = origin ?? AttributeDto.builder(metaId: selfMeta.id);
   Func currentFunc = FuncManager.selfFunc; // 当前选中的表达式
   AttrType currentType = AttrType.string; // 当前表达式返回值类型
 
@@ -385,7 +385,7 @@ Future<AttributeDto?> showAttributeEditDialog({
             try {
               Expression currentExpr = Expression(
                   metaId: currentMeta.id,
-                  pKeys:  [currentArg.k],
+                  pKeys: [currentArg.k],
                   calls: [currentFunc],
                   rType: currentType);
 

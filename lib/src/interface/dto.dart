@@ -209,23 +209,26 @@ class RecordMetaDto extends IMongoEntityDto {
     String memo = "",
     List<AttributeDto>? attributes,
   }) {
+    final metaId = id == null ? ObjectId() : ObjectId.fromHexString(id);
     final attrs = attributes ??
         [
           AttributeDto.builder(
+            metaId: metaId,
             k: 0,
             name: "ID",
             memo: "系统生成的唯一ID",
-            expr: Expression.field(AttrType.objectId),
+            expr: Expression.field(metaId, 0, AttrType.objectId),
           ),
           AttributeDto.builder(
+            metaId: metaId,
             k: 1,
             name: "metaId",
             memo: "元数据ID",
-            expr: Expression.field(AttrType.objectId),
+            expr: Expression.field(metaId, 1, AttrType.objectId),
           ),
         ];
     return RecordMetaDto(
-      id: id == null ? ObjectId() : ObjectId.fromHexString(id),
+      id: metaId,
       name: name,
       memo: memo,
       maxKey: attrs.length,
@@ -330,6 +333,7 @@ class AttributeDto extends IMongoDto {
 
   /// 供Form初始化
   AttributeDto.builder({
+    ObjectId? metaId,
     int k = 0,
     String name = "",
     String memo = "",
@@ -339,7 +343,7 @@ class AttributeDto extends IMongoDto {
           k: k,
           name: name,
           memo: memo,
-          expr: expr ?? Expression.field(AttrType.string),
+          expr: expr ?? Expression.field(metaId, 0, AttrType.string),
           checkFuncName: checkFuncName,
         );
 

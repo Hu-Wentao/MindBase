@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
+import 'package:mongo_dart/mongo_dart.dart';
 
 main() {
   test("Value toJson", () {
@@ -21,7 +21,7 @@ main() {
   });
 
   test("Expression", () {
-    Expression expression = Expression.field(AttrType.objectId);
+    Expression expression = Expression.field(ObjectId(), 0, AttrType.objectId);
     final js = expression.toJson();
     print("expression: $js");
     expect(js, {
@@ -41,7 +41,7 @@ main() {
     expect(exp2, expression);
   });
   test("Expression.fromJson", () {
-    Expression expression = Expression.field(AttrType.string);
+    Expression expression = Expression.field(ObjectId(), 0, AttrType.string);
     final js = expression.toJson();
     print("expression: $js");
 

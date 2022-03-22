@@ -5,6 +5,7 @@ import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
+import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
 class MetaForm extends StatelessWidget {
   final bool isCreate;
@@ -69,19 +70,22 @@ class MetaForm extends StatelessWidget {
     final attrs = attrFormatMap.entries.map((e) {
       final json = e.value;
       // todo 手动修正 expr
+      final metaId = ObjectId.fromHexString(attrMap['id'] as String);
+      final key = int.parse(json['k'] as String);
       return AttributeDto(
-        k: int.parse(json['k'] as String),
-        // 与原序列化不同
+        k: key,
+        // Form的序列化与原序列化不同
         name: json['name'] as String,
         memo: json['memo'] as String,
         expr: Expression.field(
-            AttrType.values.byName(json['expr.rType'] as String)),
+          metaId,
+          key,
+          AttrType.values.byName(json['expr.rType'] as String),
+        ),
         // expr: Expression.fromJson(json['expr'] as Map<String, dynamic>),
         checkFuncName: json['checkFuncName'] as String,
       );
-    })
-        // .map((e) => AttributeDto.fromFrom(e.value))
-        .toList();
+    }).toList();
     print("debug # attrs: $attrs");
     return RecordMetaDto.fromForm(metaMap, attrs);
   }

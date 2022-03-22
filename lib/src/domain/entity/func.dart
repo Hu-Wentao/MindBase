@@ -36,14 +36,19 @@ abstract class BaseCallable extends IMongoDto implements ICallable {
   toMongoJson({AttrType type = AttrType.string}) => toJsonWithType();
 }
 
-/// 表达式由多个[Func]构成
+/// 表达式[Expression]由多个[Func]构成
+/// 表达式是有状态的,存储了参数的来源,返回值类型等等; 而Func是无状态,只有name
 /// 如果是Value，则pTypes为空， expr为表达式的内容， rType为返回值类型
 class Expression extends BaseCallable {
-  static Expression field(AttrType rType, {List<BaseCallable>? calls}) =>
+  static Expression field(
+    ObjectId? selfMetaId,
+    int selfKey,
+    AttrType rType,
+  ) =>
       Expression(
-        metaId: null, // 对于字段,无需引用 其他类 的属性,
-        pKeys: const [], // 无需入参
-        calls: calls ?? [FuncManager.selfFunc], // 返回字段本身
+        metaId: selfMetaId, // 字段 所存在的Meta,
+        pKeys: [selfKey], // 字段的Attr::k
+        calls: [FuncManager.selfFunc], // 返回字段本身
         rType: rType,
       );
 
