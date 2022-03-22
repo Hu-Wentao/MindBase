@@ -88,7 +88,7 @@ class Expression extends BaseCallable {
   });
 
   @override
-  List<Object?> get props => [pKeys, calls, rType];
+  List<Object?> get props => [metaId, pKeys, calls, rType];
 
   static Expression fromJson(Map<String, dynamic> attrMap) {
     final mtId = attrMap['metaId'] as String?;
@@ -104,6 +104,7 @@ class Expression extends BaseCallable {
 
   @override
   Map<String, dynamic> toJson() => {
+        'metaId': metaId?.toHexString(), // 空表示当前所在的Meta类
         'pKeys': pKeys.map((e) => e).toList(growable: false),
         'calls': calls.map((e) => e.toJsonWithType()).toList(growable: false),
         'rType': rType.name,
@@ -117,6 +118,8 @@ class Func extends BaseCallable {
   final String name; // 全局唯一
   final String? alias;
   final List<AttrType> pTypes;
+
+  // todo 新增一个动态获取 rType的方法，针对Any类型的返回值，可以通过方法得到实际的返回类型，而不是Any
   final AttrType rType;
 
   // run 只有运算, 在调用之前,需要先检查Attr的类型匹配问题
