@@ -4,6 +4,7 @@ import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/repo.dart';
+import 'package:mind_base/src/infra/mongo_storage.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_frame.dart';
 import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
@@ -34,8 +35,8 @@ class WorkspaceProvider extends ProviderSidecar {
   @override
   onInitializing() {
     _metaRepo = sl<MetaRepo>();
+    _recordRepo = RecordRepo(sl<IMongoStorage>(), _metaRepo, null);
     _cacheAllMetaByWorkspace();
-    // todo
   }
 
   _cacheAllMetaByWorkspace() {
@@ -158,6 +159,10 @@ class WorkspaceProvider extends ProviderSidecar {
 
   /// 适配与业务逻辑部分
   /// MetaProvider
+  Map<ObjectId, RecordMeta> get metaMap => _cacheMeta;
+
+  List<RecordMeta> get metaList => _cacheMeta.values.toList();
+
   RecordMeta? getMeta(ObjectId? id) => id == null ? null : _cacheMeta[id];
 
   Future<void> actInsertMeta(RecordMeta meta) =>
@@ -177,7 +182,7 @@ class WorkspaceProvider extends ProviderSidecar {
   Future<RecordMetaDto?> actQueryMeta(ObjectId metaId) =>
       sl<RecordMetaAccessor>().findById(metaId);
 
-  /// 更新meta的指定Attr
+  // 更新meta的指定Attr
   Future<void> actEditAttribute(
     RecordMetaDto metaDto,
     AttributeDto? attr,
@@ -233,10 +238,7 @@ class WorkspaceProvider extends ProviderSidecar {
   //       });
   //     });
 
-  RecordDataGridSource2 actGetDataSource(
-    RecordMeta? Function(ObjectId? metaId) getMeta,
-  ) =>
-      _watchMeta(watchedMeta!);
+  RecordDataGridSource2 actGetDataSource() => _watchMeta(watchedMeta!);
 
   RecordDataGridSource2 _watchMeta(RecordMeta meta) {
     watchedMeta = meta;
