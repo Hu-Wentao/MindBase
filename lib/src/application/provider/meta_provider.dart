@@ -2,6 +2,7 @@ import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/repo.dart';
+import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
@@ -67,4 +68,28 @@ class MetaProvider extends ProviderSidecar {
             final schema = dto.toDm((dto) => dto.toDm(FuncManager.findBy));
             await _metaRepo.save(schema);
           }));
+
+  Future<RecordMetaDto?> actQueryMeta(ObjectId metaId) =>
+      sl<RecordMetaAccessor>().findById(metaId);
+
+  /// 更新meta的指定Attr
+  Future<void> actEditAttribute(
+    RecordMetaDto metaDto,
+    AttributeDto? attr,
+  ) async {
+    if (attr == null) {
+      return;
+    }
+    print("debug 更新meta的指定Attr [$metaDto] [$attr]");
+    // todo 后期改为update
+    metaDto.attributes.removeWhere((element) => element.k == attr.k);
+    metaDto.attributes.add(attr);
+    // 持久化
+    return actSaveMeta(metaDto);
+  }
+
+  Future<List<RecordMetaDto>> actQueryMetaByName(String metaName) async =>
+      sl<RecordMetaAccessor>()
+          .findAll(selector: where.eq("name", metaName))
+          .drain();
 }

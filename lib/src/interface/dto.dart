@@ -170,6 +170,9 @@ class RecordMetaDto extends IMongoEntityDto {
         attributes,
       ];
 
+  AttributeDto findAttr(int k) =>
+      attributes.firstWhere((element) => element.k == k);
+
   int nextKey() => maxKey + 1;
 
   // 用于给Form提供初始值
@@ -348,6 +351,21 @@ class AttributeDto extends IMongoDto {
         expr,
         checkFuncName,
       ];
+
+  AttributeDto copyWith({
+    k,
+    name,
+    memo,
+    expr,
+    checkFuncName,
+  }) =>
+      AttributeDto(
+        k: k ?? this.k,
+        name: name ?? this.name,
+        memo: memo ?? this.memo,
+        expr: expr ?? this.expr,
+        checkFuncName: checkFuncName ?? this.checkFuncName,
+      );
 
   AttributeDto.fromJson(Map<String, dynamic> json)
       : this(

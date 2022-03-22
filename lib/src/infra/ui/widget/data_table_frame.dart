@@ -78,43 +78,52 @@ class RecordDataGridSource extends DataGridSource {
                   // todo ToolTip 展示部分memo内容
                   title: Text(attr.name, overflow: TextOverflow.ellipsis),
                   trailing: PopupMenuButton<String>(
+                    onSelected: (value) async {
+                      if (value == "edit_type") {
+                        await pMeta.actEditAttribute(
+                          _metaDto,
+                          await showAttributeEditDialog(
+                            context: context,
+                            origin: attr,
+                            queryMeta: pMeta.actQueryMeta,
+                            selfMeta: _metaDto,
+                            queryMetaByName: pMeta.actQueryMetaByName,
+                          ),
+                        );
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(content: Text("OK")));
+                        // _showMetaEditDialog(context, attr);
+                      // } else if (value == "delete") {
+                        // _showMetaDeleteDialog(context, attr);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("尚未实现[$value]敬请期待..")));
+                      }
+                    },
                     itemBuilder: (BuildContext context) => [
-                      PopupMenuItem(
-                          onTap: () {
-                            // todo 修改类型
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("敬请期待..")));
-                          },
+                      const PopupMenuItem<String>(
+                          value: "edit_type",
                           padding: EdgeInsets.zero,
-                          child: const ListTile(
+                          child: ListTile(
                             leading: Icon(Icons.edit),
                             title: Text("修改类型"),
                             // trailing: Text("( ${attr.expr.rType.name} )"),
                             dense: true,
                           )),
-                      PopupMenuItem(
-                          onTap: () {
-
-                            // todo 修改描述
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("敬请期待..")));
-                          },
+                      const PopupMenuItem(
+                          value: "edit_memo",
                           padding: EdgeInsets.zero,
-                          child: const ListTile(
+                          child: ListTile(
                             leading: Icon(Icons.notes),
                             title: Text("修改描述"),
                             // trailing: Text(attr.expr.rType.name),
                             dense: true,
                           )),
                       const PopupMenuDivider(),
-                      PopupMenuItem(
-                          onTap: () {
-                            // todo 插入一列
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("敬请期待..")));
-                          },
+                      const PopupMenuItem(
+                          value: "edit_insert_attr",
                           padding: EdgeInsets.zero,
-                          child: const ListTile(
+                          child: ListTile(
                             leading: Icon(Icons.chevron_right),
                             title: Text("插入一列"),
                             // trailing: Text(attr.expr.rType.name),
@@ -126,29 +135,20 @@ class RecordDataGridSource extends DataGridSource {
                       //   title: Text(attr.expr.rType.name),
                       // )),
                       const PopupMenuDivider(),
-                      PopupMenuItem(
-                          onTap: () {
-                            // todo 隐藏一列
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("敬请期待..")));
-                          },
+                      const PopupMenuItem(
+                          value: "view_hide_attr",
                           padding: EdgeInsets.zero,
-                          child: const ListTile(
+                          child: ListTile(
                             leading: Icon(Icons.visibility_outlined),
                             title: Text("隐藏本列"),
                             // trailing: Text(attr.expr.rType.name),
                             dense: true,
                           )),
                       const PopupMenuDivider(),
-                      PopupMenuItem(
-                        onTap: () {
-
-                          // todo 删除一列
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(SnackBar(content: Text("敬请期待..")));
-                        }, // enabled: false, // 针对ID等类型,禁止删除
+                      const PopupMenuItem(
+                        value: "edit_delete_attr",
                         padding: EdgeInsets.zero,
-                        child: const ListTile(
+                        child: ListTile(
                           leading: Icon(Icons.delete),
                           title: Text("删除"),
                           dense: true,
