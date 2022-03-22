@@ -93,7 +93,7 @@ class RecordDataGridSource extends DataGridSource {
                         ScaffoldMessenger.of(context)
                             .showSnackBar(const SnackBar(content: Text("OK")));
                         // _showMetaEditDialog(context, attr);
-                      // } else if (value == "delete") {
+                        // } else if (value == "delete") {
                         // _showMetaDeleteDialog(context, attr);
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -166,15 +166,17 @@ class RecordDataGridSource extends DataGridSource {
   DataGridRow _entityToRow(RecordDto recordDto) => DataGridRow(
         cells: _metaDto.attributes.map((attr) {
           // todo 在 orElse中根据 Attr::k 创建一个填充null的Value 实例
-          final value = recordDto.getValueBy(
-            attr.k,
-            orElse: (k) => Value.of(''),
-          );
+          final value = recordDto.getValueWithCalc(attr);
+          // final value = recordDto.getValueBy(
+          //   attr.k,
+          //   orElse: (k) => Value.of(''),
+          // );
           return DataGridCell(columnName: "${attr.k}", value: value);
         }).toList(),
       );
 
   /// DataGridRow -> Widget
+  /// DataGridRow由[_entityToRow]构成
   /// todo 在这里为不同Attr的数据返回不同类型的Widget
   @override
   DataGridRowAdapter? buildRow(DataGridRow row) {

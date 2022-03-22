@@ -42,8 +42,8 @@ class Expression extends BaseCallable {
   static Expression field(AttrType rType, {List<BaseCallable>? calls}) =>
       Expression(
         metaId: null, // 对于字段,无需引用 其他类 的属性,
-        pKeys: const [], // 单个入参
-        calls: calls ?? [FuncManager.selfFunc], // 不做处理返回自身
+        pKeys: const [], // 无需入参
+        calls: calls ?? [FuncManager.selfFunc], // 返回字段本身
         rType: rType,
       );
 

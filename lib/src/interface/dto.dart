@@ -60,6 +60,29 @@ class RecordDto extends IMongoEntityDto {
     return rst;
   }
 
+  /// 当前Value所在Meta, 当前Value所在列的Attr
+  /// fixme 随便写的, 需要优化
+  Value getValueWithCalc(
+    AttributeDto attrDto, // 当前Value所在Attr
+  ) {
+    // final attrDto = getValueBy(currentAttrK, orElse: (int k) {throw "error ";});
+    // fixme 当前最多支持1个Func
+    final func = attrDto.expr.calls.first as Func;
+    // 表达式要求的 Attr的k
+    final funcParamAttrKeys = attrDto.expr.pKeys;
+    // 表达式要求的Attr
+    // final funcParamsAttr = funcParamAttrKeys.map(metaDto.findAttr).toList();
+
+    // todo 需要根据Attr, 找到当前value值对应的Value, 当前Value应当是Record的ObjectId,
+    // fixme 这里默认是当前Record的Object, 因此得到的作为参数的Value都是当前Record中的. 如果为空,则表示当前Record
+    final funcParams = funcParamAttrKeys
+        .map((e) => getValueBy(e, orElse: (int k) => Value.of('')))
+        .toList();
+    final value = func.call(funcParams) as Value;
+    print("debug getValueWithCalc $value");
+    return value;
+  }
+
   factory RecordDto.builder({
     ObjectId? id,
     required ObjectId metaId,

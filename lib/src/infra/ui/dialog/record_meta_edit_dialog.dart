@@ -70,7 +70,7 @@ Future<AttributeDto?> showAttributeEditDialog({
   // fixme 查询所有/当前工作区,然后根据name筛选
   var allMetaInWorkspace = sl<RecordMetaAccessor>().findAll().toList();
   var currentMeta = selfMeta; // 选中的引用目标Meta
-  // 表达式的参数<AttributeDto>, 暂时只支持输入单个参数
+  // 表达式的参数<AttributeDto>, 暂时只支持输入单个参数, 默认首个参数为当前列
   AttributeDto currentArg = origin ?? AttributeDto.builder();
   Func currentFunc = FuncManager.selfFunc; // 当前选中的表达式
   AttrType currentType = AttrType.string; // 当前表达式返回值类型
@@ -315,7 +315,7 @@ Future<AttributeDto?> showAttributeEditDialog({
                       compareFn: (ex, selected) => ex == selected,
                       onFind: (text) async {
                         if (text?.isEmpty ?? true) {
-                          return [];
+                          return AttrType.values.toList();
                         } else {
                           final lowerText = text!.toLowerCase();
                           return AttrType.values
@@ -385,7 +385,7 @@ Future<AttributeDto?> showAttributeEditDialog({
             try {
               Expression currentExpr = Expression(
                   metaId: currentMeta.id,
-                  pKeys: currentArg == null ? [] : [currentArg!.k],
+                  pKeys:  [currentArg.k],
                   calls: [currentFunc],
                   rType: currentType);
 
