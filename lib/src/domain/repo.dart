@@ -134,7 +134,7 @@ class RecordRepo extends IMongoRepo<Record, RecordDto>
   @Deprecated("请使用 ::asyncAccessorWith")
   @override
   Future<IMongoAccessor<RecordDto>> get asyncAccessor async =>
-      asyncAccessorWith(metaId);
+      asyncAccessorWith(metaId!);
 
   Future<IMongoAccessor<RecordDto>> asyncAccessorWith(String metaId) async {
     final sync = await mongoStorage.asyncDb;
@@ -147,7 +147,7 @@ class RecordRepo extends IMongoRepo<Record, RecordDto>
 
   final IMongoStorage mongoStorage;
   final MetaRepo metaRepo;
-  String metaId;
+  String? metaId; // 默认的metaId,可以为空
 
   RecordRepo(this.mongoStorage, this.metaRepo, this.metaId);
 
