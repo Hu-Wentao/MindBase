@@ -70,7 +70,7 @@ class MetaForm extends StatelessWidget {
     final attrs = attrFormatMap.entries.map((e) {
       final json = e.value;
       // todo 手动修正 expr
-      final metaId = ObjectId.fromHexString(attrMap['id'] as String);
+      // final metaId = ObjectId.fromHexString(attrMap['id'] as String);
       final key = int.parse(json['k'] as String);
       return AttributeDto(
         k: key,
@@ -78,7 +78,7 @@ class MetaForm extends StatelessWidget {
         name: json['name'] as String,
         memo: json['memo'] as String,
         expr: Expression.field(
-          metaId,
+          null,
           key,
           AttrType.values.byName(json['expr.rType'] as String),
         ),
