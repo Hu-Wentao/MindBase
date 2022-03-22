@@ -75,10 +75,14 @@ class RecordDto extends IMongoEntityDto {
 
     // todo 需要根据Attr, 找到当前value值对应的Value, 当前Value应当是Record的ObjectId,
     // fixme 这里默认是当前Record的Object, 因此得到的作为参数的Value都是当前Record中的. 如果为空,则表示当前Record
-    final funcParams = funcParamAttrKeys
+    final funcParamValues = funcParamAttrKeys
         .map((e) => getValueBy(e, orElse: (int k) => Value.of('')))
         .toList();
-    final value = func.call(funcParams) as Value;
+    // 如果入参为空,则传入自身作为默认的[0]参数
+    if (funcParamValues.isEmpty) {
+      funcParamValues.add(getValueBy(attrDto.k, orElse: (_) => Value.of('')));
+    }
+    final value = func.call(funcParamValues) as Value;
     print("debug getValueWithCalc $value");
     return value;
   }
