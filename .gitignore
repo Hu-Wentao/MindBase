@@ -1,3 +1,4 @@
 /build
 /.dart_tool
 /data/
+/.flutter-plugins-dependencies

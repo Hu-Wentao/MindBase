@@ -78,10 +78,10 @@ class RecordDto extends IMongoEntityDto {
     final funcParamValues = funcParamAttrKeys
         .map((e) => getValueBy(e, orElse: (int k) => Value.of('')))
         .toList();
-    // 如果入参为空,则传入自身作为默认的[0]参数
-    if (funcParamValues.isEmpty) {
-      funcParamValues.add(getValueBy(attrDto.k, orElse: (_) => Value.of('')));
-    }
+    // // 如果入参为空,则传入自身作为默认的[0]参数 ## 已注释: 从Dto处就已经要求填充selfKey,此处不在重复
+    // if (funcParamValues.isEmpty) {
+    //   funcParamValues.add(getValueBy(attrDto.k, orElse: (_) => Value.of('')));
+    // }
     final value = func.call(funcParamValues) as Value;
     print("debug getValueWithCalc $value");
     return value;
