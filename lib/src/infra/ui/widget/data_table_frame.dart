@@ -5,6 +5,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:logging/logging.dart';
 import 'package:mind_base/src/application/provider/meta_provider.dart';
+import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/repo.dart';
@@ -49,7 +50,7 @@ abstract class IRecordDataGridSource extends DataGridSource {
   // List<DataGridRow> get rows => _cacheRows;
 
   /// 构建Header
-  List<GridColumn> buildColumn(BuildContext context, MetaProvider pMeta);
+  List<GridColumn> buildColumn(BuildContext context, WorkspaceProvider pMeta);
 
   /// 实体类-> Row对象
   /// todo 在这里指定Row的类型
@@ -177,7 +178,7 @@ class RecordDataGridSource extends IRecordDataGridSource {
 
   /// 构建Header
   @override
-  List<GridColumn> buildColumn(BuildContext context, MetaProvider pMeta) =>
+  List<GridColumn> buildColumn(BuildContext context, WorkspaceProvider pMeta) =>
       _metaDto.attributes
           .map((attr) => GridColumn(
                 columnName: "${attr.k}",
@@ -578,7 +579,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
 
   /// 构建Header
   @override
-  List<GridColumn> buildColumn(BuildContext context, MetaProvider pMeta) =>
+  List<GridColumn> buildColumn(BuildContext context, WorkspaceProvider pMeta) =>
       _metaDto.attributes
           .map((attr) => GridColumn(
                 columnName: "${attr.k}",
@@ -946,7 +947,7 @@ class _RecordDataGridState extends State<RecordDataGrid> {
   }
 
   @override
-  Widget build(BuildContext context) => Consumer<MetaProvider>(
+  Widget build(BuildContext context) => Consumer<WorkspaceProvider>(
         builder: (c, pMeta, _) => Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
