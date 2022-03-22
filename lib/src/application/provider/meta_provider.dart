@@ -82,8 +82,13 @@ class MetaProvider extends ProviderSidecar {
     }
     print("debug 更新meta的指定Attr [$metaDto] [$attr]");
     // todo 后期改为update
-    metaDto.attributes.removeWhere((element) => element.k == attr.k);
-    metaDto.attributes.add(attr);
+    final index =
+        metaDto.attributes.indexWhere((element) => element.k == attr.k);
+    if (index != -1) {
+      metaDto.attributes[index] = (attr);
+    } else {
+      metaDto.attributes.add(attr);
+    }
     // 持久化
     return actSaveMeta(metaDto);
   }
