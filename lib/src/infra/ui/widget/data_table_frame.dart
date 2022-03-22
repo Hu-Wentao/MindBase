@@ -923,7 +923,7 @@ class RecordDataGrid extends StatefulWidget {
     required this.onSaveMeta,
   }) : super(key: key);
 
-  final RecordDataGridSource dataGridSource;
+  final IRecordDataGridSource dataGridSource;
   final Future<void> Function(RecordDto? dto) onSaveRecord;
   final Future<void> Function(RecordMetaDto? dto) onSaveMeta;
 
