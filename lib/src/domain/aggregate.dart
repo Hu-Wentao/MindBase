@@ -75,7 +75,7 @@ class Record extends Equatable implements IEtt<ObjectId> {
       fields[attrKey] ?? orElse?.call(attrKey);
 
   /// 根据属性名称获取属性值(同时调用表达式进行计算)
-  getValueWithCalc(Attribute attr) {
+  Value getValueWithCalc(Attribute attr) {
     // final attrDto = getValueBy(currentAttrK, orElse: (int k) {throw "error ";});
     // fixme 当前最多支持1个Func
     final func = attr.expr.calls.first as Func;
