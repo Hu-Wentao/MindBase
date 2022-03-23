@@ -53,7 +53,7 @@ class WorkspaceProvider extends ProviderSidecar {
 
   void _actUpdateMeta(RecordMeta meta) => setInitialized("更新/替换Meta", () {
         _cacheMeta[meta.id] = meta;
-        if(watchedMeta?.id == meta.id) {
+        if (watchedMeta?.id == meta.id) {
           watchedMeta = meta; // 提示UI可以刷新
         }
       });
@@ -193,6 +193,7 @@ class WorkspaceProvider extends ProviderSidecar {
     if (attr == null) {
       return;
     }
+    // final metaDto = meta.toDto();
     print("debug 更新meta的指定Attr [$metaDto] [$attr]");
     // todo 后期改为update
     final index =
@@ -251,11 +252,8 @@ class WorkspaceProvider extends ProviderSidecar {
   RecordDataGridSource2 _newDataSource(RecordMeta meta) =>
       RecordDataGridSource2(
         meta,
-        _getCachedRecord(meta.id),
+        _cacheRecord[meta.id]?.values.toList() ?? [],
         _cacheSubject[meta.id]!.stream.listen(null),
         actSaveRecord,
       );
-
-  List<RecordDto> _getCachedRecord(ObjectId id) =>
-      _cacheRecord[id]?.values.map((e) => e.toDto()).toList() ?? [];
 }

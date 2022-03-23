@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:form_builder_validators/localization/l10n.dart';
-import 'package:mind_base/src/application/provider/record_provider.dart';
-import 'package:mind_base/src/application/provider/meta_provider.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/infra/ui/routes_config.gr.dart';
 import 'package:provider/provider.dart';

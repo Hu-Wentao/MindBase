@@ -58,6 +58,51 @@ class Record extends Equatable implements IEtt<ObjectId> {
 
   @override
   String toString() => toDto().toString();
+
+  /// Value不存在时返回一个空Value
+  Value getFieldByColumn(String name) =>
+      tryGetFieldByColumn(name, orElse: (_) => Value.of(''))!;
+
+  Value? tryGetFieldByColumn(String name, {Value Function(int k)? orElse}) =>
+      tryGetFieldBy(int.parse(name), orElse: orElse);
+
+  Value getFieldBy(int attrKey, {Value Function(int k)? orElse}) =>
+      tryGetFieldBy(attrKey) ??
+      orElse?.call(attrKey) ??
+      (throw "找不到属性: [$attrKey] 对应的字段");
+
+  Value? tryGetFieldBy(int attrKey, {Value Function(int k)? orElse}) =>
+      fields[attrKey] ?? orElse?.call(attrKey);
+
+  /// 根据属性名称获取属性值(同时调用表达式进行计算)
+  getValueWithCalc(Attribute attr) {
+    // final attrDto = getValueBy(currentAttrK, orElse: (int k) {throw "error ";});
+    // fixme 当前最多支持1个Func
+    final func = attr.expr.calls.first as Func;
+    // 表达式要求的 Attr的k
+    final funcParamAttrKeys = attr.expr.pKeys;
+    // 表达式要求的Attr
+    // final funcParamsAttr = funcParamAttrKeys.map(metaDto.findAttr).toList();
+
+    // todo 需要根据Attr, 找到当前value值对应的Value, 当前Value应当是Record的ObjectId,
+    // fixme 这里默认是当前Record的Object, 因此得到的作为参数的Value都是当前Record中的. 如果为空,则表示当前Record
+    final funcParamValues = funcParamAttrKeys
+        .map((e) => getFieldBy(e, orElse: (_) => Value.of('')))
+        .toList();
+    // // 如果入参为空,则传入自身作为默认的[0]参数 ## 已注释: 从Dto处就已经要求填充selfKey,此处不在重复
+    // if (funcParamValues.isEmpty) {
+    //   funcParamValues.add(getValueBy(attrDto.k, orElse: (_) => Value.of('')));
+    // }
+    final value = func.call(funcParamValues) as Value;
+    print("debug getValueWithCalc $value");
+    return value;
+  }
+
+  Record updateWith({required int attrKey, required Value value}) => Record(
+        id: id,
+        meta: meta,
+        fields: fields..update(attrKey, (_) => value),
+      );
 }
 
 /// Meta信息

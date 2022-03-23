@@ -51,42 +51,6 @@ class RecordDto extends IMongoEntityDto {
   @override
   List<Object?> get props => [fields];
 
-  Value getValueBy(int k, {required Value Function(int k) orElse}) {
-    var rst = fields[k];
-    if (rst == null) {
-      rst = orElse(k);
-      fields[k] = rst;
-    }
-    return rst;
-  }
-
-  /// 当前Value所在Meta, 当前Value所在列的Attr
-  /// fixme 随便写的, 需要优化
-  Value getValueWithCalc(
-    AttributeDto attrDto, // 当前Value所在Attr
-  ) {
-    // final attrDto = getValueBy(currentAttrK, orElse: (int k) {throw "error ";});
-    // fixme 当前最多支持1个Func
-    final func = attrDto.expr.calls.first as Func;
-    // 表达式要求的 Attr的k
-    final funcParamAttrKeys = attrDto.expr.pKeys;
-    // 表达式要求的Attr
-    // final funcParamsAttr = funcParamAttrKeys.map(metaDto.findAttr).toList();
-
-    // todo 需要根据Attr, 找到当前value值对应的Value, 当前Value应当是Record的ObjectId,
-    // fixme 这里默认是当前Record的Object, 因此得到的作为参数的Value都是当前Record中的. 如果为空,则表示当前Record
-    final funcParamValues = funcParamAttrKeys
-        .map((e) => getValueBy(e, orElse: (int k) => Value.of('')))
-        .toList();
-    // // 如果入参为空,则传入自身作为默认的[0]参数 ## 已注释: 从Dto处就已经要求填充selfKey,此处不在重复
-    // if (funcParamValues.isEmpty) {
-    //   funcParamValues.add(getValueBy(attrDto.k, orElse: (_) => Value.of('')));
-    // }
-    final value = func.call(funcParamValues) as Value;
-    print("debug getValueWithCalc $value");
-    return value;
-  }
-
   factory RecordDto.builder({
     ObjectId? id,
     required ObjectId metaId,

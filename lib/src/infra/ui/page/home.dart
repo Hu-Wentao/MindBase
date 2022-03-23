@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:mind_base/src/application/provider/meta_provider.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_frame.dart';
@@ -16,7 +15,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _kMetaBuilder = GlobalKey<FormBuilderState>();
   final _kAttrBuilder = GlobalKey<FormBuilderState>();
-  final _kDebugGlobalKey = GlobalKey<State>(debugLabel: "全局debug Key");
 
   @override
   Widget build(BuildContext context) => Scaffold(
