@@ -252,8 +252,12 @@ class WorkspaceProvider extends ProviderSidecar {
   RecordDataGridSource2 _newDataSource(RecordMeta meta) =>
       RecordDataGridSource2(
         meta,
-        _cacheRecord[meta.id]?.values.toList() ?? [],
+        actQueryRecord(meta.id),
         _cacheSubject[meta.id]!.stream.listen(null),
         actSaveRecord,
+        (_) async => actQueryRecord(_),
       );
+
+  List<Record> actQueryRecord(ObjectId metaId) =>
+      _cacheRecord[metaId]?.values.toList() ?? <Record>[];
 }

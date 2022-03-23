@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:logging/logging.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
@@ -123,6 +124,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
   final StreamSubscription<RepoEvent<Record>> recordSub;
   @override
   final Future<void> Function(RecordDto? dto) actSaveRecord;
+  final Future<List<Record>> Function(ObjectId metaId) queryRecordsByMeta;
 
   // 防止同一个对象状态更新后被重复缓存
   final List<Record> _cache = [];
@@ -157,6 +159,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     List<Record> cache,
     this.recordSub,
     this.actSaveRecord,
+    this.queryRecordsByMeta,
   ) {
     log = Logger("$runtimeType");
     for (var element in cache) {
@@ -169,6 +172,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
   List<DataGridRow> get rows => _cacheRows;
 
   /// 构建Header
+  /// todo #3 后期根据`视图表`,控制列展示顺序(List<GridColumn> buildColumn的元素排列顺序)与Attr的对应关系(显式)
   @override
   List<GridColumn> buildColumn(BuildContext context, WorkspaceProvider pMeta) =>
       meta.attributes
@@ -267,29 +271,58 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
   @override
   DataGridRow entityToRow(Record record) => DataGridRow(
         cells: meta.attributes.map((attr) {
-          // todo 在 orElse中根据 Attr::k 创建一个填充null的Value 实例
           final value = record.getValueWithCalc(attr);
-          return DataGridCell(columnName: "${attr.k}", value: value);
+          return DataGridCell<Value>(columnName: "${attr.k}", value: value);
         }).toList(),
       );
 
   /// DataGridRow -> Widget
   /// DataGridRow由[entityToRow]构成
   /// todo 在这里为不同Attr的数据返回不同类型的Widget
+  /// todo 可以考虑提交一个而入Column的PR, 以便实现调整Column顺序的功能
   @override
-  DataGridRowAdapter? buildRow(DataGridRow row) {
-    return DataGridRowAdapter(
-        cells: row.getCells().map((e) {
-      return Container(
+  DataGridRowAdapter? buildRow(DataGridRow row) => DataGridRowAdapter(
+          cells: row.getCells().asMap().entries.map((entry) {
+        final cell = entry.value as DataGridCell<Value>;
+        final cellIndex = entry.key;
+        // todo #3 后期需要根据`视图表`获取列展示顺序与Attr的对应关系
+        final attr = meta.attributes[cellIndex];
+
+        late Widget cellWidget;
+        switch (attr.expr.rType) {
+          case AttrType.objectId:
+            cellWidget = _buildShowObjectId(cell.value!);
+            break;
+          case AttrType.string:
+          case AttrType.num:
+          case AttrType.bool:
+          case AttrType.date:
+          case AttrType.any:
+            cellWidget = _buildShowAny(cell.value!);
+        }
+        return cellWidget;
+      }).toList());
+
+  Widget _buildShowObjectId(Value value) => Container(
+        padding: const EdgeInsets.all(8.0),
+        alignment: Alignment.centerLeft,
+        // color: Colors.black12,
+        child: Text(
+          value.v,
+          maxLines: 1,
+          // style: TextStyle(background: Paint()..color = Colors.black12),
+          overflow: TextOverflow.fade,
+        ),
+      );
+
+  Widget _buildShowAny(Value value) => Container(
         padding: const EdgeInsets.all(8.0),
         alignment: Alignment.centerLeft,
         child: Text(
-          e.value.toString(),
+          value.toString(),
           overflow: TextOverflow.ellipsis,
         ),
       );
-    }).toList());
-  }
 
   /// todo 可编辑的单元格
   /// Help to control the editable text in [TextField] widget.
@@ -303,8 +336,9 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     GridColumn column,
     CellSubmit submitCell,
   ) {
+    final sourceAttr = meta.attributes[rowColumnIndex.columnIndex];
     // 选择指定行的数据
-    final sourceValue = _cache[rowColumnIndex.rowIndex];
+    final sourceRow = _cache[rowColumnIndex.rowIndex];
     // 这个值作为 EditWidget的初始值
     // final String displayText = dataGridRow
     //     .getCells()
@@ -317,8 +351,9 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     //     .toString();
 
     // fixme 如果动态新增了列,则原有对象是没有与新列对应的value的
-    final displayText = sourceValue.getFieldBy(int.parse(column.columnName)).v;
-    // final displayText = sourceValue.toGridKeyValueMap()[column.columnName]!.v;
+    final sourceValue = sourceRow.getFieldByColumn(column.columnName);
+    final displayText = sourceValue.v;
+    // final displayText = sourceRow.toGridKeyValueMap()[column.columnName]!.v;
     slLogger.info("buildEditWidget:displayText# $displayText");
 
     // The new cell value must be reset.
@@ -340,14 +375,87 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     //       '';
     //   return _buildDropDownWidget(displayText == '' ? null : displayText,
     //       submitCell, _shipCity[shipCountry]!);
-    // } else {
-    return _buildTextFieldWidget(
-      displayText,
-      rowColumnIndex,
-      column,
-      submitCell,
+    // } else {\
+    late Widget editWidget;
+    switch (sourceAttr.expr.rType) {
+      case AttrType.objectId:
+        editWidget = _buildEditObjectId(sourceAttr, sourceValue, submitCell);
+        break;
+      case AttrType.any:
+      case AttrType.string:
+      case AttrType.num:
+      case AttrType.bool:
+      case AttrType.date:
+        editWidget = _buildTextFieldWidget(
+          displayText,
+          rowColumnIndex,
+          column,
+          submitCell,
+        );
+    }
+    return editWidget;
+  }
+
+  Widget _buildEditObjectId(
+    Attribute attr,
+    Value sourceValue,
+    CellSubmit submitCell,
+  ) {
+    // 如果k==0||k==1,则不可编辑(Id和metaId) #3 属于-1级权限
+    if (attr.k == 0 || attr.k == 1) {
+      return Tooltip(
+        child: _buildShowObjectId(sourceValue),
+        message: '[ID]与[MetaID]不可编辑',
+      );
+    }
+    // return _buildShowObjectId(sourceValue);
+
+    // todo #5 后期改为弹出metaId对应的Record列表,以供选择
+    // final metaDto = meta.toDto();
+    // 选取 Attr上指定的MetaId下的Record::Id
+    final metaId =
+        attr.expr.metaId!; //fixme #4 Expression::metaId不能为null! 需要新增dto
+    final allRecordInMeta = queryRecordsByMeta(metaId);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 220,
+          child: FormBuilderSearchableDropdown<Record>(
+            decoration: const InputDecoration(labelText: '所选Meta下的RecordId'),
+            name: 'recordId',
+            // initialValue: null,
+            itemAsString: (meta) => meta?.id.toHexString() ?? sourceValue.v,
+            //空则选择默认值
+            // items: allCountries,
+            onChanged: (value) {
+              newCellValue =
+                  (value == null) ? sourceValue.v : value.id.toHexString();
+            },
+            showSearchBox: true,
+            isFilteredOnline: true,
+            compareFn: (item, selected) => item?.id == selected?.id,
+            onFind: (text) async {
+              if (text?.isEmpty ?? true) {
+                return await allRecordInMeta;
+              } else {
+                final lowerText = text!.toLowerCase();
+                return allRecordInMeta.then((value) => value
+                    .where(
+                        (element) => element.id.toHexString().contains(lowerText))
+                    .toList());
+              }
+            },
+          ),
+        ),
+        IconButton(
+            onPressed: () {
+              print("debug ## 选中记录: $newCellValue");
+              submitCell();
+            },
+            icon: const Icon(Icons.check))
+      ],
     );
-    // }
   }
 
   /// Building a [TextField] for numeric and text column.
