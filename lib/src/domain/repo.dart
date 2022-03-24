@@ -162,13 +162,18 @@ class RecordRepo extends IMongoRepo<Record, RecordDto>
   /// 通过MetaId监视聚合根的所有记录对应的实例的变更
   /// 重点测试
   /// watch Meta对应的Record 集合.
-  Stream<RepoEvent<Record>> watchAllByMeta(ObjectId metaId) async* {
-    final sync = await asyncAccessorWith(metaId.toHexString());
-    yield* metaRepo
-        .watchBy(metaId) // 返回Meta事件流
-        .asyncExpand((meta) => sync.watchAll().map((rcd) =>
-            RepoEvent.of<Record, RecordDto>(
-                rcd, (dto) => dto?.toDomainOr(meta.entity))));
+  Stream<RepoEvent<Record>> watchAllByMeta(RecordMeta meta) async* {
+    final sync = await asyncAccessorWith(meta.id.toHexString());
+    // fixme 收不到更新消息
+    yield*  sync.watchAll().map(
+          (rcd) => RepoEvent.of<Record, RecordDto>(
+              rcd, (dto) => dto?.toDomainOr(meta)),
+        );
+    // yield* metaRepo
+    //     .watchBy(metaId) // 返回Meta事件流
+    //     .asyncExpand((meta) => sync.watchAll().map((rcd) =>
+    //         RepoEvent.of<Record, RecordDto>(
+    //             rcd, (dto) => dto?.toDomainOr(meta.entity))));
   }
 
   Future<WriteResult> insert(Record entity) async {

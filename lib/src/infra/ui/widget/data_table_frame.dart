@@ -8,7 +8,6 @@ import 'package:logging/logging.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
-import 'package:mind_base/src/domain/repo.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_edit_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
@@ -21,29 +20,11 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 abstract class IRecordDataGridSource extends DataGridSource {
   RecordMeta get meta;
 
-  StreamSubscription<RepoEvent<Record>> get recordSub;
+  // Future<void> Function(RecordDto? dto) get actSaveRecord;
 
-  Future<void> Function(RecordDto? dto) get actSaveRecord;
+  void renderRecord(Record entity, int? rowIndex, {bool notify = true});
 
-  void saveRecord(Record entity, int? rowIndex, {bool notify = true}) {
-    // if (rowIndex == null) {
-    //   _cache.add(entity);
-    //   _cacheRows.add(_entityToRow(entity));
-    //   if (notify) _notifyAll();
-    // } else {
-    //   _cache[rowIndex] = entity;
-    //   _cacheRows[rowIndex] = _entityToRow(entity);
-    //   if (notify) _notifyDataRow(rowIndex, entity);
-    // }
-  }
-
-  void removeRecordBy(ObjectId ettId) {
-    // final ettIdHex = ettId.toHexString();
-    // final index = _cache.indexWhere((element) => element.idHex == ettIdHex);
-    // _cache.removeAt(index);
-    // _cacheRows.removeAt(index);
-    // _notifyAll();
-  }
+  void removeRecordBy(int rowIndex);
 
   // @override
   // List<DataGridRow> get rows => _cacheRows;
@@ -73,11 +54,6 @@ abstract class IRecordDataGridSource extends DataGridSource {
               ))
           .toList());
 
-  /// todo 可编辑的单元格
-  /// Help to control the editable text in [TextField] widget.
-  TextEditingController editingController = TextEditingController();
-  String? newCellValue;
-
   @override
   Widget? buildEditWidget(
     DataGridRow dataGridRow,
@@ -88,7 +64,7 @@ abstract class IRecordDataGridSource extends DataGridSource {
 
   /// todo 单元格数据提交
   /// 本方法结束后将会自动刷新指定[RowColumnIndex]对应的Cell
-  /// fixme 当前是假设 [_cache]和[_cacheRows]对视index一一对应的,
+  /// fixme 当前是假设 [cache]和[_cacheRows]对视index一一对应的,
   /// 一旦后期允许row重排序,对应关系将只能依赖::firstWhere遍历查询得到,详见官方示例代码
   @override
   void onCellSubmit(
@@ -110,7 +86,6 @@ abstract class IRecordDataGridSource extends DataGridSource {
 
   @override
   void dispose() {
-    recordSub.cancel();
     super.dispose();
   }
 }
@@ -120,52 +95,60 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
 
   @override
   final RecordMeta meta;
-  @override
-  final StreamSubscription<RepoEvent<Record>> recordSub;
+
   @override
   final Future<void> Function(RecordDto? dto) actSaveRecord;
-  final Future<List<Record>> Function(ObjectId metaId) queryRecordsByMeta;
 
-  // 防止同一个对象状态更新后被重复缓存
-  final List<Record> _cache = [];
+  final List<Record> Function(ObjectId metaId) getCachedRecords;
+  final Record Function(ObjectId metaId, int index) getCachedRecordByIndex;
+
+  // Rows与Provider中的Record一一对应,包括元素顺序
   final List<DataGridRow> _cacheRows = [];
 
   // 用于查询 Attr的Key 在Grid中的index
   // late final List<String> _attrKeyList;
+  RecordDataGridSource2(
+    this.meta,
+    this.actSaveRecord,
+    this.getCachedRecords,
+    this.getCachedRecordByIndex,
+  ) {
+    log = Logger("$runtimeType");
+
+    // 同步rows
+    getCachedRecords(meta.id).forEach(onInsertEvt);
+    // 全部插入后再 notifyAll
+    // for (var element in cache) {
+    //   renderRecord(element, null, notify: false);
+    // }
+    // notifyAll();
+    // recordSub.onData(_onEvent);
+  }
+
+  // 源数据List 新增
+  void onInsertEvt(Record record) => renderRecord(record, null);
+
+  // 源数据List 更新
+  void onUpdateEvt(Record record, int index) => renderRecord(record, index);
+
+  // 源数据List 删除
+  void onRemoveEvt(int index) => removeRecordBy(index);
 
   @override
-  void saveRecord(Record entity, int? rowIndex, {bool notify = true}) {
+  void renderRecord(Record entity, int? rowIndex, {bool notify = true}) {
     if (rowIndex == null) {
-      _cache.add(entity);
       _cacheRows.add(entityToRow(entity));
       if (notify) notifyAll();
     } else {
-      _cache[rowIndex] = entity;
       _cacheRows[rowIndex] = entityToRow(entity);
       if (notify) notifyDataRow(rowIndex, entity);
     }
   }
 
   @override
-  void removeRecordBy(ObjectId ettId) {
-    final index = _cache.indexWhere((element) => element.id == ettId);
-    _cache.removeAt(index);
+  void removeRecordBy(int index) {
     _cacheRows.removeAt(index);
     notifyAll();
-  }
-
-  RecordDataGridSource2(
-    this.meta,
-    List<Record> cache,
-    this.recordSub,
-    this.actSaveRecord,
-    this.queryRecordsByMeta,
-  ) {
-    log = Logger("$runtimeType");
-    for (var element in cache) {
-      saveRecord(element, null);
-    }
-    recordSub.onData(_onEvent);
   }
 
   @override
@@ -338,7 +321,8 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
   ) {
     final sourceAttr = meta.attributes[rowColumnIndex.columnIndex];
     // 选择指定行的数据
-    final sourceRow = _cache[rowColumnIndex.rowIndex];
+    final sourceRow = getCachedRecordByIndex(meta.id, rowColumnIndex.rowIndex);
+
     // 这个值作为 EditWidget的初始值
     // final String displayText = dataGridRow
     //     .getCells()
@@ -415,7 +399,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     // 选取 Attr上指定的MetaId下的Record::Id
     final metaId =
         attr.expr.metaId!; //fixme #4 Expression::metaId不能为null! 需要新增dto
-    final allRecordInMeta = queryRecordsByMeta(metaId);
+    final allRecordInMeta = getCachedRecords(metaId);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -437,13 +421,13 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
             compareFn: (item, selected) => item?.id == selected?.id,
             onFind: (text) async {
               if (text?.isEmpty ?? true) {
-                return await allRecordInMeta;
+                return allRecordInMeta;
               } else {
                 final lowerText = text!.toLowerCase();
-                return allRecordInMeta.then((value) => value
-                    .where(
-                        (element) => element.id.toHexString().contains(lowerText))
-                    .toList());
+                return allRecordInMeta
+                    .where((element) =>
+                        element.id.toHexString().contains(lowerText))
+                    .toList();
               }
             },
           ),
@@ -533,7 +517,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
 
   /// todo 单元格数据提交
   /// 本方法结束后将会自动刷新指定[RowColumnIndex]对应的Cell
-  /// fixme 当前是假设 [_cache]和[_cacheRows]对视index一一对应的,
+  /// fixme 当前是假设 [cache]和[_cacheRows]对视index一一对应的,
   /// 一旦后期允许row重排序,对应关系将只能依赖::firstWhere遍历查询得到,详见官方示例代码
   @override
   void onCellSubmit(
@@ -541,7 +525,8 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     RowColumnIndex rowColumnIndex,
     GridColumn col,
   ) {
-    final Record oldEntity = _cache[rowColumnIndex.rowIndex];
+    final Record oldEntity =
+        getCachedRecordByIndex(meta.id, rowColumnIndex.rowIndex);
     final oldValue = oldEntity.tryGetFieldByColumn(col.columnName);
     if (newCellValue == null ||
         oldValue == null ||
@@ -558,8 +543,8 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     );
     // ..setFieldByColumn(col.columnName, Value.of(newCellValue, oldValue.e));
 
-    // 替换单元格内的值 (会面会自动notify)
-    saveRecord(entity, rowColumnIndex.rowIndex, notify: false);
+    // 替换单元格内的值 (save成功后,watch到消息将会自动notify)
+    renderRecord(entity, rowColumnIndex.rowIndex, notify: false);
     // fixme 没有检查保存是否成功， 考虑添加保存失败时回滚初始值的逻辑
     actSaveRecord(entity.toDto());
   }
@@ -586,35 +571,9 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     notifyListeners();
   }
 
-  void _onEvent(RepoEvent<Record> event) {
-    log.fine("_onEvent 数据刷新\n$event");
-
-    // todo 本方法会在首次初始化时被调用, 短时间内连续刷新可能会造成卡顿...,
-    //todo 考虑首次加载转换为Future,然后一次性转为Row后再notify / 直接为Stream做缓存节流每次返回一个List<>
-    switch (event.type) {
-      case RepoEventType.insert:
-        saveRecord(event.entity!, null);
-        break;
-      case RepoEventType.update: // todo      update
-      case RepoEventType.replace:
-        final index = _cache.indexWhere((element) => element.id == event.ettId);
-        saveRecord(event.entity!, index);
-        break;
-      case RepoEventType.drop: // todo         drop
-      case RepoEventType.rename: // todo       rename
-      case RepoEventType.dropDatabase: // todo dropDatabase
-      case RepoEventType.invalidate: // todo   invalidate
-      case RepoEventType.delete:
-        if (event.type != RepoEventType.delete)
-          print("###debug drop 尚未确认 '${event.type}'事件的机制, 按照delete处理");
-        removeRecordBy(event.ettId);
-        break;
-    }
-  }
-
   @override
   void dispose() {
-    recordSub.cancel();
+    // recordSub.cancel();
     super.dispose();
   }
 }
@@ -627,7 +586,7 @@ class RecordDataGrid extends StatefulWidget {
     required this.onSaveMeta,
   }) : super(key: key);
 
-  final IRecordDataGridSource dataGridSource;
+  final RecordDataGridSource2 dataGridSource;
   final Future<void> Function(RecordDto? dto) onSaveRecord;
   final Future<void> Function(RecordMetaDto? dto) onSaveMeta;
 

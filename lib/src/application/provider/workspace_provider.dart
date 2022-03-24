@@ -15,7 +15,11 @@ import 'package:provider_sidecar/provider_sidecar.dart';
 /// todo 当前假定本数据库为一个工作空间
 class WorkspaceProvider extends ProviderSidecar {
   late final MetaRepo _metaRepo;
-  late final RecordRepo _recordRepo;
+
+  // RecordRepo 无法监听数据
+  // late final RecordRepo _recordRepo;
+  RecordAccessor _recordAccessor(String metaId) =>
+      RecordAccessor(sl<Db>(), metaId);
 
   // 防止同一个对象状态更新后被重复缓存 <MetaId, Meta>
   final Map<ObjectId, RecordMeta> _cacheMeta = {};
@@ -25,60 +29,71 @@ class WorkspaceProvider extends ProviderSidecar {
   // <MetaId, List<Record>> , 方案2A .. 省一点空间.. 插入/更新较慢 ## 当前方案!
   // <Meta,List<Record>>, 便于查询,但插入时需要根据Record->MetaId->Meta
   // <RecordId, Record> , 便于刷新数据,但如果要恢复某个Meta状态,则需要遍历where
-  // final Map<ObjectId, List<Record>> _cacheRecord = {};
-  // <MetaId, Map<RecordId,Record>> , 方案2B 考虑.. 插入/更新数据更快
-  final Map<ObjectId, Map<ObjectId, Record>> _cacheRecord = {};
+  final Map<ObjectId, List<Record>> _cacheRecord = {};
 
+  // <MetaId, Map<RecordId,Record>> , 方案2B 考虑.. 插入/更新数据更快
+  // final Map<ObjectId, Map<ObjectId, Record>> _cacheRecord = {};
+
+  // 监听更新事件
   // <MetaId, StreamController<..>>
   final Map<ObjectId, StreamController<RepoEvent<Record>>> _cacheSubject = {};
+
+  // final StreamController<RepoEvent<Record>> _operateSubject =
+  //     StreamController<RepoEvent<Record>>.broadcast();
 
   @override
   onInitializing() {
     _metaRepo = sl<MetaRepo>();
-    _recordRepo = RecordRepo(sl<IMongoStorage>(), _metaRepo, null);
+    // _recordRepo = RecordRepo(sl<IMongoStorage>(), _metaRepo, null);
     _cacheAllMetaByWorkspace();
   }
 
   _cacheAllMetaByWorkspace() {
     // 先查询有所元素 // 然后开始监听变更
-    _metaRepo.findAll().listen(_actInsertMeta);
-    _metaRepo.watchAll().listen(_onWatchMeta);
+    _metaRepo.findAll().listen(_onEvtInsertMeta);
+    _metaRepo.watchAll().listen(_onWatchMetaEvt);
   }
 
-  void _actInsertMeta(RecordMeta meta) => setInitialized("插入Meta", () {
+  void _onEvtInsertMeta(RecordMeta meta) => setInitialized("插入Meta", () {
         _cacheMeta[meta.id] = meta;
         // 缓存并监听Meta下Record
         _cacheRecordByMeta(meta);
+        // fixme 如果meta更新， 那么缓存的Record也需要更新才对，否则映射会出问题
+        // fixme
+        // fixme
+        // fixme
+        // fixme
+        // fixme
       });
 
-  void _actUpdateMeta(RecordMeta meta) => setInitialized("更新/替换Meta", () {
+  void _onEvtUpdateMeta(RecordMeta meta) => setInitialized("更新/替换Meta", () {
         _cacheMeta[meta.id] = meta;
         if (watchedMeta?.id == meta.id) {
           watchedMeta = meta; // 提示UI可以刷新
         }
       });
 
-  void _actRemoveMeta(ObjectId ettId) => setInitialized("移除Meta", () {
+  void _onEvtRemoveMeta(ObjectId ettId) => setInitialized("移除Meta", () {
         _cacheMeta.remove(ettId);
         // 取消缓存和监听Meta下Record
         _disposeSubject(ettId);
       });
 
-  void _onWatchMeta(RepoEvent<RecordMeta> event) {
+  void _onWatchMetaEvt(RepoEvent<RecordMeta> event) {
     switch (event.type) {
       case RepoEventType.insert:
-        _actInsertMeta(event.entity!);
+        _onEvtInsertMeta(event.entity!);
         break;
       case RepoEventType.replace:
       case RepoEventType.update:
-        _actUpdateMeta(event.entity!);
+        _onEvtUpdateMeta(event.entity!);
         break;
       case RepoEventType.delete:
-        _actRemoveMeta(event.ettId);
+        _onEvtRemoveMeta(event.ettId);
         break;
       case RepoEventType.drop:
         print("###debug drop 尚未确认 '${event.type}'事件的机制, 按照delete处理");
-        _actRemoveMeta(event.ettId);
+        _onEvtRemoveMeta(event.ettId);
         break;
       case RepoEventType.rename:
       case RepoEventType.dropDatabase:
@@ -89,14 +104,24 @@ class WorkspaceProvider extends ProviderSidecar {
   }
 
   _cacheRecordByMeta(RecordMeta meta) {
-    _recordRepo.findAllByMeta(meta.id).listen(_actInsertRecord);
+    // _recordRepo.findAllByMeta(meta.id).listen(_onEvtInsertRecord);
+    final acc = _recordAccessor(meta.id.$oid)
+      ..findAll()
+          .map((event) => event.toDomain(meta))
+          .listen(_onEvtInsertRecord);
     // 异步广播流,暂停的监听器将在内部缓存事件,直到监听器取消暂停/被Cancel (需要UI及时dispose子流)
     // 同步广播流,Provider中始终有一个监听器用于刷新数据；其他监听器只用于刷新UI(可能会有丢失UI数据..)
     _cacheSubject[meta.id]?.close();
     _cacheSubject[meta.id] =
         StreamController<RepoEvent<Record>>.broadcast(sync: false)
-          ..addStream(_recordRepo.watchAllByMeta(meta.id))
-          ..stream.listen(_onWatchRecord);
+          ..addStream(
+            acc.watchAll().map((dtoEvt) => RepoEvent.of<Record, RecordDto>(
+                  dtoEvt,
+                  (dto) => dto?.toDomainOr(meta),
+                )),
+          )
+          // ..addStream(_recordRepo.watchAllByMeta(meta))
+          ..stream.listen((evt) => _onWatchRecord(evt, meta.id));
   }
 
   // 不指定则移除所有的监听
@@ -115,36 +140,57 @@ class WorkspaceProvider extends ProviderSidecar {
     }
   }
 
-  void _actInsertRecord(Record record) => setInitialized("插入Record", () {
-        (_cacheRecord[record.meta.id] ??= {})[record.id] = record;
+  void _onEvtInsertRecord(Record record) => setInitialized("插入Record", () {
+        (_cacheRecord[record.meta.id] ??= []).add(record);
       });
 
-  void _actUpdateRecord(Record record) => setInitialized("更新/替换Meta", () {
-        (_cacheRecord[record.meta.id] ??= {})[record.id] = record;
-      });
+  // 返回被更新的元素index
+  int _onEvtUpdateRecord(Record record) =>
+      setInitialized<int>("更新/替换Record", () {
+        final index = (_cacheRecord[record.meta.id] ??= [])
+            .indexWhere((element) => element.id == record.id);
+        if (index == -1) {
+          _onEvtInsertRecord(record);
+        } else {
+          _cacheRecord[record.meta.id]![index] = record;
+        }
+        return index;
+      })!;
 
-  void _actRemoveRecord(ObjectId ettId) => setInitialized("移除Meta", () {
-        // _cacheRecord.remove(ettId);
+  // 返回被更新的元素index
+  int _onEvtRemoveRecord(ObjectId ettId) => setInitialized<int>("移除Record", () {
         // 遍历所有的 <RecordId,Record>
-        _cacheRecord.values
-            .firstWhere((recordMap) => recordMap.remove(ettId) != null);
-      });
+        var index = -1;
+        for (var recordList in _cacheRecord.values) {
+          index = recordList.indexWhere((element) => element.id == ettId);
+          if (index != -1) {
+            recordList.removeAt(index);
+            break;
+          }
+        }
+        return index;
+      })!;
 
-  void _onWatchRecord(RepoEvent<Record> event) {
+  void _onWatchRecord(RepoEvent<Record> event, ObjectId metaId) {
+    print("debug #监听WatchRecord meta# $metaId # $event");
     switch (event.type) {
       case RepoEventType.insert:
-        _actInsertRecord(event.entity!);
+        _onEvtInsertRecord(event.entity!);
+        _onEvtInsertRecordSource(event.entity!);
         break;
       case RepoEventType.replace:
       case RepoEventType.update:
-        _actUpdateRecord(event.entity!);
+        final index = _onEvtUpdateRecord(event.entity!);
+        _onEvtUpdateRecordSource(event.entity!, index);
         break;
       case RepoEventType.delete:
-        _actRemoveRecord(event.ettId);
+        final index = _onEvtRemoveRecord(event.ettId);
+        _onEvtRemoveRecordSource(event.ettId, metaId, index);
         break;
       case RepoEventType.drop:
         print("###debug drop 尚未确认 '${event.type}'事件的机制, 按照delete处理");
-        _actRemoveRecord(event.ettId);
+        final index = _onEvtRemoveRecord(event.ettId);
+        _onEvtRemoveRecordSource(event.ettId, metaId, index);
         break;
       case RepoEventType.rename:
       case RepoEventType.dropDatabase:
@@ -235,6 +281,18 @@ class WorkspaceProvider extends ProviderSidecar {
         });
       });
 
+  Future<void> actRemoveRecord(ObjectId ettId) => actWrapper(() async {
+        log("actRemoveRecord $ettId");
+        // todo
+        throw UnimplementedError("尚未实现删除记录");
+        // // 无需set,因为插入成功后, watch会监听到新的变更
+        // await RecordAccessor(sl<Db>(), dto.metaId.toHexString())
+        //     .save(dto.id, dto)
+        //     .then((value) {
+        //   log("actSaveRecord 插入成功");
+        // });
+      });
+
   // Future<void> actSaveMeta(RecordMetaDto? dto) => actWrapper(() async {
   //       if (dto == null) return;
   //       await sl<RecordMetaAccessor>().save(dto.id, dto).then((value) {
@@ -242,22 +300,57 @@ class WorkspaceProvider extends ProviderSidecar {
   //       });
   //     });
 
-  RecordDataGridSource2 actGetDataSource() => _watchMeta(watchedMeta!);
+  // <MetaId, 数据源>
+  final Map<ObjectId, RecordDataGridSource2> _cacheSource = {};
 
-  RecordDataGridSource2 _watchMeta(RecordMeta meta) {
+  void _findCachedSource(
+    ObjectId metaId,
+    Function(RecordDataGridSource2 source) onFind,
+  ) {
+    final source = _cacheSource[metaId];
+    if (source != null) {
+      onFind(source);
+    }
+  }
+
+  void _onEvtInsertRecordSource(Record record) => _findCachedSource(
+        record.meta.id,
+        (source) => source.onInsertEvt(record),
+      );
+
+  // index: 更新的Record在cache中的索引
+  void _onEvtUpdateRecordSource(Record record, int index) => _findCachedSource(
+        record.meta.id,
+        (source) => source.onUpdateEvt(record, index),
+      );
+
+  void _onEvtRemoveRecordSource(ObjectId ettId, ObjectId metaId, int index) =>
+      _findCachedSource(metaId, (source) => source.onRemoveEvt(index));
+
+  RecordDataGridSource2 actGetDataSource() => _getByMeta(watchedMeta!);
+
+  RecordDataGridSource2 _getByMeta(RecordMeta meta) {
     watchedMeta = meta;
-    return _newDataSource(meta);
+    var cached = _cacheSource[meta.id];
+    if (cached == null || cached.meta != meta) {
+      cached = _newDataSource(meta);
+      _cacheSource[meta.id] = cached;
+    }
+    return cached;
   }
 
   RecordDataGridSource2 _newDataSource(RecordMeta meta) =>
       RecordDataGridSource2(
         meta,
-        actQueryRecord(meta.id),
-        _cacheSubject[meta.id]!.stream.listen(null),
         actSaveRecord,
-        (_) async => actQueryRecord(_),
+        // actRemoveRecord,
+        getCachedRecordsByMeta,
+        getCachedRecordByIndex,
       );
 
-  List<Record> actQueryRecord(ObjectId metaId) =>
-      _cacheRecord[metaId]?.values.toList() ?? <Record>[];
+  List<Record> getCachedRecordsByMeta(ObjectId metaId) =>
+      _cacheRecord[metaId] ??= <Record>[];
+
+  Record getCachedRecordByIndex(ObjectId metaId, int index) =>
+      getCachedRecordsByMeta(metaId)[index];
 }

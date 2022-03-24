@@ -8,25 +8,25 @@ final dto1 = RecordDto.builder(
     // id: ObjectId.fromHexString("6232ae5d5c918fa41061f449"),
     metaId: ObjectId.fromHexString("62314b932f929ede7dfebc8f"));
 
-main() {
+main() async {
   var flowSign = 1;
   int getFlowSign([int add = 2]) => flowSign += add;
+  IMongoStorage client = BaseMongoStorage(MongoStorageConfig(
+    // auth: const MongoAuthBasic(
+    //   username: "root",
+    //   password: "example",
+    // ),
+    databaseName: 'test',
+    port: 30001,
+  ));
+  final db = await client.asyncDb;
+
+  test("connect",(){
+    expect(db.state, State.OPEN, reason: "db is not open");
+  });
 
   test("dao ", () async {
-    IMongoStorage client = BaseMongoStorage(MongoStorageConfig(
-      // auth: const MongoAuthBasic(
-      //   username: "root",
-      //   password: "example",
-      // ),
-      databaseName: 'test',
-      port: 30001,
-    ));
-
-    final db = await client.asyncDb;
-    expect(db.state, State.OPEN, reason: "db is not open");
-
     print("start");
-
     RecordAccessor acc = RecordAccessor(db,ObjectId().toHexString());
     // RecordAccessor acc = RecordAccessor(db,dto1.metaId.toHexString());
 

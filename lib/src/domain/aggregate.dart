@@ -94,7 +94,7 @@ class Record extends Equatable implements IEtt<ObjectId> {
     //   funcParamValues.add(getValueBy(attrDto.k, orElse: (_) => Value.of('')));
     // }
     final value = func.call(funcParamValues) as Value;
-    print("debug getValueWithCalc $value");
+    // print("debug getValueWithCalc $value");
     return value;
   }
 
