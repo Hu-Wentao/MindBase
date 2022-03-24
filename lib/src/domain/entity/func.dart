@@ -4,36 +4,11 @@ import 'dart:math' as math;
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
+part 'func_manager.dart';
+
 /// 函数 ========================================================================
-abstract class ICallable extends IMongoDto {
-  ICallable call(List<ICallable> p);
-}
-
-abstract class BaseCallable extends IMongoDto implements ICallable {
-  const BaseCallable();
-
-  factory BaseCallable.fromTypedJson(Map<String, dynamic> json) {
-    final type = json['type'] as String;
-    final real = json['real'] as Map<String, dynamic>;
-    switch (type) {
-      case "Value":
-        return Value.fromJson(real);
-      case 'Func':
-        return Func.fromJson(real);
-      case 'Expression':
-        return Expression.fromJson(real);
-      default:
-        throw Exception('BaseCallable::fromTypedJson# Unknown type: $type');
-    }
-  }
-
-  Map<String, dynamic> toJsonWithType() => {
-        'type': "$runtimeType",
-        'real': toJson(),
-      };
-
-  @override
-  toMongoJson({AttrType type = AttrType.string}) => toJsonWithType();
+mixin Invokable on EquatableMixin {
+  Invokable invoke();
 }
 
 /// 表达式[Expression]由多个[Func]构成
@@ -119,22 +94,101 @@ class Expression extends BaseCallable {
   toMongoJson({AttrType type = AttrType.string}) => toJson();
 }
 
-class Func extends BaseCallable {
+// class Expression  {
+//   static Expression field(
+//     ObjectId? selfMetaId,
+//     int selfKey,
+//     AttrType rType,
+//   ) =>
+//       Expression(
+//         metaId: selfMetaId, // 字段 所存在的Meta,
+//         pKeys: [selfKey], // 字段的Attr::k
+//         calls: [], // 返回字段本身
+//         rType: rType,
+//       );
+//
+//   /// [pThisType] 表示改列对应的Value的类型
+//   static Expression method(
+//     AttrType pThisType, {
+//     required ObjectId metaId,
+//     required AttrType rType,
+//     required List<int> pAttrKeys,
+//     required List<Invokable> calls,
+//   }) =>
+//       Expression(
+//         metaId: metaId,
+//         pKeys: pAttrKeys,
+//         calls: calls,
+//         rType: rType,
+//       );
+//
+//   /// Expression 所在列的Value必须是[AttrType.objectId]类型
+//   /// Expression 所在
+//   /// Value持有的ObjectId对应的
+//   final ObjectId? metaId; // null表示引用当前类的meta
+//   final List<int> pKeys;
+//   final List<Invokable> calls;
+//   final AttrType rType;
+//
+//   @override
+//   Invokable invoke([List<Invokable> p = const []]) {
+//     // fixme 未检查类型正确性
+//     late Invokable r;
+//     for (var callable in calls) {
+//       r = callable.invoke();
+//     }
+//     return r;
+//   }
+//
+//   const Expression({
+//     required this.metaId,
+//     required this.pKeys,
+//     required this.calls,
+//     required this.rType,
+//   });
+//
+//   @override
+//   List<Object?> get props => [metaId, pKeys, calls, rType];
+//
+//   static Expression fromJson(Map<String, dynamic> attrMap) {
+//     final mtId = attrMap['metaId'] as String?;
+//     return Expression(
+//       metaId: mtId == null ? null : ObjectId.fromHexString(mtId),
+//       pKeys: (attrMap['pKeys'] as List<dynamic>).map((e) => e as int).toList(),
+//       calls: [],
+//       // calls: (attrMap['calls'] as List<dynamic>)
+//       //     .map((e) => BaseCallableDto.fromTypedJson(e as Map<String, dynamic>))
+//       //     .toList(),
+//       rType: AttrType.values.byName(attrMap['rType'] as String),
+//     );
+//   }
+//
+//   @override
+//   Map<String, dynamic> toJson() => {
+//         'metaId': metaId?.toHexString(), // 空表示当前所在的Meta类
+//         'pKeys': pKeys.map((e) => e).toList(growable: false),
+//         // 'calls': calls.map((e) => e.toJsonWithType()).toList(growable: false),
+//         'rType': rType.name,
+//       };
+//
+//   @override
+//   toMongoJson({AttrType type = AttrType.string}) => toJson();
+// }
+
+class Func with EquatableMixin {
   final String name; // 全局唯一
-  final String? alias;
   final List<AttrType> pTypes;
 
   // todo 新增一个动态获取 rType的方法，针对Any类型的返回值，可以通过方法得到实际的返回类型，而不是Any
   final AttrType rType;
 
   // run 只有运算, 在调用之前,需要先检查Attr的类型匹配问题
-  final ICallable Function(List<ICallable> p) onRun;
+  final Invokable Function(List<Invokable> p) logic;
 
-  @override
-  ICallable call(List<ICallable> p) {
+  Invokable onInvoke(List<Value> p) {
     try {
       // fixme 未作细节处理，如保留原值等
-      return onRun(p);
+      return logic(p);
     } catch (e) {
       return Value('', e.toString());
     }
@@ -142,10 +196,9 @@ class Func extends BaseCallable {
 
   const Func({
     required this.name,
-    this.alias,
     required this.pTypes,
     required this.rType,
-    required this.onRun,
+    required this.logic,
   });
 
   @override
@@ -162,199 +215,3 @@ class Func extends BaseCallable {
   static Func fromJson(Map<String, dynamic> json) =>
       FuncManager.findBy(json['name'] as String);
 }
-
-/// todo 添加test, 1.检查name唯一性, 2检查参数转换是否正常
-class FuncManager {
-  static const String noneFuncName = "none";
-  static const String selfFuncName = "self";
-  static final Func noneFunc = Func(
-    name: noneFuncName,
-    pTypes: const [AttrType.any],
-    rType: AttrType.any,
-    onRun: (p) => p[0],
-  );
-  static final Func selfFunc = Func(
-    name: selfFuncName,
-    pTypes: const [AttrType.any],
-    rType: AttrType.any,
-    onRun: (p) => p[0],
-  );
-
-  static Iterable<Func> get funcList =>
-      methodMap.values.expand((element) => element);
-
-  /// 相关 [AttrType]所有用的方法
-  static Map<AttrType, Iterable<Func>> get methodMap => {
-        AttrType.any: anyFunList,
-        AttrType.bool: boolFunList,
-        AttrType.num: numFunList,
-        AttrType.string: strFunList,
-        // AttrType.date: dateFunList,
-      };
-
-  @Deprecated("弃用")
-  static Func findMethod(
-    AttrType type,
-    String name, {
-    Func Function()? orElse,
-  }) =>
-      methodMap[type]!
-          .firstWhere((element) => element.name == name, orElse: orElse);
-
-  static Func findBy(String funcName, {Func Function()? orElse}) =>
-      findByName(funcName, orElse: () => findByAlias(funcName, orElse: orElse));
-
-  static Func findByName(String funcName, {Func Function()? orElse}) =>
-      funcList.firstWhere((f) => f.name == funcName, orElse: orElse);
-
-  static Func findByAlias(String funcName, {Func Function()? orElse}) =>
-      funcList.firstWhere((f) => f.alias == funcName, orElse: orElse);
-}
-
-/// 类型检查与转换表达式, 检查/转换失败则抛出异常
-final anyFunList = <Func>[
-  FuncManager.noneFunc,
-  FuncManager.selfFunc,
-  Func(
-      name: "toStr",
-      pTypes: const [AttrType.any],
-      rType: AttrType.string,
-      onRun: (p) => Value.of((p[0] as Value).asString)),
-  Func(
-      name: "toNum",
-      pTypes: const [AttrType.any],
-      rType: AttrType.num,
-      onRun: (p) => Value.of((p[0] as Value).asNum)),
-  Func(
-      name: "toBool",
-      pTypes: const [AttrType.any],
-      rType: AttrType.bool,
-      onRun: (p) => Value.of((p[0] as Value).asBool)),
-  Func(
-      name: "toDate",
-      pTypes: const [AttrType.any],
-      rType: AttrType.date,
-      onRun: (p) => Value.of((p[0] as Value).asDate)),
-  Func(
-    name: "equal",
-    alias: "==",
-    pTypes: const [AttrType.any, AttrType.any],
-    rType: AttrType.bool,
-    onRun: (p) =>
-        Value.of((p[0] as Value).asString == (p[1] as Value).asString),
-  ),
-  Func(
-    name: "notEqual",
-    alias: "!=",
-    pTypes: const [AttrType.any, AttrType.any],
-    rType: AttrType.bool,
-    onRun: (p) =>
-        Value.of((p[0] as Value).asString != (p[1] as Value).asString),
-  ),
-];
-
-/// 基础表达式
-final numFunList = [
-  Func(
-    name: "add",
-    alias: "+",
-    pTypes: const [AttrType.num, AttrType.num],
-    rType: AttrType.num,
-    onRun: (p) => Value.of((p[0] as Value).asNum + (p[1] as Value).asNum),
-  ),
-  Func(
-    name: "sub",
-    alias: "-",
-    pTypes: const [AttrType.num, AttrType.num],
-    rType: AttrType.num,
-    onRun: (p) => Value.of((p[0] as Value).asNum - (p[1] as Value).asNum),
-  ),
-  Func(
-    name: "mul",
-    alias: "*",
-    pTypes: const [AttrType.num, AttrType.num],
-    rType: AttrType.num,
-    onRun: (p) => Value.of((p[0] as Value).asNum * (p[1] as Value).asNum),
-  ),
-  Func(
-    name: "div",
-    alias: "/",
-    pTypes: const [AttrType.num, AttrType.num],
-    rType: AttrType.num,
-    onRun: (p) => Value.of((p[0] as Value).asNum / (p[1] as Value).asNum),
-  ),
-  Func(
-    name: "mod",
-    alias: "%",
-    pTypes: const [AttrType.num, AttrType.num],
-    rType: AttrType.num,
-    onRun: (p) => Value.of((p[0] as Value).asNum % (p[1] as Value).asNum),
-  ),
-  Func(
-    name: "pow",
-    alias: "^",
-    pTypes: const [AttrType.num, AttrType.num],
-    rType: AttrType.num,
-    onRun: (p) =>
-        Value.of(math.pow((p[0] as Value).asNum, (p[1] as Value).asNum)),
-  ),
-  Func(
-    name: "greater",
-    alias: ">",
-    pTypes: const [AttrType.num, AttrType.num],
-    rType: AttrType.bool,
-    onRun: (p) => Value.of((p[0] as Value).asNum > (p[1] as Value).asNum),
-  ),
-  Func(
-    name: "greaterEqual",
-    alias: ">=",
-    pTypes: const [AttrType.num, AttrType.num],
-    rType: AttrType.bool,
-    onRun: (p) => Value.of((p[0] as Value).asNum > (p[1] as Value).asNum),
-  ),
-  Func(
-    name: "little",
-    alias: "<",
-    pTypes: const [AttrType.num, AttrType.num],
-    rType: AttrType.bool,
-    onRun: (p) => Value.of((p[0] as Value).asNum < (p[1] as Value).asNum),
-  ),
-  Func(
-    name: "littleEqual",
-    alias: "<=",
-    pTypes: const [AttrType.num, AttrType.num],
-    rType: AttrType.bool,
-    onRun: (p) => Value.of((p[0] as Value).asNum <= (p[1] as Value).asNum),
-  ),
-];
-final boolFunList = [
-  Func(
-    name: "and",
-    alias: "&&",
-    pTypes: const [AttrType.bool, AttrType.bool],
-    rType: AttrType.bool,
-    onRun: (p) => Value.of((p[0] as Value).asBool && (p[1] as Value).asBool),
-  ),
-  Func(
-    name: "or",
-    alias: "||",
-    pTypes: const [AttrType.bool, AttrType.bool],
-    rType: AttrType.bool,
-    onRun: (p) => Value.of((p[0] as Value).asBool || (p[1] as Value).asBool),
-  ),
-  Func(
-    name: "not",
-    alias: "!",
-    pTypes: const [AttrType.bool],
-    rType: AttrType.bool,
-    onRun: (p) => Value.of(!(p[0] as Value).asBool),
-  ),
-];
-final strFunList = [
-  Func(
-    name: "len",
-    pTypes: const [AttrType.string],
-    rType: AttrType.num,
-    onRun: (p) => Value.of((p[0] as Value).v.length),
-  )
-];
