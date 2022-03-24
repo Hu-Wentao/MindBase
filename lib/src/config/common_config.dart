@@ -3,8 +3,11 @@ import 'package:get_arch_core/get_arch_core.dart';
 import 'package:logging/logging.dart';
 import 'package:mind_base/src/application.dart';
 
+Logger get slLogger => _logger ??  Logger("Logger_For_Test");
+
+Logger? _logger;
 // 在onBeforeAppRun中赋值
-late Logger slLogger;
+set slLogger(l) => _logger = l;
 
 @module
 abstract class ConfigCommon {
