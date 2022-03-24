@@ -101,7 +101,7 @@ class Record extends Equatable implements IEtt<ObjectId> {
   Record updateWith({required int attrKey, required Value value}) => Record(
         id: id,
         meta: meta,
-        fields: fields..update(attrKey, (_) => value),
+        fields: fields..[attrKey] = value,
       );
 }
 

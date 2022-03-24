@@ -11,6 +11,7 @@ import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_edit_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
+import 'package:mind_base/src/infra/ui/widget/data_table_edit.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:provider/provider.dart';
@@ -277,6 +278,8 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
             cellWidget = _buildShowObjectId(cell.value!);
             break;
           case AttrType.string:
+            cellWidget = _buildShowString(cell.value!);
+            break;
           case AttrType.num:
           case AttrType.bool:
           case AttrType.date:
@@ -298,7 +301,9 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
         ),
       );
 
-  Widget _buildShowAny(Value value) => Container(
+  Widget _buildShowAny(Value value) => _buildShowString(value);
+
+  Widget _buildShowString(Value value) => Container(
         padding: const EdgeInsets.all(8.0),
         alignment: Alignment.centerLeft,
         child: Text(
@@ -310,7 +315,8 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
   /// todo 可编辑的单元格
   /// Help to control the editable text in [TextField] widget.
   TextEditingController editingController = TextEditingController();
-  String? newCellValue;
+
+  // String? newCellValue;
 
   @override
   Widget? buildEditWidget(
@@ -323,17 +329,6 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     // 选择指定行的数据
     final sourceRow = getCachedRecordByIndex(meta.id, rowColumnIndex.rowIndex);
 
-    // 这个值作为 EditWidget的初始值
-    // final String displayText = dataGridRow
-    //     .getCells()
-    //     .firstWhere(
-    //       (DataGridCell cell) => cell.columnName == column.columnName,
-    //       orElse: () =>
-    //           DataGridCell<String>(columnName: column.columnName, value: ''),
-    //     )
-    //     .value
-    //     .toString();
-
     // fixme 如果动态新增了列,则原有对象是没有与新列对应的value的
     final sourceValue = sourceRow.getFieldByColumn(column.columnName);
     final displayText = sourceValue.v;
@@ -343,7 +338,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     // The new cell value must be reset.
     // To avoid committing the [DataGridCell] value that was previously edited
     // into the current non-modified [DataGridCell].
-    newCellValue = null;
+    // newCellValue = null;
 
     // if (column.columnName == 'Shipped Date') {
     //   return _buildDateTimePicker(displayText, submitCell);
@@ -365,16 +360,25 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
       case AttrType.objectId:
         editWidget = _buildEditObjectId(sourceAttr, sourceValue, submitCell);
         break;
-      case AttrType.any:
       case AttrType.string:
+        editWidget = DataTableEditText(
+          editingController: editingController..text = displayText,
+          // displayText: displayText,
+          rowColumnIndex: rowColumnIndex,
+          column: column,
+          submitCell: submitCell,
+        );
+        break;
+      case AttrType.any:
       case AttrType.num:
       case AttrType.bool:
       case AttrType.date:
-        editWidget = _buildTextFieldWidget(
-          displayText,
-          rowColumnIndex,
-          column,
-          submitCell,
+        editWidget = DataTableEditText(
+          editingController: editingController..text = displayText,
+          // displayText: displayText,
+          rowColumnIndex: rowColumnIndex,
+          column: column,
+          submitCell: submitCell,
         );
     }
     return editWidget;
@@ -413,7 +417,8 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
             //空则选择默认值
             // items: allCountries,
             onChanged: (value) {
-              newCellValue =
+              editingController.text =
+                  // newCellValue =
                   (value == null) ? sourceValue.v : value.id.toHexString();
             },
             showSearchBox: true,
@@ -434,84 +439,12 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
         ),
         IconButton(
             onPressed: () {
-              print("debug ## 选中记录: $newCellValue");
+              print("debug ## 选中记录: ${editingController.text}");
+              // print("debug ## 选中记录: $newCellValue");
               submitCell();
             },
             icon: const Icon(Icons.check))
       ],
-    );
-  }
-
-  /// Building a [TextField] for numeric and text column.
-  Widget _buildTextFieldWidget(
-    String displayText,
-    RowColumnIndex rowColumnIndex,
-    GridColumn column,
-    CellSubmit submitCell,
-  ) {
-    // final bool isTextAlignRight = column.columnName == 'Product No' ||
-    //     column.columnName == 'Shipped Date' ||
-    //     column.columnName == 'Price';
-
-    // final bool isNumericKeyBoardType =
-    //     column.columnName == 'Product No' || column.columnName == 'Price';
-    //
-    // // Holds regular expression pattern based on the column type.
-    // final RegExp regExp = _getRegExp(isNumericKeyBoardType, column.columnName);
-
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      alignment: Alignment.centerLeft, // 文本居左
-      // isTextAlignRight ? Alignment.centerRight : Alignment.centerLeft,
-      child: TextField(
-        autofocus: true,
-        controller: editingController..text = displayText,
-        textAlign: TextAlign.left,
-        // 文本居左
-        // textAlign: isTextAlignRight ? TextAlign.right : TextAlign.left,
-        autocorrect: false,
-        // 键盘 日间/夜间模式
-        // keyboardAppearance: sampleModel.themeData.colorScheme.brightness,
-        decoration: const InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 16.0),
-          // 主题: 下划线
-          focusedBorder: UnderlineInputBorder(
-              // 主题色
-              borderSide: BorderSide(color: Colors.black)),
-        ),
-        // style: textStyle,
-        // cursorColor: sampleModel.backgroundColor,
-        // todo 文本格式化输入, 自动过滤字符,只保留数值等等, regex仅仅针对输入的单个字符,如 "[0-9]"表示只能输入数值
-        // inputFormatters: <TextInputFormatter>[
-        //   FilteringTextInputFormatter.allow(regExp)
-        // ],
-        keyboardType: TextInputType.text,
-        // todo 输入类型
-        // isNumericKeyBoardType ? TextInputType.number : TextInputType.text,
-        onChanged: (String value) {
-          print("debug #onchange # $value");
-
-          if (value.isNotEmpty) {
-            // if (isNumericKeyBoardType) {
-            //   newCellValue = column.columnName == 'Price'
-            //       ? double.parse(value)
-            //       : int.parse(value);
-            // } else {
-            //   newCellValue = value;
-            // }
-            newCellValue = value;
-          } else {
-            newCellValue = null;
-          }
-        },
-        onSubmitted: (String value) {
-          slLogger.info("buildEditWidget:onSubmitted# $value");
-
-          /// Call [CellSubmit] callback to fire the canSubmitCell and
-          /// onCellSubmit to commit the new value in single place.
-          submitCell();
-        },
-      ),
     );
   }
 
@@ -525,12 +458,15 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     RowColumnIndex rowColumnIndex,
     GridColumn col,
   ) {
+    print("debug onCellSubmit text# ${editingController.text}");
+
     final Record oldEntity =
         getCachedRecordByIndex(meta.id, rowColumnIndex.rowIndex);
     final oldValue = oldEntity.tryGetFieldByColumn(col.columnName);
-    if (newCellValue == null ||
-        oldValue == null ||
-        oldValue.v == newCellValue) {
+    if (oldValue?.v == editingController.text) {
+      // if (newCellValue == null ||
+      //     oldValue == null ||
+      //     oldValue.v == newCellValue) {
       return;
     }
     // final nGridMap = oldGridMap
@@ -539,7 +475,8 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     // final entity = Record.fromGridKeyValueMap(oldEntity, nGridMap);
     final entity = oldEntity.updateWith(
       attrKey: int.parse(col.columnName),
-      value: Value.of(newCellValue),
+      value: Value.of(editingController.text),
+      // value: Value.of(newCellValue),
     );
     // ..setFieldByColumn(col.columnName, Value.of(newCellValue, oldValue.e));
 
