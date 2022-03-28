@@ -386,10 +386,9 @@ Future<AttributeDto?> showAttributeEditDialog({
             // 当前最终表达式
             try {
               Expression currentExpr = Expression(
-                  metaId: currentMeta.id,
-                  pKeys: [currentArg.k],
-                  calls: [currentFunc],
-                  rType: currentType);
+                currentFunc,
+                currentArg, // fixme
+              );
 
               AttributeDto rst = attr.copyWith(
                 name: currentAttrName,

@@ -77,8 +77,7 @@ class MetaForm extends StatelessWidget {
         // Form的序列化与原序列化不同
         name: json['name'] as String,
         memo: json['memo'] as String,
-        expr: Expression.field(
-          null,
+        calc: Expression(
           key,
           AttrType.values.byName(json['expr.rType'] as String),
         ),
@@ -289,7 +288,7 @@ class _AttributeListFormState extends State<AttributeListForm> {
               child: FormBuilderDropdown(
                 name: '${a.k}@expr.rType',
                 decoration: const InputDecoration(labelText: '属性/表达式 类型'),
-                initialValue: a.expr.rType.name,
+                initialValue: a.calc.type.name,
                 items: AttrType.values
                     .map((e) => DropdownMenuItem<String>(
                           value: e.name,

@@ -4,22 +4,17 @@ import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/repo.dart';
-import 'package:mind_base/src/infra/mongo_storage.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_frame.dart';
 import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show Db, ObjectId, where;
 import 'package:provider_sidecar/provider_sidecar.dart';
 
-/// 统一监听与处理工作空间内的所有数据
-/// todo 当前假定本数据库为一个工作空间
-class WorkspaceProvider extends ProviderSidecar {
-  late final MetaRepo _metaRepo;
-
-  // RecordRepo 无法监听数据
-  // late final RecordRepo _recordRepo;
-  RecordAccessor _recordAccessor(String metaId) =>
-      RecordAccessor(sl<Db>(), metaId);
+/// 本类缓存一个工作空间内的所有数据,
+/// 以便 "reference"等Func进行计算处理
+@singleton
+class WorkspaceDataHolder {
+  final String name; // 目前全局只有一个workspace
 
   // 防止同一个对象状态更新后被重复缓存 <MetaId, Meta>
   final Map<ObjectId, RecordMeta> _cacheMeta = {};
@@ -31,15 +26,46 @@ class WorkspaceProvider extends ProviderSidecar {
   // <RecordId, Record> , 便于刷新数据,但如果要恢复某个Meta状态,则需要遍历where
   final Map<ObjectId, List<Record>> _cacheRecord = {};
 
+  WorkspaceDataHolder({this.name = 'default'});
+
   // <MetaId, Map<RecordId,Record>> , 方案2B 考虑.. 插入/更新数据更快
   // final Map<ObjectId, Map<ObjectId, Record>> _cacheRecord = {};
+
+  RecordMeta setMeta(RecordMeta meta) => _cacheMeta[meta.id] = meta;
+
+  void removeMeta(ObjectId metaId) => _cacheMeta.remove(metaId);
+
+  List<Record>? removeRecords(ObjectId metaId) => _cacheRecord.remove(metaId);
+
+  void clearMeta() => _cacheMeta.clear();
+
+  void clearRecord() => _cacheRecord.clear();
+
+  List<Record> getRecords(ObjectId metaId) => _cacheRecord[metaId] ??= [];
+
+  Iterable<List<Record>> allRecords() => _cacheRecord.values;
+
+  Map<ObjectId, RecordMeta> getMeta() => _cacheMeta;
+
+  Iterable<RecordMeta> allMetas() => _cacheMeta.values;
+
+  RecordMeta? getMetaBy(ObjectId? id) => id == null ? null : _cacheMeta[id];
+}
+
+/// 统一监听与处理工作空间内的所有数据
+/// todo 当前假定本数据库为一个工作空间
+class WorkspaceProvider extends ProviderSidecar {
+  late final MetaRepo _metaRepo;
+  late final WorkspaceDataHolder _dataHolder;
+
+  // RecordRepo 无法监听数据
+  // late final RecordRepo _recordRepo;
+  RecordAccessor _recordAccessor(String metaId) =>
+      RecordAccessor(sl<Db>(), metaId);
 
   // 监听更新事件
   // <MetaId, StreamController<..>>
   final Map<ObjectId, StreamController<RepoEvent<Record>>> _cacheSubject = {};
-
-  // final StreamController<RepoEvent<Record>> _operateSubject =
-  //     StreamController<RepoEvent<Record>>.broadcast();
 
   @override
   onInitializing() {
@@ -55,7 +81,7 @@ class WorkspaceProvider extends ProviderSidecar {
   }
 
   void _onEvtInsertMeta(RecordMeta meta) => setInitialized("插入Meta", () {
-        _cacheMeta[meta.id] = meta;
+        _dataHolder.setMeta(meta);
         // 缓存并监听Meta下Record
         _cacheRecordByMeta(meta);
         // fixme 如果meta更新， 那么缓存的Record也需要更新才对，否则映射会出问题
@@ -67,14 +93,14 @@ class WorkspaceProvider extends ProviderSidecar {
       });
 
   void _onEvtUpdateMeta(RecordMeta meta) => setInitialized("更新/替换Meta", () {
-        _cacheMeta[meta.id] = meta;
+        _dataHolder.setMeta(meta);
         if (watchedMeta?.id == meta.id) {
           watchedMeta = meta; // 提示UI可以刷新
         }
       });
 
   void _onEvtRemoveMeta(ObjectId ettId) => setInitialized("移除Meta", () {
-        _cacheMeta.remove(ettId);
+        _dataHolder.removeMeta(ettId);
         // 取消缓存和监听Meta下Record
         _disposeSubject(ettId);
       });
@@ -127,12 +153,12 @@ class WorkspaceProvider extends ProviderSidecar {
   // 不指定则移除所有的监听
   _disposeSubject([ObjectId? metaId]) {
     if (metaId != null) {
-      _cacheMeta.remove(metaId);
-      _cacheRecord.remove(metaId);
+      _dataHolder.removeMeta(metaId);
+      _dataHolder.removeRecords(metaId);
       _cacheSubject.remove(metaId)?.close();
     } else {
-      _cacheMeta.clear();
-      _cacheRecord.clear();
+      _dataHolder.clearMeta();
+      _dataHolder.clearRecord();
       for (var element in _cacheSubject.values) {
         element.close();
       }
@@ -140,19 +166,18 @@ class WorkspaceProvider extends ProviderSidecar {
     }
   }
 
-  void _onEvtInsertRecord(Record record) => setInitialized("插入Record", () {
-        (_cacheRecord[record.meta.id] ??= []).add(record);
-      });
+  void _onEvtInsertRecord(Record record) => setInitialized(
+      "插入Record", () => _dataHolder.getRecords(record.meta.id).add(record));
 
   // 返回被更新的元素index
   int _onEvtUpdateRecord(Record record) =>
       setInitialized<int>("更新/替换Record", () {
-        final index = (_cacheRecord[record.meta.id] ??= [])
+        final index = (_dataHolder.getRecords(record.meta.id))
             .indexWhere((element) => element.id == record.id);
         if (index == -1) {
           _onEvtInsertRecord(record);
         } else {
-          _cacheRecord[record.meta.id]![index] = record;
+          _dataHolder.getRecords(record.meta.id)[index] = record;
         }
         return index;
       })!;
@@ -161,7 +186,7 @@ class WorkspaceProvider extends ProviderSidecar {
   int _onEvtRemoveRecord(ObjectId ettId) => setInitialized<int>("移除Record", () {
         // 遍历所有的 <RecordId,Record>
         var index = -1;
-        for (var recordList in _cacheRecord.values) {
+        for (var recordList in _dataHolder.allRecords()) {
           index = recordList.indexWhere((element) => element.id == ettId);
           if (index != -1) {
             recordList.removeAt(index);
@@ -208,11 +233,11 @@ class WorkspaceProvider extends ProviderSidecar {
 
   /// 适配与业务逻辑部分
   /// MetaProvider
-  Map<ObjectId, RecordMeta> get metaMap => _cacheMeta;
+  Map<ObjectId, RecordMeta> get metaMap => _dataHolder.getMeta();
 
-  List<RecordMeta> get metaList => _cacheMeta.values.toList();
+  List<RecordMeta> get metaList => _dataHolder.allMetas().toList();
 
-  RecordMeta? getMeta(ObjectId? id) => id == null ? null : _cacheMeta[id];
+  RecordMeta? getMeta(ObjectId? id) => _dataHolder.getMetaBy(id);
 
   Future<void> actInsertMeta(RecordMeta meta) =>
       actWrapper(() => setInitialized("新增Meta [$meta]", () async {
@@ -349,7 +374,7 @@ class WorkspaceProvider extends ProviderSidecar {
       );
 
   List<Record> getCachedRecordsByMeta(ObjectId metaId) =>
-      _cacheRecord[metaId] ??= <Record>[];
+      _dataHolder.getRecords(metaId);
 
   Record getCachedRecordByIndex(ObjectId metaId, int index) =>
       getCachedRecordsByMeta(metaId)[index];

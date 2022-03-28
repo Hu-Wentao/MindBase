@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1647575935;
+const int timestamp = 1648435933;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -95,6 +95,18 @@ const Map<String, Object> dependencies = <String, Object>{
     'sdk': r'flutter',
   },
   'cupertino_icons': r'^1.0.2',
+  'get_arch_core': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/GetArch/get_arch_core.git',
+      'ref': r'v3.0',
+    },
+  },
+  'provider_sidecar': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/Hu-Wentao/provider_sidecar.git',
+      'ref': r'v1.1',
+    },
+  },
 };
 
 /// Developer dependencies
@@ -106,14 +118,7 @@ const Map<String, Object> devDependencies = <String, Object>{
 };
 
 /// Dependency overrides
-const Map<String, Object> dependencyOverrides = <String, Object>{
-  'get_arch_core': <String, Object>{
-    'path': r'../get_arch/get_arch_core',
-  },
-  'provider_sidecar': <String, Object>{
-    'path': r'../provider_sidecar',
-  },
-};
+const Map<String, Object> dependencyOverrides = <String, Object>{};
 
 /// Executables
 const Map<String, Object> executables = <String, Object>{};

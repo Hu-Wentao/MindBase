@@ -76,26 +76,9 @@ class Record extends Equatable implements IEtt<ObjectId> {
 
   /// 根据属性名称获取属性值(同时调用表达式进行计算)
   Value getValueWithCalc(Attribute attr) {
-    // final attrDto = getValueBy(currentAttrK, orElse: (int k) {throw "error ";});
-    // fixme 当前最多支持1个Func
-    final func = attr.expr.calls.first as Func;
-    // 表达式要求的 Attr的k
-    final funcParamAttrKeys = attr.expr.pKeys;
-    // 表达式要求的Attr
-    // final funcParamsAttr = funcParamAttrKeys.map(metaDto.findAttr).toList();
-
-    // todo 需要根据Attr, 找到当前value值对应的Value, 当前Value应当是Record的ObjectId,
-    // fixme 这里默认是当前Record的Object, 因此得到的作为参数的Value都是当前Record中的. 如果为空,则表示当前Record
-    final funcParamValues = funcParamAttrKeys
-        .map((e) => getFieldBy(e, orElse: (_) => Value.of('')))
-        .toList();
-    // // 如果入参为空,则传入自身作为默认的[0]参数 ## 已注释: 从Dto处就已经要求填充selfKey,此处不在重复
-    // if (funcParamValues.isEmpty) {
-    //   funcParamValues.add(getValueBy(attrDto.k, orElse: (_) => Value.of('')));
-    // }
-    final value = func.call(funcParamValues) as Value;
-    // print("debug getValueWithCalc $value");
-    return value;
+    // fixme 或许 invoke() 的返回值应当限定为Value, 否则可能会造成循环引用...
+    // fixme 如何处理 "self"类型的表达式?? invoke() 是否应该传入参数,包括但不限于"Value所属Attr","Value所属Record"?
+    return attr.calc.invoke() as Value;
   }
 
   Record updateWith({required int attrKey, required Value value}) => Record(
@@ -151,7 +134,9 @@ class Attribute extends Equatable {
   final int k; // 表头key,对应Field:k,需要从所在的TableMeat中获取
   final String name; // 表头名称
   final String memo; // 表头备注
-  final Expression expr; // 包含当前字段的类型，值等等
+  final Expression calc; // 计算表达式
+  AttrType get type => calc.type;
+
   // todo 读写权限等..
 
   // Func的默认值应当为 NoneFunc
@@ -162,12 +147,12 @@ class Attribute extends Equatable {
     required this.k,
     required this.name,
     required this.memo,
-    required this.expr,
+    required this.calc,
     required this.check,
   });
 
   @override
-  List<Object?> get props => [k, name, memo, expr, check];
+  List<Object?> get props => [k, name, memo, calc, check];
 
   // // 检查当前函数值是否合法
   // @protected

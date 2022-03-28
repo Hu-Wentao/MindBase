@@ -76,7 +76,7 @@ class _DataTableEditTextState extends State<DataTableEditText> {
         // todo 输入类型
         // isNumericKeyBoardType ? TextInputType.number : TextInputType.text,
         onChanged: (String value) {
-          print("debug #onchange # $value");
+          // print("debug #onchange # $value");
           if (value.isNotEmpty) {
             // if (isNumericKeyBoardType) {
             //   newCellValue = column.columnName == 'Price'

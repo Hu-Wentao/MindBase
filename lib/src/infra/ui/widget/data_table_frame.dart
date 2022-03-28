@@ -273,7 +273,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
         final attr = meta.attributes[cellIndex];
 
         late Widget cellWidget;
-        switch (attr.expr.rType) {
+        switch (attr.calc.func.rType) {
           case AttrType.objectId:
             cellWidget = _buildShowObjectId(cell.value!);
             break;
@@ -356,7 +356,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     //       submitCell, _shipCity[shipCountry]!);
     // } else {\
     late Widget editWidget;
-    switch (sourceAttr.expr.rType) {
+    switch (sourceAttr.calc.type) {
       case AttrType.objectId:
         editWidget = _buildEditObjectId(sourceAttr, sourceValue, submitCell);
         break;
@@ -401,8 +401,8 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     // todo #5 后期改为弹出metaId对应的Record列表,以供选择
     // final metaDto = meta.toDto();
     // 选取 Attr上指定的MetaId下的Record::Id
-    final metaId =
-        attr.expr.metaId!; //fixme #4 Expression::metaId不能为null! 需要新增dto
+    final metaId = attr.calc.metaId!;
+    //fixme #4 Expression::metaId不能为null! 需要新增dto
     final allRecordInMeta = getCachedRecords(metaId);
     return Row(
       mainAxisSize: MainAxisSize.min,

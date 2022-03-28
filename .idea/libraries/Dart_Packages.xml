@@ -5,7 +5,7 @@
         <entry key="_fe_analyzer_shared">
           <value>
             <list>
-              <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/_fe_analyzer_shared-36.0.0/lib" />
+              <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/_fe_analyzer_shared-38.0.0/lib" />
             </list>
           </value>
         </entry>
@@ -26,14 +26,14 @@
         <entry key="analyzer">
           <value>
             <list>
-              <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/analyzer-3.3.1/lib" />
+              <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/analyzer-3.4.1/lib" />
             </list>
           </value>
         </entry>
         <entry key="archive">
           <value>
             <list>
-              <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/archive-3.2.2/lib" />
+              <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/archive-3.3.0/lib" />
             </list>
           </value>
         </entry>
@@ -387,6 +387,20 @@
             </list>
           </value>
         </entry>
+        <entry key="freezed">
+          <value>
+            <list>
+              <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/freezed-1.1.1/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="freezed_annotation">
+          <value>
+            <list>
+              <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/freezed_annotation-1.1.0/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="frontend_server_client">
           <value>
             <list>
@@ -397,7 +411,7 @@
         <entry key="get_arch_core">
           <value>
             <list>
-              <option value="$PROJECT_DIR$/../get_arch/get_arch_core/lib" />
+              <option value="$USER_HOME$/AppData/Local/Pub/Cache/git/get_arch_core-35dced73fa4e632ca41dadc50aac7c9207516d03//lib" />
             </list>
           </value>
         </entry>
@@ -555,6 +569,13 @@
             </list>
           </value>
         </entry>
+        <entry key="mind_base">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="mongo_dart">
           <value>
             <list>
@@ -642,7 +663,7 @@
         <entry key="provider_sidecar">
           <value>
             <list>
-              <option value="$PROJECT_DIR$/../provider_sidecar/lib" />
+              <option value="$USER_HOME$/AppData/Local/Pub/Cache/git/provider_sidecar-8dfea4af6f44d72a00671ad1a3e7cb007f9f24b7//lib" />
             </list>
           </value>
         </entry>
@@ -894,11 +915,13 @@
       </option>
     </properties>
     <CLASSES>
-      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/_fe_analyzer_shared-36.0.0/lib" />
+      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/git/get_arch_core-35dced73fa4e632ca41dadc50aac7c9207516d03//lib" />
+      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/git/provider_sidecar-8dfea4af6f44d72a00671ad1a3e7cb007f9f24b7//lib" />
+      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/_fe_analyzer_shared-38.0.0/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/adaptive_breakpoints-0.0.5/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/adaptive_navigation-0.0.5/lib" />
-      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/analyzer-3.3.1/lib" />
-      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/archive-3.2.2/lib" />
+      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/analyzer-3.4.1/lib" />
+      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/archive-3.3.0/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/args-2.3.0/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/async-2.8.2/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/auto_route-3.2.4/lib" />
@@ -945,6 +968,8 @@
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_typeahead-3.2.4/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/form_builder_extra_fields-7.1.0/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/form_builder_validators-7.7.0/lib" />
+      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/freezed-1.1.1/lib" />
+      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/freezed_annotation-1.1.0/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/frontend_server_client-2.1.2/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/get_it-7.2.0/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/glob-2.0.2/lib" />
@@ -1014,8 +1039,7 @@
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/web_socket_channel-2.1.0/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/xml-5.3.1/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/yaml-3.1.0/lib" />
-      <root url="file://$PROJECT_DIR$/../get_arch/get_arch_core/lib" />
-      <root url="file://$PROJECT_DIR$/../provider_sidecar/lib" />
+      <root url="file://$PROJECT_DIR$/../lib" />
       <root url="file://$USER_HOME$/fvm/default/bin/cache/pkg/sky_engine/lib" />
       <root url="file://$USER_HOME$/fvm/default/packages/flutter/lib" />
       <root url="file://$USER_HOME$/fvm/default/packages/flutter_localizations/lib" />

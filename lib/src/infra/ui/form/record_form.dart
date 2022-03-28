@@ -51,7 +51,7 @@ class _RecordFormState extends State<RecordForm> {
                   initialValue: field?.v,
                   decoration: InputDecoration(
                     labelText: attr.name,
-                    hintText: attr.expr.rType.toString(),
+                    hintText: attr.calc.type.name,
                   ),
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(context),

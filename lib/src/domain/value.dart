@@ -53,12 +53,12 @@ class Error {
 }
 
 // /// 无类型(String)方案
-class Value extends BaseCallable with ITypeMx {
+class Value with EquatableMixin, Invokable, ITypeMx {
   final String v; // 字段存储值
   final String? e; // 字段错误信息
 
   @override
-  ICallable call(List<ICallable> p) => this;
+  Invokable invoke() => this;
 
   const Value(this.v, this.e);
 
@@ -102,6 +102,8 @@ class Value extends BaseCallable with ITypeMx {
 
   @override
   String get asString => v;
+
+  ObjectId get asObjectId => ObjectId.parse(v);
 
   bool equals(Value input) => v == input.v;
 

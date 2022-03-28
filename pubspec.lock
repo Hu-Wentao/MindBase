@@ -7,7 +7,7 @@ packages:
       name: _fe_analyzer_shared
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "36.0.0"
+    version: "38.0.0"
   adaptive_breakpoints:
     dependency: transitive
     description:
@@ -28,14 +28,14 @@ packages:
       name: analyzer
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.3.1"
+    version: "3.4.1"
   archive:
     dependency: transitive
     description:
       name: archive
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.2.2"
+    version: "3.3.0"
   args:
     dependency: transitive
     description:
@@ -378,6 +378,20 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "7.7.0"
+  freezed:
+    dependency: "direct dev"
+    description:
+      name: freezed
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.1.1"
+  freezed_annotation:
+    dependency: "direct main"
+    description:
+      name: freezed_annotation
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.1.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -388,9 +402,11 @@ packages:
   get_arch_core:
     dependency: "direct main"
     description:
-      path: "../get_arch/get_arch_core"
-      relative: true
-    source: path
+      path: "."
+      ref: "v3.0"
+      resolved-ref: "35dced73fa4e632ca41dadc50aac7c9207516d03"
+      url: "https://github.com/GetArch/get_arch_core.git"
+    source: git
     version: "3.0.0"
   get_it:
     dependency: transitive
@@ -633,9 +649,11 @@ packages:
   provider_sidecar:
     dependency: "direct main"
     description:
-      path: "../provider_sidecar"
-      relative: true
-    source: path
+      path: "."
+      ref: "v1.1"
+      resolved-ref: "8dfea4af6f44d72a00671ad1a3e7cb007f9f24b7"
+      url: "https://github.com/Hu-Wentao/provider_sidecar.git"
+    source: git
     version: "1.0.0"
   pub_semver:
     dependency: transitive

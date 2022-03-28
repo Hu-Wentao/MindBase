@@ -31,7 +31,7 @@ main() {
       k: 0,
       name: "ID",
       memo: "系统生成的唯一ID",
-      expr: Expression.field(null, 0, AttrType.num),
+      // calc: Expression.field(null, 0, AttrType.num),
       // expr: Expression.field(AttrType.objectId),
     );
     print("dto: $dto");

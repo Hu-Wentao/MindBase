@@ -5,6 +5,11 @@ import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'dto.freezed.dart';
+
+part 'dto.g.dart';
 
 /// 实体类对应的Dto需要实现本类, 并添加`_id`字段/get方法
 abstract class IMongoEntityDto extends IMongoDto {
@@ -17,15 +22,17 @@ abstract class IMongoEntityDto extends IMongoDto {
 }
 
 /// 普通的携带有ObjectId字段的Dto需要实现本类
-abstract class IMongoDto extends Equatable implements IDto {
+abstract class IMongoDto extends Equatable with IMongoDtoMx {
   const IMongoDto();
-
-  // 返回的结果与json的Map相似,但 id是 ObjectId类型,而不是String
-  // todo 可以在这里实现保存 int， bool， 等原始类型的需求
-  dynamic toMongoJson({AttrType type = AttrType.string});
 
   @override
   bool? get stringify => true;
+}
+
+mixin IMongoDtoMx implements IDto {
+  // 返回的结果与json的Map相似,但 id是 ObjectId类型,而不是String
+  // todo 可以在这里实现保存 int， bool， 等原始类型的需求
+  dynamic toMongoJson({AttrType type = AttrType.string});
 
   @override
   String toString() => toMongoJson().toString();
@@ -181,14 +188,14 @@ class RecordMetaDto extends IMongoEntityDto {
             k: 0,
             name: "ID",
             memo: "系统生成的唯一ID",
-            expr: Expression.field(metaId, 0, AttrType.objectId),
+            // expr: Expression.field(metaId, 0, AttrType.objectId),
           ),
           AttributeDto.builder(
             metaId: metaId,
             k: 1,
             name: "metaId",
             memo: "元数据ID",
-            expr: Expression.field(metaId, 1, AttrType.objectId),
+            // expr: Expression.field(metaId, 1, AttrType.objectId),
           ),
         ];
     return RecordMetaDto(
@@ -288,11 +295,11 @@ class RecordMetaDto extends IMongoEntityDto {
 }
 
 /// 表头/属性: 关系/表的一列叫属性
-class AttributeDto extends IMongoDto {
+class AttributeDto with IMongoDtoMx, EquatableMixin {
   final int k;
   final String name;
   final String memo;
-  final Expression expr;
+  final Expression calc;
   final String checkFuncName;
 
   /// 供Form初始化
@@ -301,13 +308,14 @@ class AttributeDto extends IMongoDto {
     int k = 0,
     String name = "",
     String memo = "",
-    Expression? expr,
+    Expression? calc,
     String checkFuncName = FuncManager.noneFuncName,
   }) : this(
           k: k,
           name: name,
           memo: memo,
-          expr: expr ?? Expression.field(metaId, 0, AttrType.string),
+          calc: calc ?? Expression(
+          ),
           checkFuncName: checkFuncName,
         );
 
@@ -317,7 +325,9 @@ class AttributeDto extends IMongoDto {
         k: int.parse(attrMap['k'] as String),
         name: attrMap['name'] as String,
         memo: attrMap['memo'] as String,
-        expr: Expression.fromJson(attrMap['expr'] as Map<String, dynamic>),
+        calc: BaseInvokableDto.fromTypedJson(
+                attrMap['calc'] as Map<String, dynamic>)
+            .toDomain() as Expression,
         checkFuncName: attrMap['checkFuncName'] as String,
       );
 
@@ -326,7 +336,7 @@ class AttributeDto extends IMongoDto {
           k: attr.k,
           name: attr.name,
           memo: attr.memo,
-          expr: attr.expr,
+          calc: attr.calc,
           checkFuncName: attr.check.name,
         );
 
@@ -334,7 +344,7 @@ class AttributeDto extends IMongoDto {
     required this.k,
     required this.name,
     required this.memo,
-    required this.expr,
+    required this.calc,
     required this.checkFuncName,
   });
 
@@ -343,7 +353,7 @@ class AttributeDto extends IMongoDto {
         k,
         name,
         memo,
-        expr,
+        calc,
         checkFuncName,
       ];
 
@@ -358,7 +368,7 @@ class AttributeDto extends IMongoDto {
         k: k ?? this.k,
         name: name ?? this.name,
         memo: memo ?? this.memo,
-        expr: expr ?? this.expr,
+        calc: expr ?? this.calc,
         checkFuncName: checkFuncName ?? this.checkFuncName,
       );
 
@@ -367,7 +377,9 @@ class AttributeDto extends IMongoDto {
           k: json['k'] as int,
           name: json['name'] as String,
           memo: json['memo'] as String,
-          expr: Expression.fromJson(json['expr'] as Map<String, dynamic>),
+          calc: BaseInvokableDto.fromTypedJson(
+                  json['calc'] as Map<String, dynamic>)
+              .toDomain() as Expression,
           checkFuncName: json['checkFuncName'] as String,
         );
 
@@ -376,7 +388,7 @@ class AttributeDto extends IMongoDto {
         'k': k,
         'name': name,
         'memo': memo,
-        'expr': expr.toJson(),
+        'calc': ExpressionDto.fromDomain(calc),
         'checkFuncName': checkFuncName,
       };
 
@@ -392,7 +404,7 @@ class AttributeDto extends IMongoDto {
         k: k,
         name: name,
         memo: memo,
-        expr: expr,
+        calc: calc,
         check: check,
       );
 
@@ -401,4 +413,99 @@ class AttributeDto extends IMongoDto {
 
   @override
   toMongoJson({AttrType type = AttrType.string}) => toJson();
+}
+
+mixin BaseInvokableDto on IMongoDtoMx {
+  static BaseInvokableDto fromDomain(Invokable entity) {
+    if (entity is Expression) {
+      return ExpressionDto.fromDomain(entity);
+    } else if (entity is Value) {
+      return ValueDto.fromDomain(entity);
+    } else {
+      throw Exception("不支持的Invokable类型");
+    }
+  }
+
+  static BaseInvokableDto fromTypedJson(Map<String, dynamic> json) {
+    final type = json['type'] as String;
+    final real = json['real'] as Map<String, dynamic>;
+    switch (type) {
+      case "Value":
+        return ValueDto.fromJson(real);
+      case 'Expression':
+        return ExpressionDto.fromJson(real);
+      default:
+        throw Exception('BaseCallable::fromTypedJson# Unknown type: $type');
+    }
+  }
+
+  Map<String, dynamic> toJsonWithType() => {
+        'type': "$runtimeType",
+        'real': toJson(),
+      };
+
+  @override
+  toMongoJson({AttrType type = AttrType.string}) => toJsonWithType();
+
+  Invokable toDomain() {
+    switch (runtimeType) {
+      case ValueDto:
+        final dto = this as ValueDto;
+        return Value(dto.v ?? '', dto.e);
+      case ExpressionDto:
+        final dto = (this as ExpressionDto);
+        return Expression(
+          FuncManager.findBy(dto.func),
+          dto.args.map((e) => e.toDomain()).toList(),
+        );
+      default:
+        throw "未知的类型 [$runtimeType]";
+    }
+  }
+}
+
+@freezed
+class ValueDto with _$ValueDto, IMongoDtoMx, BaseInvokableDto {
+  const ValueDto._();
+
+  const factory ValueDto(
+    String? v, // 字段存储值
+    String? e, // 字段错误信息
+  ) = _ValueDto;
+
+  factory ValueDto.fromJson(Map<String, dynamic> json) =>
+      _$ValueDtoFromJson(json);
+
+  @override
+  toMongoJson({AttrType type = AttrType.string}) => toJson();
+
+  static ValueDto fromDomain(Value entity) => ValueDto(entity.v, entity.e);
+}
+
+class ExpressionDto with IMongoDtoMx, BaseInvokableDto {
+  //内嵌函数的名
+  String func;
+  List<BaseInvokableDto> args;
+
+  ExpressionDto({
+    required this.func,
+    required this.args,
+  });
+
+  static ExpressionDto fromJson(Map<String, dynamic> real) => ExpressionDto(
+      func: real['func'] as String,
+      args: (real['args'] as List<dynamic>)
+          .map((e) => BaseInvokableDto.fromTypedJson(e as Map<String, dynamic>))
+          .toList());
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'func': func,
+        'args': args.map((e) => e.toJsonWithType()).toList(),
+      };
+
+  static fromDomain(Expression expr) => ExpressionDto(
+        func: expr.func.name,
+        args: expr.args.map(BaseInvokableDto.fromDomain).toList(),
+      );
 }
