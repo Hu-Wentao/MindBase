@@ -4,10 +4,8 @@ import 'package:mongo_dart/mongo_dart.dart';
 
 @module
 abstract class ConfigMongo {
-  IMongoStorage get mongoStorage => BaseMongoStorage(MongoStorageConfig(
-        host: "localhost",
-        port: 30001,
-        databaseName: "dev_mind_base_4",
+  IMongoStorage get mongoStorage => BaseMongoStorage(MongoStorageConfig.ofUrl(
+        "mongodb+srv://mind_base_dev:ud16tt2bOgNRqs4B@cluster0.nqkse.mongodb.net/dev_set1?retryWrites=true&w=majority",
       ));
 
   @preResolve
