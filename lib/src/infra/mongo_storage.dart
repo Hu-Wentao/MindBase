@@ -17,6 +17,7 @@ class MongoStorageConfig {
   final String databaseName;
   final String authSource;
   final int retryAttempts;
+  final String? _fullUrl;
 
   MongoStorageConfig({
     this.auth,
@@ -25,11 +26,23 @@ class MongoStorageConfig {
     required this.databaseName,
     this.authSource = "admin",
     this.retryAttempts = 5,
-  });
+  }) : _fullUrl = null;
+
+  MongoStorageConfig.ofUrl(
+    String url, {
+    this.databaseName = 'see_url',
+    this.retryAttempts = 5,
+    this.auth,
+    this.host = 'see_url',
+    this.port = 0,
+    this.authSource = 'see_url',
+  }) : _fullUrl = url;
 
   String get authStr => auth?.toAuthPreString() ?? "";
 
   String fullUri() =>
+      // mongodb+srv://mind_base_dev:<password>@cluster0.nqkse.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
+      _fullUrl ??
       'mongodb://$authStr$host:$port/$databaseName?authSource=$authSource';
 }
 
@@ -59,7 +72,7 @@ abstract class IMongoStorage {
       while (true) {
         try {
           _tryConnect++;
-          _db = Db(config.fullUri());
+          _db = await Db.create(config.fullUri());
           await _db!.open();
           break;
         } catch (e) {
