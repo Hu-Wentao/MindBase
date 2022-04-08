@@ -1,19 +1,21 @@
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'dart:math' as math;
 
 part 'func_manager.dart';
 
 /// 函数 ========================================================================
-mixin Invokable on EquatableMixin {
+@Deprecated("使用IFunctor取代Invokable; invoke就是 get value")
+mixin Invokable on IFunctor, EquatableMixin {
   Invokable invoke();
+
+// Invokable invoke([List<Invokable> params]);
 }
 
 /// 表达式[Expression]由多个[Func]构成
 /// 表达式是有状态的,存储了参数的来源,返回值类型等等; 而Func是无状态,只有name
 /// 如果是Value，则pTypes为空， expr为表达式的内容， rType为返回值类型
-class Expression with EquatableMixin, Invokable {
+class Expression extends IFunctor with EquatableMixin, Invokable {
   final Func func;
   final List<Invokable> args;
 
@@ -23,6 +25,7 @@ class Expression with EquatableMixin, Invokable {
 
   @override
   Invokable invoke() {
+    // Invokable invoke([List<Invokable> params = const []]) {
     // todo 出入参数量,类型检查
     // invoke 最终的结果必然是Value类型
     final List<Value> values =
@@ -32,6 +35,15 @@ class Expression with EquatableMixin, Invokable {
 
   @override
   List<Object?> get props => [func, args];
+
+  // @override
+  // IFunctor fMap(Func fn) {
+  //   // TODO: implement fMap
+  //   throw UnimplementedError();
+  // }
+
+  @override
+  Value get value => invoke() as Value;
 }
 
 // class Expression  {
@@ -115,6 +127,7 @@ class Expression with EquatableMixin, Invokable {
 //   toMongoJson({AttrType type = AttrType.string}) => toJson();
 // }
 
+/// Func 的实例相当于 Dart的external函数
 class Func with EquatableMixin {
   final String name; // 全局唯一
   final List<AttrType> pTypes;
@@ -123,12 +136,24 @@ class Func with EquatableMixin {
   final AttrType rType;
 
   // run 只有运算, 在调用之前,需要先检查Attr的类型匹配问题
-  final Invokable Function(List<Value> p) logic;
+  final IFunctor Function(List<IFunctor> p) logic;
 
-  Invokable onInvoke(List<Value> p) {
+  // final Invokable Function(List<Value> p) logic;
+
+  IFunctor apply(List<IFunctor> p) {
     try {
       // fixme 未作细节处理，如保留原值等
       return logic(p);
+    } catch (e) {
+      return Value('', e.toString());
+    }
+  }
+
+  @Deprecated("message attr-v5后不可用")
+  Invokable onInvoke(List<Value> p) {
+    try {
+      // fixme 未作细节处理，如保留原值等
+      return logic(p) as Invokable;
     } catch (e) {
       return Value('', e.toString());
     }
