@@ -44,14 +44,28 @@ class _RecordFormState extends State<RecordForm> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ...widget.meta.attributes.map((attr) {
+              ...widget.meta.attrs.map((attr) {
                 final field = _origin.fields[attr.k];
                 return FormBuilderTextField(
-                  name: "${attr.k}", // Attribute::k作为Map的key
+                  name: attr.propId, // Attribute::k作为Map的key
                   initialValue: field?.v,
                   decoration: InputDecoration(
                     labelText: attr.name,
-                    hintText: attr.calc.type.name,
+                    hintText: attr.type.name,
+                  ),
+                  validator: FormBuilderValidators.compose([
+                    FormBuilderValidators.required(context),
+                  ]),
+                );
+              }).toList(),
+              ...widget.meta.methods.map((methods) {
+                final field = _origin.fields[methods.k];
+                return FormBuilderTextField(
+                  name: methods.propId, // Attribute::k作为Map的key
+                  initialValue: field?.v,
+                  decoration: InputDecoration(
+                    labelText: methods.name,
+                    hintText: methods.expr.toString(),
                   ),
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(context),
