@@ -71,54 +71,67 @@ final Func selfFunction = Func(
 
 /// 类型检查与转换表达式, 检查/转换失败则抛出异常
 final anyFunList = <Func>[
-  Func(
-    //  引用字段
-    name: "reference",
-    //(被引用字段所在RecordId(Value本身持有), 被引用字段所在的MetaId(Expr内嵌), 字段K值(Expr内嵌),)
-    pTypes: const [AttrType.objectId, AttrType.num, AttrType.objectId],
-    rType: AttrType.any,
-    logic: (p) {
-      final holder = sl<WorkspaceDataHolder>();
-      final recordId = p[0].asObjectId;
-      final attrKey = p[1].asNum as int;
-      final metaId = p[2].asObjectId;
-      return holder
-          .getRecords(metaId)
-          .firstWhere((element) => element.id == recordId)
-          .getFieldBy(attrKey);
-    },
-  ),
+  // fixme 有点乱..
+  // Func(
+  //   name: 'expr',
+  //   // func,
+  //   pTypes: [AttrType.any, ],
+  //   rType: AttrType.any,
+  //   logic: (v) => Expression(FuncManager.findBy("+"), [v[0] as Value, Value.of("3")])
+  //         .invoke() as Value,
+  // ),
+  // Func(
+  //   //  引用字段
+  //   name: "reference",
+  //   //(被引用字段所在RecordId(Value本身持有), 被引用字段所在的MetaId(Expr内嵌), 字段K值(Expr内嵌),)
+  //   pTypes: const [AttrType.objectId, AttrType.num, AttrType.objectId],
+  //   rType: AttrType.any,
+  //   logic: (p) {
+  //     final holder = sl<WorkspaceDataHolder>();
+  //     final recordId = p[0].asObjectId;
+  //     final attrKey = p[1].asNum as int;
+  //     final metaId = p[2].asObjectId;
+  //     return holder
+  //         .getRecords(metaId)
+  //         .firstWhere((element) => element.id == recordId)
+  //         .getFieldBy(attrKey);
+  //   },
+  // ),
+  // fixme 基本类型 不应该拥有方法
   Func(
       name: "toStr",
       pTypes: const [AttrType.any],
       rType: AttrType.string,
-      logic: (p) => Value.of(p[0].asString)),
+      logic: (p) {
+        return Value.of((p[0] as Value).asString);
+      }),
   Func(
       name: "toNum",
       pTypes: const [AttrType.any],
       rType: AttrType.num,
-      logic: (p) => Value.of(p[0].asNum)),
+      logic: (p) => Value.of((p[0] as Value).asNum)),
   Func(
       name: "toBool",
       pTypes: const [AttrType.any],
       rType: AttrType.bool,
-      logic: (p) => Value.of(p[0].asBool)),
-  Func(
-      name: "toDate",
-      pTypes: const [AttrType.any],
-      rType: AttrType.date,
-      logic: (p) => Value.of(p[0].asDate)),
+      logic: (p) => Value.of((p[0] as Value).asBool)),
+  // Func(
+  //     name: "toDate",
+  //     pTypes: const [AttrType.any],
+  //     rType: AttrType.date,
+  //     logic: (p) => Value.of((p[0] as Value).asDate)),
   Func(
     name: "equal",
     pTypes: const [AttrType.any, AttrType.any],
     rType: AttrType.bool,
-    logic: (p) => Value.of(p[0].asString == p[1].asString),
+    logic: (p) =>
+        Value.of((p[0] as Value).asString == (p[1] as Value).asString),
   ),
   Func(
     name: "notEqual",
     pTypes: const [AttrType.any, AttrType.any],
     rType: AttrType.bool,
-    logic: (p) => Value.of(p[0].asString != p[1].asString),
+    logic: (p) => Value.of(p[0] != p[1]),
   ),
   noneFunction,
   selfFunction,
@@ -130,61 +143,62 @@ final numFunList = [
     name: "add",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
-    logic: (p) => Value.of(p[0].asNum + p[1].asNum),
+    logic: (p) => Value.of((p[0] as Value).asNum + (p[1] as Value).asNum),
   ),
   Func(
     name: "sub",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
-    logic: (p) => Value.of(p[0].asNum - p[1].asNum),
+    logic: (p) => Value.of((p[0] as Value).asNum - (p[1] as Value).asNum),
   ),
   Func(
     name: "mul",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
-    logic: (p) => Value.of(p[0].asNum * p[1].asNum),
+    logic: (p) => Value.of((p[0] as Value).asNum * (p[1] as Value).asNum),
   ),
   Func(
     name: "div",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
-    logic: (p) => Value.of(p[0].asNum / p[1].asNum),
+    logic: (p) => Value.of((p[0] as Value).asNum / (p[1] as Value).asNum),
   ),
   Func(
     name: "mod",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
-    logic: (p) => Value.of(p[0].asNum % p[1].asNum),
+    logic: (p) => Value.of((p[0] as Value).asNum % (p[1] as Value).asNum),
   ),
   Func(
     name: "pow",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
-    logic: (p) => Value.of(math.pow(p[0].asNum, p[1].asNum)),
+    logic: (p) =>
+        Value.of(math.pow((p[0] as Value).asNum, (p[1] as Value).asNum)),
   ),
   Func(
     name: "greater",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.bool,
-    logic: (p) => Value.of(p[0].asNum > p[1].asNum),
+    logic: (p) => Value.of((p[0] as Value).asNum > (p[1] as Value).asNum),
   ),
   Func(
     name: "greaterEqual",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.bool,
-    logic: (p) => Value.of(p[0].asNum > p[1].asNum),
+    logic: (p) => Value.of((p[0] as Value).asNum > (p[1] as Value).asNum),
   ),
   Func(
     name: "little",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.bool,
-    logic: (p) => Value.of(p[0].asNum < p[1].asNum),
+    logic: (p) => Value.of((p[0] as Value).asNum < (p[1] as Value).asNum),
   ),
   Func(
     name: "littleEqual",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.bool,
-    logic: (p) => Value.of(p[0].asNum <= p[1].asNum),
+    logic: (p) => Value.of((p[0] as Value).asNum <= (p[1] as Value).asNum),
   ),
 ];
 final boolFunList = [
@@ -192,19 +206,19 @@ final boolFunList = [
     name: "and",
     pTypes: const [AttrType.bool, AttrType.bool],
     rType: AttrType.bool,
-    logic: (p) => Value.of(p[0].asBool && p[1].asBool),
+    logic: (p) => Value.of((p[0] as Value).asBool && (p[1] as Value).asBool),
   ),
   Func(
     name: "or",
     pTypes: const [AttrType.bool, AttrType.bool],
     rType: AttrType.bool,
-    logic: (p) => Value.of(p[0].asBool || p[1].asBool),
+    logic: (p) => Value.of((p[0] as Value).asBool || (p[1] as Value).asBool),
   ),
   Func(
     name: "not",
     pTypes: const [AttrType.bool],
     rType: AttrType.bool,
-    logic: (p) => Value.of(!p[0].asBool),
+    logic: (p) => Value.of(!(p[0] as Value).asBool),
   ),
 ];
 final strFunList = [
@@ -212,6 +226,6 @@ final strFunList = [
     name: "len",
     pTypes: const [AttrType.string],
     rType: AttrType.num,
-    logic: (p) => Value.of(p[0].v.length),
+    logic: (p) => Value.of((p[0] as Value).v.length),
   )
 ];
