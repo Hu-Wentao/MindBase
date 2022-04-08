@@ -1,6 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mind_base/src/domain/entity/func.dart';
-import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
@@ -37,16 +35,24 @@ main() {
     print("dto: $dto");
   });
 
-  test("RecordMetaDto", () {
-    RecordMetaDto dto = RecordMetaDto.builder();
-    // print("dto:attr# ${dto.attributes}");
-    // print("dto:attr# ${dto.attributes.first.expr}");
-    // print("dto: $dto");
-    final js = dto.toJson();
-    print("dto: $js");
-
-    final dto2 = RecordMetaDto.fromJson(js);
-    // print("dto2: ${dto2.toJson()}");
-    expect(dto, dto2);
+  group("RecordMetaDto Group", () {
+    final list = [
+      RecordMetaDto.builder(),
+      RecordMetaDto.builder(methods: [
+        MethodDto.builder(
+            expr: ExpressionDto(
+                func: "sum",
+                args: [const ValueDto("1", null), const ValueDto("2", null)])),
+      ]),
+    ];
+    for (var dto in list) {
+      test("RecordMetaDto", () {
+        final js = dto.toJson();
+        print("dto: $js");
+        final dto2 = RecordMetaDto.fromJson(js);
+        // print("dto2: ${dto2.toJson()}");
+        expect(dto, dto2);
+      });
+    }
   });
 }

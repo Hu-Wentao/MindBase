@@ -89,7 +89,7 @@ class RecordDto extends IMongoEntityDto {
   /// 从表单输入
   factory RecordDto.fromForm(RecordMeta meta, Map<String, dynamic> formMap) {
     return RecordDto(
-      fields: Map.fromEntries(meta.attributes.map((attr) {
+      fields: Map.fromEntries(meta.properties.map((attr) {
         final value = formMap["${attr.k}"];
         return MapEntry(attr.k, Value.of(value));
       })),
@@ -122,6 +122,7 @@ class RecordDto extends IMongoEntityDto {
         id: id,
         meta: m,
         fields: fields,
+        methods: m.methodMap,
       );
 
   Record? toDomainOr(RecordMeta? m) => m == null ? null : toDomain(m);
@@ -141,7 +142,6 @@ class RecordDto extends IMongoEntityDto {
       );
 }
 
-/// 表头属性
 /// attributes固定 0:表示Record的ID, 1:表示Record的metaId
 class RecordMetaDto extends IMongoEntityDto {
   @override
@@ -149,14 +149,16 @@ class RecordMetaDto extends IMongoEntityDto {
   String name;
   String memo;
   int maxKey; // 等于Table中出现过key的数量, 用于新增Attr,只能增加
-  List<AttributeDto> attributes;
+  List<AttributeDto> attrs;
+  List<MethodDto> methods;
 
   RecordMetaDto({
     required this.id,
     required this.name,
     required this.memo,
     required this.maxKey,
-    required this.attributes,
+    required this.attrs,
+    required this.methods,
   });
 
   @override
@@ -165,11 +167,10 @@ class RecordMetaDto extends IMongoEntityDto {
         name,
         memo,
         maxKey,
-        attributes,
+        attrs,
       ];
 
-  AttributeDto findAttr(int k) =>
-      attributes.firstWhere((element) => element.k == k);
+  AttributeDto findAttr(int k) => attrs.firstWhere((element) => element.k == k);
 
   int nextKey() => maxKey + 1;
 
@@ -179,6 +180,7 @@ class RecordMetaDto extends IMongoEntityDto {
     String name = "",
     String memo = "",
     List<AttributeDto>? attributes,
+    List<MethodDto> methods = const [],
   }) {
     final metaId = id == null ? ObjectId() : ObjectId.fromHexString(id);
     final attrs = attributes ??
@@ -203,22 +205,28 @@ class RecordMetaDto extends IMongoEntityDto {
       name: name,
       memo: memo,
       maxKey: attrs.length,
-      attributes: attrs,
+      attrs: attrs,
+      methods: methods,
     );
   }
 
   // 从Form中获取的Map
-  RecordMetaDto build(Map<String, String> map, List<AttributeDto> attributes) =>
+  RecordMetaDto build(Map<String, String> map, List<AttributeDto> attributes,
+          List<MethodDto> methods) =>
       RecordMetaDto(
         id: ObjectId.fromHexString(map['id']!),
         name: map['name']!,
         memo: map['memo']!,
         maxKey: int.parse(map['maxKey']!),
-        attributes: attributes,
+        attrs: attributes,
+        methods: methods,
       );
 
   factory RecordMetaDto.fromForm(
-          Map<String, dynamic> map, List<AttributeDto> attrs) =>
+    Map<String, dynamic> map,
+    List<AttributeDto> attrs,
+    List<MethodDto> methods,
+  ) =>
       RecordMetaDto(
         // form中是'id', 而不是'_id'
         id: ObjectId.fromHexString(map['id'] as String),
@@ -226,23 +234,29 @@ class RecordMetaDto extends IMongoEntityDto {
         memo: map['memo'] as String,
         // todo 后期考虑将k移动到form中
         maxKey: attrs.map((e) => e.k).reduce(math.max),
-        attributes: attrs,
+        attrs: attrs,
+        methods: methods,
       );
 
   factory RecordMetaDto.fromDomain(RecordMeta meta) => RecordMetaDto(
-      id: meta.id,
-      name: meta.name,
-      memo: meta.memo,
-      maxKey: meta.maxKey,
-      attributes: meta.attributes.map((e) => e.toDto()).toList());
+        id: meta.id,
+        name: meta.name,
+        memo: meta.memo,
+        maxKey: meta.maxKey,
+        attrs: meta.attrs.map((e) => e.toDto()).toList(),
+        methods: meta.methods.map((e) => e.toDto()).toList(),
+      );
 
   factory RecordMetaDto.fromJson(Map<String, dynamic> json) => RecordMetaDto(
         id: ObjectId.fromHexString(json['_id'] as String),
         name: json['name'] as String,
         memo: json['memo'] as String,
         maxKey: json['maxKey'] as int,
-        attributes: (json['attributes'] as List<dynamic>)
+        attrs: (json['attrs'] as List<dynamic>)
             .map((e) => AttributeDto.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        methods: (json['methods'] as List<dynamic>)
+            .map((e) => MethodDto.fromJson(e as Map<String, dynamic>))
             .toList(),
       );
 
@@ -255,8 +269,11 @@ class RecordMetaDto extends IMongoEntityDto {
           name: mJs['name'] as String,
           memo: mJs['memo'] as String,
           maxKey: mJs['maxKey'] as int,
-          attributes: (mJs['attributes'] as List<dynamic>)
+          attrs: (mJs['attrs'] as List<dynamic>)
               .map((e) => AttributeDto.fromJson(e as Map<String, dynamic>))
+              .toList(),
+          methods: (mJs['methods'] as List<dynamic>)
+              .map((e) => MethodDto.fromJson(e as Map<String, dynamic>))
               .toList(),
         );
 
@@ -266,32 +283,138 @@ class RecordMetaDto extends IMongoEntityDto {
         'name': name,
         'memo': memo,
         'maxKey': maxKey,
-        'attributes': attributes.map((e) => e.toJson()).toList(),
+        'attrs': attrs.map((e) => e.toJson()).toList(),
+        'methods': methods.map((e) => e.toJson()).toList(),
       };
 
   RecordMeta toDm(
     Attribute Function(AttributeDto dto) attrToDm,
   ) =>
-      toDomain(attributes.map(attrToDm).toList());
+      toDomain(
+        attrs.map(attrToDm).toList(),
+        methods.map((e) => e.toDomain()).toList(),
+      );
 
-  RecordMeta toDomain(List<Attribute> attrs) => RecordMeta(
+  RecordMeta toDomain(List<Attribute> attrs, List<Method> methods) =>
+      RecordMeta(
         id: id,
         name: name,
         memo: memo,
         maxKey: maxKey,
-        attributes: attrs,
+        attrs: attrs,
+        methods: methods,
       );
 
   // key序列, <字段key,UI展示名>/<字段key,Header名>, 例如 <"0":"ID">, <"2","年龄">等
   @Deprecated("考虑新增更内聚的方法")
   Map<String, String> toGridKeyNameMap() =>
-      Map.fromEntries(attributes.map((e) => MapEntry("${e.k}", e.name)));
+      Map.fromEntries(attrs.map((e) => MapEntry("${e.k}", e.name)));
 
   AttributeDto getAttrByKey(int key) =>
-      attributes.firstWhere((element) => element.k == key);
+      attrs.firstWhere((element) => element.k == key);
 
   AttributeDto? getAttrByKeyOr(int? key) =>
       key == null ? null : getAttrByKey(key);
+}
+
+class MethodDto with IMongoDtoMx, EquatableMixin {
+  final int k;
+  final String name;
+  final String memo;
+  final ExpressionDto expr;
+
+  /// 供Form初始化
+  MethodDto.builder({
+    ObjectId? metaId,
+    int k = 0,
+    String name = "",
+    String memo = "",
+    required ExpressionDto expr,
+  }) : this(
+          k: k,
+          name: name,
+          memo: memo,
+          expr: expr,
+        );
+
+  MethodDto build(Map<String, String> map) => MethodDto.fromJson(map);
+
+  factory MethodDto.fromFrom(Map<String, dynamic> attrMap) => MethodDto(
+        k: int.parse(attrMap['k'] as String),
+        name: attrMap['name'] as String,
+        memo: attrMap['memo'] as String,
+        expr: ExpressionDto.fromJson(attrMap['expr'] as Map<String, dynamic>),
+      );
+
+  MethodDto.ofDomain(Method method)
+      : this(
+          k: method.k,
+          name: method.name,
+          memo: method.memo,
+          expr: ExpressionDto(
+            func: method.expr.func.name,
+            args: method.expr.args
+                .map((e) => BaseInvokableDto.fromDomain(e))
+                .toList(),
+          ),
+        );
+
+  const MethodDto({
+    required this.k,
+    required this.name,
+    required this.memo,
+    required this.expr,
+  });
+
+  @override
+  List<Object?> get props => [
+        k,
+        name,
+        memo,
+        expr,
+      ];
+
+  MethodDto copyWith({
+    k,
+    name,
+    memo,
+    expr,
+  }) =>
+      MethodDto(
+        k: k ?? this.k,
+        name: name ?? this.name,
+        memo: memo ?? this.memo,
+        expr: expr ?? this.expr,
+      );
+
+  MethodDto.fromJson(Map<String, dynamic> json)
+      : this(
+          k: json['k'] as int,
+          name: json['name'] as String,
+          memo: json['memo'] as String,
+          expr: ExpressionDto.fromJson(json['expr'] as Map<String, dynamic>),
+        );
+
+  @override
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'k': k,
+        'name': name,
+        'memo': memo,
+        'expr': expr.toJson(),
+      };
+
+  Method toDomain() => Method(
+        k: k,
+        name: name,
+        memo: memo,
+        expr: expr.toDomain() as Expression,
+      );
+
+  @override
+  String toString() => toJson().toString();
+
+  @override
+  toMongoJson({AttrType type = AttrType.string}) => toJson();
 }
 
 /// 表头/属性: 关系/表的一列叫属性
@@ -299,8 +422,7 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
   final int k;
   final String name;
   final String memo;
-  final Expression calc;
-  final String checkFuncName;
+  final AttrType type;
 
   /// 供Form初始化
   AttributeDto.builder({
@@ -308,15 +430,12 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
     int k = 0,
     String name = "",
     String memo = "",
-    Expression? calc,
-    String checkFuncName = FuncManager.noneFuncName,
+    AttrType type = AttrType.any,
   }) : this(
           k: k,
           name: name,
           memo: memo,
-          calc: calc ?? Expression(
-          ),
-          checkFuncName: checkFuncName,
+          type: type,
         );
 
   AttributeDto build(Map<String, String> map) => AttributeDto.fromJson(map);
@@ -325,10 +444,7 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
         k: int.parse(attrMap['k'] as String),
         name: attrMap['name'] as String,
         memo: attrMap['memo'] as String,
-        calc: BaseInvokableDto.fromTypedJson(
-                attrMap['calc'] as Map<String, dynamic>)
-            .toDomain() as Expression,
-        checkFuncName: attrMap['checkFuncName'] as String,
+        type: AttrType.values.byName(attrMap['type'] as String),
       );
 
   AttributeDto.ofDomain(Attribute attr)
@@ -336,16 +452,14 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
           k: attr.k,
           name: attr.name,
           memo: attr.memo,
-          calc: attr.calc,
-          checkFuncName: attr.check.name,
+          type: attr.type,
         );
 
   const AttributeDto({
     required this.k,
     required this.name,
     required this.memo,
-    required this.calc,
-    required this.checkFuncName,
+    required this.type,
   });
 
   @override
@@ -353,23 +467,19 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
         k,
         name,
         memo,
-        calc,
-        checkFuncName,
       ];
 
   AttributeDto copyWith({
     k,
     name,
     memo,
-    expr,
-    checkFuncName,
+    type,
   }) =>
       AttributeDto(
         k: k ?? this.k,
         name: name ?? this.name,
         memo: memo ?? this.memo,
-        calc: expr ?? this.calc,
-        checkFuncName: checkFuncName ?? this.checkFuncName,
+        type: type ?? this.type,
       );
 
   AttributeDto.fromJson(Map<String, dynamic> json)
@@ -377,10 +487,7 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
           k: json['k'] as int,
           name: json['name'] as String,
           memo: json['memo'] as String,
-          calc: BaseInvokableDto.fromTypedJson(
-                  json['calc'] as Map<String, dynamic>)
-              .toDomain() as Expression,
-          checkFuncName: json['checkFuncName'] as String,
+          type: AttrType.values.byName(json['type'] as String),
         );
 
   @override
@@ -388,24 +495,16 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
         'k': k,
         'name': name,
         'memo': memo,
-        'calc': ExpressionDto.fromDomain(calc),
-        'checkFuncName': checkFuncName,
+        'type': type.name,
       };
 
-  Attribute toDm(
-    Func Function(String funName) getCheck,
-  ) =>
-      toDomain(getCheck(checkFuncName));
+  Attribute toDm() => toDomain();
 
-  Attribute toDomain(
-    Func check,
-  ) =>
-      Attribute(
+  Attribute toDomain() => Attribute(
         k: k,
         name: name,
         memo: memo,
-        calc: calc,
-        check: check,
+        type: type,
       );
 
   @override
@@ -427,22 +526,26 @@ mixin BaseInvokableDto on IMongoDtoMx {
   }
 
   static BaseInvokableDto fromTypedJson(Map<String, dynamic> json) {
-    final type = json['type'] as String;
+    final type = json['sign'] as String;
     final real = json['real'] as Map<String, dynamic>;
     switch (type) {
-      case "Value":
-        return ValueDto.fromJson(real);
-      case 'Expression':
+      case 'Exp':
         return ExpressionDto.fromJson(real);
+      case "Val":
+        return ValueDto.fromJson(real);
       default:
         throw Exception('BaseCallable::fromTypedJson# Unknown type: $type');
     }
   }
 
-  Map<String, dynamic> toJsonWithType() => {
-        'type': "$runtimeType",
-        'real': toJson(),
-      };
+  String get subTypeToSign => this is ExpressionDto ? 'Exp' : 'Val';
+
+  Map<String, dynamic> toJsonWithType() {
+    return {
+      'sign': subTypeToSign,
+      'real': toJson(),
+    };
+  }
 
   @override
   toMongoJson({AttrType type = AttrType.string}) => toJsonWithType();
