@@ -209,13 +209,13 @@ class Value extends IFunctor with EquatableMixin, Invokable, ITypeMx {
 // }
 
 enum AttrType {
-  objectId, // 特殊处理
+  objectId, // 特殊处理的String类型
   any, // 任意类型
   string,
   num,
   bool,
-  date,
-  // todo 引用类型; 可能不必要，考虑使用 Func去获取外部关系
+  ref, // 引用类型
+  // func, // 函数类型 相当于Dart的Function,Excel的函数 暂不实现
 }
 
 /// 与 [AttrType] 对应
