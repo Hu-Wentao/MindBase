@@ -52,13 +52,37 @@ class Error {
       };
 }
 
-// /// 无类型(String)方案
-class Value with EquatableMixin, Invokable, ITypeMx {
+abstract class IFunctor {
+  const IFunctor();
+
+  get value;
+
+// IFunctor fMap(Func fn);
+}
+
+/// 无类型(String)方案
+/// Value对应 Optional 或者 Either(更合理,因为表格会存储错误的数据)
+class Value extends IFunctor with EquatableMixin, Invokable, ITypeMx {
   final String v; // 字段存储值
   final String? e; // 字段错误信息
 
   @override
+  get value => v;
+
+  @override
   Invokable invoke() => this;
+
+  // // 关键
+  // @override
+  // IFunctor fMap(Func fn) {
+  //   return fn.apply([this]);
+  // }
+
+  // Invokable fMap(Func fn) {
+  //   return fn.onInvoke([this]);
+  // }
+
+  // Invokable map(Invokable Function(Invokable value) fn) => fn(this);
 
   const Value(this.v, this.e);
 
