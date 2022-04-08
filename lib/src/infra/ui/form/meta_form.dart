@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:mind_base/src/config/common_config.dart';
-import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
-import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
 class MetaForm extends StatelessWidget {
   final bool isCreate;
   final RecordMetaDto origin;
   final GlobalKey<FormBuilderState> kMetaBuilder;
   final GlobalKey<FormBuilderState> kAttrBuilder;
+  final GlobalKey<FormBuilderState> kMethodBuilder;
 
   const MetaForm({
     Key? key,
     required this.isCreate,
     required this.kMetaBuilder,
     required this.kAttrBuilder,
+    required this.kMethodBuilder,
     required this.origin,
   }) : super(key: key);
 
@@ -50,12 +50,14 @@ class MetaForm extends StatelessWidget {
   static RecordMetaDto? fetchDtoBy({
     required GlobalKey<FormBuilderState> kMetaBuilder,
     required GlobalKey<FormBuilderState> kAttrBuilder,
+    required GlobalKey<FormBuilderState> kMethodBuilder,
   }) {
     if (!checkBy(kMetaBuilder, kAttrBuilder)) {
       return null;
     }
     final metaMap = kMetaBuilder.currentState!.value;
     final attrMap = kAttrBuilder.currentState!.value;
+    final methodMap = kMethodBuilder.currentState!.value;
     slLogger.info("fetchDtoBy # metaMap: $metaMap, attrMap: $attrMap");
     // <key,<field,value>>
     final attrFormatMap = <int, Map<String, String>>{};
@@ -77,16 +79,22 @@ class MetaForm extends StatelessWidget {
         // Form的序列化与原序列化不同
         name: json['name'] as String,
         memo: json['memo'] as String,
-        calc: Expression(
-          key,
-          AttrType.values.byName(json['expr.rType'] as String),
-        ),
-        // expr: Expression.fromJson(json['expr'] as Map<String, dynamic>),
-        checkFuncName: json['checkFuncName'] as String,
+        type: AttrType.values.byName(json['type'] as String),
       );
     }).toList();
-    print("debug # attrs: $attrs");
-    return RecordMetaDto.fromForm(metaMap, attrs);
+    final methods = methodMap.entries.map((e) {
+      final json = e.value;
+      final key = int.parse(json['k'] as String);
+      return MethodDto(
+        k: key,
+        name: json['name'] as String,
+        memo: json['memo'] as String,
+        expr: ExpressionDto.fromJson(json['expr'] as Map<String, dynamic>),
+      );
+    }).toList();
+
+    // print("debug # attrs: $attrs");
+    return RecordMetaDto.fromForm(metaMap, attrs, methods);
   }
 }
 
@@ -176,7 +184,7 @@ class AttributeListForm extends StatefulWidget {
       AttributeListForm(
         isCreate: isCreate,
         nextKey: origin.nextKey(),
-        originList: origin.attributes,
+        originList: origin.attrs,
         kAttrBuilder: kAttrBuilder,
       );
 
@@ -287,8 +295,8 @@ class _AttributeListFormState extends State<AttributeListForm> {
               /// 非引用型字段
               child: FormBuilderDropdown(
                 name: '${a.k}@expr.rType',
-                decoration: const InputDecoration(labelText: '属性/表达式 类型'),
-                initialValue: a.calc.type.name,
+                decoration: const InputDecoration(labelText: '属性类型'),
+                initialValue: a.type.name,
                 items: AttrType.values
                     .map((e) => DropdownMenuItem<String>(
                           value: e.name,
@@ -297,20 +305,20 @@ class _AttributeListFormState extends State<AttributeListForm> {
                     .toList(),
               ),
             ),
-            SizedBox(
-              width: 150,
-              child: FormBuilderDropdown(
-                name: '${a.k}@checkFuncName',
-                decoration: const InputDecoration(labelText: '值校验函数'),
-                initialValue: a.checkFuncName,
-                items: FuncManager.funcList
-                    .map((e) => DropdownMenuItem<String>(
-                          value: e.name,
-                          child: Text(e.name),
-                        ))
-                    .toList(),
-              ),
-            ),
+            // SizedBox(
+            //   width: 150,
+            //   child: FormBuilderDropdown(
+            //     name: '${a.k}@checkFuncName',
+            //     decoration: const InputDecoration(labelText: '值校验函数'),
+            //     initialValue: a.checkFuncName,
+            //     items: FuncManager.funcList
+            //         .map((e) => DropdownMenuItem<String>(
+            //               value: e.name,
+            //               child: Text(e.name),
+            //             ))
+            //         .toList(),
+            //   ),
+            // ),
             SizedBox(
               width: 150,
               child: FormBuilderTextField(
