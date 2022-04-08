@@ -214,7 +214,7 @@ class MetaRepo extends BaseMongoRepo<RecordMeta, RecordMetaDto> {
 
   @override
   Future<RecordMeta> futureDtoToEtt(RecordMetaDto dto) async =>
-      dto.toDm((attr) => attr.toDomain(FuncManager.findBy(attr.checkFuncName)));
+      dto.toDm((attr) => attr.toDomain());
 
   @override
   RecordMetaDto ettToDto(RecordMeta ett) => ett.toDto();

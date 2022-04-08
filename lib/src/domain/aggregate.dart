@@ -2,7 +2,7 @@ import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
-import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/mongo_dart.dart' hide Type;
 
 import 'entity/func.dart';
 
@@ -16,11 +16,13 @@ class Record extends Equatable implements IEtt<ObjectId> {
   final ObjectId id;
   final RecordMeta meta; // Aggregate组装得到,实际只存储Id
   final Map<int, Value> fields;
+  final Map<int, Method> methods;
 
   const Record({
     required this.id,
     required this.meta,
     required this.fields,
+    required this.methods,
   });
 
   @override
@@ -39,6 +41,7 @@ class Record extends Equatable implements IEtt<ObjectId> {
         0: Value.of(recordId.toHexString()),
         1: Value.of(meta.id.toHexString()),
       }..addAll(fields),
+      methods: meta.methodMap,
     );
   }
 
@@ -63,8 +66,10 @@ class Record extends Equatable implements IEtt<ObjectId> {
   Value getFieldByColumn(String name) =>
       tryGetFieldByColumn(name, orElse: (_) => Value.of(''))!;
 
-  Value? tryGetFieldByColumn(String name, {Value Function(int k)? orElse}) =>
-      tryGetFieldBy(int.parse(name), orElse: orElse);
+  Value? tryGetFieldByColumn(String name, {Value Function(int k)? orElse}) {
+    final propId = Property.parsePropId(name);
+    return tryGetFieldBy(propId.value2, orElse: orElse);
+  }
 
   Value getFieldBy(int attrKey, {Value Function(int k)? orElse}) =>
       tryGetFieldBy(attrKey) ??
@@ -74,18 +79,28 @@ class Record extends Equatable implements IEtt<ObjectId> {
   Value? tryGetFieldBy(int attrKey, {Value Function(int k)? orElse}) =>
       fields[attrKey] ?? orElse?.call(attrKey);
 
+  Method? tryGetMethodBy(int methodKey, {Method Function(int k)? orElse}) =>
+      methods[methodKey] ?? orElse?.call(methodKey);
+
   /// 根据属性名称获取属性值(同时调用表达式进行计算)
-  Value getValueWithCalc(Attribute attr) {
-    // fixme 或许 invoke() 的返回值应当限定为Value, 否则可能会造成循环引用...
-    // fixme 如何处理 "self"类型的表达式?? invoke() 是否应该传入参数,包括但不限于"Value所属Attr","Value所属Record"?
-    return attr.calc.invoke() as Value;
+  Value getValueBy(Property prop) {
+    final propId = Property.parsePropId(prop.propId);
+    if (prop is Method) {
+      final method = tryGetMethodBy(propId.value2)!;
+      return method.expr.invoke() as Value; // todo 目前只有 0参数的方法, 尚不支持传参的方法
+    }
+    return getFieldBy(prop.k);
   }
 
-  Record updateWith({required int attrKey, required Value value}) => Record(
-        id: id,
-        meta: meta,
-        fields: fields..[attrKey] = value,
-      );
+  @Deprecated("只能更新字段值")
+  Record updateWith({required String propId, required Value value}) {
+    return Record(
+      id: id,
+      meta: meta,
+      fields: fields..[Property.parsePropId(propId).value2] = value,
+      methods: methods,
+    );
+  }
 }
 
 /// Meta信息
@@ -96,17 +111,26 @@ class RecordMeta extends Equatable implements IEtt<ObjectId> {
   final String name;
   final String memo;
   final int maxKey; // 等于Table中出现过key的数量, 用于新增Attr,只能增加
-  final List<Attribute> attributes; // 表头
+  final List<Attribute> attrs; // 字段表
+  final List<Method> methods; // 方法表
+
+  Map<int, Method> get methodMap =>
+      Map.fromEntries(methods.map((e) => MapEntry(e.k, e)).toList());
+
+  // 表头
+  List<Property> get properties => [...attrs, ...methods];
+
   const RecordMeta({
     required this.id,
     required this.name,
     required this.memo,
     required this.maxKey,
-    required this.attributes,
+    required this.attrs,
+    required this.methods,
   });
 
   @override
-  List<Object?> get props => [id, name, memo, maxKey, attributes];
+  List<Object?> get props => [id, name, memo, maxKey, properties];
 
   int nextKey() => maxKey + 1;
 
@@ -120,7 +144,9 @@ class RecordMeta extends Equatable implements IEtt<ObjectId> {
       name: name,
       memo: memo,
       maxKey: nextKey(),
-      attributes: attributes..add(attr),
+      attrs: attrs..add(attr),
+      methods: methods,
+      // properties: properties..add(attr),
     );
   }
 
@@ -130,52 +156,78 @@ class RecordMeta extends Equatable implements IEtt<ObjectId> {
   String toString() => toDto().toString();
 }
 
-class Attribute extends Equatable {
-  final int k; // 表头key,对应Field:k,需要从所在的TableMeat中获取
+/// 是 [Attribute]和[Method]的父类
+abstract class Property extends Equatable {
+  final int k; // 表头key,对应Field:k,需要从所在的TableMeta中获取
   final String name; // 表头名称
   final String memo; // 表头备注
-  final Expression calc; // 计算表达式
-  AttrType get type => calc.type;
+  AttrType get type; // 最终返回值类型
 
-  // todo 读写权限等..
+  /// 字段或属性在一个Meta中的唯一标识
+  /// 在字符串开头使用 m标识[Methods], 使用 a标识[Attribute]
+  String get propId => '${(this is Attribute) ? 'a' : 'm'}$k';
 
-  // Func的默认值应当为 NoneFunc
-  @Deprecated('可能是不必要的')
-  final Func check; // 校验函数, 如果出错则会将错误信息记录到e字段中
+  static Tuple2<String, int> parsePropId(String propId) => Tuple2(
+        propId.substring(0, 1),
+        int.parse(propId.substring(1)),
+      );
 
-  const Attribute({
-    required this.k,
-    required this.name,
-    required this.memo,
-    required this.calc,
-    required this.check,
-  });
+  const Property(this.k, this.name, this.memo);
+
+  static const subTypeMap = {
+    Method: 'm',
+    Attribute: 'a',
+  };
+
+  String get toSubTypeSign => subTypeMap[runtimeType]!;
+
+  Type getSubTypeBySign(String sign) {
+    final subType = subTypeMap.entries
+        .firstWhere((e) => e.value == sign,
+            orElse: () => throw "找不到类型标识: [$sign]")
+        .key;
+    return subType;
+  }
 
   @override
-  List<Object?> get props => [k, name, memo, calc, check];
+  List<Object> get props => [k, name, memo, type];
+}
 
-  // // 检查当前函数值是否合法
-  // @protected
-  // Field onCheck(Field f) => checkFunc.run([f]);
-  //
-  // // 用户输入值
-  // Field onSet(String value) {
-  //   return onInput(Field.of(value));
-  // }
-  //
-  // // 先检查后输入
-  // // Filed f 一般来自其他列,因此这里使用自带的 ::k
-  // Field onInput(Field f) {
-  //   final r = onCheck(f);
-  //   return inputFunc.run([r]);
-  // }
-  //
-  // // 先输出后检查
-  // // 输出当前函数值(进行一些转换),最后进行检查
-  // Field onOutput(Field f) {
-  //   final r = outputFunc.run([f]);
-  //   return onCheck(r);
-  // }
+class Method extends Property {
+  // 方法体
+  final Expression expr;
+
+  const Method({
+    required int k,
+    required String name,
+    required String memo,
+    required this.expr,
+  }) : super(k, name, memo);
+
+  @override
+  List<Object> get props => super.props..addAll([expr]);
+
+  MethodDto toDto() => MethodDto.ofDomain(this);
+
+  @override
+  AttrType get type => expr.type;
+}
+
+class Attribute extends Property {
+  @override
+  final AttrType type; // 类型
+  final RecordMeta? meta; //如果type是"ref", 该值不为空,存储被引用的MetaId
+
+  const Attribute({
+    required int k,
+    required String name,
+    required String memo,
+    required this.type,
+    this.meta,
+  }) : super(k, name, memo);
+
+  @override
+  List<Object> get props => super.props..addAll([if (meta != null) meta!]);
 
   AttributeDto toDto() => AttributeDto.ofDomain(this);
 
