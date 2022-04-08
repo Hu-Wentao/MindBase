@@ -249,7 +249,7 @@ class WorkspaceProvider extends ProviderSidecar {
             if (dto == null) {
               return null;
             }
-            final schema = dto.toDm((dto) => dto.toDm(FuncManager.findBy));
+            final schema = dto.toDm((dto) => dto.toDm());
             await _metaRepo.save(schema);
           }));
 
@@ -268,11 +268,11 @@ class WorkspaceProvider extends ProviderSidecar {
     print("debug 更新meta的指定Attr [$metaDto] [$attr]");
     // todo 后期改为update
     final index =
-        metaDto.attributes.indexWhere((element) => element.k == attr.k);
+        metaDto.attrs.indexWhere((element) => element.k == attr.k);
     if (index != -1) {
-      metaDto.attributes[index] = (attr);
+      metaDto.attrs[index] = (attr);
     } else {
-      metaDto.attributes.add(attr);
+      metaDto.attrs.add(attr);
     }
     // 持久化
     return actSaveMeta(metaDto);
