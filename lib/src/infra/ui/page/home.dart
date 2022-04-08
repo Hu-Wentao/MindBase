@@ -15,6 +15,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _kMetaBuilder = GlobalKey<FormBuilderState>();
   final _kAttrBuilder = GlobalKey<FormBuilderState>();
+  final _kMethodBuilder = GlobalKey<FormBuilderState>();
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -64,6 +65,7 @@ class _HomePageState extends State<HomePage> {
               context: c,
               kAttrBuilder: _kAttrBuilder,
               kMetaBuilder: _kMetaBuilder,
+              kMethodBuilder: _kMethodBuilder,
             ),
           ),
         ),

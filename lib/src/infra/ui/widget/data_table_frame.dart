@@ -159,31 +159,38 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
   /// todo #3 后期根据`视图表`,控制列展示顺序(List<GridColumn> buildColumn的元素排列顺序)与Attr的对应关系(显式)
   @override
   List<GridColumn> buildColumn(BuildContext context, WorkspaceProvider pMeta) =>
-      meta.attributes
-          .map((attr) => GridColumn(
-                columnName: "${attr.k}",
+      meta.properties
+          .map((prop) => GridColumn(
+                columnName: prop.propId,
                 label: ListTile(
                   // todo ToolTip 展示部分memo内容
-                  title: Text(attr.name, overflow: TextOverflow.ellipsis),
+                  title: Text(prop.name, overflow: TextOverflow.ellipsis),
                   trailing: PopupMenuButton<String>(
                     onSelected: (value) async {
                       if (value == "edit_type") {
-                        final metaDto = meta.toDto();
-                        await pMeta.actEditAttribute(
-                          metaDto,
-                          await showAttributeEditDialog(
-                            context: context,
-                            origin: attr.toDto(),
-                            queryMeta: pMeta.actQueryMeta,
-                            selfMeta: metaDto,
-                            queryMetaByName: pMeta.actQueryMetaByName,
-                          ),
-                        );
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(const SnackBar(content: Text("OK")));
-                        // _showMetaEditDialog(context, attr);
-                        // } else if (value == "delete") {
-                        // _showMetaDeleteDialog(context, attr);
+                        if (prop is Method) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("尚未实现 编辑表达式, 敬请期待...")));
+                        } else {
+                          final metaDto = meta.toDto();
+                          await pMeta.actEditAttribute(
+                            metaDto,
+                            await showAttributeEditDialog(
+                              context: context,
+                              origin: (prop as Attribute).toDto(),
+                              // fixme 只能编辑字段,无法编辑方法
+                              queryMeta: pMeta.actQueryMeta,
+                              selfMeta: metaDto,
+                              queryMetaByName: pMeta.actQueryMetaByName,
+                            ),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("OK")));
+                          // _showMetaEditDialog(context, attr);
+                          // } else if (value == "delete") {
+                          // _showMetaDeleteDialog(context, attr);
+                        }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text("尚未实现[$value]敬请期待..")));
@@ -254,9 +261,9 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
   /// todo 在这里指定Row的类型
   @override
   DataGridRow entityToRow(Record record) => DataGridRow(
-        cells: meta.attributes.map((attr) {
-          final value = record.getValueWithCalc(attr);
-          return DataGridCell<Value>(columnName: "${attr.k}", value: value);
+        cells: meta.properties.map((prop) {
+          final value = record.getValueBy(prop);
+          return DataGridCell<Value>(columnName: prop.propId, value: value);
         }).toList(),
       );
 
@@ -270,10 +277,10 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
         final cell = entry.value as DataGridCell<Value>;
         final cellIndex = entry.key;
         // todo #3 后期需要根据`视图表`获取列展示顺序与Attr的对应关系
-        final attr = meta.attributes[cellIndex];
+        final prop = meta.properties[cellIndex];
 
         late Widget cellWidget;
-        switch (attr.calc.func.rType) {
+        switch (prop.type) {
           case AttrType.objectId:
             cellWidget = _buildShowObjectId(cell.value!);
             break;
@@ -282,9 +289,11 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
             break;
           case AttrType.num:
           case AttrType.bool:
-          case AttrType.date:
+          case AttrType.ref: // 处理引用类型
           case AttrType.any:
             cellWidget = _buildShowAny(cell.value!);
+            // TODO: Handle this case.
+            break;
         }
         return cellWidget;
       }).toList());
@@ -325,7 +334,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     GridColumn column,
     CellSubmit submitCell,
   ) {
-    final sourceAttr = meta.attributes[rowColumnIndex.columnIndex];
+    final sourceProp = meta.properties[rowColumnIndex.columnIndex];
     // 选择指定行的数据
     final sourceRow = getCachedRecordByIndex(meta.id, rowColumnIndex.rowIndex);
 
@@ -356,9 +365,13 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     //       submitCell, _shipCity[shipCountry]!);
     // } else {\
     late Widget editWidget;
-    switch (sourceAttr.calc.type) {
+    switch (sourceProp.type) {
       case AttrType.objectId:
-        editWidget = _buildEditObjectId(sourceAttr, sourceValue, submitCell);
+        if(sourceProp is Attribute){
+          editWidget = _buildEditObjectId(sourceProp, sourceValue, submitCell);
+        }else{
+          editWidget = const Text("暂不支持编辑Method");
+        }
         break;
       case AttrType.string:
         editWidget = DataTableEditText(
@@ -372,7 +385,8 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
       case AttrType.any:
       case AttrType.num:
       case AttrType.bool:
-      case AttrType.date:
+      case AttrType.ref: // todo 处理引用类型
+      // case AttrType.date:
         editWidget = DataTableEditText(
           editingController: editingController..text = displayText,
           // displayText: displayText,
@@ -380,10 +394,13 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
           column: column,
           submitCell: submitCell,
         );
+        // TODO: Handle this case.
+        break;
     }
     return editWidget;
   }
 
+  /// 编辑对象ID Widget
   Widget _buildEditObjectId(
     Attribute attr,
     Value sourceValue,
@@ -401,7 +418,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     // todo #5 后期改为弹出metaId对应的Record列表,以供选择
     // final metaDto = meta.toDto();
     // 选取 Attr上指定的MetaId下的Record::Id
-    final metaId = attr.calc.metaId!;
+    final metaId = attr.meta!.id;
     //fixme #4 Expression::metaId不能为null! 需要新增dto
     final allRecordInMeta = getCachedRecords(metaId);
     return Row(
@@ -474,7 +491,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     //
     // final entity = Record.fromGridKeyValueMap(oldEntity, nGridMap);
     final entity = oldEntity.updateWith(
-      attrKey: int.parse(col.columnName),
+      propId: col.columnName,
       value: Value.of(editingController.text),
       // value: Value.of(newCellValue),
     );
@@ -491,9 +508,9 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
   notifyDataRow(int rowIndex, Record entity) {
     log.info("刷新一行数据");
     // fixme 如果后期支持手动排序列,本方法将出错
-    meta.attributes.map((e) {
+    meta.properties.map((e) {
       // final colIndex = _attrKeyList.indexOf("${e.k}");
-      final colIndex = meta.attributes.indexOf(e);
+      final colIndex = meta.properties.indexOf(e);
       // 更新指定单元格
       notifyDataSourceListeners(
         rowColumnIndex: RowColumnIndex(rowIndex, colIndex),
@@ -594,6 +611,7 @@ class DataFrameTitle extends StatelessWidget {
   final _kRecordBuilder = GlobalKey<FormBuilderState>();
   final kMetaBuilder = GlobalKey<FormBuilderState>();
   final kAttrBuilder = GlobalKey<FormBuilderState>();
+  final kMethodBuilder = GlobalKey<FormBuilderState>();
 
   DataFrameTitle({
     Key? key,
@@ -612,6 +630,7 @@ class DataFrameTitle extends StatelessWidget {
                 originMeta: meta.toDto(),
                 kMetaBuilder: kMetaBuilder,
                 kAttrBuilder: kAttrBuilder,
+                kMethodBuilder: kMethodBuilder,
               ),
             ),
             icon: const Icon(Icons.edit),

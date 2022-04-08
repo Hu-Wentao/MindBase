@@ -16,6 +16,7 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
   RecordMetaDto? originMeta,
   required GlobalKey<FormBuilderState> kMetaBuilder,
   required GlobalKey<FormBuilderState> kAttrBuilder,
+  required GlobalKey<FormBuilderState> kMethodBuilder,
 }) async =>
     await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: true),
@@ -24,6 +25,7 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
         isCreate: originMeta == null,
         kMetaBuilder: kMetaBuilder,
         kAttrBuilder: kAttrBuilder,
+        kMethodBuilder: kMethodBuilder,
         origin: originMeta ?? RecordMetaDto.builder(),
       ),
       actions: <Widget>[
@@ -34,6 +36,7 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
                 final dto = MetaForm.fetchDtoBy(
                   kMetaBuilder: kMetaBuilder,
                   kAttrBuilder: kAttrBuilder,
+                    kMethodBuilder:kMethodBuilder,
                 );
                 Navigator.pop<RecordMetaDto>(context, dto);
               } else {
@@ -155,10 +158,10 @@ Future<AttributeDto?> showAttributeEditDialog({
                       compareFn: (ex, selected) => ex == selected,
                       onFind: (text) async {
                         if (text?.isEmpty ?? true) {
-                          return currentMeta.attributes;
+                          return currentMeta.attrs;
                         } else {
                           final lowerText = text!.toLowerCase();
-                          return currentMeta.attributes
+                          return currentMeta.attrs
                               .where((element) => element.name
                                   .toLowerCase()
                                   .contains(lowerText))
@@ -385,14 +388,14 @@ Future<AttributeDto?> showAttributeEditDialog({
           onPressed: () {
             // 当前最终表达式
             try {
-              Expression currentExpr = Expression(
-                currentFunc,
-                currentArg, // fixme
-              );
+              // Expression currentExpr = Expression(
+              //   currentFunc,
+              //   currentArg, // fixme
+              // );
 
               AttributeDto rst = attr.copyWith(
                 name: currentAttrName,
-                expr: currentExpr,
+                type: currentType,
               );
 
               Navigator.pop<AttributeDto>(context, rst);
