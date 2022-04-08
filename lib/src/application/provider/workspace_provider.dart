@@ -12,9 +12,9 @@ import 'package:provider_sidecar/provider_sidecar.dart';
 
 /// 本类缓存一个工作空间内的所有数据,
 /// 以便 "reference"等Func进行计算处理
-@singleton
+@lazySingleton
 class WorkspaceDataHolder {
-  final String name; // 目前全局只有一个workspace
+  final String name = 'default'; // 目前全局只有一个workspace
 
   // 防止同一个对象状态更新后被重复缓存 <MetaId, Meta>
   final Map<ObjectId, RecordMeta> _cacheMeta = {};
@@ -26,7 +26,7 @@ class WorkspaceDataHolder {
   // <RecordId, Record> , 便于刷新数据,但如果要恢复某个Meta状态,则需要遍历where
   final Map<ObjectId, List<Record>> _cacheRecord = {};
 
-  WorkspaceDataHolder({this.name = 'default'});
+  // WorkspaceDataHolder({this.name = 'default'}); // 有参数,导致依赖注入失败
 
   // <MetaId, Map<RecordId,Record>> , 方案2B 考虑.. 插入/更新数据更快
   // final Map<ObjectId, Map<ObjectId, Record>> _cacheRecord = {};
@@ -70,6 +70,7 @@ class WorkspaceProvider extends ProviderSidecar {
   @override
   onInitializing() {
     _metaRepo = sl<MetaRepo>();
+    _dataHolder = sl<WorkspaceDataHolder>();
     // _recordRepo = RecordRepo(sl<IMongoStorage>(), _metaRepo, null);
     _cacheAllMetaByWorkspace();
   }
@@ -267,8 +268,7 @@ class WorkspaceProvider extends ProviderSidecar {
     // final metaDto = meta.toDto();
     print("debug 更新meta的指定Attr [$metaDto] [$attr]");
     // todo 后期改为update
-    final index =
-        metaDto.attrs.indexWhere((element) => element.k == attr.k);
+    final index = metaDto.attrs.indexWhere((element) => element.k == attr.k);
     if (index != -1) {
       metaDto.attrs[index] = (attr);
     } else {

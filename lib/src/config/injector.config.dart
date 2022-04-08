@@ -27,8 +27,7 @@ Future<_i1.GetIt> $initGetIt(_i1.GetIt get,
   gh.factory<_i3.IMongoStorage>(() => configMongo.mongoStorage);
   gh.factory<_i4.Logger>(() => configCommon.logger(get<_i5.MindBaseConfig>()));
   gh.lazySingleton<_i6.MetaRepo>(() => _i6.MetaRepo(get<_i3.IMongoStorage>()));
-  gh.singleton<_i7.WorkspaceDataHolder>(
-      _i7.WorkspaceDataHolder(name: get<String>()));
+  gh.lazySingleton<_i7.WorkspaceDataHolder>(() => _i7.WorkspaceDataHolder());
   await gh.factoryAsync<_i8.Db>(
       () => configMongo.getDb(get<_i3.IMongoStorage>()),
       preResolve: true);
