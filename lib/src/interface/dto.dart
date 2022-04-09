@@ -548,6 +548,9 @@ mixin BaseInvokableDto on IMongoDtoMx {
     };
   }
 
+  /// 可视化的表达式字符串， 例如 foo('1', '2')
+  String toEditString();
+
   @override
   toMongoJson({AttrType type = AttrType.string}) => toJsonWithType();
 
@@ -584,6 +587,13 @@ class ValueDto with _$ValueDto, IMongoDtoMx, BaseInvokableDto {
   toMongoJson({AttrType type = AttrType.string}) => toJson();
 
   static ValueDto fromDomain(Value entity) => ValueDto(entity.v, entity.e);
+
+  // fixme ValueDto没有`类型`信息，无法在这里展示类型， 考虑Form的入参直接使用Domain对象
+  // fixme 或许不需要，因为ValueDto代表的就是某个字段的值，而方法中操作的一般是某个字段(Attr)
+  @override
+  String toEditString() => "$v";
+  // 如果v是原始类型，则应当使用下面的代码
+  // String toEditString() => json.encode(v);
 }
 
 class ExpressionDto with IMongoDtoMx, BaseInvokableDto {
@@ -606,6 +616,11 @@ class ExpressionDto with IMongoDtoMx, BaseInvokableDto {
       args: (real['args'] as List<dynamic>)
           .map((e) => BaseInvokableDto.fromTypedJson(e as Map<String, dynamic>))
           .toList());
+
+  /// 可视化的函数表达式字符串
+  @override
+  String toEditString() =>
+      "$func(${args.map((e) => e.toEditString()).join(', ')})";
 
   @override
   Map<String, dynamic> toJson() => {
