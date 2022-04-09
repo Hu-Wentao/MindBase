@@ -12,7 +12,7 @@ import 'package:provider_sidecar/provider_sidecar.dart';
 
 /// 本类缓存一个工作空间内的所有数据,
 /// 以便 "reference"等Func进行计算处理
-@lazySingleton
+@singleton
 class WorkspaceDataHolder {
   final String name = 'default'; // 目前全局只有一个workspace
 
@@ -56,7 +56,8 @@ class WorkspaceDataHolder {
 /// todo 当前假定本数据库为一个工作空间
 class WorkspaceProvider extends ProviderSidecar {
   late final MetaRepo _metaRepo;
-  late final WorkspaceDataHolder _dataHolder;
+  // 避免出现 _dataHolder 未初始化的问题
+  final WorkspaceDataHolder _dataHolder = sl<WorkspaceDataHolder>();
 
   // RecordRepo 无法监听数据
   // late final RecordRepo _recordRepo;
@@ -70,7 +71,6 @@ class WorkspaceProvider extends ProviderSidecar {
   @override
   onInitializing() {
     _metaRepo = sl<MetaRepo>();
-    _dataHolder = sl<WorkspaceDataHolder>();
     // _recordRepo = RecordRepo(sl<IMongoStorage>(), _metaRepo, null);
     _cacheAllMetaByWorkspace();
   }
