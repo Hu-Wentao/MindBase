@@ -34,6 +34,11 @@ class MetaForm extends StatelessWidget {
             kAttrBuilder: kAttrBuilder,
             origin: origin,
           ),
+          MethodListForm.build(
+            isCreate: isCreate,
+            kMethodBuilder: kMethodBuilder,
+            origin: origin,
+          ),
         ],
       );
 
@@ -58,7 +63,7 @@ class MetaForm extends StatelessWidget {
     final metaMap = kMetaBuilder.currentState!.value;
     final attrMap = kAttrBuilder.currentState!.value;
     final methodMap = kMethodBuilder.currentState!.value;
-    slLogger.info("fetchDtoBy # metaMap: $metaMap, attrMap: $attrMap");
+    slLogger.info("fetchDtoBy # metaMap: $metaMap, attrMap: $attrMap, methodMap: $methodMap");
     // <key,<field,value>>
     final attrFormatMap = <int, Map<String, String>>{};
     for (final e in attrMap.entries) {
@@ -294,7 +299,7 @@ class _AttributeListFormState extends State<AttributeListForm> {
               // fixme 如何通过下拉配置表达式?
               /// 非引用型字段
               child: FormBuilderDropdown(
-                name: '${a.k}@expr.rType',
+                name: '${a.k}@type',
                 decoration: const InputDecoration(labelText: '属性类型'),
                 initialValue: a.type.name,
                 items: AttrType.values
@@ -336,6 +341,176 @@ class _AttributeListFormState extends State<AttributeListForm> {
       trailing: IconButton(
         icon: const Icon(Icons.delete),
         onPressed: () => _removeAttr(a),
+      ));
+}
+class MethodListForm extends StatefulWidget {
+  final bool isCreate; // true:表单将会新增一个待编辑的属性
+  final int nextKey; // ::nextKey()
+  final List<MethodDto> originList;
+
+  final GlobalKey<FormBuilderState>? kMethodBuilder;
+
+  factory MethodListForm.build({
+    Key? key,
+    required isCreate,
+    required RecordMetaDto origin,
+    GlobalKey<FormBuilderState>? kMethodBuilder,
+  }) =>
+      MethodListForm(
+        isCreate: isCreate,
+        nextKey: origin.nextKey(),
+        originList: origin.methods,
+        kMethodBuilder: kMethodBuilder,
+      );
+
+  const MethodListForm({
+    Key? key,
+    required this.isCreate,
+    required this.originList,
+    required this.nextKey,
+    this.kMethodBuilder,
+  }) : super(key: key);
+
+  @override
+  State<MethodListForm> createState() => _MethodListFormState();
+}
+
+class _MethodListFormState extends State<MethodListForm> {
+  late List<MethodDto> _origin;
+  late GlobalKey<FormBuilderState> _kMethodBuilder;
+
+  @override
+  initState() {
+    _origin = [
+      ...widget.originList,
+      if (widget.isCreate) MethodDto.builder(k: widget.nextKey),
+    ];
+    _kMethodBuilder = widget.kMethodBuilder ?? GlobalKey<FormBuilderState>();
+    super.initState();
+  }
+
+  _addNewAttr() => setState(() =>
+      _origin.add(MethodDto.builder(k: widget.nextKey + _origin.length)));
+
+  _removeAttr(MethodDto a) {
+    setState(() {
+      // 从数据源移除
+      _origin.remove(a);
+      // 选中表单中相关的字段名
+      final targetFields = _kMethodBuilder.currentState?.instantValue.keys
+          .where((element) => element.startsWith("${a.k}@"));
+      // 从表单中移除相关键值对 (由于_origin已移除, 因此无需在这里 setState)
+      targetFields?.forEach((fieldNames) => _kMethodBuilder.currentState
+          ?.removeInternalFieldValue(fieldNames, isSetState: false));
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => FormBuilder(
+        key: _kMethodBuilder,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          ..._origin.map((a) => _buildAttributeForm(context, a)).toList(),
+          ElevatedButton(onPressed: _addNewAttr, child: const Text('添加方法')),
+        ]),
+      );
+
+  /// 特殊处理： 对所有的键添加 ”${a.k}@“开头，以区别不同的Attribute
+  Widget _buildAttributeForm(BuildContext context, MethodDto m) => ListTile(
+      leading: SizedBox(
+        width: 45,
+        child: FormBuilderTextField(
+          // name: 'k',
+          name: '${m.k}@k',
+          initialValue: m.k.toString(),
+          decoration: const InputDecoration(labelText: 'Key'),
+          validator: FormBuilderValidators.compose([
+            FormBuilderValidators.required(context),
+          ]),
+        ),
+      ),
+      title: SizedBox(
+        // todo debug 必须设定高度
+        width: 800,
+        child: Row(
+          children: [
+            SizedBox(
+              width: 200,
+              child: FormBuilderTextField(
+                // name: 'name',
+                name: '${m.k}@name',
+                initialValue: m.name,
+                decoration: const InputDecoration(labelText: '方法名称'),
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(context),
+                ]),
+              ),
+            ),
+            SizedBox(
+              width: 200,
+              // child: FormBuilderSearchableDropdown<String>(
+              //   name: '${a.k}@expr',
+              //   // items: allCountries,
+              //   // onChanged: _onChanged,
+              //   showSearchBox: true,
+              //   isFilteredOnline: true,
+              //   compareFn: (item, selectedItem) =>
+              //       item.toLowerCase() == selectedItem.toLowerCase(),
+              //   onFind: (text) async {
+              //     await Future.delayed(const Duration(seconds: 1));
+              //     return allCountries
+              //         .where((element) =>
+              //             element.toLowerCase().contains(text.toLowerCase()))
+              //         .toList();
+              //   },
+              //   decoration: const InputDecoration(
+              //       labelText: 'Searchable Dropdown Online'),
+              // ),
+              // fixme 如何通过下拉配置表达式?
+              /// 非引用型字段
+            //   child: FormBuilderDropdown(
+            //     name: '${a.k}@expr.rType',
+            //     decoration: const InputDecoration(labelText: '属性类型'),
+            //     initialValue: a.type.name,
+            //     items: AttrType.values
+            //         .map((e) => DropdownMenuItem<String>(
+            //               value: e.name,
+            //               child: Text(e.name),
+            //             ))
+            //         .toList(),
+            //   ),
+            ),
+            // SizedBox(
+            //   width: 150,
+            //   child: FormBuilderDropdown(
+            //     name: '${a.k}@checkFuncName',
+            //     decoration: const InputDecoration(labelText: '值校验函数'),
+            //     initialValue: a.checkFuncName,
+            //     items: FuncManager.funcList
+            //         .map((e) => DropdownMenuItem<String>(
+            //               value: e.name,
+            //               child: Text(e.name),
+            //             ))
+            //         .toList(),
+            //   ),
+            // ),
+            SizedBox(
+              width: 150,
+              child: FormBuilderTextField(
+                name: '${m.k}@memo',
+                initialValue: m.memo,
+                decoration: const InputDecoration(labelText: '备注'),
+                validator: FormBuilderValidators.compose([
+                  // FormBuilderValidators.required(context),
+                ]),
+              ),
+            ),
+          ],
+        ),
+      ),
+      trailing: IconButton(
+        icon: const Icon(Icons.delete),
+        onPressed: () => _removeAttr(m),
       ));
 }
 
