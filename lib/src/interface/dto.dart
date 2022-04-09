@@ -90,7 +90,7 @@ class RecordDto extends IMongoEntityDto {
   factory RecordDto.fromForm(RecordMeta meta, Map<String, dynamic> formMap) {
     return RecordDto(
       fields: Map.fromEntries(meta.properties.map((attr) {
-        final value = formMap["${attr.k}"];
+        final value = formMap[attr.propId];
         return MapEntry(attr.k, Value.of(value));
       })),
     );
