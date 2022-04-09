@@ -45,10 +45,12 @@ class MetaForm extends StatelessWidget {
   static checkBy(
     GlobalKey<FormBuilderState> kMetaBuilder,
     GlobalKey<FormBuilderState> kAttrBuilder,
+    GlobalKey<FormBuilderState> kMethodBuilder,
   ) {
     final metaState = kMetaBuilder.currentState?.saveAndValidate() ?? false;
     final attrState = kAttrBuilder.currentState?.saveAndValidate() ?? false;
-    return metaState && attrState;
+    final methodState = kMethodBuilder.currentState?.saveAndValidate() ?? false;
+    return metaState && attrState && methodState;
   }
 
   /// 通过 k获取 MetaForm和AttrForm 中的数据, 最后转换成DTO
@@ -57,13 +59,14 @@ class MetaForm extends StatelessWidget {
     required GlobalKey<FormBuilderState> kAttrBuilder,
     required GlobalKey<FormBuilderState> kMethodBuilder,
   }) {
-    if (!checkBy(kMetaBuilder, kAttrBuilder)) {
+    if (!checkBy(kMetaBuilder, kAttrBuilder, kMethodBuilder)) {
       return null;
     }
     final metaMap = kMetaBuilder.currentState!.value;
     final attrMap = kAttrBuilder.currentState!.value;
     final methodMap = kMethodBuilder.currentState!.value;
-    slLogger.info("fetchDtoBy # metaMap: $metaMap, attrMap: $attrMap, methodMap: $methodMap");
+    slLogger.info(
+        "fetchDtoBy # metaMap: $metaMap, attrMap: $attrMap, methodMap: $methodMap");
     // <key,<field,value>>
     final attrFormatMap = <int, Map<String, String>>{};
     for (final e in attrMap.entries) {
@@ -343,6 +346,7 @@ class _AttributeListFormState extends State<AttributeListForm> {
         onPressed: () => _removeAttr(a),
       ));
 }
+
 class MethodListForm extends StatefulWidget {
   final bool isCreate; // true:表单将会新增一个待编辑的属性
   final int nextKey; // ::nextKey()
@@ -389,10 +393,10 @@ class _MethodListFormState extends State<MethodListForm> {
     super.initState();
   }
 
-  _addNewAttr() => setState(() =>
-      _origin.add(MethodDto.builder(k: widget.nextKey + _origin.length)));
+  _addNewMethod() => setState(
+      () => _origin.add(MethodDto.builder(k: widget.nextKey + _origin.length)));
 
-  _removeAttr(MethodDto a) {
+  _removeMethod(MethodDto a) {
     setState(() {
       // 从数据源移除
       _origin.remove(a);
@@ -410,17 +414,16 @@ class _MethodListFormState extends State<MethodListForm> {
         key: _kMethodBuilder,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          ..._origin.map((a) => _buildAttributeForm(context, a)).toList(),
-          ElevatedButton(onPressed: _addNewAttr, child: const Text('添加方法')),
+          ..._origin.map((a) => _buildMethodForm(context, a)).toList(),
+          ElevatedButton(onPressed: _addNewMethod, child: const Text('添加方法')),
         ]),
       );
 
   /// 特殊处理： 对所有的键添加 ”${a.k}@“开头，以区别不同的Attribute
-  Widget _buildAttributeForm(BuildContext context, MethodDto m) => ListTile(
+  Widget _buildMethodForm(BuildContext context, MethodDto m) => ListTile(
       leading: SizedBox(
         width: 45,
         child: FormBuilderTextField(
-          // name: 'k',
           name: '${m.k}@k',
           initialValue: m.k.toString(),
           decoration: const InputDecoration(labelText: 'Key'),
@@ -437,7 +440,6 @@ class _MethodListFormState extends State<MethodListForm> {
             SizedBox(
               width: 200,
               child: FormBuilderTextField(
-                // name: 'name',
                 name: '${m.k}@name',
                 initialValue: m.name,
                 decoration: const InputDecoration(labelText: '方法名称'),
@@ -468,17 +470,17 @@ class _MethodListFormState extends State<MethodListForm> {
               // ),
               // fixme 如何通过下拉配置表达式?
               /// 非引用型字段
-            //   child: FormBuilderDropdown(
-            //     name: '${a.k}@expr.rType',
-            //     decoration: const InputDecoration(labelText: '属性类型'),
-            //     initialValue: a.type.name,
-            //     items: AttrType.values
-            //         .map((e) => DropdownMenuItem<String>(
-            //               value: e.name,
-            //               child: Text(e.name),
-            //             ))
-            //         .toList(),
-            //   ),
+              //   child: FormBuilderDropdown(
+              //     name: '${a.k}@expr.rType',
+              //     decoration: const InputDecoration(labelText: '属性类型'),
+              //     initialValue: a.type.name,
+              //     items: AttrType.values
+              //         .map((e) => DropdownMenuItem<String>(
+              //               value: e.name,
+              //               child: Text(e.name),
+              //             ))
+              //         .toList(),
+              //   ),
             ),
             // SizedBox(
             //   width: 150,
@@ -510,7 +512,7 @@ class _MethodListFormState extends State<MethodListForm> {
       ),
       trailing: IconButton(
         icon: const Icon(Icons.delete),
-        onPressed: () => _removeAttr(m),
+        onPressed: () => _removeMethod(m),
       ));
 }
 

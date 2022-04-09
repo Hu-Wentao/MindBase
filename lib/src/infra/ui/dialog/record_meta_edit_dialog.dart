@@ -32,11 +32,15 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
         TextButton(
             child: const Text("确认"),
             onPressed: () {
-              if (MetaForm.checkBy(kMetaBuilder, kAttrBuilder)) {
+              if (MetaForm.checkBy(
+                kMetaBuilder,
+                kAttrBuilder,
+                kMethodBuilder,
+              )) {
                 final dto = MetaForm.fetchDtoBy(
                   kMetaBuilder: kMetaBuilder,
                   kAttrBuilder: kAttrBuilder,
-                    kMethodBuilder:kMethodBuilder,
+                  kMethodBuilder: kMethodBuilder,
                 );
                 Navigator.pop<RecordMetaDto>(context, dto);
               } else {
