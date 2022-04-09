@@ -377,7 +377,7 @@ packages:
       name: form_builder_validators
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "7.7.0"
+    version: "7.9.0"
   freezed:
     dependency: "direct dev"
     description:
@@ -404,7 +404,7 @@ packages:
     description:
       path: "."
       ref: "v3.0"
-      resolved-ref: "35dced73fa4e632ca41dadc50aac7c9207516d03"
+      resolved-ref: "8f618ef2d8aa9e1ed28e7a278e6698b4d7536b8d"
       url: "https://github.com/GetArch/get_arch_core.git"
     source: git
     version: "3.0.0"
@@ -710,7 +710,7 @@ packages:
       name: shelf
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.2.0"
+    version: "1.3.0"
   shelf_web_socket:
     dependency: transitive
     description:
@@ -792,14 +792,14 @@ packages:
       name: syncfusion_flutter_core
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "19.4.56"
+    version: "20.1.47"
   syncfusion_flutter_datagrid:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_datagrid
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "19.4.56"
+    version: "20.1.47"
   term_glyph:
     dependency: transitive
     description:
