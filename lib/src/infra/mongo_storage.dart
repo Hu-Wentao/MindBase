@@ -76,7 +76,7 @@ abstract class IMongoStorage {
           await _db!.open();
           break;
         } catch (e) {
-          logger.config("Failed to connect to mongoDB, retry $_tryConnect");
+          logger.info("Failed to connect to mongoDB, retry $_tryConnect; info[$e]");
           if (_tryConnect >= config.retryAttempts) {
             rethrow;
           }
