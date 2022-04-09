@@ -172,7 +172,8 @@ class RecordMetaDto extends IMongoEntityDto {
 
   AttributeDto findAttr(int k) => attrs.firstWhere((element) => element.k == k);
 
-  int nextKey() => maxKey + 1;
+  // 方法和属性公用 k值，在创建表单时，会对同一个实例多次调用，因此这里用`+=`
+  int nextKey() => maxKey += 1;
 
   // 用于给Form提供初始值
   factory RecordMetaDto.builder({
@@ -329,12 +330,12 @@ class MethodDto with IMongoDtoMx, EquatableMixin {
     int k = 0,
     String name = "",
     String memo = "",
-    required ExpressionDto expr,
+    ExpressionDto? expr,
   }) : this(
           k: k,
           name: name,
           memo: memo,
-          expr: expr,
+          expr: expr ?? ExpressionDto.builder(),
         );
 
   MethodDto build(Map<String, String> map) => MethodDto.fromJson(map);
@@ -558,7 +559,7 @@ mixin BaseInvokableDto on IMongoDtoMx {
       case ExpressionDto:
         final dto = (this as ExpressionDto);
         return Expression(
-          FuncManager.findBy(dto.func),
+          FuncManager.findBy(dto.func!),
           dto.args.map((e) => e.toDomain()).toList(),
         );
       default:
@@ -587,12 +588,17 @@ class ValueDto with _$ValueDto, IMongoDtoMx, BaseInvokableDto {
 
 class ExpressionDto with IMongoDtoMx, BaseInvokableDto {
   //内嵌函数的名
-  String func;
+  String? func;
   List<BaseInvokableDto> args;
 
   ExpressionDto({
-    required this.func,
-    required this.args,
+    this.func,
+    this.args = const [],
+  });
+
+  ExpressionDto.builder({
+    this.func,
+    this.args = const [],
   });
 
   static ExpressionDto fromJson(Map<String, dynamic> real) => ExpressionDto(
