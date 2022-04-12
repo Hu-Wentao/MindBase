@@ -46,87 +46,6 @@ class Expression extends IFunctor with EquatableMixin, Invokable {
   Value get value => invoke() as Value;
 }
 
-// class Expression  {
-//   static Expression field(
-//     ObjectId? selfMetaId,
-//     int selfKey,
-//     AttrType rType,
-//   ) =>
-//       Expression(
-//         metaId: selfMetaId, // 字段 所存在的Meta,
-//         pKeys: [selfKey], // 字段的Attr::k
-//         calls: [], // 返回字段本身
-//         rType: rType,
-//       );
-//
-//   /// [pThisType] 表示改列对应的Value的类型
-//   static Expression method(
-//     AttrType pThisType, {
-//     required ObjectId metaId,
-//     required AttrType rType,
-//     required List<int> pAttrKeys,
-//     required List<Invokable> calls,
-//   }) =>
-//       Expression(
-//         metaId: metaId,
-//         pKeys: pAttrKeys,
-//         calls: calls,
-//         rType: rType,
-//       );
-//
-//   /// Expression 所在列的Value必须是[AttrType.objectId]类型
-//   /// Expression 所在
-//   /// Value持有的ObjectId对应的
-//   final ObjectId? metaId; // null表示引用当前类的meta
-//   final List<int> pKeys;
-//   final List<Invokable> calls;
-//   final AttrType rType;
-//
-//   @override
-//   Invokable invoke([List<Invokable> p = const []]) {
-//     // fixme 未检查类型正确性
-//     late Invokable r;
-//     for (var callable in calls) {
-//       r = callable.invoke();
-//     }
-//     return r;
-//   }
-//
-//   const Expression({
-//     required this.metaId,
-//     required this.pKeys,
-//     required this.calls,
-//     required this.rType,
-//   });
-//
-//   @override
-//   List<Object?> get props => [metaId, pKeys, calls, rType];
-//
-//   static Expression fromJson(Map<String, dynamic> attrMap) {
-//     final mtId = attrMap['metaId'] as String?;
-//     return Expression(
-//       metaId: mtId == null ? null : ObjectId.fromHexString(mtId),
-//       pKeys: (attrMap['pKeys'] as List<dynamic>).map((e) => e as int).toList(),
-//       calls: [],
-//       // calls: (attrMap['calls'] as List<dynamic>)
-//       //     .map((e) => BaseCallableDto.fromTypedJson(e as Map<String, dynamic>))
-//       //     .toList(),
-//       rType: AttrType.values.byName(attrMap['rType'] as String),
-//     );
-//   }
-//
-//   @override
-//   Map<String, dynamic> toJson() => {
-//         'metaId': metaId?.toHexString(), // 空表示当前所在的Meta类
-//         'pKeys': pKeys.map((e) => e).toList(growable: false),
-//         // 'calls': calls.map((e) => e.toJsonWithType()).toList(growable: false),
-//         'rType': rType.name,
-//       };
-//
-//   @override
-//   toMongoJson({AttrType type = AttrType.string}) => toJson();
-// }
-
 /// Func 的实例相当于 Dart的external函数
 class Func with EquatableMixin {
   final String name; // 全局唯一
@@ -136,9 +55,7 @@ class Func with EquatableMixin {
   final AttrType rType;
 
   // run 只有运算, 在调用之前,需要先检查Attr的类型匹配问题
-  final IFunctor Function(List<IFunctor> p) logic;
-
-  // final Invokable Function(List<Value> p) logic;
+  final dynamic Function(List p) logic;
 
   IFunctor apply(List<IFunctor> p) {
     try {
