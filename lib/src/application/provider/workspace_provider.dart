@@ -47,6 +47,8 @@ class WorkspaceDataHolder {
 
   Map<ObjectId, RecordMeta> getMeta() => _cacheMeta;
 
+  bool hasMetaId(ObjectId id) => _cacheMeta.containsKey(id);
+
   Iterable<RecordMeta> allMetas() => _cacheMeta.values;
 
   RecordMeta? getMetaBy(ObjectId? id) => id == null ? null : _cacheMeta[id];
@@ -56,6 +58,7 @@ class WorkspaceDataHolder {
 /// todo 当前假定本数据库为一个工作空间
 class WorkspaceProvider extends ProviderSidecar {
   late final MetaRepo _metaRepo;
+
   // 避免出现 _dataHolder 未初始化的问题
   final WorkspaceDataHolder _dataHolder = sl<WorkspaceDataHolder>();
 
