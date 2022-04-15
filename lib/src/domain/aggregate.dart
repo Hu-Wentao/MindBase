@@ -99,8 +99,12 @@ class Record extends Equatable implements IEtt<ObjectId> {
     final propId = Property.parsePropId(prop.propId);
     if (prop is Method) {
       final method = tryGetMethodBy(propId.value2)!;
-      return evaluator.eval(expr.ExpressionDto.of(parser, method.expr), {}); // fixme 应该传入...
-      // return method.expr.invoke() as Value; // todo 目前只有 0参数的方法, 尚不支持传参的方法
+      return Value.of(evaluator.eval(expr.ExpressionDto.of(parser, method.expr),
+          // fixme 应该传入...哪些上下文?
+          {
+            "this": this, // 传入当前Record的值,可以访问当前对象内的属性
+            // todo 还要传入其他对象的引用值,用于访问其他Record的内容
+          }));
     }
     return getFieldBy(prop.k);
   }
