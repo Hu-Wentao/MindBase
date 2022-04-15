@@ -12,6 +12,8 @@ import 'package:provider_sidecar/provider_sidecar.dart';
 
 /// 本类缓存一个工作空间内的所有数据,
 /// 以便 "reference"等Func进行计算处理
+/// todo 在这里实现save Record时,只更新Record实例的属性值,而不是替换对象, 以便其他持有引用的对象访问更新后的属性
+/// todo 例如 更新 Meta的值,而已缓存的Record无需再次更新Meta的引用; 如果是替换Meta,则需要逐个更新Record的Meta引用;
 @singleton
 class WorkspaceDataHolder {
   final String name = 'default'; // 目前全局只有一个workspace
@@ -40,6 +42,13 @@ class WorkspaceDataHolder {
   void clearMeta() => _cacheMeta.clear();
 
   void clearRecord() => _cacheRecord.clear();
+
+  @protected
+  Record setRecord(Record record) {
+    _cacheRecord.putIfAbsent(record.meta.id, () => []);
+    _cacheRecord[record.meta.id]!.add(record);
+    return record;
+  }
 
   List<Record> getRecords(ObjectId metaId) => _cacheRecord[metaId] ??= [];
 
