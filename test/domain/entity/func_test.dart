@@ -68,6 +68,54 @@ main() {
     print("$r");
     expect(r, Value.of("10.0"));
   });
+  test("Expression2#嵌套3", () {
+    final exp = Expression(
+      FuncManager.findBy("+"),
+      [
+        Expression(FuncManager.findBy("*"), [
+          Value.of(4),
+          Expression(FuncManager.findBy("/"), [
+            Value.of(6),
+            Value.of(2),
+          ])
+        ]),
+        Expression(FuncManager.findBy("-"), [
+          Value.of(2),
+          Value.of(4),
+        ]),
+      ],
+    );
+    final r = exp.invoke();
+    print("$r");
+    expect(r, Value.of("10.0"));
+  });
+
+  /// Attr_v6 移除
+  // test("fMap", () {
+  //   final r = Value.of("2").fMap(Func(
+  //     name: 'test',
+  //     pTypes: [AttrType.string],
+  //     rType: AttrType.num,
+  //     logic: (v) {
+  //       return Expression(FuncManager.findBy("+"), [v[0] as Value, Value.of("3")])
+  //           .invoke() as Value;
+  //     },
+  //   ));
+  //   print("#r $r");
+  // });
+  //
+  // test("fMap2", () {
+  //   final r = Value.of("2").fMap(Func(
+  //     name: 'test',
+  //     pTypes: [AttrType.string],
+  //     rType: AttrType.num,
+  //     logic: (v) {
+  //       return Expression(FuncManager.findBy("+"), [v[0] as Value, Value.of("3")])
+  //           .invoke() as Value;
+  //     },
+  //   ));
+  //   print("#r $r");
+  // });
 
   // test("Expression", () {
   //   Expression expression = Expression.field(ObjectId(), 0, AttrType.objectId);

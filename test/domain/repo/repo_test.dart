@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
-import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/repo.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/infra/mongo_storage.dart';
@@ -24,16 +23,26 @@ main() async {
   test("recordRepo", () async {
     final metaId = ObjectId.fromHexString("622d8e7ab1e16c6095af8989");
     final meta = RecordMeta(
-        id: metaId,
-        name: 'test',
-        memo: "..",
-        maxKey: 3,
-        attributes: [
-          AttributeDto.builder(
-            k: 3,
-            name: "test",
-          ).toDm(FuncManager.findBy),
-        ]);
+      id: metaId,
+      name: 'test',
+      memo: "..",
+      maxKey: 3,
+      attrs: [
+        AttributeDto.builder(
+          k: 3,
+          name: "test",
+        ).toDm(),
+      ],
+      methods: [
+        MethodDto.builder(expr: "3+4"
+                // expr: ExpressionDto(
+                //   func: "sum",
+                //   args: [const ValueDto("3", null), const ValueDto("4", null)],
+                // ),
+                )
+            .toDomain(),
+      ],
+    );
     final recordRepo = RecordRepo(mongoStorage, metaRepo, metaId.toHexString());
     final record = Record.of(
         id: ObjectId.fromHexString("622d8e7ab1e16c6095af898a"),

@@ -4,6 +4,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
+import 'package:mind_base/src/interface/expr_context.dart';
 import 'package:ndialog/ndialog.dart';
 
 class MetaForm extends StatelessWidget {
@@ -98,7 +99,8 @@ class MetaForm extends StatelessWidget {
         k: key,
         name: json['name'] as String,
         memo: json['memo'] as String,
-        expr: ExpressionDto.fromJson(json['expr'] as Map<String, dynamic>),
+        expr: json['expr'] as String,
+        // expr: ExpressionDto.fromJson(json['expr'] as Map<String, dynamic>),
       );
     }).toList();
 
@@ -421,98 +423,107 @@ class _MethodListFormState extends State<MethodListForm> {
 
   /// 特殊处理： 对所有的键添加 ”${a.k}@“开头，以区别不同的Attribute
   Widget _buildMethodForm(BuildContext context, MethodDto m) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0),
-    child: ListTile(
-        leading: SizedBox(
-          width: 45,
-          child: FormBuilderTextField(
-            name: '${m.k}@k',
-            initialValue: m.k.toString(),
-            decoration: const InputDecoration(
-              labelText: 'Key',
-              border: OutlineInputBorder(),
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: ListTile(
+            leading: SizedBox(
+              width: 45,
+              child: FormBuilderTextField(
+                name: '${m.k}@k',
+                initialValue: m.k.toString(),
+                decoration: const InputDecoration(
+                  labelText: 'Key',
+                  border: OutlineInputBorder(),
+                ),
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(context),
+                ]),
+              ),
             ),
-            validator: FormBuilderValidators.compose([
-              FormBuilderValidators.required(context),
-            ]),
-          ),
-        ),
-        title: SizedBox(
-          // todo debug 必须设定高度
-          width: 800,
-          child: Row(
-            children: [
-              SizedBox(
-                width: 200,
-                child: FormBuilderTextField(
-                  name: '${m.k}@name',
-                  initialValue: m.name,
-                  decoration: const InputDecoration(
-                    labelText: '方法名称',
-                    border: OutlineInputBorder(),
+            title: SizedBox(
+              // todo debug 必须设定高度
+              width: 800,
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 200,
+                    child: FormBuilderTextField(
+                      name: '${m.k}@name',
+                      initialValue: m.name,
+                      decoration: const InputDecoration(
+                        labelText: '方法名称',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(context),
+                      ]),
+                    ),
                   ),
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(context),
-                  ]),
-                ),
-              ),
-              const SizedBox(width: 8),
-              SizedBox(
-                width: 200,
-                child: FormBuilderExpressionInputFields(
-                  name: '${m.k}@expr',
-                  initialValue: m.expr,
-                ),
-              ),
-              // SizedBox(
-              //   width: 150,
-              //   child: FormBuilderDropdown(
-              //     name: '${a.k}@checkFuncName',
-              //     decoration: const InputDecoration(labelText: '值校验函数'),
-              //     initialValue: a.checkFuncName,
-              //     items: FuncManager.funcList
-              //         .map((e) => DropdownMenuItem<String>(
-              //               value: e.name,
-              //               child: Text(e.name),
-              //             ))
-              //         .toList(),
-              //   ),
-              // ),
-              const SizedBox(width: 8),
-              SizedBox(
-                width: 150,
-                child: FormBuilderTextField(
-                  name: '${m.k}@memo',
-                  initialValue: m.memo,
-                  decoration: const InputDecoration(
-                    labelText: '备注',
-                    border: OutlineInputBorder(),
+                  const SizedBox(width: 8),
+                  SizedBox(
+                    width: 200,
+                    child: FormBuilderExpressionInputFields(
+                      name: '${m.k}@expr',
+                      initialValue: m.expr,
+                      initExprContexts: [
+                        // ...FuncManager.getFuncExprContexts,
+                      ],
+                    ),
                   ),
-                  validator: FormBuilderValidators.compose([
-                    // FormBuilderValidators.required(context),
-                  ]),
-                ),
+                  // SizedBox(
+                  //   width: 150,
+                  //   child: FormBuilderDropdown(
+                  //     name: '${a.k}@checkFuncName',
+                  //     decoration: const InputDecoration(labelText: '值校验函数'),
+                  //     initialValue: a.checkFuncName,
+                  //     items: FuncManager.funcList
+                  //         .map((e) => DropdownMenuItem<String>(
+                  //               value: e.name,
+                  //               child: Text(e.name),
+                  //             ))
+                  //         .toList(),
+                  //   ),
+                  // ),
+                  const SizedBox(width: 8),
+                  SizedBox(
+                    width: 150,
+                    child: FormBuilderTextField(
+                      name: '${m.k}@memo',
+                      initialValue: m.memo,
+                      decoration: const InputDecoration(
+                        labelText: '备注',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: FormBuilderValidators.compose([
+                        // FormBuilderValidators.required(context),
+                      ]),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        trailing: IconButton(
-          icon: const Icon(Icons.delete),
-          onPressed: () => _removeMethod(m),
-        )),
-  );
+            ),
+            trailing: IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () => _removeMethod(m),
+            )),
+      );
 }
 
 /// 表达式输入框
 /// Expr输入方案B
+/// 展示：对象 -> EditString
+/// 输入；EditString -> 对象
 class FormBuilderExpressionInputFields extends StatefulWidget {
   final String name;
-  final ExpressionDto initialValue;
+  final String initialValue;
+
+  // final ExpressionDto initialValue;
+  final List<ExprContext> initExprContexts;
 
   const FormBuilderExpressionInputFields({
     Key? key,
     required this.name,
     required this.initialValue,
+    required this.initExprContexts,
   }) : super(key: key);
 
   @override
@@ -525,15 +536,24 @@ class _FormBuilderExpressionInputFieldsState
   bool visible = false;
 
   late TextEditingController _ctrl;
-  final _focusNode = FocusNode();
+
+  // 属性上下文集合：相关的 属性，方法列表
+  // 1. 当前Meta的所有方法，属性；
+  // 2. 所有全局函数
+  // 3. 新添加，尚未持久化的当前方案、属性
+  List<ExprContext> exprContexts = [];
+
+  // final _focusNode = FocusNode();
 
   @override
   void initState() {
-    _ctrl = TextEditingController(text: widget.initialValue.toEditString())
+    _ctrl = TextEditingController(text: widget.initialValue)
+      // _ctrl = TextEditingController(text: widget.initialValue.toEditString())
       ..addListener(() {
         print("#debug _ctrl.text: ${_ctrl.value}");
         onEdit(_ctrl.value.text, _ctrl.value.selection);
       });
+    exprContexts.addAll(widget.initExprContexts);
     super.initState();
   }
 
@@ -543,6 +563,7 @@ class _FormBuilderExpressionInputFieldsState
   onEdit(String text, TextSelection selection) {
     // selection.isCollapsed; // 是否为点击（开始==结束）
     selection.start; // 开始位置
+    /// 手动解析方案
   }
 
   // 要save的时候才会调用本方法， 考虑做一个每次用户输入即save一次，并添加节流（每秒一次）
@@ -555,7 +576,7 @@ class _FormBuilderExpressionInputFieldsState
   Widget build(BuildContext context) => TextField(
         decoration: const InputDecoration(
           labelText: "方法体",
-          border: const OutlineInputBorder(),
+          border: OutlineInputBorder(),
         ),
         controller: _ctrl,
         onTap: _exprEditDialog,

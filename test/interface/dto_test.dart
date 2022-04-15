@@ -39,10 +39,10 @@ main() {
     final list = [
       RecordMetaDto.builder(),
       RecordMetaDto.builder(methods: [
-        MethodDto.builder(
-            expr: ExpressionDto(
-                func: "sum",
-                args: [const ValueDto("1", null), const ValueDto("2", null)])),
+        MethodDto.builder(expr: "1+2"),
+        // expr: ExpressionDto(
+        //     func: "sum",
+        //     args: [const ValueDto("1", null), const ValueDto("2", null)])),
       ]),
     ];
     for (var dto in list) {

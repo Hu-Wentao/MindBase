@@ -322,7 +322,9 @@ class MethodDto with IMongoDtoMx, EquatableMixin {
   final int k;
   final String name;
   final String memo;
-  final ExpressionDto expr;
+  final String expr;
+
+  // final ExpressionDto expr;
 
   /// 供Form初始化
   MethodDto.builder({
@@ -330,12 +332,14 @@ class MethodDto with IMongoDtoMx, EquatableMixin {
     int k = 0,
     String name = "",
     String memo = "",
-    ExpressionDto? expr,
+    String expr = "",
+    // ExpressionDto? expr,
   }) : this(
           k: k,
           name: name,
           memo: memo,
-          expr: expr ?? ExpressionDto.builder(),
+          expr: expr,
+          // expr: expr ?? ExpressionDto.builder(),
         );
 
   MethodDto build(Map<String, String> map) => MethodDto.fromJson(map);
@@ -344,7 +348,8 @@ class MethodDto with IMongoDtoMx, EquatableMixin {
         k: int.parse(attrMap['k'] as String),
         name: attrMap['name'] as String,
         memo: attrMap['memo'] as String,
-        expr: ExpressionDto.fromJson(attrMap['expr'] as Map<String, dynamic>),
+        expr: attrMap['expr'] as String,
+        // expr: ExpressionDto.fromJson(attrMap['expr'] as Map<String, dynamic>),
       );
 
   MethodDto.ofDomain(Method method)
@@ -352,12 +357,13 @@ class MethodDto with IMongoDtoMx, EquatableMixin {
           k: method.k,
           name: method.name,
           memo: method.memo,
-          expr: ExpressionDto(
-            func: method.expr.func.name,
-            args: method.expr.args
-                .map((e) => BaseInvokableDto.fromDomain(e))
-                .toList(),
-          ),
+          expr: method.expr,
+          // expr: ExpressionDto(
+          //   func: method.expr.func.name,
+          //   args: method.expr.args
+          //       .map((e) => BaseInvokableDto.fromDomain(e))
+          //       .toList(),
+          // ),
         );
 
   const MethodDto({
@@ -393,7 +399,8 @@ class MethodDto with IMongoDtoMx, EquatableMixin {
           k: json['k'] as int,
           name: json['name'] as String,
           memo: json['memo'] as String,
-          expr: ExpressionDto.fromJson(json['expr'] as Map<String, dynamic>),
+          expr: json['expr'] as String,
+          // expr: ExpressionDto.fromJson(json['expr'] as Map<String, dynamic>),
         );
 
   @override
@@ -401,14 +408,16 @@ class MethodDto with IMongoDtoMx, EquatableMixin {
         'k': k,
         'name': name,
         'memo': memo,
-        'expr': expr.toJson(),
+        'expr': expr,
+        // 'expr': expr.toJson(),
       };
 
   Method toDomain() => Method(
         k: k,
         name: name,
         memo: memo,
-        expr: expr.toDomain() as Expression,
+        expr: expr,
+        // expr: expr.toDomain() as Expression,
       );
 
   @override
@@ -592,8 +601,8 @@ class ValueDto with _$ValueDto, IMongoDtoMx, BaseInvokableDto {
   // fixme 或许不需要，因为ValueDto代表的就是某个字段的值，而方法中操作的一般是某个字段(Attr)
   @override
   String toEditString() => "$v";
-  // 如果v是原始类型，则应当使用下面的代码
-  // String toEditString() => json.encode(v);
+// 如果v是原始类型，则应当使用下面的代码
+// String toEditString() => json.encode(v);
 }
 
 class ExpressionDto with IMongoDtoMx, BaseInvokableDto {
