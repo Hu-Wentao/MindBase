@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:petitparser/petitparser.dart';
 
-import 'expr_parser.dart';
+import '../application/expression_parser.dart';
 
 /// 标识符 仅用于对用户输入的表达式解析
 /// 变量/方法的名称, 与上下文对应
@@ -25,7 +25,7 @@ class Identifier {
 /// 解析用户输入的表达式
 abstract class ExpressionDto {
   /// 表达式不合法会抛出异常
-  static ExpressionDto of(ExprParser parser, String humanReadableString) =>
+  static ExpressionDto of(ExpressionParser parser, String humanReadableString) =>
       parser.expression.end().parse(humanReadableString).value;
 
   String toReadableString(); // 人类可读字符串（代码）
@@ -149,7 +149,7 @@ class BinaryExpressionDto extends CompoundExpressionDto {
   BinaryExpressionDto(this.operator, this.left, this.right);
 
   static int precedenceForOperator(String operator) =>
-      ExprParser.binaryOperations[operator]!;
+      ExpressionParser.binaryOperations[operator]!;
 
   int get precedence => precedenceForOperator(operator);
 
