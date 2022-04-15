@@ -246,8 +246,10 @@ class RecordMemberAccessor implements MemberAccessor<Record> {
 
   @override
   getMember(Record object, String member) {
-    // fixme 目前只支持直接访问attr,暂不支持访问method
-    final attr = object.meta.attrs.firstWhere((element) => element.name == member);
-    return object.getFieldBy(attr.k).v; // 直接返回 v, 不做其他处理
+    // fixme 虽然可以访问method,但无法正常获取返回结果
+    return object
+        .getValueBy(object.meta.properties
+            .firstWhere((element) => element.name == member))
+        .v;
   }
 }
