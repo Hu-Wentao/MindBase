@@ -60,6 +60,7 @@ dependencies:
   #  responsive_table:
   syncfusion_flutter_datagrid:
   freezed_annotation:
+  petitparser:
 
 dev_dependencies:
   flutter_test:

@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1649438272;
+const int timestamp = 1649512465;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -107,6 +107,7 @@ const Map<String, Object> dependencies = <String, Object>{
       'ref': r'v1.1',
     },
   },
+  'flutter_portal': r'0.4.0',
 };
 
 /// Developer dependencies
