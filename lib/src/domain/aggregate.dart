@@ -1,10 +1,12 @@
-import 'package:get_arch_core/get_arch_core_interface.dart';
-import 'package:mind_base/src/domain/entity/func.dart';
+import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/application/expression_parser.dart';
+import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' hide Type;
 
-import 'entity/func.dart';
+import '../application/expression_evaluator.dart';
+import 'package:mind_base/src/interface/expression_dto.dart' as expr;
 
 /// 表 =========================================================================
 
@@ -82,12 +84,23 @@ class Record extends Equatable implements IEtt<ObjectId> {
   Method? tryGetMethodBy(int methodKey, {Method Function(int k)? orElse}) =>
       methods[methodKey] ?? orElse?.call(methodKey);
 
+  // todo 注入到容器中
+  static ExpressionEvaluator? _eval;
+
+  static ExpressionEvaluator get evaluator => _eval ??= ExpressionEvaluator(
+        memberAccessors: [
+          RecordMemberAccessor(sl<WorkspaceDataHolder>()),
+        ],
+      );
+  static ExpressionParser parser = ExpressionParser();
+
   /// 根据属性名称获取属性值(同时调用表达式进行计算)
   Value getValueBy(Property prop) {
     final propId = Property.parsePropId(prop.propId);
     if (prop is Method) {
       final method = tryGetMethodBy(propId.value2)!;
-      return method.expr.invoke() as Value; // todo 目前只有 0参数的方法, 尚不支持传参的方法
+      return evaluator.eval(expr.ExpressionDto.of(parser, method.expr), {}); // fixme 应该传入...
+      // return method.expr.invoke() as Value; // todo 目前只有 0参数的方法, 尚不支持传参的方法
     }
     return getFieldBy(prop.k);
   }
@@ -195,7 +208,10 @@ abstract class Property extends Equatable {
 
 class Method extends Property {
   // 方法体
-  final Expression expr;
+  // final Expression expr;
+  final String expr; // 直接用string存储
+  @override
+  final AttrType type = AttrType.string; // fixme 暂时使用String
 
   const Method({
     required int k,
@@ -209,8 +225,8 @@ class Method extends Property {
 
   MethodDto toDto() => MethodDto.ofDomain(this);
 
-  @override
-  AttrType get type => expr.type;
+// @override
+// AttrType get type => expr.type;
 }
 
 class Attribute extends Property {
