@@ -92,7 +92,17 @@ class MetaForm extends StatelessWidget {
         type: AttrType.values.byName(json['type'] as String),
       );
     }).toList();
-    final methods = methodMap.entries.map((e) {
+
+    final methodFormatMap = <int, Map<String, String>>{};
+    for (final e in methodMap.entries) {
+      final k = e.key.split("@");
+      final ik = int.parse(k[0]);
+      final fk = k[1];
+      final v = e.value;
+      methodFormatMap[ik] ??= {};
+      methodFormatMap[ik]![fk] = v;
+    }
+    final methods = methodFormatMap.entries.map((e) {
       final json = e.value;
       final key = int.parse(json['k'] as String);
       return MethodDto(
@@ -461,14 +471,30 @@ class _MethodListFormState extends State<MethodListForm> {
                   const SizedBox(width: 8),
                   SizedBox(
                     width: 200,
-                    child: FormBuilderExpressionInputFields(
+                    child: FormBuilderTextField(
+                      // fixme 无法输入空格
                       name: '${m.k}@expr',
                       initialValue: m.expr,
-                      initExprContexts: [
-                        // ...FuncManager.getFuncExprContexts,
-                      ],
+                      decoration: const InputDecoration(
+                        labelText: '方法体',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: FormBuilderValidators.compose([
+                        // FormBuilderValidators.required(context),
+                      ]),
                     ),
                   ),
+                  // SizedBox(
+                  //   width: 200,
+                  //   child: FormBuilderExpressionInputFields(
+                  //     name: '${m.k}@expr',
+                  //     initialValue: m.expr,
+                  //     initExprContexts: [
+                  //       // ...FuncManager.getFuncExprContexts,
+                  //     ],
+                  //   ),
+                  // ),
+                  // FormBuilderTextField(name: '${m.k}@expr2'),
                   // SizedBox(
                   //   width: 150,
                   //   child: FormBuilderDropdown(
