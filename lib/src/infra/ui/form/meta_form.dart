@@ -472,7 +472,6 @@ class _MethodListFormState extends State<MethodListForm> {
                   SizedBox(
                     width: 200,
                     child: FormBuilderTextField(
-                      // fixme 无法输入空格
                       name: '${m.k}@expr',
                       initialValue: m.expr,
                       decoration: const InputDecoration(
