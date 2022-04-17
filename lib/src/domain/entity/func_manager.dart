@@ -67,7 +67,7 @@ class FuncManager {
     "!": "not",
   };
 
-  static Func findAsFunc(String funcName, {Func Function()? orElse}) =>
+  static AsFunc findAsFunc(String funcName, {Func Function()? orElse}) =>
       asFuncList.firstWhere(
         (f) => f.name == funcName,
         orElse: () => orElse?.call() as AsFunc,
