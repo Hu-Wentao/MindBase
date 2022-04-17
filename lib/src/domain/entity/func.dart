@@ -11,6 +11,8 @@ part 'func_manager.dart';
 mixin IExpr on IFunctor {
   Func get fn;
 
+  AttrType get type => fn.rType;
+
   List<dynamic> get ag;
 }
 
@@ -25,8 +27,6 @@ class Expression with IFunctor, IExpr, EquatableMixin {
   final List<IExpr> ag;
 
   const Expression(this.fn, this.ag);
-
-  AttrType get type => fn.rType;
 
 // todo 出入参数量,类型检查 等等
   @override
