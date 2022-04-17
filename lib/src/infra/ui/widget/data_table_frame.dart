@@ -16,6 +16,7 @@ import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import '../../../domain/entity/func.dart';
 
 /// 用于构建一张表的数据源, 包含Meta和Rows的数据, 相关Rows的Stream
 abstract class IRecordDataGridSource extends DataGridSource {
@@ -367,9 +368,9 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     late Widget editWidget;
     switch (sourceProp.type) {
       case AttrType.objectId:
-        if(sourceProp is Attribute){
+        if (sourceProp is Attribute) {
           editWidget = _buildEditObjectId(sourceProp, sourceValue, submitCell);
-        }else{
+        } else {
           editWidget = const Text("暂不支持编辑Method");
         }
         break;
@@ -386,7 +387,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
       case AttrType.num:
       case AttrType.bool:
       case AttrType.ref: // todo 处理引用类型
-      // case AttrType.date:
+        // case AttrType.date:
         editWidget = DataTableEditText(
           editingController: editingController..text = displayText,
           // displayText: displayText,

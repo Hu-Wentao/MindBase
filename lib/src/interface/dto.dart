@@ -525,7 +525,7 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
 }
 
 mixin BaseInvokableDto on IMongoDtoMx {
-  static BaseInvokableDto fromDomain(Invokable entity) {
+  static BaseInvokableDto fromDomain(IFunctor entity) {
     if (entity is Expression) {
       return ExpressionDto.fromDomain(entity);
     } else if (entity is Value) {
@@ -563,11 +563,11 @@ mixin BaseInvokableDto on IMongoDtoMx {
   @override
   toMongoJson({AttrType type = AttrType.string}) => toJsonWithType();
 
-  Invokable toDomain() {
+  IExpr toDomain() {
     switch (runtimeType) {
       case ValueDto:
         final dto = this as ValueDto;
-        return Value(dto.v ?? '', dto.e);
+        return Value.of(dto.v, dto.e);
       case ExpressionDto:
         final dto = (this as ExpressionDto);
         return Expression(
@@ -638,7 +638,7 @@ class ExpressionDto with IMongoDtoMx, BaseInvokableDto {
       };
 
   static fromDomain(Expression expr) => ExpressionDto(
-        func: expr.func.name,
-        args: expr.args.map(BaseInvokableDto.fromDomain).toList(),
+        func: expr.fn.name,
+        args: expr.ag.map(BaseInvokableDto.fromDomain).toList(),
       );
 }
