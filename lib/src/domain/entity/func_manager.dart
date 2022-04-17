@@ -33,12 +33,19 @@ class FuncManager {
     String name, {
     Func Function()? orElse,
   }) =>
-      methodMap[type]!
-          .firstWhere((element) => element.name == name, orElse: orElse);
+      methodMap[type]!.firstWhere(
+        (element) => element.name == name,
+        orElse: orElse,
+      );
 
   // 先查一查别名表,如果没有则再查FuncName
-  static Func findBy(String funcName, {Func Function()? orElse}) =>
-      _findBy((al[funcName] ?? funcName), orElse: orElse);
+  static Func findBy(String funcName, {Func Function()? orElse}) => _findBy(
+        (al[funcName] ?? funcName),
+        orElse: () => findAsFunc(
+          funcName,
+          orElse: orElse,
+        ),
+      );
 
   static Func _findBy(String funcName, {Func Function()? orElse}) =>
       funcList.firstWhere((f) => f.name == funcName, orElse: orElse);
@@ -59,6 +66,12 @@ class FuncManager {
     "||": "or",
     "!": "not",
   };
+
+  static Func findAsFunc(String funcName, {Func Function()? orElse}) =>
+      asFuncList.firstWhere(
+        (f) => f.name == funcName,
+        orElse: () => orElse?.call() as AsFunc,
+      );
 }
 
 final Func noneFunction = Func(
@@ -74,25 +87,41 @@ final Func selfFunction = Func(
   logic: (p) => p[0],
 );
 
+/// dynamic -> T 转换
+const asFuncList = <AsFunc>[
+  AsFunc<String>(),
+  AsFunc<num>(),
+  AsFunc<bool>(),
+];
+
 /// 类型检查与转换表达式, 检查/转换失败则抛出异常
 final anyFunList = <Func>[
   Func(
       name: "toStr",
       pTypes: const [AttrType.any],
       rType: AttrType.string,
-      logic: (p) {
-        return (p[0]);
-      }),
+      logic: (p) => "${p[0]}"),
   Func(
       name: "toNum",
       pTypes: const [AttrType.any],
       rType: AttrType.num,
-      logic: (p) => (p[0])),
+      logic: (p) => num.parse(p[0])),
   Func(
       name: "toBool",
       pTypes: const [AttrType.any],
       rType: AttrType.bool,
-      logic: (p) => (p[0])),
+      logic: (p) {
+        switch (p[0].runtimeType) {
+          case bool:
+            return p[0];
+          case String:
+            return p[0] == "true";
+          case num:
+            return p[0] != 0;
+          default:
+            return false;
+        }
+      }),
   Func(
     name: "equal",
     pTypes: const [AttrType.any, AttrType.any],
