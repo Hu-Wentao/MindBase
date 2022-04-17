@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
@@ -28,9 +27,9 @@ main() {
         Value.of(2),
       ],
     );
-    final r = exp.invoke();
+    final r = exp.value;
     print("$r");
-    expect(r, Value.of(3));
+    expect(r, Value.of(3).value);
   });
   test("Expression2#嵌套2", () {
     final exp = Expression(
@@ -43,9 +42,9 @@ main() {
         Value.of(2),
       ],
     );
-    final r = exp.invoke();
+    final r = exp.value;
     print("$r");
-    expect(r, Value.of(10));
+    expect(r, Value.of(10).value);
   });
   test("Expression2#嵌套3", () {
     final exp = Expression(
@@ -64,9 +63,9 @@ main() {
         ]),
       ],
     );
-    final r = exp.invoke();
+    final r = exp.value;
     print("$r");
-    expect(r, Value.of("10.0"));
+    expect(r, Value.of(10.0).value);
   });
   test("Expression2#嵌套3", () {
     final exp = Expression(
@@ -85,9 +84,9 @@ main() {
         ]),
       ],
     );
-    final r = exp.invoke();
+    final r = exp.value;
     print("$r");
-    expect(r, Value.of("10.0"));
+    expect(r, Value.of(10.0).value);
   });
 
   /// Attr_v6 移除
@@ -98,7 +97,7 @@ main() {
   //     rType: AttrType.num,
   //     logic: (v) {
   //       return Expression(FuncManager.findBy("+"), [v[0] as Value, Value.of("3")])
-  //           .invoke() as Value;
+  //           .value as Value;
   //     },
   //   ));
   //   print("#r $r");
@@ -111,7 +110,7 @@ main() {
   //     rType: AttrType.num,
   //     logic: (v) {
   //       return Expression(FuncManager.findBy("+"), [v[0] as Value, Value.of("3")])
-  //           .invoke() as Value;
+  //           .value as Value;
   //     },
   //   ));
   //   print("#r $r");

@@ -30,7 +30,7 @@ class Expression with IFunctor, IExpr, EquatableMixin {
 
 // todo 出入参数量,类型检查 等等
   @override
-  Value get value => Value.of(fn.logic.call(ag));
+  get value => fn.logic.call(ag.map((a) => a.value).toList());
 
   @override
   List<Object?> get props => [fn, ag];
@@ -64,37 +64,65 @@ mixin IFunctor {
 //  T get value => throw UnimplementedError();
 // }
 
-/// Expr-v11.1 方案 所有Value都是对String类型的包装,无其他类型
+/// Expr-v11.2 方案 直接存储dynamic类型,通过 fn映射为具体的类型
 /// 一般来说 List [ag], ag[0]用于存储 v, 表示当前的值;考虑用ag[1]存储 e
 /// 需要注意的是, ag[0]可以是dynamic类型,在计算时,会自动as为String类型
 class Value with IFunctor, IExpr, EquatableMixin {
   @override
-  final AsFunc<String> fn; // 对于Value, fn对象始终是 [AsFunc]类及其子类
+  final AsFunc fn; // 对于Value, fn对象始终是 [AsFunc]类及其子类
   // 对于Value, ag对象始终是 [List<String>]类
   @override
   final List<dynamic> ag; // ag[0]为实际值, ag[1]为错误值
 
   @override
-  String get value => fn.logic.call(ag);
+  dynamic get value => fn.logic.call(ag);
 
-  String get v => value;
+  dynamic get v => value;
+
+  String get e => ag[1];
 
   @override
   List<Object?> get props => [fn, ...ag];
 
   @protected
   const Value({
-    this.fn = const AsFunc<String>(),
+    required this.fn,
     required this.ag,
   });
 
-  Value.of(dynamic v, [dynamic e]) : this(ag: [v ?? "", if (e != null) e]);
+  factory Value.of(dynamic v, [dynamic e]) {
+    AsFunc fn;
+    switch (v.runtimeType) {
+      case double:
+        fn = const AsFunc<double>();
+        break;
+      case int:
+        fn = const AsFunc<int>();
+        break;
+      case num:
+        fn = const AsFunc<num>();
+        break;
+      case String:
+        fn = const AsFunc<String>();
+        break;
+      case bool:
+        fn = const AsFunc<bool>();
+        break;
+      default:
+        throw "暂不支持的包装类型[${v.runtimeType}]";
+    }
 
-  Value.err(String? e) : this.of("", e);
+    return Value(
+      fn: fn,
+      ag: [v ?? "", if (e != null) e],
+    );
+  }
+
+  factory Value.err(String? e) => Value.of("", e);
 
   Value.fromJson(Map<String, dynamic> json)
       : this(
-          fn: FuncManager.findAsFunc(json['fn'] as String) as AsFunc<String>,
+          fn: FuncManager.findAsFunc(json['fn'] as String),
           ag: (json['ag'] as List<dynamic>),
         );
 
@@ -168,10 +196,11 @@ class AsFunc<T> implements Func {
   AttrType get rType => AttrType.values.byName("$T");
 
   @override
-  Function get logic => (v) {
-        if (v is String && T is ObjectId) {
-          return ObjectId.fromHexString(v);
-        }
+  Function get logic => (args) {
+        final v = args[0];
+        // if (v is String && T is ObjectId) {
+        //   return ObjectId.fromHexString(v);
+        // }
         return v as T;
       };
 
