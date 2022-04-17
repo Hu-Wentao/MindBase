@@ -8,7 +8,7 @@ import '../interface/expression_dto.dart';
 class ExpressionParser {
   ExpressionParser() {
     expression.set(binaryExpression);
-    token.set((literal | unaryExpression | variable).cast<ExpressionDto>());
+    readableString.set((literal | unaryExpression | variable).cast<ExpressionDto>());
   }
 
   Parser<Identifier> get identifier =>
@@ -98,9 +98,9 @@ class ExpressionParser {
           mapLiteral)
       .cast();
 
-  // 另一种二元表达式:
-  // 例如 `foo.bar(baz)`, `1`, `'abc'`, `(a % 2)`
-  final SettableParser<ExpressionDto> token = undefined<ExpressionDto>();
+  /// 相关[expression]
+  /// 方法: foo.bar(baz), 一元表达式: -1, 字面值 "abc", 括号()
+  final SettableParser<ExpressionDto> readableString = undefined<ExpressionDto>();
 
   // 二元表达式操作符优先级
   static const Map<String, int> binaryOperations = {
@@ -133,7 +133,7 @@ class ExpressionParser {
 
   /// 二元表达式
   Parser<ExpressionDto> get binaryExpression =>
-      token.separatedBy(binaryOperation).map((l) {
+      readableString.separatedBy(binaryOperation).map((l) {
         var first = l[0];
         var stack = <dynamic>[first];
 
@@ -174,7 +174,7 @@ class ExpressionParser {
       .map<Parser<String>>((v) => string(v))
       .reduce((a, b) => (a | b).cast<String>())
       .trim()
-      .seq(token)
+      .seq(readableString)
       .map((l) => UnaryExpressionDto(l[0], l[1]));
 
   // 处理List形式的参数列表, 例如方法参数列表`(a, b, c)`, 数组`[a, b, c]`
@@ -231,5 +231,7 @@ class ExpressionParser {
   Parser<List<ExpressionDto>> get callArgument =>
       (char('(') & arguments & char(')')).pick(1).cast();
 
+  /// 相关:[readableString]
+  /// 二元表达式
   final SettableParser<ExpressionDto> expression = undefined();
 }
