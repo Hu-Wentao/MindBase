@@ -54,13 +54,13 @@ class Func with EquatableMixin {
   // todo 新增一个动态获取 rType的方法，针对Any类型的返回值，可以通过方法得到实际的返回类型，而不是Any
   final AttrType rType;
 
-  // run 只有运算, 在调用之前,需要先检查Attr的类型匹配问题
-  final dynamic Function(List p) logic;
+  // 在调用之前,需要先检查Attr的类型匹配问题
+  final Function logic;
 
-  IFunctor apply(List<IFunctor> p) {
+  IFunctor apply(List<IFunctor>? p) {
     try {
       // fixme 未作细节处理，如保留原值等
-      return logic(p);
+      return Function.apply(logic, p);
     } catch (e) {
       return Value('', e.toString());
     }
