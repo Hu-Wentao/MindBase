@@ -1,3 +1,4 @@
+import 'package:mind_base/src/application/parser_char.dart';
 import 'package:petitparser/core.dart';
 import 'package:petitparser/parser.dart';
 
@@ -11,7 +12,7 @@ class ExpressionParser {
   }
 
   Parser<Identifier> get identifier =>
-      (digit().not() & (word() | char(r'$')).plus())
+      (digit().not() & (word() | char(r'$') | chineseChar()).plus())
           .flatten()
           .map((v) => Identifier(v));
 
