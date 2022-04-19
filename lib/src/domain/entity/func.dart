@@ -224,3 +224,22 @@ class AsFunc<T> implements Func {
   @override
   bool get stringify => true;
 }
+
+class AsFuncDynamic extends AsFunc {
+  const AsFuncDynamic();
+
+  @override
+  IFunctor apply(List<IFunctor>? p) {
+    // TODO: implement apply
+    throw UnimplementedError();
+  }
+
+  @override
+  Function get logic => (_) => _[0];
+
+  @override
+  String get name => "asDynamic";
+
+  @override
+  AttrType get rType => AttrType.any;
+}
