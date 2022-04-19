@@ -28,9 +28,11 @@ class Expression with IFunctor, IExpr, EquatableMixin {
 
   const Expression(this.fn, this.ag);
 
+  get callee => () => fn.logic.call(ag.map((a) => a.value).toList());
+
 // todo 出入参数量,类型检查 等等
   @override
-  get value => fn.logic.call(ag.map((a) => a.value).toList());
+  get value => callee();
 
   @override
   List<Object?> get props => [fn, ag];
@@ -109,7 +111,8 @@ class Value with IFunctor, IExpr, EquatableMixin {
         fn = const AsFunc<bool>();
         break;
       default:
-        throw "暂不支持的包装类型[${v.runtimeType}]";
+        fn = const AsFuncDynamic();
+      // throw "暂不支持的包装类型[${v.runtimeType}]";
     }
 
     return Value(
