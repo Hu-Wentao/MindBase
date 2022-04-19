@@ -3,13 +3,11 @@ part of 'func.dart';
 /// todo 添加test, 1.检查name唯一性, 2检查参数转换是否正常
 /// todo 移除alias属性
 class FuncManager {
+  // 是否为短路运算符
+  static bool isShortCircuit(String name) =>
+      const ['&&', '||', "and", "or"].contains(name);
   static const String noneFuncName = "none";
   static const String selfFuncName = "self";
-
-  // static get getFuncExprContexts => funcList.map((e) => ExprContext(
-  //       e.name,
-  //       e.name,
-  //     ));
 
   static Func get selfFunc => selfFunction;
 
@@ -201,18 +199,21 @@ final numFunList = [
     logic: ((p) => (p[0]) <= (p[1])),
   ),
 ];
+
+/// `short-circuit` 短路表达式
+/// todo 考虑将参数2的类型改为 [AttrType.any] 或者对类型检查进行特殊处理
 final boolFunList = [
   Func(
     name: "and",
     pTypes: const [AttrType.bool, AttrType.bool],
     rType: AttrType.bool,
-    logic: ((p) => (p[0]) && (p[1])),
+    logic: ((p) => (p[0]) && (p[1] is Function) ? p[1].call() : p[1]),
   ),
   Func(
     name: "or",
     pTypes: const [AttrType.bool, AttrType.bool],
     rType: AttrType.bool,
-    logic: ((p) => (p[0]) || (p[1])),
+    logic: ((p) => (p[0]) || (p[1] is Function) ? p[1].call() : p[1]),
   ),
   Func(
     name: "not",
