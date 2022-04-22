@@ -12,6 +12,7 @@ import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_edit_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_edit.dart';
+import 'package:mind_base/src/infra/ui/widget/my_checkbox.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:provider/provider.dart';
@@ -647,6 +648,17 @@ class DataFrameTitle extends StatelessWidget {
             icon: const Icon(Icons.add),
             label: const Text("新增记录"),
           ),
+          MyCheckBox(),
+          Consumer<WorkspaceProvider>(
+              builder: (c, pWorkspace, _) => TextButton.icon(
+                  onPressed: () {
+                    pWorkspace.metaMap.remove(meta.id);
+                    pWorkspace.actWatchMeta(pWorkspace.metaList.last);
+                  },
+                  icon: const Icon(Icons.delete),
+                  label: const Text("删除表"),
+              )
+          )
         ],
       );
 }
