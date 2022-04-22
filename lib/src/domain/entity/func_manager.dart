@@ -11,11 +11,15 @@ class FuncManager {
 
   static get memberFuncName => memberFunc.name;
 
+  static get indexFuncName => indexFunc.name;
+
   static Func get selfFunc => selfFunction;
 
   static Func get noneFunc => noneFunction;
 
   static Func get memberFunc => memberFunction;
+
+  static Func get indexFunc => indexFunction;
 
   static Iterable<Func> get funcList => [
         ...anyFunList,
@@ -23,6 +27,7 @@ class FuncManager {
         ...numFunList,
         ...strFunList,
         memberFunc,
+        indexFunc,
       ];
 
   /// 相关 [AttrType]所有用的方法
@@ -84,6 +89,8 @@ class FuncManager {
             : orElse.call() as AsFunc,
       );
 }
+
+const Func indexFunction = IndexFunc();
 
 /// 通过RecordId查询当前工作区内的Record,并访问成员对象
 /// 类比Java访问内存中的对象

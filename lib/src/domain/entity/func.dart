@@ -10,6 +10,7 @@ part 'func_manager.dart';
 
 mixin IExpr on IFunctor {
   Func get fn;
+
   /// [ctx] 上下文, 仅在IExpr为Expression,并且作为`方法`时,才会传入
   callee([Map<String, dynamic>? ctx]);
 
@@ -269,6 +270,7 @@ class MemberFunc implements Func {
   @override
   final String name = "member";
 
+  /// [ctx]是隐式传递
   @override
   List<AttrType> get pTypes => [rType];
 
@@ -289,10 +291,45 @@ class MemberFunc implements Func {
         return record[propId] ?? (throw "找不到 propId [$propId]");
       };
 
-
   @override
   List<Object?> get props => [name, pTypes, rType, logic];
 
+  @override
+  IFunctor apply(List<IFunctor>? p) {
+    // TODO: implement apply
+    throw UnimplementedError();
+  }
+
+  @override
+  bool get stringify => true;
+}
+
+/// 访问数组对象
+class IndexFunc implements Func {
+  const IndexFunc();
+
+  @override
+  final String name = "index";
+
+  /// [索引, 对象]
+  @override
+  List<AttrType> get pTypes => [AttrType.num, rType];
+
+  @override
+  AttrType get rType => AttrType.any;
+
+  @override
+  invoke([Map<String, dynamic>? ctx, List<dynamic>? ag]) {}
+
+  @override
+  Function get logic => (p) {
+        final index = p[0];
+        final list = p[1];
+        return list[index] ?? (throw "list 中找不到索引 [$index]");
+      };
+
+  @override
+  List<Object?> get props => [name, pTypes, rType, logic];
 
   @override
   IFunctor apply(List<IFunctor>? p) {
