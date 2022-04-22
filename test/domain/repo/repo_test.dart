@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
+import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/repo.dart';
-import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/infra/mongo_storage.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
@@ -34,13 +34,21 @@ main() async {
         ).toDm(),
       ],
       methods: [
-        MethodDto.builder(expr: "3+4"
-                // expr: ExpressionDto(
-                //   func: "sum",
-                //   args: [const ValueDto("3", null), const ValueDto("4", null)],
-                // ),
-                )
-            .toDomain(),
+        Method(
+            k: 0,
+            name: 'name',
+            memo: 'memo',
+            expr: Expression(FuncManager.findBy('add'), [
+              Value.of(1),
+              Value.of(2),
+            ]))
+        // MethodDto.builder(expr: "3+4"
+        //         // expr: ExpressionDto(
+        //         //   func: "sum",
+        //         //   args: [const ValueDto("3", null), const ValueDto("4", null)],
+        //         // ),
+        //         )
+        //     .toDomain(),
       ],
     );
     final recordRepo = RecordRepo(mongoStorage, metaRepo, metaId.toHexString());
