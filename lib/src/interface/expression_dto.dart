@@ -38,13 +38,16 @@ class Identifier {
 
 /// Expr v11
 /// 解析用户输入的表达式
+/// `可读字符串` -> `可执行表达式`
 abstract class ExpressionDto {
   /// 表达式不合法会抛出异常
   static ExpressionDto of(
     ExpressionParser parser,
     String humanReadableString,
-  ) =>
-      parser.expression.end().parse(humanReadableString).value;
+  ) {
+    // print("#debug#ExpressionDto.of: $humanReadableString");
+    return parser.expression.end().parse(humanReadableString).value;
+  }
 
   String toReadableString(); // 人类可读字符串（代码）
 
