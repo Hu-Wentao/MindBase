@@ -106,7 +106,7 @@ class ThisExpressionDto extends BaseExpressionDto {
   List<Object?> get props => const [];
 
   @override
-  String toReadableString() => toString();
+  String toReadableString() => 'this';
 
   /// 似乎不需要
   @override
