@@ -258,7 +258,7 @@ abstract class Property extends Equatable {
 
 class Method extends Property {
   // 方法体
-  final Expression expr;
+  final IExpr expr;
 
   @override
   AttrType get type => expr.type;
