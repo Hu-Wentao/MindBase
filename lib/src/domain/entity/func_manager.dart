@@ -62,7 +62,7 @@ class FuncManager {
     "+": "add",
     "-": "sub",
     "*": "mul",
-    "/": "div",
+    "/": "div", // 非整除
     "%": "mod",
     "^": "pow",
     ">": "greater",
@@ -72,6 +72,8 @@ class FuncManager {
     "&&": "and",
     "||": "or",
     "!": "not",
+    // 一元位补码
+    "~": "complement",
   };
 
   static AsFunc findAsFunc(String funcName, {Func Function()? orElse}) =>
@@ -149,6 +151,12 @@ final anyFunList = <Func>[
   ),
   noneFunction,
   selfFunction,
+  Func(
+    name: "complement",
+    pTypes: const [AttrType.num],
+    rType: AttrType.num,
+    logic: (p) => ~(p[0]),
+  ),
 ];
 
 /// 基础表达式
