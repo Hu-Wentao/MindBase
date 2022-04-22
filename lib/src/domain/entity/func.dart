@@ -319,7 +319,7 @@ class IndexFunc implements Func {
   AttrType get rType => AttrType.any;
 
   @override
-  invoke([Map<String, dynamic>? ctx, List<dynamic>? ag]) {}
+  invoke([Map<String, dynamic>? ctx, List<dynamic>? ag]) => logic(ag);
 
   @override
   Function get logic => (p) {
