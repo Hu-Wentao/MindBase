@@ -6,15 +6,24 @@ class FuncManager {
   // 是否为短路运算符
   static bool isShortCircuit(String name) =>
       const ['&&', '||', "and", "or"].contains(name);
-  static const String noneFuncName = "none";
-  static const String selfFuncName = "self";
+  static const noneFuncName = "none";
+  static const selfFuncName = "self";
+
+  static get memberFuncName => memberFunc.name;
 
   static Func get selfFunc => selfFunction;
 
   static Func get noneFunc => noneFunction;
 
-  static Iterable<Func> get funcList =>
-      methodMap.values.expand((element) => element);
+  static Func get memberFunc => memberFunction;
+
+  static Iterable<Func> get funcList => [
+        ...anyFunList,
+        ...boolFunList,
+        ...numFunList,
+        ...strFunList,
+        memberFunc,
+      ];
 
   /// 相关 [AttrType]所有用的方法
   static Map<AttrType, Iterable<Func>> get methodMap => {
@@ -41,7 +50,7 @@ class FuncManager {
         (al[funcName] ?? funcName),
         orElse: () => findAsFunc(
           funcName,
-          orElse: orElse,
+          orElse: orElse ?? () => (throw "找不到Func[$funcName]"),
         ),
       );
 
@@ -68,9 +77,15 @@ class FuncManager {
   static AsFunc findAsFunc(String funcName, {Func Function()? orElse}) =>
       asFuncList.firstWhere(
         (f) => f.name == funcName,
-        orElse: () => orElse?.call() as AsFunc,
+        orElse: () => (orElse == null)
+            ? (throw "找不到`AsFunc`[$funcName]")
+            : orElse.call() as AsFunc,
       );
 }
+
+/// 通过RecordId查询当前工作区内的Record,并访问成员对象
+/// 类比Java访问内存中的对象
+const Func memberFunction = MemberFunc();
 
 final Func noneFunction = Func(
   name: FuncManager.noneFuncName,
