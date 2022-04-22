@@ -19,6 +19,7 @@ class WorkspaceDataHolder {
   ///
   final List<RecordMeta> _cacheMeta = [];
 
+  @protected
   RecordMeta insertMeta(RecordMeta meta) {
     _cacheMeta.add(meta);
     return meta;
