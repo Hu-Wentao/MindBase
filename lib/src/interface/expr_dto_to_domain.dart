@@ -151,6 +151,8 @@ class ExpressionConvertException implements Exception {
 
 /// 将对象名改成转换成 propId, 以便持久化
 class MetaMemberAccessor implements MemberAccessor<RecordMeta> {
+  const MetaMemberAccessor();
+
   // final WorkspaceDataHolder workspace;
   // RecordMemberAccessor(this.workspace);
 
