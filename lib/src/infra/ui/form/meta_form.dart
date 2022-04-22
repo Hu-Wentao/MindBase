@@ -4,7 +4,6 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
-import 'package:mind_base/src/interface/expr_context.dart';
 import 'package:ndialog/ndialog.dart';
 
 class MetaForm extends StatelessWidget {
@@ -109,8 +108,7 @@ class MetaForm extends StatelessWidget {
         k: key,
         name: json['name'] as String,
         memo: json['memo'] as String,
-        expr: json['expr'] as String,
-        // expr: ExpressionDto.fromJson(json['expr'] as Map<String, dynamic>),
+        expr: IExprJsonDto.fromJson(json['expr'] as Map<String, dynamic>),
       );
     }).toList();
 
@@ -473,7 +471,7 @@ class _MethodListFormState extends State<MethodListForm> {
                     width: 200,
                     child: FormBuilderTextField(
                       name: '${m.k}@expr',
-                      initialValue: m.expr,
+                      initialValue: m.expr.toReadableString(),
                       decoration: const InputDecoration(
                         labelText: '方法体',
                         border: OutlineInputBorder(),
@@ -541,8 +539,8 @@ class FormBuilderExpressionInputFields extends StatefulWidget {
   final String name;
   final String initialValue;
 
-  // final ExpressionDto initialValue;
-  final List<ExprContext> initExprContexts;
+  // 应该放入 {"this":<当前的Meta>, "全局Func的name":<Func>...}
+  final Map<String, dynamic> initExprContexts;
 
   const FormBuilderExpressionInputFields({
     Key? key,
@@ -566,7 +564,7 @@ class _FormBuilderExpressionInputFieldsState
   // 1. 当前Meta的所有方法，属性；
   // 2. 所有全局函数
   // 3. 新添加，尚未持久化的当前方案、属性
-  List<ExprContext> exprContexts = [];
+  Map<String, dynamic> exprContexts = {};
 
   // final _focusNode = FocusNode();
 
