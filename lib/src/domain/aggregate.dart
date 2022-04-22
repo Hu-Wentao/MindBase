@@ -1,34 +1,31 @@
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/application/expression_parser.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
+import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' hide Type;
 
 import '../application/expression_evaluator.dart';
-import 'package:mind_base/src/interface/expression_dto.dart' as expr;
 
 /// 表 =========================================================================
 
 /// 记录
 /// 必须通过DTO转换 [RecordDto]
 /// fields[0] 始终为 [id]
-class Record extends Equatable implements IEtt<ObjectId> {
+class Record implements IEtt<ObjectId> {
   @override
   final ObjectId id;
   final RecordMeta meta; // Aggregate组装得到,实际只存储Id
-  final Map<int, Value> fields;
-  final Map<int, Method> methods;
+  Map<int, Value> fields;
 
-  const Record({
+  List<Method> get methods => meta.methods; // method自带k值
+
+  Record({
     required this.id,
     required this.meta,
     required this.fields,
-    required this.methods,
   });
-
-  @override
-  get props => [id, meta, fields];
 
   factory Record.of({
     ObjectId? id,
@@ -43,23 +40,10 @@ class Record extends Equatable implements IEtt<ObjectId> {
         0: Value.of(recordId.toHexString()),
         1: Value.of(meta.id.toHexString()),
       }..addAll(fields),
-      methods: meta.methodMap,
     );
   }
 
   RecordDto toDto() => RecordDto.fromDomain(this);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Record &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          meta == other.meta &&
-          fields == other.fields;
-
-  @override
-  int get hashCode => id.hashCode ^ meta.hashCode ^ fields.hashCode;
 
   @override
   String toString() => toDto().toString();
@@ -76,13 +60,16 @@ class Record extends Equatable implements IEtt<ObjectId> {
   Value getFieldBy(int attrKey, {Value Function(int k)? orElse}) =>
       tryGetFieldBy(attrKey) ??
       orElse?.call(attrKey) ??
-      (throw "找不到属性: [$attrKey] 对应的字段");
+      (throw "找不到attrKey: [$attrKey] 对应的Field");
 
   Value? tryGetFieldBy(int attrKey, {Value Function(int k)? orElse}) =>
       fields[attrKey] ?? orElse?.call(attrKey);
 
   Method? tryGetMethodBy(int methodKey, {Method Function(int k)? orElse}) =>
-      methods[methodKey] ?? orElse?.call(methodKey);
+      methods.firstWhere((mth) => mth.k == methodKey,
+          orElse: () =>
+              orElse?.call(methodKey) ??
+              (throw "找不到attrKey: [$methods] 对应的Method"));
 
   // todo 注入到容器中
   static ExpressionEvaluator? _eval;
@@ -96,17 +83,29 @@ class Record extends Equatable implements IEtt<ObjectId> {
 
   /// 根据属性名称获取属性值(同时调用表达式进行计算)
   Value getValueBy(Property prop) {
-    final propId = Property.parsePropId(prop.propId);
     if (prop is Method) {
-      final method = tryGetMethodBy(propId.value2)!;
-      return Value.of(evaluator.eval(expr.ExpressionDto.of(parser, method.expr),
-          // fixme 应该传入...哪些上下文?
-          {
-            "this": this, // 传入当前Record的值,可以访问当前对象内的属性
-            // todo 还要传入其他对象的引用值,用于访问其他Record的内容
-          }));
+      final method = prop;
+      return Value.of(method.invoke(this));
+    } else {
+      return getFieldBy(prop.k);
     }
-    return getFieldBy(prop.k);
+  }
+
+  // // fixme 待完善
+  // getPropBy(String propId) {
+  //   print("debug # getPropBy# propId: $propId");
+  //   final parsedPropId = Property.parsePropId(propId);
+  //   if (parsedPropId.value1 == 'm') {
+  //     return tryGetMethodBy(parsedPropId.value2);
+  //   } else {
+  //     return tryGetFieldBy(parsedPropId.value2);
+  //   }
+  // }
+
+  // 更新属性值
+  void update(Record record) {
+    assert(id == record.id, "Record::update,当前ID[$id]与更新ID[${record.id}]不一致!");
+    fields = record.fields;
   }
 
   @Deprecated("只能更新字段值")
@@ -115,21 +114,34 @@ class Record extends Equatable implements IEtt<ObjectId> {
       id: id,
       meta: meta,
       fields: fields..[Property.parsePropId(propId).value2] = value,
-      methods: methods,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Record &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          meta == other.meta &&
+          fields == other.fields &&
+          methods == other.methods;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^ meta.hashCode ^ fields.hashCode ^ methods.hashCode;
 }
 
 /// Meta信息
 /// 必须通过DTO转换 [RecordMetaDto]
-class RecordMeta extends Equatable implements IEtt<ObjectId> {
+class RecordMeta implements IEtt<ObjectId> {
   @override
   final ObjectId id;
-  final String name;
-  final String memo;
-  final int maxKey; // 等于Table中出现过key的数量, 用于新增Attr,只能增加
-  final List<Attribute> attrs; // 字段表
-  final List<Method> methods; // 方法表
+  String name;
+  String memo;
+  int maxKey; // 等于Table中出现过key的数量, 用于新增Attr,只能增加
+  List<Attribute> attrs; // 字段表
+  List<Method> methods; // 方法表
 
   Map<int, Method> get methodMap =>
       Map.fromEntries(methods.map((e) => MapEntry(e.k, e)).toList());
@@ -137,7 +149,7 @@ class RecordMeta extends Equatable implements IEtt<ObjectId> {
   // 表头
   List<Property> get properties => [...attrs, ...methods];
 
-  const RecordMeta({
+  RecordMeta({
     required this.id,
     required this.name,
     required this.memo,
@@ -145,9 +157,6 @@ class RecordMeta extends Equatable implements IEtt<ObjectId> {
     required this.attrs,
     required this.methods,
   });
-
-  @override
-  List<Object?> get props => [id, name, memo, maxKey, properties];
 
   int nextKey() => maxKey + 1;
 
@@ -167,10 +176,47 @@ class RecordMeta extends Equatable implements IEtt<ObjectId> {
     );
   }
 
+  Method? getMethodBy(String member) {
+    for (final element in methods) {
+      if (element.name == member) return element;
+    }
+    return null;
+  }
+
   RecordMetaDto toDto() => RecordMetaDto.fromDomain(this);
 
   @override
   String toString() => toDto().toString();
+
+  void update(RecordMeta meta) {
+    assert(id == meta.id, "Meta::update,当前ID[$id]与更新ID[${meta.id}]不一致!");
+    name = meta.name;
+    memo = meta.memo;
+    maxKey = meta.maxKey;
+    attrs = meta.attrs;
+    methods = meta.methods;
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RecordMeta &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          name == other.name &&
+          memo == other.memo &&
+          maxKey == other.maxKey &&
+          attrs == other.attrs &&
+          methods == other.methods;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      name.hashCode ^
+      memo.hashCode ^
+      maxKey.hashCode ^
+      attrs.hashCode ^
+      methods.hashCode;
 }
 
 /// 是 [Attribute]和[Method]的父类
@@ -212,10 +258,10 @@ abstract class Property extends Equatable {
 
 class Method extends Property {
   // 方法体
-  // final Expression expr;
-  final String expr; // 直接用string存储
+  final Expression expr;
+
   @override
-  final AttrType type = AttrType.string; // fixme 暂时使用String
+  AttrType get type => expr.type;
 
   const Method({
     required int k,
@@ -229,8 +275,14 @@ class Method extends Property {
 
   MethodDto toDto() => MethodDto.ofDomain(this);
 
-// @override
-// AttrType get type => expr.type;
+  // 方法被调用时, 就算是无参,也默认传入`this`
+  invoke(Record record) {
+    final selfCtx = record.fields.map((k, v) => MapEntry("a$k", v.value))
+      ..addAll(
+        Map.fromEntries(record.methods.map((e) => MapEntry("m${e.k}", e.expr))),
+      );
+    return expr.callee(selfCtx);
+  }
 }
 
 class Attribute extends Property {
