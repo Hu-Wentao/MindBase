@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/application/provider/workspace_provider.dart';
+import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'dart:math' as math;
 
@@ -119,6 +121,12 @@ class Value with IFunctor, IExpr, EquatableMixin {
         break;
       case bool:
         fn = const AsFunc<bool>();
+        break;
+      case RecordMeta:
+        fn = const AsFuncRecordMeta();
+        break;
+      case Record:
+        fn = const AsFuncRecord();
         break;
       default:
         fn = const AsFuncDynamic();
@@ -259,6 +267,54 @@ class AsFuncDynamic extends AsFunc {
 
   @override
   String get name => "asDynamic";
+
+  @override
+  AttrType get rType => AttrType.any;
+}
+
+class AsFuncRecord extends AsFunc<Record> {
+  const AsFuncRecord();
+
+  @override
+  IFunctor apply(List<IFunctor>? p) {
+    // TODO: implement apply
+    throw UnimplementedError();
+  }
+
+  /// 存储的是RecordId
+  @override
+  Function get logic => (_) {
+        final recordId = _[0];
+        final record = sl<WorkspaceDataHolder>().queryRecordBy(recordId);
+        return record;
+      };
+
+  @override
+  String get name => "asFuncRecord";
+
+  @override
+  AttrType get rType => AttrType.any;
+}
+
+class AsFuncRecordMeta extends AsFunc<RecordMeta> {
+  const AsFuncRecordMeta();
+
+  @override
+  IFunctor apply(List<IFunctor>? p) {
+    // TODO: implement apply
+    throw UnimplementedError();
+  }
+
+  /// 存储的是MetaId
+  @override
+  Function get logic => (_) {
+        final metaId = _[0];
+        final meta = sl<WorkspaceDataHolder>().getMetaBy(metaId);
+        return meta;
+      };
+
+  @override
+  String get name => "asFuncRecordMeta";
 
   @override
   AttrType get rType => AttrType.any;

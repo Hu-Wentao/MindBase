@@ -120,6 +120,9 @@ const asFuncList = <AsFunc>[
   AsFunc<String>(),
   AsFunc<num>(),
   AsFunc<bool>(),
+  AsFuncDynamic(),
+  AsFuncRecordMeta(),
+  AsFuncRecord(),
 ];
 
 /// 类型检查与转换表达式, 检查/转换失败则抛出异常
