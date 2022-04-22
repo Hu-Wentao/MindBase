@@ -244,12 +244,19 @@ class RecordMemberAccessor implements MemberAccessor<Record> {
     // return workspace.hasMetaId(meta.id);
   }
 
+  /// 成员可以是值, 也可是函数[Function]
+  /// todo 在新增/修改变量/方法名称时,没有检查名称唯一性
+  /// 考虑允许方法与变量重名,用于表达"get"方法
   @override
-  getMember(Record object, String member) {
-    // fixme 虽然可以访问method,但无法正常获取返回结果
-    return object
-        .getValueBy(object.meta.properties
-            .firstWhere((element) => element.name == member))
-        .v;
+  getMember(Record record, String member) {
+    final method = record.meta.getMethodBy(member);
+    if (method != null) {
+      return method.expr.callee; // 可以被调用
+    }
+    final field = record.tryGetFieldByColumn(member);
+    if (field != null) {
+      return field.value; // 值
+    }
+    throw "在Record[${record.id}]找不到名称为[$member]的成员方法或变量";
   }
 }
