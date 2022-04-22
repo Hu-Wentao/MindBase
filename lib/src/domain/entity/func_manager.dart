@@ -30,9 +30,14 @@ class FuncManager {
         ...boolFunList,
         ...numFunList,
         ...strFunList,
+        ...asFuncList,
         memberFunc,
         indexFunc,
       ];
+
+  static bool isAsFunc(String name) =>
+      (name.startsWith('as')) &&
+      asFuncList.any((element) => element.name == name);
 
   /// 相关 [AttrType]所有用的方法
   static Map<AttrType, Iterable<Func>> get methodMap => {
@@ -42,17 +47,6 @@ class FuncManager {
         AttrType.string: strFunList,
         // AttrType.date: dateFunList,
       };
-
-  @Deprecated("弃用")
-  static Func findMethod(
-    AttrType type,
-    String name, {
-    Func Function()? orElse,
-  }) =>
-      methodMap[type]!.firstWhere(
-        (element) => element.name == name,
-        orElse: orElse,
-      );
 
   // 先查一查别名表,如果没有则再查FuncName
   static Func findBy(String funcName, {Func Function()? orElse}) => _findBy(
@@ -86,12 +80,14 @@ class FuncManager {
   };
 
   static AsFunc findAsFunc(String funcName, {Func Function()? orElse}) =>
-      asFuncList.firstWhere(
-        (f) => f.name == funcName,
-        orElse: () => (orElse == null)
-            ? (throw "找不到`AsFunc`[$funcName]")
-            : orElse.call() as AsFunc,
-      );
+      (funcName.startsWith('as'))
+          ? asFuncList.firstWhere(
+              (f) => f.name == funcName,
+              orElse: () => (orElse == null)
+                  ? (throw "找不到`AsFunc`[$funcName]")
+                  : orElse.call() as AsFunc,
+            )
+          : throw "findAsFunc 的函数名必须以`as`开头";
 }
 
 const Func callFunction = CallFunc();
