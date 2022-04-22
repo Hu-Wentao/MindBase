@@ -340,3 +340,42 @@ class IndexFunc implements Func {
   @override
   bool get stringify => true;
 }
+
+/// 执行函数
+class CallFunc implements Func {
+  const CallFunc();
+
+  @override
+  final String name = "call";
+
+  /// [callee, List参数列表]
+  /// todo 考虑新增 函数类型, List类型
+  @override
+  List<AttrType> get pTypes => [AttrType.any, AttrType.any];
+
+  @override
+  AttrType get rType => AttrType.any;
+
+  @override
+  invoke([Map<String, dynamic>? ctx, List<dynamic>? ag]) => logic(ag);
+
+  @override
+  Function get logic => (p) {
+        final callee = p[0];
+        final args = p[1];
+        return Function.apply(callee, args) ??
+            (throw "无法执行函数[$callee], 参数[$args]");
+      };
+
+  @override
+  List<Object?> get props => [name, pTypes, rType, logic];
+
+  @override
+  IFunctor apply(List<IFunctor>? p) {
+    // TODO: implement apply
+    throw UnimplementedError();
+  }
+
+  @override
+  bool get stringify => true;
+}

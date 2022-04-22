@@ -13,6 +13,8 @@ class FuncManager {
 
   static get indexFuncName => indexFunc.name;
 
+  static get callFuncName => callFunc.name;
+
   static Func get selfFunc => selfFunction;
 
   static Func get noneFunc => noneFunction;
@@ -20,6 +22,8 @@ class FuncManager {
   static Func get memberFunc => memberFunction;
 
   static Func get indexFunc => indexFunction;
+
+  static Func get callFunc => callFunction;
 
   static Iterable<Func> get funcList => [
         ...anyFunList,
@@ -89,6 +93,8 @@ class FuncManager {
             : orElse.call() as AsFunc,
       );
 }
+
+const Func callFunction = CallFunc();
 
 const Func indexFunction = IndexFunc();
 
