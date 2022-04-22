@@ -1,23 +1,8 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
-import 'package:mind_base/src/domain/value.dart';
-import 'package:mongo_dart/mongo_dart.dart';
 
 main() {
-  // test("Value toJson", () {
-  //   Value value = Value.of(
-  //     "asdf",
-  //     "error",
-  //   );
-  //   print(value.toJson());
-  //   print(value.toJsonWithType());
-  //
-  //   expect(value.toJsonWithType(), {
-  //     "type": "Value",
-  //     "real": {"v": "asdf", "e": "error"}
-  //   });
-  // });
 
   test("Expression2", () {
     final exp = Expression(
