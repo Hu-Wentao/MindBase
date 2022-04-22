@@ -10,6 +10,8 @@ part 'func_manager.dart';
 
 mixin IExpr on IFunctor {
   Func get fn;
+  /// [ctx] 上下文, 仅在IExpr为Expression,并且作为`方法`时,才会传入
+  callee([Map<String, dynamic>? ctx]);
 
   AttrType get type => fn.rType;
 
@@ -26,9 +28,14 @@ class Expression with IFunctor, IExpr, EquatableMixin {
   @override
   final List<IExpr> ag;
 
-  const Expression(this.fn, this.ag);
+  const Expression(this.fn, [this.ag = const []]);
 
-  get callee => () => fn.logic.call(ag.map((a) => a.value).toList());
+  /// self 参数 当且仅当 表达式是`方法体`时才会传入, 值应当为Record的prop集合
+  @override
+  callee([Map<String, dynamic>? ctx]) => fn.invoke(
+        ctx, // 相当于this
+        ag.map((a) => a.callee(ctx)).toList(),
+      );
 
 // todo 出入参数量,类型检查 等等
   @override
@@ -75,9 +82,11 @@ class Value with IFunctor, IExpr, EquatableMixin {
   // 对于Value, ag对象始终是 [List<String>]类
   @override
   final List<dynamic> ag; // ag[0]为实际值, ag[1]为错误值
+  @override
+  callee([Map<String, dynamic>? ctx]) => fn.logic.call(ag);
 
   @override
-  dynamic get value => fn.logic.call(ag);
+  dynamic get value => callee();
 
   dynamic get v => value;
 
@@ -154,7 +163,11 @@ class Func with EquatableMixin {
   final AttrType rType;
 
   // 在调用之前,需要先检查Attr的类型匹配问题
+  @protected
   final Function logic;
+
+  /// [ctx] 仅当函数作为方法体时才会被传入, 内容即对象的成员对象(属性和其他方法)
+  invoke([Map<String, dynamic>? ctx, List<dynamic>? ag]) => logic(ag);
 
   IFunctor apply(List<IFunctor>? p) {
     throw UnimplementedError();
@@ -197,6 +210,9 @@ class AsFunc<T> implements Func {
 
   @override
   AttrType get rType => AttrType.values.byName("$T");
+
+  @override
+  invoke([Map<String, dynamic>? ctx, List<dynamic>? ag]) => logic(ag);
 
   @override
   Function get logic => (args) {
@@ -245,4 +261,45 @@ class AsFuncDynamic extends AsFunc {
 
   @override
   AttrType get rType => AttrType.any;
+}
+
+class MemberFunc implements Func {
+  const MemberFunc();
+
+  @override
+  final String name = "member";
+
+  @override
+  List<AttrType> get pTypes => [rType];
+
+  @override
+  AttrType get rType => AttrType.any;
+
+  @override
+  invoke([Map<String, dynamic>? ctx, List<dynamic>? ag]) {
+    if (ctx == null) throw "MemberFunc 必须传入 ctx";
+    return logic([ctx, if (ag != null) ...ag]);
+  }
+
+  @override
+  Function get logic => (p) {
+        print("memberFunction# param # $p");
+        final record = p[0];
+        final propId = p[1];
+        return record[propId] ?? (throw "找不到 propId [$propId]");
+      };
+
+
+  @override
+  List<Object?> get props => [name, pTypes, rType, logic];
+
+
+  @override
+  IFunctor apply(List<IFunctor>? p) {
+    // TODO: implement apply
+    throw UnimplementedError();
+  }
+
+  @override
+  bool get stringify => true;
 }
