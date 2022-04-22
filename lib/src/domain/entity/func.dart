@@ -4,8 +4,6 @@ import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'dart:math' as math;
 
-import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
-
 part 'func_manager.dart';
 
 mixin IExpr on IFunctor {
@@ -105,6 +103,8 @@ class Value with IFunctor, IExpr, EquatableMixin {
   factory Value.of(dynamic v, [dynamic e]) {
     AsFunc fn;
     switch (v.runtimeType) {
+      case IExpr:
+        return v;
       case double:
         fn = const AsFunc<double>();
         break;
@@ -172,12 +172,12 @@ class Func with EquatableMixin {
 
   IFunctor apply(List<IFunctor>? p) {
     throw UnimplementedError();
-    try {
-      // fixme 未作细节处理，如保留原值等
-      return Function.apply(logic, p);
-    } catch (e) {
-      // return Value('', e.toString());
-    }
+    // try {
+    //   // fixme 未作细节处理，如保留原值等
+    //   return Function.apply(logic, p);
+    // } catch (e) {
+    //   // return Value('', e.toString());
+    // }
   }
 
   const Func({
