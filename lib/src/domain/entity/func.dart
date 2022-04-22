@@ -104,9 +104,11 @@ class Value with IFunctor, IExpr, EquatableMixin {
 
   factory Value.of(dynamic v, [dynamic e]) {
     AsFunc fn;
+    dynamic value = v ?? "";
     switch (v.runtimeType) {
-      case IExpr:
-        return v;
+      case String:
+        fn = const AsFunc<String>();
+        break;
       case double:
         fn = const AsFunc<double>();
         break;
@@ -116,18 +118,23 @@ class Value with IFunctor, IExpr, EquatableMixin {
       case num:
         fn = const AsFunc<num>();
         break;
-      case String:
-        fn = const AsFunc<String>();
-        break;
       case bool:
         fn = const AsFunc<bool>();
         break;
       case RecordMeta:
         fn = const AsFuncRecordMeta();
+        value = v.id;
         break;
       case Record:
         fn = const AsFuncRecord();
+        value = v.id;
         break;
+      case IExpr:
+        return v;
+      case Value: // 无法被IExpr取代, 原因未知
+        return v;
+      case Expression: // 无法被IExpr取代, 原因未知
+        return v;
       default:
         fn = const AsFuncDynamic();
       // throw "暂不支持的包装类型[${v.runtimeType}]";
@@ -135,7 +142,7 @@ class Value with IFunctor, IExpr, EquatableMixin {
 
     return Value(
       fn: fn,
-      ag: [v ?? "", if (e != null) e],
+      ag: [value, if (e != null) e],
     );
   }
 
@@ -308,7 +315,7 @@ class AsFuncRecordMeta extends AsFunc<RecordMeta> {
   /// 存储的是MetaId
   @override
   Function get logic => (_) {
-        final metaId = _[0];
+        final metaId = _[0]; // ObjectId (MetaId), 注册在Workspace中
         final meta = sl<WorkspaceDataHolder>().getMetaBy(metaId);
         return meta;
       };
