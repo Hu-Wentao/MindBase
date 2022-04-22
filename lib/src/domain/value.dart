@@ -53,12 +53,13 @@ class Error {
 }
 
 enum AttrType {
-  objectId, // 特殊处理的String类型
+  objectId, // 特殊处理的String类型, todo 考虑移除,直接用 String/ref/type表示; 但可能存在ObjectId相关转换的问题,需要谨慎处理
   any, // 任意类型
   string,
   num,
   bool,
-  ref, // 引用类型
+  ref, // 对应 AsFuncRecord, 是ObjectId() String 的别名类型; 只有在引用其他字段时,才标识为ref, 如果标识当前记录的_id,则应该使用 string
+  type, // 对应 AsFuncRecordMeta, 是ObjectId() String 的别名类型
   // func, // 函数类型 相当于Dart的Function,Excel的函数 暂不实现
 }
 
