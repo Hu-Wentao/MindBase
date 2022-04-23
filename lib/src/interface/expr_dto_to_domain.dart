@@ -4,6 +4,9 @@ import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/interface/expression_dto.dart';
 
+const exprToDomain = ExprDtoToDomain(
+  memberAccessors: [MetaMemberAccessor()],
+);
 /// 可读表达式 -> Domain
 /// 注意[ctx]与Eval不同, 传入的是[RecordMeta],而不是[Record]
 class ExprDtoToDomain {
