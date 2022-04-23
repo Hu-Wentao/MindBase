@@ -58,7 +58,7 @@ dependencies:
   ndialog:
   #  data_table2:
   #  responsive_table:
-  syncfusion_flutter_datagrid:
+  syncfusion_flutter_datagrid: "20.1.47"
   freezed_annotation:
   petitparser:
   quiver:
