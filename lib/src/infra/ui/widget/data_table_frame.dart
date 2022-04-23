@@ -148,8 +148,9 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
   }
 
   @override
-  void removeRecordBy(int index) {
-    _cacheRows.removeAt(index);
+  void removeRecordBy(int rowIndex) {
+    // print("removeRecordBy: $rowIndex");
+    _cacheRows.removeAt(rowIndex);
     notifyAll();
   }
 
