@@ -51,7 +51,7 @@ dependencies:
   # form
   flutter_form_builder:
   form_builder_extra_fields:
-  form_builder_validators:
+  form_builder_validators: "7.9.0"
   auto_route:
   adaptive_navigation:
   line_icons:
@@ -61,6 +61,7 @@ dependencies:
   syncfusion_flutter_datagrid:
   freezed_annotation:
   petitparser:
+  quiver:
 
 dev_dependencies:
   flutter_test:
