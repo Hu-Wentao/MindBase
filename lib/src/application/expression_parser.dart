@@ -4,6 +4,7 @@ import 'package:petitparser/parser.dart';
 
 import '../interface/expression_dto.dart';
 
+final exprParser = ExpressionParser();
 /// 用户输入表达式解析器
 class ExpressionParser {
   ExpressionParser() {
