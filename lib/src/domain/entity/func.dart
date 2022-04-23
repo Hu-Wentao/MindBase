@@ -335,7 +335,11 @@ class MemberFunc implements Func {
   Function get logic => (p) {
         print("memberFunction# param # $p");
         final record = p[0];
-        final propId = p[1];
+        var propId = p[1];
+        // fixme 通过UI创建的方法Expr, 传入的ctx正常, 但参数 p[1]是 RecordMeta, p[2]是 propId, 与预期的 仅p[1] propId不符, 这里进行特殊处理
+        if (p[1] is RecordMeta) {
+          propId = p[2];
+        }
         return record[propId] ?? (throw "找不到 propId [$propId]");
       };
 
