@@ -6,6 +6,7 @@ import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
+import 'package:quiver/core.dart' as quiver;
 
 /// 实体类对应的Dto需要实现本类, 并添加`_id`字段/get方法
 abstract class IMongoEntityDto extends IMongoDto {
@@ -512,7 +513,11 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
   toMongoJson({AttrType type = AttrType.string}) => toJson();
 }
 
-mixin IExprJsonDto on IMongoDtoMx {
+abstract class IExprJsonDto implements IMongoDtoMx {
+  String? get fn;
+
+  List<dynamic> get ag;
+
   static IExprJsonDto fromDomain(dynamic expr) {
     if (expr is Value) {
       return ValueJsonDto(
@@ -550,7 +555,8 @@ mixin IExprJsonDto on IMongoDtoMx {
         final dto = this as ValueJsonDto;
         final fn = FuncManager.findAsFunc(dto.fn!);
         var ag = dto.ag;
-        if (fn is AsFuncRecord || fn is AsFuncRecordMeta) {
+        if ((fn is AsFuncRecord || fn is AsFuncRecordMeta) &&
+            ag[0] is! ObjectId) {
           ag[0] = ObjectId.fromHexString(ag[0] as String);
         }
         return Value(fn: fn, ag: dto.ag);
@@ -564,11 +570,25 @@ mixin IExprJsonDto on IMongoDtoMx {
         throw "IExpr::toDomain 未知的类型 [$runtimeType]";
     }
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ExprJsonDto &&
+          runtimeType == other.runtimeType &&
+          fn == other.fn &&
+          // fixme 低性能
+          toString() == other.toString();
+
+  @override
+  int get hashCode => fn.hashCode ^ quiver.hashObjects(ag);
 }
 
-class ExprJsonDto with IMongoDtoMx, IExprJsonDto {
+class ExprJsonDto extends IExprJsonDto with IMongoDtoMx {
   //内嵌函数的名
+  @override
   String? fn;
+  @override
   List<IExprJsonDto> ag;
 
   ExprJsonDto({
@@ -605,9 +625,11 @@ class ExprJsonDto with IMongoDtoMx, IExprJsonDto {
 }
 
 /// 不同点在于, ValueDto 的ag是 List<dynamic>
-class ValueJsonDto with IMongoDtoMx, IExprJsonDto {
+class ValueJsonDto extends IExprJsonDto with IMongoDtoMx {
   //内嵌函数的名
+  @override
   String? fn;
+  @override
   List<dynamic> ag;
 
   ValueJsonDto({
