@@ -1,9 +1,12 @@
 import 'dart:convert';
 
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/domain/entity/func.dart';
+import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:petitparser/petitparser.dart';
 
 import '../application/expression_parser.dart';
+import 'expr_dto_to_domain.dart';
 
 //
 // /// 后期替换 领域层的 Expression类
@@ -55,6 +58,9 @@ abstract class ExpressionDto {
   /// [currentContext] 在用户输入字符串时的上下文，会随时变更，例如 `bob.name`
   /// 转换后将会被替换为持久化上下文，即 `<bob对象对应的Record::id>.<bob对应Meta::propId>`
   ExpressionDto toPersistence(Map<String, dynamic> currentContext);
+
+  IExpr toDomain(ObjectId metaId) => exprToDomain
+      .convert(this, {ThisExpressionDto.sign: Value.ofMetaId(metaId)});
 }
 
 abstract class BaseExpressionDto extends ExpressionDto with EquatableMixin {
@@ -102,11 +108,13 @@ class VariableDto extends BaseExpressionDto {
 
 /// 即`this`
 class ThisExpressionDto extends BaseExpressionDto {
+  static const sign = 'this';
+
   @override
   List<Object?> get props => const [];
 
   @override
-  String toReadableString() => 'this';
+  String toReadableString() => sign;
 
   /// 似乎不需要
   @override
