@@ -601,7 +601,12 @@ class ExprJsonDto extends IExprJsonDto with IMongoDtoMx {
     this.ag = const [],
   });
 
-  static ExprJsonDto fromJson(Map<String, dynamic> json) => ExprJsonDto(
+  factory ExprJsonDto.fromDomain(IExpr expr) => ExprJsonDto(
+        fn: expr.fn.name,
+        ag: expr.ag.map(IExprJsonDto.fromDomain).toList(),
+      );
+
+  factory ExprJsonDto.fromJson(Map<String, dynamic> json) => ExprJsonDto(
       fn: json['fn'] as String,
       ag: (json['ag'] as List<dynamic>)
           .map((e) => IExprJsonDto.fromJson(e as Map<String, dynamic>))
@@ -617,11 +622,6 @@ class ExprJsonDto extends IExprJsonDto with IMongoDtoMx {
         'fn': fn,
         'ag': ag.map((e) => e.toJson()).toList(),
       };
-
-  static fromDomain(IExpr expr) => ExprJsonDto(
-        fn: expr.fn.name,
-        ag: expr.ag.map(IExprJsonDto.fromDomain).toList(),
-      );
 }
 
 /// 不同点在于, ValueDto 的ag是 List<dynamic>
