@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:mind_base/src/application/expression_parser.dart';
 import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
+import 'package:mind_base/src/interface/expression_dto.dart';
+import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:ndialog/ndialog.dart';
 
 class MetaForm extends StatelessWidget {
@@ -80,8 +83,6 @@ class MetaForm extends StatelessWidget {
     }
     final attrs = attrFormatMap.entries.map((e) {
       final json = e.value;
-      // todo 手动修正 expr
-      // final metaId = ObjectId.fromHexString(attrMap['id'] as String);
       final key = int.parse(json['k'] as String);
       return AttributeDto(
         k: key,
@@ -101,6 +102,7 @@ class MetaForm extends StatelessWidget {
       methodFormatMap[ik] ??= {};
       methodFormatMap[ik]![fk] = v;
     }
+    final metaId = ObjectId.fromHexString(metaMap['id'] as String);
     final methods = methodFormatMap.entries.map((e) {
       final json = e.value;
       final key = int.parse(json['k'] as String);
@@ -108,7 +110,9 @@ class MetaForm extends StatelessWidget {
         k: key,
         name: json['name'] as String,
         memo: json['memo'] as String,
-        expr: IExprJsonDto.fromJson(json['expr'] as Map<String, dynamic>),
+        expr: IExprJsonDto.fromDomain(
+          ExpressionDto.of(exprParser, json['expr'] as String).toDomain(metaId),
+        ),
       );
     }).toList();
 
