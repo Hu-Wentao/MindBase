@@ -33,6 +33,7 @@ class FuncManager {
         ...asFuncList,
         memberFunc,
         indexFunc,
+        callFunc,
       ];
 
   static bool isAsFunc(String name) =>
@@ -51,10 +52,7 @@ class FuncManager {
   // 先查一查别名表,如果没有则再查FuncName
   static Func findBy(String funcName, {Func Function()? orElse}) => _findBy(
         (al[funcName] ?? funcName),
-        orElse: () => findAsFunc(
-          funcName,
-          orElse: orElse ?? () => (throw "找不到Func[$funcName]"),
-        ),
+        orElse: () => (throw "找不到Func[$funcName]"),
       );
 
   static Func _findBy(String funcName, {Func Function()? orElse}) =>
@@ -87,7 +85,7 @@ class FuncManager {
                   ? (throw "找不到`AsFunc`[$funcName]")
                   : orElse.call() as AsFunc,
             )
-          : throw "findAsFunc 的函数名必须以`as`开头";
+          : throw "findAsFunc 的函数名必须以`as`开头,而不是[$funcName]";
 }
 
 const Func callFunction = CallFunc();
