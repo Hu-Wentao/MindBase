@@ -8,7 +8,6 @@ import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
-import 'package:mind_base/src/interface/expr_dto_to_domain.dart';
 import 'package:mind_base/src/interface/expression_dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
@@ -100,9 +99,6 @@ main() {
     /// 可读字符串 -> ReadableDto
     const readable = "'My age is ' + this.age";
     final readableDto = ExpressionDto.of(parser, readable);
-    const exprToDomain = ExprDtoToDomain(
-      memberAccessors: [MetaMemberAccessor()],
-    );
 
     /// ReadableDto -> ReadableString
     final str = readableDto.toReadableString();
@@ -113,7 +109,7 @@ main() {
 
     /// ReadableDto -> Domain
     /// 注意,传入的是 [RecordMeta]实例,但存储在内部的只有MetaId :String, 实际上通过 WorkspaceDataHolder读取
-    domain = exprToDomain.convert(readableDto, {"this": Value.of(rcd.meta)});
+    domain = readableDto.toDomain(rcd.meta.id);
     // print("domain = ${domain}");
     expect(
         domain,
@@ -167,7 +163,9 @@ main() {
 
     /// Json -> JsonDto
     final jsonDto2 = IExprJsonDto.fromJson(dto3Json);
-    print("jsonDto2 = $jsonDto2");
+    // print("jsonDto2 = $jsonDto2");
+    // print("jsonDto  = $jsonDto");
+    // print("== ${jsonDto2 == jsonDto}");
     expect(jsonDto2, jsonDto);
 
     /// ========================================================================
