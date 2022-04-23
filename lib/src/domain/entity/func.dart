@@ -1,10 +1,10 @@
-import 'dart:convert';
-
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'dart:math' as math;
+
+import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
 part 'func_manager.dart';
 
@@ -122,9 +122,7 @@ class Value with IFunctor, IExpr, EquatableMixin {
         fn = const AsFunc<bool>();
         break;
       case RecordMeta:
-        fn = const AsFuncRecordMeta();
-        value = v.id;
-        break;
+        return Value.ofMetaId(v.id);
       case Record:
         fn = const AsFuncRecord();
         value = v.id;
@@ -144,6 +142,12 @@ class Value with IFunctor, IExpr, EquatableMixin {
       ag: [value, if (e != null) e],
     );
   }
+
+  Value.ofMetaId(ObjectId metaId)
+      : this(
+          fn: const AsFuncRecordMeta(),
+          ag: [metaId],
+        );
 
   factory Value.err(String? e) => Value.of("", e);
 
