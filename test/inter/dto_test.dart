@@ -5,29 +5,80 @@ import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-final pMetaId = ObjectId.fromHexString("62314b932f929ede7dfebc8f");
-
 main() {
-  test("RecordDto mongo", () {
-    final mp = {
-      "_id": ObjectId.fromHexString("6232ae5d5c918fa41061f449"),
+  group("RecordDto", () {
+    final pMetaId = ObjectId.fromHexString("62314b932f929ede7dfebc8f");
+    final pRecordId = ObjectId.fromHexString("6232ae5d5c918fa41061f449");
+    final pRcdMgJs = {
+      "_id": pRecordId,
       "metaId": pMetaId,
-      "0": {"v": "2", "e": null}
+      "0": {
+        "fn": "asString",
+        "ag": [jsonEncode(pRecordId.toHexString())]
+      },
+      "1": {
+        "fn": "asString",
+        "ag": [jsonEncode(pMetaId.toHexString())]
+      },
+      "2": {
+        "fn": "asString",
+        "ag": [jsonEncode("asdf")]
+      },
     };
-    // fromMongoJson会修改数据, 因此同一个map只能传入1次
-    RecordDto dto = RecordDto.fromMongoJson(mp);
-    print(dto);
-  });
+    final pRcdDto = RecordDto(fields: {
+      0: Value.of(pRecordId.toHexString()),
+      1: Value.of(pMetaId.toHexString()),
+      2: Value.of("asdf"),
+    });
 
-  test("RecordDto builder", () {
-    final dto = RecordDto.builder(metaId: pMetaId);
+    final pRcdJs = {
+      "_id": pRecordId.toHexString(),
+      "metaId": pMetaId.toHexString(),
+      "0": {
+        "fn": "asString",
+        "ag": [jsonEncode(pRecordId.toHexString())]
+      },
+      "1": {
+        "fn": "asString",
+        "ag": [jsonEncode(pMetaId.toHexString())]
+      },
+      "2": {
+        "fn": "asString",
+        "ag": [jsonEncode("asdf")]
+      },
+    };
+    test("RecordDto fromMongoJson", () {
+      // fromMongoJson会修改数据, 因此同一个map只能传入1次
+      final dto = RecordDto.fromMongoJson(pRcdMgJs);
+      print(dto);
+      expect(dto, pRcdDto);
+    });
 
-    print("dto: $dto");
-    print("${dto.id}");
+    test("RecordDto toMongoJson", () {
+      final mgJs = pRcdDto.toMongoJson();
+      // print("mgJs: $mgJs");
+      // print("pRcdMgJs: $pRcdMgJs");
+      expect(mgJs, pRcdMgJs);
+    });
+    test("RecordDto fromJson", () {
+      final dto2 = RecordDto.fromJson(pRcdJs);
+      print(dto2);
+      expect(dto2.toJson(), pRcdJs);
+    });
+    test("RecordDto toJson", () {
+      final js = pRcdDto.toJson();
+      final jsStr = json.encode(js);
+      print(jsStr);
+      expect(js, pRcdJs);
+    });
+    test("RecordDto builder", () {
+      final dto = RecordDto.builder(metaId: pMetaId);
+      print("dto: $dto");
+      print("${dto.id}");
+    });
   });
 
   test("AttributeDto builder", () {
-    // AttributeDto dto = AttributeDto.builder();
     AttributeDto dto = AttributeDto.builder(
       k: 0,
       name: "ID",
@@ -74,39 +125,7 @@ main() {
       "_id": "62275a65418db3d74941d6b3",
     });
   });
-  test("RecordDto json", () {
-    final dto = RecordDto.builder(
-        id: ObjectId.fromHexString('62275a65418db3d74941d6b3'),
-        metaId: ObjectId.fromHexString('62275a65418db3d74941d6b4'),
-        fields: {
-          // 0: Value.of('62275a65418db3d74941d6b3'), // id
-          // 1: Value.of('62275a65418db3d74941d6b4'), // meta
-          2: Value.of('aaa'),
-          3: Value.of('ccc'),
-        });
 
-    final js = dto.toJson();
-    final jsStr = json.encode(js);
-    print(jsStr);
-    expect(js, {
-      '0': {'v': '62275a65418db3d74941d6b3', 'e': null},
-      '1': {'v': '62275a65418db3d74941d6b4', 'e': null},
-      '2': {'v': 'aaa', 'e': null},
-      '3': {'v': 'ccc', 'e': null},
-      '_id': '62275a65418db3d74941d6b3',
-    });
-
-    final js2 = json.decode(jsStr);
-    final dto2 = RecordDto.fromJson(js2);
-    print(dto2);
-    expect(dto2.toJson(), {
-      "0": {"v": "62275a65418db3d74941d6b3", "e": null},
-      "1": {"v": "62275a65418db3d74941d6b4", "e": null},
-      "2": {"v": "aaa", 'e': null},
-      "3": {'v': 'ccc', 'e': null},
-      "_id": "62275a65418db3d74941d6b3",
-    });
-  });
   group("RecordMetaDto Group", () {
     final list = [
       RecordMetaDto.builder(),
