@@ -139,7 +139,6 @@ class Value with IFunctor, IExpr, EquatableMixin {
         fn = const AsFuncDynamic();
       // throw "暂不支持的包装类型[${v.runtimeType}]";
     }
-
     return Value(
       fn: fn,
       ag: [value, if (e != null) e],
@@ -148,26 +147,8 @@ class Value with IFunctor, IExpr, EquatableMixin {
 
   factory Value.err(String? e) => Value.of("", e);
 
-  Value.fromJson(Map<String, dynamic> json)
-      : this(
-          fn: FuncManager.findAsFunc(json['fn'] as String),
-          ag: (json['ag'] as List<dynamic>),
-        );
-
-  toJson() => {
-        "fn": fn.name,
-        "ag": jsonEncode(ag),
-      };
-
-  // 返回值可以是 json， 也可以是[ObjectId]
-  dynamic toMongoJson({AttrType type = AttrType.string}) {
-    switch (type) {
-      // case AttrType.objectId: // todo 暂无实现
-      //   return value;
-      default:
-        return toJson();
-    }
-  }
+  @override
+  String toString() => '${fn.name}($ag)';
 }
 
 /// Func 的实例相当于 Dart的external函数

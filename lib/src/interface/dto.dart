@@ -75,12 +75,17 @@ class RecordDto extends IMongoEntityDto {
         fields: Map.fromEntries(
           json.entries
               .where((element) => element.value is Map<String, dynamic>)
-              .map((e) => MapEntry(int.parse(e.key), Value.fromJson(e.value))),
+              .map((e) => MapEntry(
+                    int.parse(e.key),
+                    ValueJsonDto.fromJson(e.value).toDomain() as Value,
+                  )),
         ),
       );
 
   @override
-  Map<String, dynamic> toJson() => toMongoJson()..['_id'] = idHex;
+  Map<String, dynamic> toJson() => toMongoJson()
+    ..['metaId'] = metaIdHex
+    ..['_id'] = idHex;
 
   /// 从表单输入
   factory RecordDto.fromForm(RecordMeta meta, Map<String, dynamic> formMap) {
@@ -100,7 +105,7 @@ class RecordDto extends IMongoEntityDto {
             .where((element) => element.value is Map<String, dynamic>)
             .map((e) => MapEntry(
                   int.parse(e.key),
-                  Value.fromJson(e.value),
+                  ValueJsonDto.fromJson(e.value).toDomain() as Value,
                 )),
       ));
 
@@ -108,7 +113,9 @@ class RecordDto extends IMongoEntityDto {
   /// 这里直接使用json,无需将value转换为String
   @override
   Map<String, dynamic> toMongoJson({AttrType type = AttrType.string}) =>
-      fields.map((key, value) => MapEntry("$key", value.toMongoJson()))
+      fields.map((key, value) =>
+          MapEntry("$key", ValueJsonDto.fromDomain(value).toMongoJson()))
+        ..['metaId'] = metaId
         ..['_id'] = id;
 
   Record toDm(RecordMeta Function(ObjectId metaId) getMeta) =>
@@ -613,14 +620,12 @@ class ValueJsonDto with IMongoDtoMx, IExprJsonDto {
     this.ag = const [],
   });
 
-  static fromDomain(IExpr expr) => ValueJsonDto(
+  factory ValueJsonDto.fromDomain(IExpr expr) => ValueJsonDto(
         fn: expr.fn.name,
-        ag: expr.ag.map((e) => jsonEncode(e)).toList(),
+        ag: expr.ag,
+        // ag: expr.ag.map((e) => jsonEncode(e)).toList(),
       );
 
-  // static ValueJsonDto fromJsonWithFn(Func fn , List<dynamic> ag) => ValueJsonDto(
-  //     fn: fn.name,
-  //     ag: (ag).map((e) => jsonDecode(e)).toList());
   static ValueJsonDto fromJson(Map<String, dynamic> json) => ValueJsonDto(
       fn: json['fn'] as String,
       ag: (json['ag'] as List<dynamic>).map((e) => jsonDecode(e)).toList());
