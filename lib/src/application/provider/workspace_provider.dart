@@ -8,6 +8,7 @@ import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show Db, ObjectId, where;
 import 'package:provider_sidecar/provider_sidecar.dart';
+import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 /// 本类缓存一个工作空间内的所有数据, 类比Jvm中存在的对象
 @singleton
@@ -350,13 +351,14 @@ class WorkspaceProvider extends ProviderSidecar {
       });
 
   // <MetaId, 数据源>
-  final Map<ObjectId, RecordDataGridSource2> _cacheSource = {};
+  final Map<ObjectId, Tuple2<RecordDataGridSource2, DataGridController>>
+      _cacheSourceWithCtrl = {};
 
   void _findCachedSource(
     ObjectId metaId,
     Function(RecordDataGridSource2 source) onFind,
   ) {
-    final source = _cacheSource[metaId];
+    final source = _cacheSourceWithCtrl[metaId]?.head;
     if (source != null) {
       onFind(source);
     }
@@ -376,26 +378,28 @@ class WorkspaceProvider extends ProviderSidecar {
   void _onEvtRemoveRecordSource(ObjectId ettId, ObjectId metaId, int index) =>
       _findCachedSource(metaId, (source) => source.onRemoveEvt(index));
 
-  RecordDataGridSource2 actGetDataSource() => _getByMeta(watchedMeta!);
+  /// 返回当前meta对应的[IRecordDataGridSource]
+  Tuple2<RecordDataGridSource2, DataGridController>
+      actGetDataSourceWithCtrl() => _getByMeta(watchedMeta!);
 
-  RecordDataGridSource2 _getByMeta(RecordMeta meta) {
+  Tuple2<RecordDataGridSource2, DataGridController> _getByMeta(
+      RecordMeta meta) {
     watchedMeta = meta;
-    var cached = _cacheSource[meta.id];
-    if (cached == null || cached.meta != meta) {
-      cached = _newDataSource(meta);
-      _cacheSource[meta.id] = cached;
-    }
-    return cached;
+    var cached = _cacheSourceWithCtrl[meta.id];
+    return cached ?? _newDataSourceWithCtrl(meta);
   }
 
-  RecordDataGridSource2 _newDataSource(RecordMeta meta) =>
-      RecordDataGridSource2(
-        meta,
-        actSaveRecord,
-        // actRemoveRecord,
-        getCachedRecordsByMeta,
-        getCachedRecordByIndex,
-      );
+  /// 创建数据源, 以及数据源对应的[DataGridController]
+  Tuple2<RecordDataGridSource2, DataGridController> _newDataSourceWithCtrl(
+          RecordMeta meta) =>
+      _cacheSourceWithCtrl[meta.id] = Tuple2(
+          RecordDataGridSource2(
+            meta,
+            actSaveRecord,
+            getCachedRecordsByMeta,
+            getCachedRecordByIndex,
+          ),
+          DataGridController());
 
   List<Record> getCachedRecordsByMeta(ObjectId metaId) =>
       _dataHolder.getRecords(metaId);
