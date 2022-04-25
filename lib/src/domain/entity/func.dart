@@ -11,27 +11,21 @@ part 'func_manager.dart';
 abstract class IExpr with IFunctor {
   const IExpr();
 
+  /// 不常用, 如果是 [ExpressionDto]转换成 [IExpr], 则需要使用 [ExprDtoToDomain],结合ctx上下文做转换
   factory IExpr.of(Func fn, List<dynamic> ag) {
-    if (ag is List<IExpr>) {
-      print(
-          "IExpr.of: ag is List<IExpr>#[${fn.runtimeType}], ag: ${ag.join(", ")}");
-      return Expression(fn, ag);
-    } else if (fn is AsFunc) {
-      print("IExpr.of: fn is AsFunc#[${fn.runtimeType}], ag: ${ag.join(", ")}");
+    if (fn is AsFunc) {
       return Value(fn: fn, ag: ag);
-    } else if (fn is MemberFunc) {
-      // fixme 这里由于MemberFunc 的参数额外添加了一个 RecordMeta的kvMap, 导致这里需要特殊处理
-      print("debug### ag[0]: ${ag[0].runtimeType}");
-      return Expression(fn, [Value.of((ag[0] as RecordMeta)), Value.of(ag[1])]);
+    } else if (ag is List<IExpr>) {
+      return Expression(fn, ag);
     } else {
-      throw "IExpr.of# [${fn.runtimeType}] # ${ag.join(", ")}";
+      throw "IExpr.of构造失败#fn名称与类型: [${fn.name}][${fn.runtimeType}] #ag参数# ${ag.join(", ")}";
     }
   }
 
   Func get fn;
 
-  /// [ctx] 上下文, 仅在IExpr为Expression,并且作为`方法`时,才会传入
-  callee([Map<String, dynamic>? ctx]);
+  /// 调用后即为 [value]
+  callee();
 
   AttrType get type => fn.rType;
 
@@ -43,9 +37,6 @@ abstract class IExpr with IFunctor {
 /// 如果是Value，则pTypes为空， expr为表达式的内容， rType为返回值类型
 /// 如果Expression作为方法体, 则 ag[0]应当为`this`
 class Expression extends IExpr with IFunctor, EquatableMixin {
-  // todo 如果短时间内无法解决, 则使用本方案
-  // String? raw; // 存储原始可读串, 用于解决表达式无法被还原的问题
-
   @override
   final Func fn;
   @override
@@ -53,12 +44,8 @@ class Expression extends IExpr with IFunctor, EquatableMixin {
 
   const Expression(this.fn, [this.ag = const []]);
 
-  /// self 参数 当且仅当 表达式是`方法体`时才会传入, 值应当为Record的prop集合
   @override
-  callee([Map<String, dynamic>? ctx]) => fn.invoke(
-        ctx, // 相当于this
-        ag.map((a) => a.callee(ctx)).toList(),
-      );
+  callee() => fn.invoke(ag.map((a) => a.callee()).toList());
 
 // todo 出入参数量,类型检查 等等
   @override
@@ -81,21 +68,6 @@ mixin IFunctor {
 // IFunctor fMap(Func fn);
 }
 
-// /// Expr-v11.2 方案,允许Value指定类型
-// class Value2<T> extends IExpr with IFunctor, EquatableMixin,ITypeMx{
-//   @override
-//   final AsFunc<T> fn ;
-//
-//   @override
-//   final  List<IExpr> ag ;
-//
-//   @override
-//   List<Object?> get props =>[fn,ag];
-//
-//   @override
-//  T get value => throw UnimplementedError();
-// }
-
 /// Expr-v11.2 方案 直接存储dynamic类型,通过 fn映射为具体的类型
 /// 一般来说 List [ag], ag[0]用于存储 v, 表示当前的值;考虑用ag[1]存储 e
 /// 需要注意的是, ag[0]可以是dynamic类型,在计算时,会自动as为String类型
@@ -106,7 +78,7 @@ class Value extends IExpr with IFunctor, EquatableMixin {
   @override
   final List<dynamic> ag; // ag[0]为实际值, ag[1]为错误值
   @override
-  callee([Map<String, dynamic>? ctx]) => fn.logic.call(ag);
+  callee() => fn.logic.call(ag);
 
   @override
   dynamic get value => callee();
@@ -165,11 +137,9 @@ class Value extends IExpr with IFunctor, EquatableMixin {
     );
   }
 
+  /// 特殊处理 对于[RecordMeta], 直接存储 metaId:[ObjectId]
   Value.ofMetaId(ObjectId metaId)
-      : this(
-          fn: const AsFuncRecordMeta(),
-          ag: [metaId],
-        );
+      : this(fn: const AsFuncRecordMeta(), ag: [metaId]);
 
   factory Value.err(String? e) => Value.of("", e);
 
@@ -190,7 +160,7 @@ class Func with EquatableMixin {
   final Function logic;
 
   /// [ctx] 仅当函数作为方法体时才会被传入, 内容即对象的成员对象(属性和其他方法)
-  invoke([Map<String, dynamic>? ctx, List<dynamic>? ag]) => logic(ag);
+  invoke([List<dynamic>? ag]) => logic(ag);
 
   IFunctor apply(List<IFunctor>? p) {
     throw UnimplementedError();
@@ -211,15 +181,6 @@ class Func with EquatableMixin {
 
   @override
   List<Object?> get props => [name, pTypes, rType, logic];
-
-// Map<String, dynamic> toJson() => {
-//       "name": name,
-//     };
-//
-// toMongoJson({AttrType type = AttrType.string}) => toJson();
-//
-// static Func fromJson(Map<String, dynamic> json) =>
-//     FuncManager.findBy(json['name'] as String);
 }
 
 class AsFunc<T> implements Func {
@@ -235,27 +196,16 @@ class AsFunc<T> implements Func {
   AttrType get rType => AttrType.values.byName("$T");
 
   @override
-  invoke([Map<String, dynamic>? ctx, List<dynamic>? ag]) => logic(ag);
+  invoke([List<dynamic>? ag]) => logic(ag);
 
   @override
   Function get logic => (args) {
         final v = args[0];
-        // if (v is String && T is ObjectId) {
-        //   return ObjectId.fromHexString(v);
-        // }
         return v as T;
       };
 
   @override
   List<Object?> get props => [name, pTypes, rType, logic];
-
-  // @override
-  // Map<String, dynamic> toJson() => {
-  //       "name": name,
-  //     };
-  //
-  // @override
-  // toMongoJson({AttrType type = AttrType.string}) => toJson();
 
   @override
   IFunctor apply(List<IFunctor>? p) {
@@ -352,19 +302,15 @@ class MemberFunc implements Func {
 
   /// fixme 隐式传递 本身就是个错误的设计! 应当恢复成原有的样式, memberFunc就相当于 `.`, 必须要有两个参数!
   @override
-  invoke([Map<String, dynamic>? ctx, List<dynamic>? ag]) {
-    if (ctx == null) throw "MemberFunc 必须传入 ctx";
-    return logic([ctx, if (ag != null) ...ag]);
-  }
+  invoke([List<dynamic>? ag]) => logic(ag);
 
   @override
   Function get logic => (p) {
         print("memberFunction# param # $p");
         final record = p[0];
         var propId = p[1];
-        // fixme 通过UI创建的方法Expr, 传入的ctx正常, 但参数 p[1]是 RecordMeta, p[2]是 propId, 与预期的 仅p[1] propId不符, 这里进行特殊处理
-        if (p[1] is RecordMeta) {
-          propId = p[2];
+        if (record is RecordMeta) {
+          return record.getPropBy(propId).name;
         }
         return record[propId] ?? (throw "找不到 propId [$propId]");
       };
@@ -397,7 +343,7 @@ class IndexFunc implements Func {
   AttrType get rType => AttrType.any;
 
   @override
-  invoke([Map<String, dynamic>? ctx, List<dynamic>? ag]) => logic(ag);
+  invoke([List<dynamic>? ag]) => logic(ag);
 
   @override
   Function get logic => (p) {
@@ -435,11 +381,10 @@ class CallFunc implements Func {
   AttrType get rType => AttrType.any;
 
   @override
-  invoke([Map<String, dynamic>? ctx, List<dynamic>? ag]) => logic(ag);
+  invoke([List<dynamic>? ag]) => logic(ag);
 
   @override
   Function get logic => (p) {
-        print("callFunc#$p");
         final callee = p[0];
         final args = p[1];
         return Function.apply(callee, args) ??
