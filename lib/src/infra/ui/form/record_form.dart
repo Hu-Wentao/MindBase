@@ -48,7 +48,7 @@ class _RecordFormState extends State<RecordForm> {
                 final field = _origin.fields[attr.k];
                 return FormBuilderTextField(
                   name: attr.propId, // Attribute::k作为Map的key
-                  initialValue: field?.v,
+                  initialValue: field?.value,
                   decoration: InputDecoration(
                     labelText: attr.name,
                     hintText: attr.type.name,
@@ -62,7 +62,7 @@ class _RecordFormState extends State<RecordForm> {
                 final field = _origin.fields[methods.k];
                 return FormBuilderTextField(
                   name: methods.propId, // Attribute::k作为Map的key
-                  initialValue: field?.v,
+                  initialValue: field?.value,
                   decoration: InputDecoration(
                     labelText: methods.name,
                     hintText: methods.expr.toString(),

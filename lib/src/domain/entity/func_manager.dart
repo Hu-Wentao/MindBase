@@ -269,6 +269,6 @@ final strFunList = [
     name: "len",
     pTypes: const [AttrType.string],
     rType: AttrType.num,
-    logic: ((p) => (p[0]).v.length),
+    logic: ((p) => (p[0]).value.length),
   )
 ];
