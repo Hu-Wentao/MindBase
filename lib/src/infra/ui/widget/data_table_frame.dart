@@ -324,11 +324,11 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
       alignment: Alignment.centerLeft,
       child: Row(
         children: [
-            Consumer<WorkspaceProvider>(
-              builder: (c, pWorkspace, _) =>
-                  PopupMenuButton(
-                    iconSize: 18,
-                    itemBuilder: (BuildContext context)=>[
+          Consumer<WorkspaceProvider>(
+            builder: (c, pWorkspace, _) => PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert),
+                iconSize: 18,
+                itemBuilder: (BuildContext context) => [
                       const PopupMenuItem(
                           value: "delete",
                           padding: EdgeInsets.zero,
@@ -338,18 +338,18 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
                             dense: true,
                           ))
                     ],
-                    onSelected: (String val) {
-                      pWorkspace.actGetDataSource().removeRecordBy(index);
-                      if (val == "delete") {
-                        ScaffoldMessenger.of(c).showSnackBar(
-                            const SnackBar(content: Text("OK")));
-                      } else {
-                        ScaffoldMessenger.of(c).showSnackBar(
-                            SnackBar(content: Text("尚未实现[$val]敬请期待..")));
-                      }
-                    }
-                  ),
-            ),
+                onSelected: (String val) {
+                  if (val == "delete") {
+                    pWorkspace.actRemoveRecordBy(index);
+
+                    ScaffoldMessenger.of(c)
+                        .showSnackBar(const SnackBar(content: Text("OK")));
+                  } else {
+                    ScaffoldMessenger.of(c).showSnackBar(
+                        SnackBar(content: Text("尚未实现[$val]敬请期待..")));
+                  }
+                }),
+          ),
           Text(
             value.toString(),
             overflow: TextOverflow.ellipsis,
@@ -367,10 +367,17 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
       );
 
   Widget _buildShowBool(Value value) => Container(
-    padding: const EdgeInsets.all(8.0),
-    alignment: Alignment.center,
-    child: MyCheckBox(flag: value.toString().substring(3,8).trim()=="true"?true:false),
-  );
+        padding: const EdgeInsets.all(8.0),
+        alignment: Alignment.center,
+        child: Checkbox(
+          // fixme 尚未完全实现类型模式,只能通过字符串匹配
+          value: value.value == "true",
+          onChanged: (bool? value) {
+            // fixme 应该屏蔽CheckBox的点击事件, 或者点击后立即切换到 buildWidget,并应用新的值
+            print("onChanged: $value");
+          },
+        ),
+      );
 
   /// todo 可编辑的单元格
   /// Help to control the editable text in [TextField] widget.
