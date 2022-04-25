@@ -1,7 +1,6 @@
 // repo 是对与聚合根而言的
 
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/infra/mongo_storage.dart';
 import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
@@ -122,9 +121,12 @@ abstract class BaseMongoRepo<Ett extends IEtt<ObjectId>,
       return insert(entity);
     } else {
       return replace(entity);
-// return update(schema);
     }
   }
+
+  /// 仅删除主记录, 未对关联记录进行处理
+  Future<WriteResult> deleteBy(ObjectId entityId) async =>
+      await (await asyncAccessor).deleteBy(entityId);
 }
 
 ///
@@ -165,7 +167,7 @@ class RecordRepo extends IMongoRepo<Record, RecordDto>
   Stream<RepoEvent<Record>> watchAllByMeta(RecordMeta meta) async* {
     final sync = await asyncAccessorWith(meta.id.toHexString());
     // fixme 收不到更新消息
-    yield*  sync.watchAll().map(
+    yield* sync.watchAll().map(
           (rcd) => RepoEvent.of<Record, RecordDto>(
               rcd, (dto) => dto?.toDomainOr(meta)),
         );
