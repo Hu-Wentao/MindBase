@@ -9,10 +9,10 @@ import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/value.dart';
+import 'package:mind_base/src/infra/ui/dialog/confirm_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_edit_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_edit.dart';
-import 'package:mind_base/src/infra/ui/widget/my_checkbox.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:provider/provider.dart';
@@ -683,6 +683,8 @@ class _RecordDataGridState extends State<RecordDataGrid> {
   }
 }
 
+///
+/// 表格标题栏
 class DataFrameTitle extends StatelessWidget {
   final RecordMeta meta;
   final Future<void> Function(RecordDto? dto) onSaveRecord;
@@ -728,14 +730,13 @@ class DataFrameTitle extends StatelessWidget {
           ),
           Consumer<WorkspaceProvider>(
               builder: (c, pWorkspace, _) => TextButton.icon(
-                  onPressed: () {
-                    pWorkspace.metaMap.remove(meta.id);
-                    pWorkspace.actWatchMeta(pWorkspace.metaList.last);
-                  },
-                  icon: const Icon(Icons.delete),
-                  label: const Text("删除表"),
-              )
-          ),
+                    onPressed: () => showConfirmDialog(
+                        context: context,
+                        title: "确认删除[${meta.name}]表吗",
+                        onConfirm: () => pWorkspace.actRemoveMeta(meta.id)),
+                    icon: const Icon(Icons.delete),
+                    label: const Text("删除表"),
+                  )),
         ],
       );
 }
