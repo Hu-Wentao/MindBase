@@ -68,6 +68,12 @@ abstract class IMongoAccessor<T extends IMongoEntityDto> {
   Future<WriteResult> insert(T dto);
 
   Future<WriteResult> replace(T dto);
+
+  /// 删除记录
+  Future<WriteResult> deleteBy(ObjectId id);
+
+  /// 删除表
+  Future<bool> drop();
 }
 
 abstract class BaseMongoAccessor<T extends IMongoEntityDto>
@@ -139,6 +145,13 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
   Future<WriteResult> replace(T dto) async => await db
       .collection(collectionName)
       .replaceOne(where.id(dto.id), dto.toMongoJson());
+
+  @override
+  Future<WriteResult> deleteBy(ObjectId id) =>
+      db.collection(collectionName).deleteOne(where.id(id));
+
+  @override
+  Future<bool> drop() => db.dropCollection(collectionName);
 }
 
 // @lazySingleton
