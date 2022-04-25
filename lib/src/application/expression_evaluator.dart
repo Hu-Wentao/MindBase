@@ -236,12 +236,7 @@ class RecordMemberAccessor implements MemberAccessor<Record> {
     // 只允许访问Record类型
     if (object is! Record) return false;
     // 是否存在对应的成员
-    return object.meta.properties.any((element) => element.name == member);
-
-    // 因为传入的类型是Record, 无论是否存在于workspace中,都可以访问其成员
-    // final meta = object.meta;
-    // // 检查meta是否存在
-    // return workspace.hasMetaId(meta.id);
+    return object.meta.hasPropBy(member);
   }
 
   /// 成员可以是值, 也可是函数[Function]
@@ -249,7 +244,7 @@ class RecordMemberAccessor implements MemberAccessor<Record> {
   /// 考虑允许方法与变量重名,用于表达"get"方法
   @override
   getMember(Record record, String member) {
-    final method = record.meta.getMethodBy(member);
+    final method = record.meta.tryGetMethodBy(member);
     if (method != null) {
       return method.expr.callee; // 可以被调用
     }
