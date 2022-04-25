@@ -70,6 +70,15 @@ class ExprDtoToDomain {
   //   ]
   // );
 
+  /// 转换Member表达式:
+  ///   1. 通过 expr.object, 从ctx中查询到`对象`,
+  ///   如: object为`this`,即从ctx中查询this对应的Meta
+  ///   2. 通过 expr.property.name, 借助 getMember方法, 从`对象`中查询到property对应的propId
+  ///   如: property.name为`name`,则查询 Meta中,名称为 `name`的property, 返回propId
+  /// <备注>
+  /// 如果要从MemberExpr转换成Dto, 或者转换成 ReadableString,也是同理,
+  ///   1. 通过propId,查询到Meta中的prop的name, 直接展示name值
+  ///   2. 通过object(即MetaId),
   @protected
   IExpr convertMemberExpression(
     MemberExpressionDto expr,
@@ -91,18 +100,21 @@ class ExprDtoToDomain {
       ]);
 
   /// 将表达式Call 转换成 Domain
-  ///
+  /// 1. 读取DTO的callee, 从ctx中查询到callee对应的Func实例(Value.of(Func))
+  /// 2. 读取DTO的arguments, 从ctx中查询 arguments分别对应的Value/Expression实例
+  /// 3. 将 callee与 arguments 组装成 Expression,并返回
   @protected
   IExpr convertCallExpression(
       CallExpressionDto expr, Map<String, dynamic> ctx) {
-    var callee = convert(expr.callee, ctx).value; // value才是Ctx中存储的Func实例
-    var arguments = expr.arguments.map((e) {
-
-      return convert(e, ctx).value;
-    }).toList();
-    // var arguments = expr.arguments.map((e) => e.toDomain()).toList();
-    print("convertCallExpression# [$callee], [$arguments]");
-    return IExpr.of(callee, arguments);
+    final callee = convert(expr.callee, ctx).value; // .value才是Ctx中存储的Func实例
+    return (callee is AsFunc) // AsFunc表示该IExpr是Value
+        ? Value(
+            fn: callee,
+            ag: expr.arguments.map((e) => (e as ValueDto).value).toList())
+        : Expression(
+            callee,
+            expr.arguments.map((e) => convert(e, ctx)).toList(),
+          );
   }
 
   /// [-], [~], [!], [+]
