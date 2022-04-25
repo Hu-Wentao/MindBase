@@ -8,7 +8,26 @@ import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
 part 'func_manager.dart';
 
-mixin IExpr on IFunctor {
+abstract class IExpr with IFunctor {
+  const IExpr();
+
+  factory IExpr.of(Func fn, List<dynamic> ag) {
+    if (ag is List<IExpr>) {
+      print(
+          "IExpr.of: ag is List<IExpr>#[${fn.runtimeType}], ag: ${ag.join(", ")}");
+      return Expression(fn, ag);
+    } else if (fn is AsFunc) {
+      print("IExpr.of: fn is AsFunc#[${fn.runtimeType}], ag: ${ag.join(", ")}");
+      return Value(fn: fn, ag: ag);
+    } else if (fn is MemberFunc) {
+      // fixme 这里由于MemberFunc 的参数额外添加了一个 RecordMeta的kvMap, 导致这里需要特殊处理
+      print("debug### ag[0]: ${ag[0].runtimeType}");
+      return Expression(fn, [Value.of((ag[0] as RecordMeta)), Value.of(ag[1])]);
+    } else {
+      throw "IExpr.of# [${fn.runtimeType}] # ${ag.join(", ")}";
+    }
+  }
+
   Func get fn;
 
   /// [ctx] 上下文, 仅在IExpr为Expression,并且作为`方法`时,才会传入
@@ -23,7 +42,10 @@ mixin IExpr on IFunctor {
 /// 表达式是有状态的,存储了参数的来源,返回值类型等等; 而Func是无状态,只有name
 /// 如果是Value，则pTypes为空， expr为表达式的内容， rType为返回值类型
 /// 如果Expression作为方法体, 则 ag[0]应当为`this`
-class Expression with IFunctor, IExpr, EquatableMixin {
+class Expression extends IExpr with IFunctor, EquatableMixin {
+  // todo 如果短时间内无法解决, 则使用本方案
+  // String? raw; // 存储原始可读串, 用于解决表达式无法被还原的问题
+
   @override
   final Func fn;
   @override
@@ -77,7 +99,7 @@ mixin IFunctor {
 /// Expr-v11.2 方案 直接存储dynamic类型,通过 fn映射为具体的类型
 /// 一般来说 List [ag], ag[0]用于存储 v, 表示当前的值;考虑用ag[1]存储 e
 /// 需要注意的是, ag[0]可以是dynamic类型,在计算时,会自动as为String类型
-class Value with IFunctor, IExpr, EquatableMixin {
+class Value extends IExpr with IFunctor, EquatableMixin {
   @override
   final AsFunc fn; // 对于Value, fn对象始终是 [AsFunc]类及其子类
   // 对于Value, ag对象始终是 [List<String>]类
@@ -300,7 +322,10 @@ class AsFuncRecordMeta extends AsFunc<RecordMeta> {
   /// 存储的是MetaId
   @override
   Function get logic => (_) {
-        final metaId = _[0]; // ObjectId (MetaId), 注册在Workspace中
+        // fixme 这里做特殊处理,
+        final metaId = (_[0] is ObjectId)
+            ? _[0]
+            : ObjectId.fromHexString(_[0]); // ObjectId (MetaId), 注册在Workspace中
         final meta = sl<WorkspaceDataHolder>().getMetaBy(metaId);
         return meta;
       };
@@ -325,6 +350,7 @@ class MemberFunc implements Func {
   @override
   AttrType get rType => AttrType.any;
 
+  /// fixme 隐式传递 本身就是个错误的设计! 应当恢复成原有的样式, memberFunc就相当于 `.`, 必须要有两个参数!
   @override
   invoke([Map<String, dynamic>? ctx, List<dynamic>? ag]) {
     if (ctx == null) throw "MemberFunc 必须传入 ctx";
@@ -413,6 +439,7 @@ class CallFunc implements Func {
 
   @override
   Function get logic => (p) {
+        print("callFunc#$p");
         final callee = p[0];
         final args = p[1];
         return Function.apply(callee, args) ??

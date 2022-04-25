@@ -3,6 +3,15 @@ part of 'func.dart';
 /// todo 添加test, 1.检查name唯一性, 2检查参数转换是否正常
 /// todo 移除alias属性
 class FuncManager {
+  static Iterable<MapEntry<String, Func>>? _funcMapCache;
+
+  /// 返回所有的全局函数, 用于表达式解析
+  static Iterable<MapEntry<String, Func>> get allFuncMapEntry =>
+      _funcMapCache ??=
+          funcList.map((e) => MapEntry(e.name, e)).followedBy(
+                al.entries.map((e) => MapEntry(e.key, findBy(e.key))),
+              );
+
   // 是否为短路运算符
   static bool isShortCircuit(String name) =>
       const ['&&', '||', "and", "or"].contains(name);
@@ -13,7 +22,7 @@ class FuncManager {
 
   static get indexFuncName => indexFunc.name;
 
-  static get callFuncName => callFunc.name;
+  // static get callFuncName => callFunc.name;
 
   static Func get selfFunc => selfFunction;
 
@@ -23,7 +32,7 @@ class FuncManager {
 
   static Func get indexFunc => indexFunction;
 
-  static Func get callFunc => callFunction;
+  // static Func get callFunc => callFunction;
 
   static Iterable<Func> get funcList => [
         ...anyFunList,
@@ -33,7 +42,7 @@ class FuncManager {
         ...asFuncList,
         memberFunc,
         indexFunc,
-        callFunc,
+        // callFunc,
       ];
 
   static bool isAsFunc(String name) =>
@@ -88,7 +97,7 @@ class FuncManager {
           : throw "findAsFunc 的函数名必须以`as`开头,而不是[$funcName]";
 }
 
-const Func callFunction = CallFunc();
+// const Func callFunction = CallFunc();
 
 const Func indexFunction = IndexFunc();
 

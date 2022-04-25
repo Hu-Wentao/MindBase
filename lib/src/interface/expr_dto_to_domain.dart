@@ -7,6 +7,7 @@ import 'package:mind_base/src/interface/expression_dto.dart';
 const exprToDomain = ExprDtoToDomain(
   memberAccessors: [MetaMemberAccessor()],
 );
+
 /// 可读表达式 -> Domain
 /// 注意[ctx]与Eval不同, 传入的是[RecordMeta],而不是[Record]
 class ExprDtoToDomain {
@@ -52,7 +53,10 @@ class ExprDtoToDomain {
 
   @protected
   Value convertVariable(VariableDto variable, Map<String, dynamic> ctx) =>
-      Value.of(ctx[variable.identifier.name]);
+      Value.of(
+        ctx[variable.identifier.name] ??
+            (throw "在ctx中找不到变量[${variable.identifier.name}]"),
+      );
 
   @protected
   Value convertThis(ThisExpressionDto expr, Map<String, dynamic> ctx) =>
@@ -72,12 +76,10 @@ class ExprDtoToDomain {
     Map<String, dynamic> ctx,
   ) {
     // 用 `this`从ctx中获取到 MetaId, 而Value本身可以从 Workspace中得到Meta
-    final meta = convert(expr.object, ctx);
+    final metaValue = convert(expr.object, ctx);
+    final propValue = Value.of(getMember(metaValue, expr.property.name));
     // final obj
-    return Expression(FuncManager.memberFunc, [
-      meta,
-      Value.of(getMember(meta, expr.property.name)),
-    ]);
+    return Expression(FuncManager.memberFunc, [metaValue, propValue]);
   }
 
   @protected
@@ -88,15 +90,19 @@ class ExprDtoToDomain {
         convert(expr.index, ctx),
       ]);
 
+  /// 将表达式Call 转换成 Domain
+  ///
   @protected
   IExpr convertCallExpression(
       CallExpressionDto expr, Map<String, dynamic> ctx) {
-    var callee = convert(expr.callee, ctx);
-    var arguments = expr.arguments.map((e) => convert(e, ctx)).toList();
-    return Expression(FuncManager.callFunc, [
-      callee,
-      ...arguments,
-    ]);
+    var callee = convert(expr.callee, ctx).value; // value才是Ctx中存储的Func实例
+    var arguments = expr.arguments.map((e) {
+
+      return convert(e, ctx).value;
+    }).toList();
+    // var arguments = expr.arguments.map((e) => e.toDomain()).toList();
+    print("convertCallExpression# [$callee], [$arguments]");
+    return IExpr.of(callee, arguments);
   }
 
   /// [-], [~], [!], [+]

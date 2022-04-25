@@ -59,8 +59,12 @@ abstract class ExpressionDto {
   /// 转换后将会被替换为持久化上下文，即 `<bob对象对应的Record::id>.<bob对应Meta::propId>`
   ExpressionDto toPersistence(Map<String, dynamic> currentContext);
 
-  IExpr toDomain(ObjectId metaId) => exprToDomain
-      .convert(this, {ThisExpressionDto.sign: Value.ofMetaId(metaId)});
+  /// 允许metaId为null, 用于解析没有使用`this`或者其他`全局函数`的表达式
+  IExpr toDomain([ObjectId? metaId]) => exprToDomain.convert(
+        this,
+        {if (metaId != null) ThisExpressionDto.sign: Value.ofMetaId(metaId)}
+          ..addEntries(FuncManager.allFuncMapEntry), // 添加全局Func到Ctx中
+      );
 }
 
 abstract class BaseExpressionDto extends ExpressionDto with EquatableMixin {
