@@ -338,16 +338,15 @@ class WorkspaceProvider extends ProviderSidecar {
         });
       });
 
+  Future<void> actRemoveRecordBy(int rowIndex) {
+    final meta = watchedMeta;
+    final rcd = _dataHolder.getRecords(meta!.id)[rowIndex];
+    return actRemoveRecord(rcd.id);
+  }
+
   Future<void> actRemoveRecord(ObjectId ettId) => actWrapper(() async {
         log("actRemoveRecord $ettId");
-        // todo
-        throw UnimplementedError("尚未实现删除记录");
-        // // 无需set,因为插入成功后, watch会监听到新的变更
-        // await RecordAccessor(sl<Db>(), dto.metaId.toHexString())
-        //     .save(dto.id, dto)
-        //     .then((value) {
-        //   log("actSaveRecord 插入成功");
-        // });
+        await RecordAccessor(sl<Db>(), ettId.toHexString()).deleteBy(ettId);
       });
 
   // <MetaId, 数据源>
