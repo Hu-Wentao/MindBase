@@ -10,8 +10,6 @@ import 'package:mongo_dart/mongo_dart.dart' show Db, ObjectId, where;
 import 'package:provider_sidecar/provider_sidecar.dart';
 
 /// 本类缓存一个工作空间内的所有数据, 类比Jvm中存在的对象
-/// todo 在这里实现save Record时,只更新Record实例的属性值,而不是替换对象, 以便其他持有引用的对象访问更新后的属性
-/// todo 例如 更新 Meta的值,而已缓存的Record无需再次更新Meta的引用; 如果是替换Meta,则需要逐个更新Record的Meta引用;
 @singleton
 class WorkspaceDataHolder {
   final String name = 'default'; // 目前全局只有一个workspace
@@ -92,7 +90,7 @@ class WorkspaceDataHolder {
 class WorkspaceProvider extends ProviderSidecar {
   late final MetaRepo _metaRepo;
 
-  // 避免出现 _dataHolder 未初始化的问题
+  // 在此处直接赋值,避免出现 _dataHolder未初始化的问题;
   final WorkspaceDataHolder _dataHolder = sl<WorkspaceDataHolder>();
 
   // RecordRepo 无法监听数据
@@ -111,6 +109,7 @@ class WorkspaceProvider extends ProviderSidecar {
     _cacheAllMetaByWorkspace();
   }
 
+  /// 数据同步 ===================================================================
   _cacheAllMetaByWorkspace() {
     // 先查询有所元素 // 然后开始监听变更
     _metaRepo.findAll().listen(_onEvtInsertMeta);
@@ -255,7 +254,7 @@ class WorkspaceProvider extends ProviderSidecar {
     super.dispose();
   }
 
-  /// 适配与业务逻辑部分
+  /// 业务逻辑-Meta ==============================================================
   /// MetaProvider
 
   List<RecordMeta> get metaList => _dataHolder.allMetas().toList();
@@ -272,8 +271,8 @@ class WorkspaceProvider extends ProviderSidecar {
             if (dto == null) {
               return null;
             }
-            final schema = dto.toDm((dto) => dto.toDm());
-            await _metaRepo.save(schema);
+            final meta = dto.toDm((dto) => dto.toDm());
+            await _metaRepo.save(meta);
           }));
 
   Future<RecordMetaDto?> actQueryMeta(ObjectId metaId) =>
@@ -287,7 +286,6 @@ class WorkspaceProvider extends ProviderSidecar {
     if (attr == null) {
       return;
     }
-    // final metaDto = meta.toDto();
     print("debug 更新meta的指定Attr [$metaDto] [$attr]");
     // todo 后期改为update
     final index = metaDto.attrs.indexWhere((element) => element.k == attr.k);
@@ -305,14 +303,25 @@ class WorkspaceProvider extends ProviderSidecar {
           .findAll(selector: where.eq("name", metaName))
           .drain();
 
+  void actRemoveMeta(ObjectId metaId) =>
+      actWrapper(() => setInitialized("删除Meta [$metaId]", () async {
+            // 取消meta的监听
+            actWatchMeta(null);
+            // 从数据库中删除 Meta记录
+            await _metaRepo.deleteBy(metaId);
+            // 从数据库中删除 Meta对应的Record集合
+            _recordAccessor(metaId.toHexString()).drop();
+          }));
+
+  /// 业务逻辑-Record ============================================================
   /// RecordProvider
 
   RecordMeta? watchedMeta;
 
   // 切换监听的Meta
-  Future<void> actWatchMeta(RecordMeta meta) => actWrapper(
+  Future<void> actWatchMeta(RecordMeta? meta) => actWrapper(
         () => setInitialized(
-          "开始/切换监听Meta[${meta.name}]",
+          meta == null ? "取消监听Meta" : "开始/切换监听Meta[${meta.name}]",
           () => watchedMeta = meta,
         ),
       );
