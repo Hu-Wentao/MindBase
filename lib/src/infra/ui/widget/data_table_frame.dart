@@ -281,26 +281,29 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
   DataGridRowAdapter? buildRow(DataGridRow row) => DataGridRowAdapter(
           cells: row.getCells().asMap().entries.map((entry) {
         final cell = entry.value as DataGridCell<Value>;
-        final cellIndex = entry.key;
+        final cellColIndex = entry.key;
         // todo #3 后期需要根据`视图表`获取列展示顺序与Attr的对应关系
-        final prop = meta.properties[cellIndex];
+        final prop = meta.properties[cellColIndex];
         int index = c;
         late Widget cellWidget;
         switch (prop.type) {
           case AttrType.objectId:
             cellWidget = _buildShowObjectId(cell.value!);
             break;
+          case AttrType.num:
           case AttrType.string:
             cellWidget = _buildShowString(cell.value!);
             break;
-          case AttrType.num:
           case AttrType.bool:
             cellWidget = _buildShowBool(cell.value!);
             break;
           case AttrType.ref: // 处理引用类型
+          case AttrType.type:
           case AttrType.any:
-            cell.columnName == "a0"?cellWidget = _buildShowAnyButton(cell.value!,index++):cellWidget = _buildShowAny(cell.value!);
-            // TODO: Handle this case.
+            /// fixme 考虑改用contextMenu
+            cell.columnName == "a0"
+                ? cellWidget = _buildShowAnyButton(cell.value!, index++)
+                : cellWidget = _buildShowAny(cell.value!);
             break;
         }
         return cellWidget;
@@ -319,7 +322,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
 
   Widget _buildShowAny(Value value) => _buildShowString(value);
 
-  _buildShowAnyButton(Value value,int index) => Container(
+  _buildShowAnyButton(Value value, int index) => Container(
       padding: const EdgeInsets.all(8.0),
       alignment: Alignment.centerLeft,
       child: Row(
@@ -658,6 +661,14 @@ class _RecordDataGridState extends State<RecordDataGrid> {
               Expanded(
                 child: SfDataGrid(
                   source: widget.dataGridSource,
+                  // 展示最左侧CheckBox列
+                  // showCheckboxColumn: true,
+                  // checkboxColumnSettings: const DataGridCheckboxColumnSettings(
+                  //   showCheckboxOnHeader: true,
+                  // ),
+                  // 展示排序数
+                  // showSortNumbers: true, //
+                  // 填充宽度
                   columnWidthMode: ColumnWidthMode.fill,
                   // todo 使用 Column Resizing 以便调整列宽
                   columns: widget.dataGridSource.buildColumn(context, pMeta),
@@ -675,6 +686,35 @@ class _RecordDataGridState extends State<RecordDataGrid> {
                   // stackedHeaderRows: [StackedHeaderRow(cells: [StackedHeaderCell(columnNames: ['a0','a1'], child: Text("T形合并Header"))])],
                   // 冻结前n列
                   // frozenColumnsCount:1,
+                  // todo #126
+                  // onCellLongPress: (DataGridCellLongPressDetails details) {
+                  //   if (!isDesktop) {
+                  //     final RenderBox renderObject =
+                  //     context.findRenderObject()! as RenderBox;
+                  //     showMenu(
+                  //         context: context,
+                  //         position: RelativeRect.fromRect(
+                  //             details.globalPosition & Size.zero,
+                  //             Offset.zero & renderObject.size),
+                  //         items: buildMenuItems(details.column));
+                  //   }
+                  // },
+                  // onCellSecondaryTap: (DataGridCellTapDetails details) {
+                  //   // if (isDesktop) {
+                  //   final RenderBox renderObject =
+                  //       context.findRenderObject()! as RenderBox;
+                  //   final Offset localPosition =
+                  //       renderObject.globalToLocal(details.globalPosition);
+                  //   showMenu(
+                  //       context: context,
+                  //       position: RelativeRect.fromSize(
+                  //           localPosition & Size.zero, renderObject.size),
+                  //       items: buildMenuItems(details.column));
+                  //   // }
+                  // },
+                  // 展示单元格/Header网格
+                  gridLinesVisibility: GridLinesVisibility.both,
+                  headerGridLinesVisibility: GridLinesVisibility.both,
                 ),
               ),
             ],
