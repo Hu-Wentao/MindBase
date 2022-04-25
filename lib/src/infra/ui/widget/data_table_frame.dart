@@ -12,6 +12,7 @@ import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_edit_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_edit.dart';
+import 'package:mind_base/src/infra/ui/widget/my_checkbox.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:provider/provider.dart';
@@ -273,6 +274,8 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
   /// DataGridRow由[entityToRow]构成
   /// todo 在这里为不同Attr的数据返回不同类型的Widget
   /// todo 可以考虑提交一个而入Column的PR, 以便实现调整Column顺序的功能
+
+  int c = 0; // 记录删除记录的index值
   @override
   DataGridRowAdapter? buildRow(DataGridRow row) => DataGridRowAdapter(
           cells: row.getCells().asMap().entries.map((entry) {
@@ -280,7 +283,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
         final cellIndex = entry.key;
         // todo #3 后期需要根据`视图表`获取列展示顺序与Attr的对应关系
         final prop = meta.properties[cellIndex];
-
+        int index = c;
         late Widget cellWidget;
         switch (prop.type) {
           case AttrType.objectId:
@@ -291,9 +294,11 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
             break;
           case AttrType.num:
           case AttrType.bool:
+            cellWidget = _buildShowBool(cell.value!);
+            break;
           case AttrType.ref: // 处理引用类型
           case AttrType.any:
-            cellWidget = _buildShowAny(cell.value!);
+            cell.columnName == "a0"?cellWidget = _buildShowAnyButton(cell.value!,index++):cellWidget = _buildShowAny(cell.value!);
             // TODO: Handle this case.
             break;
         }
@@ -314,6 +319,46 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
 
   Widget _buildShowAny(Value value) => _buildShowString(value);
 
+  _buildShowAnyButton(Value value,int index) => Container(
+      padding: const EdgeInsets.all(8.0),
+      alignment: Alignment.centerLeft,
+      child: Row(
+        children: [
+            Consumer<WorkspaceProvider>(
+              builder: (c, pWorkspace, _) =>
+                  PopupMenuButton(
+                    iconSize: 18,
+                    itemBuilder: (BuildContext context)=>[
+                      const PopupMenuItem(
+                        value: "delete",
+                        padding: EdgeInsets.zero,
+                        child: ListTile(
+                          leading: Icon(Icons.delete),
+                          title: Text("删除记录"),
+                          dense: true,
+                        )
+                      )
+                    ],
+                    onSelected: (String val) {
+                      pWorkspace.actGetDataSource().removeRecordBy(index);
+                      if (val == "delete") {
+                        ScaffoldMessenger.of(c).showSnackBar(
+                            const SnackBar(content: Text("OK")));
+                      } else {
+                        ScaffoldMessenger.of(c).showSnackBar(
+                            SnackBar(content: Text("尚未实现[$val]敬请期待..")));
+                      }
+                    }
+                  ),
+            ),
+          Text(
+            value.toString(),
+            overflow: TextOverflow.ellipsis,
+          )
+        ],
+      )
+  );
+
   Widget _buildShowString(Value value) => Container(
         padding: const EdgeInsets.all(8.0),
         alignment: Alignment.centerLeft,
@@ -322,6 +367,12 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
           overflow: TextOverflow.ellipsis,
         ),
       );
+
+  Widget _buildShowBool(Value value) => Container(
+    padding: const EdgeInsets.all(8.0),
+    alignment: Alignment.center,
+    child: MyCheckBox(flag: value.toString().substring(3,8).trim()=="true"?true:false),
+  );
 
   /// todo 可编辑的单元格
   /// Help to control the editable text in [TextField] widget.
@@ -648,6 +699,16 @@ class DataFrameTitle extends StatelessWidget {
             ),
             icon: const Icon(Icons.add),
             label: const Text("新增记录"),
+          ),
+          Consumer<WorkspaceProvider>(
+              builder: (c, pWorkspace, _) => TextButton.icon(
+                  onPressed: () {
+                    pWorkspace.metaMap.remove(meta.id);
+                    pWorkspace.actWatchMeta(pWorkspace.metaList.last);
+                  },
+                  icon: const Icon(Icons.delete),
+                  label: const Text("删除表"),
+              )
           ),
         ],
       );
