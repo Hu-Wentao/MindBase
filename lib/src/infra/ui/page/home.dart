@@ -42,9 +42,10 @@ class _HomePageState extends State<HomePage> {
                       child: Center(child: Text("请选择/创建 一个Meta")),
                     ),
                   if (pWorkspace.watchedMeta != null)
-                    RecordDataGrid(
+                    RecordDataGrid.build(
                       key: ValueKey(pWorkspace.watchedMeta),
-                      dataGridSource: pWorkspace.actGetDataSource(),
+                      dataGridSourceWithCtrl:
+                          pWorkspace.actGetDataSourceWithCtrl(),
                       onSaveRecord: pWorkspace.actSaveRecord,
                       onSaveMeta: pWorkspace.actSaveMeta,
                     ),

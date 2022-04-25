@@ -137,6 +137,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
   // 源数据List 删除
   void onRemoveEvt(int index) => removeRecordBy(index);
 
+  /// [rowIndex]为null时, 表示新增
   @override
   void renderRecord(Record entity, int? rowIndex, {bool notify = true}) {
     if (rowIndex == null) {
@@ -310,9 +311,8 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
         alignment: Alignment.centerLeft,
         // color: Colors.black12,
         child: Text(
-          value.v,
+          value.value,
           maxLines: 1,
-          // style: TextStyle(background: Paint()..color = Colors.black12),
           overflow: TextOverflow.fade,
         ),
       );
@@ -330,14 +330,13 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
                     iconSize: 18,
                     itemBuilder: (BuildContext context)=>[
                       const PopupMenuItem(
-                        value: "delete",
-                        padding: EdgeInsets.zero,
-                        child: ListTile(
-                          leading: Icon(Icons.delete),
-                          title: Text("删除记录"),
-                          dense: true,
-                        )
-                      )
+                          value: "delete",
+                          padding: EdgeInsets.zero,
+                          child: ListTile(
+                            leading: Icon(Icons.delete),
+                            title: Text("删除记录"),
+                            dense: true,
+                          ))
                     ],
                     onSelected: (String val) {
                       pWorkspace.actGetDataSource().removeRecordBy(index);
@@ -356,8 +355,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
             overflow: TextOverflow.ellipsis,
           )
         ],
-      )
-  );
+      ));
 
   Widget _buildShowString(Value value) => Container(
         padding: const EdgeInsets.all(8.0),
@@ -393,7 +391,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
 
     // fixme 如果动态新增了列,则原有对象是没有与新列对应的value的
     final sourceValue = sourceRow.getFieldByColumn(column.columnName);
-    final displayText = sourceValue.v;
+    final displayText = sourceValue.value;
     // final displayText = sourceRow.toGridKeyValueMap()[column.columnName]!.v;
     slLogger.info("buildEditWidget:displayText# $displayText");
 
@@ -449,6 +447,9 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
         );
         // TODO: Handle this case.
         break;
+      case AttrType.type:
+        // TODO: Handle this case.
+        break;
     }
     return editWidget;
   }
@@ -483,13 +484,13 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
             decoration: const InputDecoration(labelText: '所选Meta下的RecordId'),
             name: 'recordId',
             // initialValue: null,
-            itemAsString: (meta) => meta?.id.toHexString() ?? sourceValue.v,
+            itemAsString: (meta) => meta?.id.toHexString() ?? sourceValue.value,
             //空则选择默认值
             // items: allCountries,
             onChanged: (value) {
               editingController.text =
                   // newCellValue =
-                  (value == null) ? sourceValue.v : value.id.toHexString();
+                  (value == null) ? sourceValue.value : value.id.toHexString();
             },
             showSearchBox: true,
             isFilteredOnline: true,
@@ -533,7 +534,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     final Record oldEntity =
         getCachedRecordByIndex(meta.id, rowColumnIndex.rowIndex);
     final oldValue = oldEntity.tryGetFieldByColumn(col.columnName);
-    if (oldValue?.v == editingController.text) {
+    if (oldValue?.value == editingController.text) {
       // if (newCellValue == null ||
       //     oldValue == null ||
       //     oldValue.v == newCellValue) {
@@ -586,14 +587,31 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
 }
 
 class RecordDataGrid extends StatefulWidget {
+  factory RecordDataGrid.build({
+    Key? key,
+    dataGridSourceWithCtrl,
+    onSaveRecord,
+    onSaveMeta,
+  }) =>
+      RecordDataGrid(
+        key: key,
+        dataGridSource: dataGridSourceWithCtrl.value1,
+        dataGridController: dataGridSourceWithCtrl.value2,
+        onSaveRecord: onSaveRecord,
+        onSaveMeta: onSaveMeta,
+      );
+
   const RecordDataGrid({
     Key? key,
     required this.dataGridSource,
+    required this.dataGridController,
     required this.onSaveRecord,
     required this.onSaveMeta,
   }) : super(key: key);
 
   final RecordDataGridSource2 dataGridSource;
+  final DataGridController dataGridController;
+
   final Future<void> Function(RecordDto? dto) onSaveRecord;
   final Future<void> Function(RecordMetaDto? dto) onSaveMeta;
 
@@ -636,12 +654,20 @@ class _RecordDataGridState extends State<RecordDataGrid> {
                   columnWidthMode: ColumnWidthMode.fill,
                   // todo 使用 Column Resizing 以便调整列宽
                   columns: widget.dataGridSource.buildColumn(context, pMeta),
+                  // 允许编辑单元格数据
                   allowEditing: true,
+                  // 双击编辑
                   editingGestureType: EditingGestureType.doubleTap,
-                  // 单击选中
-                  selectionMode: SelectionMode.single,
-                  // 选中单元格
+                  // 单击选中,再点取消
+                  selectionMode: SelectionMode.singleDeselect,
+                  // 选中单元格(以便编辑选中cell的值)
                   navigationMode: GridNavigationMode.cell,
+                  // 选中单元格 需要配合[DataGridController]
+                  // selectionManager: SelectionManagerBase(),
+                  controller: widget.dataGridController,
+                  // stackedHeaderRows: [StackedHeaderRow(cells: [StackedHeaderCell(columnNames: ['a0','a1'], child: Text("T形合并Header"))])],
+                  // 冻结前n列
+                  // frozenColumnsCount:1,
                 ),
               ),
             ],
