@@ -176,17 +176,23 @@ class RecordMeta implements IEtt<ObjectId> {
     );
   }
 
-  Method? getMethodBy(String member) {
-    for (final element in methods) {
-      if (element.name == member) return element;
+  Method? tryGetMethodBy(String member) {
+    for (final method in methods) {
+      if (method.name == member) return method;
     }
     return null;
   }
 
+  Property getPropBy(String propId) =>
+      properties.firstWhere((prop) => prop.propId == propId);
+
+  bool hasPropBy(String member) =>
+      properties.any((prop) => prop.name == member);
+
   RecordMetaDto toDto() => RecordMetaDto.fromDomain(this);
 
   @override
-  String toString() => toDto().toString();
+  String toString() => "RecordMeta#${toDto()}";
 
   void update(RecordMeta meta) {
     assert(id == meta.id, "Meta::update,当前ID[$id]与更新ID[${meta.id}]不一致!");
@@ -276,13 +282,7 @@ class Method extends Property {
   MethodDto toDto() => MethodDto.ofDomain(this);
 
   // 方法被调用时, 就算是无参,也默认传入`this`
-  invoke(Record record) {
-    final selfCtx = record.fields.map((k, v) => MapEntry("a$k", v.value))
-      ..addAll(
-        Map.fromEntries(record.methods.map((e) => MapEntry("m${e.k}", e.expr))),
-      );
-    return expr.callee(selfCtx);
-  }
+  invoke(Record record) => expr.callee();
 }
 
 class Attribute extends Property {
