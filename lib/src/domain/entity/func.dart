@@ -74,7 +74,6 @@ mixin IFunctor {
 class Value extends IExpr with IFunctor, EquatableMixin {
   @override
   final AsFunc fn; // 对于Value, fn对象始终是 [AsFunc]类及其子类
-  // 对于Value, ag对象始终是 [List<String>]类
   @override
   final List<dynamic> ag; // ag[0]为实际值, ag[1]为错误值
   @override
@@ -83,7 +82,7 @@ class Value extends IExpr with IFunctor, EquatableMixin {
   @override
   dynamic get value => callee();
 
-  dynamic get v => value;
+  dynamic get v => ag[0];
 
   String get e => ag[1];
 
