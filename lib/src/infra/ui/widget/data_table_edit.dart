@@ -1,18 +1,85 @@
 import 'package:flutter/material.dart';
+import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/config/common_config.dart';
+import 'package:mind_base/src/domain/value.dart';
+import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+
+class DataTableEditRef extends StatefulWidget {
+  const DataTableEditRef({
+    Key? key,
+    required this.type,
+    required this.editCtrl, // 展示值
+    required this.rowColumnIndex,
+    required this.column,
+    required this.submitCell,
+  }) : super(key: key);
+
+  final AttrType type;
+  final TextEditingController editCtrl;
+  final RowColumnIndex rowColumnIndex;
+  final GridColumn column;
+  final CellSubmit submitCell;
+
+  @override
+  State<DataTableEditRef> createState() => _DataTableEditRefState();
+}
+
+class _DataTableEditRefState extends State<DataTableEditRef> {
+  String? newCellValue;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  /// 在这里选择一条记录
+  @override
+  Widget build(BuildContext context) {
+    // 子实体的类型
+    // print("#debug# type.r#${widget.type.r}");
+    final refMetaId = ObjectId.fromHexString(widget.type.r!);
+    final refRecords = sl<WorkspaceDataHolder>().getRecords(refMetaId);
+
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      alignment: Alignment.centerLeft, // 文本居左
+      // isTextAlignRight ? Alignment.centerRight : Alignment.centerLeft,
+      child: DropdownButton<String>(
+        autofocus: true,
+        focusColor: Colors.transparent,
+        underline: const SizedBox.shrink(),
+        icon: const Icon(Icons.arrow_drop_down_sharp),
+        isExpanded: true,
+        onChanged: (value) {
+          if (value == null) return;
+          widget.editCtrl.text = value;
+          widget.submitCell();
+        },
+        items: refRecords
+            .map((e) => DropdownMenuItem(
+                value: e.id.toHexString(),
+                child: ListTile(
+                  title: Text("${e.id}"),
+                  trailing: Text("${e.fields[3]}"),
+                )))
+            .toList(),
+      ),
+    );
+  }
+}
 
 class DataTableEditText extends StatefulWidget {
   const DataTableEditText({
     Key? key,
     required this.editingController,
-    // required this.displayText,
     required this.rowColumnIndex,
     required this.column,
     required this.submitCell,
   }) : super(key: key);
-  // final String displayText;
-   final TextEditingController editingController;
+
+  final TextEditingController editingController;
   final RowColumnIndex rowColumnIndex;
   final GridColumn column;
   final CellSubmit submitCell;
