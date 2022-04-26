@@ -4,6 +4,7 @@ import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/repo.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_frame.dart';
+import 'package:mind_base/src/infra/ui/widget/data_table_source.dart';
 import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show Db, ObjectId, where;
@@ -350,12 +351,12 @@ class WorkspaceProvider extends ProviderSidecar {
       });
 
   // <MetaId, 数据源>
-  final Map<ObjectId, Tuple2<RecordDataGridSource2, DataGridController>>
+  final Map<ObjectId, Tuple2<RecordDataGridSource, DataGridController>>
       _cacheSourceWithCtrl = {};
 
   void _findCachedSource(
     ObjectId metaId,
-    Function(RecordDataGridSource2 source) onFind,
+    Function(RecordDataGridSource source) onFind,
   ) {
     final source = _cacheSourceWithCtrl[metaId]?.head;
     if (source != null) {
@@ -378,10 +379,10 @@ class WorkspaceProvider extends ProviderSidecar {
       _findCachedSource(metaId, (source) => source.onRemoveEvt(index));
 
   /// 返回当前meta对应的[IRecordDataGridSource]
-  Tuple2<RecordDataGridSource2, DataGridController>
+  Tuple2<RecordDataGridSource, DataGridController>
       actGetDataSourceWithCtrl() => _getByMeta(watchedMeta!);
 
-  Tuple2<RecordDataGridSource2, DataGridController> _getByMeta(
+  Tuple2<RecordDataGridSource, DataGridController> _getByMeta(
       RecordMeta meta) {
     watchedMeta = meta;
     var cached = _cacheSourceWithCtrl[meta.id];
@@ -389,10 +390,10 @@ class WorkspaceProvider extends ProviderSidecar {
   }
 
   /// 创建数据源, 以及数据源对应的[DataGridController]
-  Tuple2<RecordDataGridSource2, DataGridController> _newDataSourceWithCtrl(
+  Tuple2<RecordDataGridSource, DataGridController> _newDataSourceWithCtrl(
           RecordMeta meta) =>
       _cacheSourceWithCtrl[meta.id] = Tuple2(
-          RecordDataGridSource2(
+          RecordDataGridSource(
             meta,
             actSaveRecord,
             getCachedRecordsByMeta,
