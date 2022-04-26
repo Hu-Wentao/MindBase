@@ -83,7 +83,9 @@ class AttrType {
 
   static Iterable<AttrTp> get values => AttrTp.values;
 
-  String get name => tp == AttrTp.type ? "type_$ref" : tp.name;
+  String get tpName => tp.name;
+
+  String get name => tp == AttrTp.type ? "type_$ref" : tpName;
 
   @override
   bool operator ==(Object other) =>
