@@ -70,7 +70,7 @@ class AttrType {
   static const AttrType any = AttrType(AttrTp.any, null);
   static const AttrType num = AttrType(AttrTp.num, null);
   static const AttrType string = AttrType(AttrTp.string, null);
-  static const AttrType bool = AttrType(AttrTp.bool, null);
+  static const AttrType boolean = AttrType(AttrTp.bool, null);
 
   const AttrType.type(String ref) : this(AttrTp.type, ref);
 
@@ -84,6 +84,17 @@ class AttrType {
   static Iterable<AttrTp> get values => AttrTp.values;
 
   String get name => tp == AttrTp.type ? "type_$ref" : tp.name;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AttrType &&
+          runtimeType == other.runtimeType &&
+          tp == other.tp &&
+          ref == other.ref;
+
+  @override
+  int get hashCode => tp.hashCode ^ ref.hashCode;
 
   @override
   String toString() => 'AttrType{tp: $tp, ref: $ref}';
