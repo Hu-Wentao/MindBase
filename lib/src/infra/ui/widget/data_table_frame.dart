@@ -299,6 +299,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
             break;
           case AttrTp.ref:
           case AttrTp.any:
+
             /// fixme 考虑改用contextMenu
             cell.columnName == "a0"
                 ? cellWidget = _buildShowAnyButton(cell.value!, index++)
@@ -394,6 +395,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     GridColumn column,
     CellSubmit submitCell,
   ) {
+    // fixme 通过index查询prop容易出错, #125 如果新增了checkbox列,通过index查列会导致真实值偏移
     final sourceProp = meta.properties[rowColumnIndex.columnIndex];
     // 选择指定行的数据
     final sourceRow = getCachedRecordByIndex(meta.id, rowColumnIndex.rowIndex);
@@ -442,11 +444,19 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
           submitCell: submitCell,
         );
         break;
+      case AttrTp.ref:
+        editWidget = DataTableEditRef(
+          type: sourceProp.type,
+          editCtrl: editingController..text = displayText,
+          rowColumnIndex: rowColumnIndex,
+          column: column,
+          submitCell: submitCell,
+        );
+        break;
       case AttrTp.any:
       case AttrTp.num:
       case AttrTp.bool:
-      case AttrTp.ref:
-      // case AttrTp.date:
+        // case AttrTp.date:
         editWidget = DataTableEditText(
           editingController: editingController..text = displayText,
           // displayText: displayText,
