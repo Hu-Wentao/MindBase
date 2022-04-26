@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/application/expression_parser.dart';
+import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
@@ -89,7 +91,7 @@ class MetaForm extends StatelessWidget {
         // Form的序列化与原序列化不同
         name: json['name'] as String,
         memo: json['memo'] as String,
-        type: AttrType.by(json['type'] as String),
+        type: AttrType.by(json['type'] as String, json['ref'] as String?),
       );
     }).toList();
 
@@ -243,6 +245,18 @@ class _AttributeListFormState extends State<AttributeListForm> {
   late List<AttributeDto> _origin;
   late GlobalKey<FormBuilderState> _kAttrBuilder;
 
+  /// 用于存储 第{a.k}个属性的Type是否为 [AttrTp.type]类型, 以便展示"Meta选择器"
+  final Map<int, bool> _isAttrTpType = {};
+
+  _onChangeType(int index, Object? type) {
+    final origin = _isAttrTpType[index];
+    final update = type == AttrTp.type.name;
+    if (origin == update) return;
+    setState(() {
+      _isAttrTpType[index] = update;
+    });
+  }
+
   @override
   initState() {
     _origin = [
@@ -317,11 +331,12 @@ class _AttributeListFormState extends State<AttributeListForm> {
                     ),
                   ),
                   const SizedBox(width: 8),
+
+                  /// 属性类型选择
                   SizedBox(
                     width: 200,
-
-                    /// 非引用型字段
-                    child: FormBuilderDropdown(
+                    // 选择String类型,以便序列化(fromForm)
+                    child: FormBuilderDropdown<String>(
                       name: '${a.k}@type',
                       decoration: const InputDecoration(
                         labelText: '属性类型',
@@ -334,9 +349,33 @@ class _AttributeListFormState extends State<AttributeListForm> {
                                 child: Text(e.name),
                               ))
                           .toList(),
+                      onChanged: (v) => _onChangeType(a.k, v),
                     ),
                   ),
                   const SizedBox(width: 8),
+
+                  /// Meta选择器
+                  if (_isAttrTpType[a.k] ?? false)
+                    SizedBox(
+                      width: 200,
+                      child: FormBuilderDropdown<String>(
+                        name: '${a.k}@ref',
+                        decoration: const InputDecoration(
+                          labelText: '类型选择',
+                          border: OutlineInputBorder(),
+                        ),
+                        initialValue: null,
+                        // 注意: 必须为空,否则报错 https://github.com/danvick/flutter_form_builder/issues/220
+                        items: sl<WorkspaceDataHolder>()
+                            .allMetas()
+                            .map((e) => DropdownMenuItem<String>(
+                                  value: e.id.toHexString(),
+                                  child: Text(e.name),
+                                ))
+                            .toList(),
+                      ),
+                    ),
+                  if (_isAttrTpType[a.k] ?? false) const SizedBox(width: 8),
                   SizedBox(
                     width: 150,
                     child: FormBuilderTextField(
