@@ -57,30 +57,29 @@ enum AttrTp {
   string,
   num,
   bool,
-  // ref, // 对应 AsFuncRecord, 是ObjectId() String 的别名类型; 只有在引用其他字段时,才标识为ref, 如果标识当前记录的_id,则应该使用 string
-  type, // 对应 AsFuncRecordMeta, 是ObjectId() String 的别名类型
+  ref, // 引用类型
   // func, // 函数类型 相当于Dart的Function,Excel的函数 暂不实现
 }
 
-/// 如果[tp]为[AttrTp.type],则[ref]不能为空
+/// 如果[tp]为[AttrTp.ref],则[r]不能为空
 class AttrType {
   final AttrTp tp;
 
   // todo #129 需要分为DTO, 本类应当持有 [RecordMeta], 否则无法获取到RecordMeta的名称, String ref则由DTO存储
-  final String? ref;
+  final String? r;
 
   static const AttrType any = AttrType(AttrTp.any, null);
   static const AttrType num = AttrType(AttrTp.num, null);
   static const AttrType string = AttrType(AttrTp.string, null);
   static const AttrType boolean = AttrType(AttrTp.bool, null);
 
-  const AttrType.type(String ref) : this(AttrTp.type, ref);
+  const AttrType.ref(String r) : this(AttrTp.ref, r);
 
-  const AttrType(this.tp, this.ref);
+  const AttrType(this.tp, this.r);
 
   /// [name]可以仅为 AttrTp.name, 也可以是 type_$ref
   factory AttrType.by(String name, [String? ref]) => (name.startsWith("type_"))
-      ? AttrType.type(name.substring(5))
+      ? AttrType.ref(name.substring(5))
       : AttrType(AttrTp.values.byName(name), ref);
 
   static Iterable<AttrTp> get values => AttrTp.values;
@@ -88,7 +87,7 @@ class AttrType {
   // todo #129 相关调用应该改为获取RecordMeta的名称,而不是`type`
   String get tpName => tp.name;
 
-  String get name => tp == AttrTp.type ? "${AttrTp.type.name}_$ref" : tpName;
+  String get name => tp == AttrTp.ref ? "${AttrTp.ref.name}_$r" : tpName;
 
   @override
   bool operator ==(Object other) =>
@@ -96,13 +95,13 @@ class AttrType {
       other is AttrType &&
           runtimeType == other.runtimeType &&
           tp == other.tp &&
-          ref == other.ref;
+          r == other.r;
 
   @override
-  int get hashCode => tp.hashCode ^ ref.hashCode;
+  int get hashCode => tp.hashCode ^ r.hashCode;
 
   @override
-  String toString() => 'AttrType{tp: $tp, ref: $ref}';
+  String toString() => 'AttrType{tp: $tp, ref: $r}';
 }
 
 /// 与 [AttrType] 对应
