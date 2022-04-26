@@ -78,16 +78,20 @@ class AttrType {
   const AttrType(this.tp, this.r);
 
   /// [name]可以仅为 AttrTp.name, 也可以是 type_$ref
-  factory AttrType.by(String name, [String? ref]) => (name.startsWith("type_"))
-      ? AttrType.ref(name.substring(5))
-      : AttrType(AttrTp.values.byName(name), ref);
+  factory AttrType.by(String name, [String? ref]) =>
+      (name.startsWith(refPrefix))
+          ? AttrType.ref(name.substring(refPrefix.length))
+          : AttrType(AttrTp.values.byName(name), ref);
 
   static Iterable<AttrTp> get values => AttrTp.values;
+
+  /// [AttrTp.ref]类型的[r]前缀
+  static final refPrefix = "${AttrTp.ref.name}_";
 
   // todo #129 相关调用应该改为获取RecordMeta的名称,而不是`type`
   String get tpName => tp.name;
 
-  String get name => tp == AttrTp.ref ? "${AttrTp.ref.name}_$r" : tpName;
+  String get name => tp == AttrTp.ref ? "$refPrefix$r" : tpName;
 
   @override
   bool operator ==(Object other) =>
