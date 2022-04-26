@@ -245,12 +245,12 @@ class _AttributeListFormState extends State<AttributeListForm> {
   late List<AttributeDto> _origin;
   late GlobalKey<FormBuilderState> _kAttrBuilder;
 
-  /// 用于存储 第{a.k}个属性的Type是否为 [AttrTp.type]类型, 以便展示"Meta选择器"
+  /// 用于存储 第{a.k}个属性的Type是否为 [AttrTp.ref]类型, 以便展示"Meta选择器"
   final Map<int, bool> _isAttrTpType = {};
 
   _onChangeType(int index, Object? type) {
     final origin = _isAttrTpType[index];
-    final update = type == AttrTp.type.name;
+    final update = type == AttrTp.ref.name;
     if (origin == update) return;
     setState(() {
       _isAttrTpType[index] = update;

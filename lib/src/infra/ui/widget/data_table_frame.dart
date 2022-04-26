@@ -297,7 +297,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
           case AttrTp.bool:
             cellWidget = _buildShowBool(cell.value!);
             break;
-          case AttrTp.type:
+          case AttrTp.ref:
           case AttrTp.any:
             /// fixme 考虑改用contextMenu
             cell.columnName == "a0"
@@ -445,7 +445,7 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
       case AttrTp.any:
       case AttrTp.num:
       case AttrTp.bool:
-      case AttrTp.type:
+      case AttrTp.ref:
       // case AttrTp.date:
         editWidget = DataTableEditText(
           editingController: editingController..text = displayText,
