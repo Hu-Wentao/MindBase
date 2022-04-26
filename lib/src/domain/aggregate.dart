@@ -87,7 +87,7 @@ class Record implements IEtt<ObjectId> {
       final method = prop;
       return Value.of(method.invoke(this));
     } else {
-      return getFieldBy(prop.k);
+      return getFieldBy(prop.k, orElse: (_) => Value.of(null)); // 填充一个null默认值
     }
   }
 
