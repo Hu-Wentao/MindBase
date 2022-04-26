@@ -52,15 +52,27 @@ class Error {
       };
 }
 
-enum AttrType {
+enum AttrTp {
+  @Deprecated("考虑移除, 但需要先处理MongoJs相关转换问题")
   objectId, // 特殊处理的String类型, todo 考虑移除,直接用 String/ref/type表示; 但可能存在ObjectId相关转换的问题,需要谨慎处理
   any, // 任意类型
   string,
   num,
   bool,
-  ref, // 对应 AsFuncRecord, 是ObjectId() String 的别名类型; 只有在引用其他字段时,才标识为ref, 如果标识当前记录的_id,则应该使用 string
+  // ref, // 对应 AsFuncRecord, 是ObjectId() String 的别名类型; 只有在引用其他字段时,才标识为ref, 如果标识当前记录的_id,则应该使用 string
   type, // 对应 AsFuncRecordMeta, 是ObjectId() String 的别名类型
   // func, // 函数类型 相当于Dart的Function,Excel的函数 暂不实现
+}
+
+/// 如果[tp]为[AttrTp.type],则[ref]不能为空
+class AttrType {
+  final AttrTp tp;
+  final String? ref;
+
+  const AttrType(this.tp, this.ref);
+
+  AttrType.of(this.tp, [this.ref])
+      : assert(tp == AttrTp.type || ref != null, "如果tp==type, ref不能为空");
 }
 
 /// 与 [AttrType] 对应
