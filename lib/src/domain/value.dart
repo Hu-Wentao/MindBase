@@ -84,10 +84,11 @@ class AttrType {
       : AttrType(AttrTp.values.byName(name), ref);
 
   static Iterable<AttrTp> get values => AttrTp.values;
+
   // todo #129 相关调用应该改为获取RecordMeta的名称,而不是`type`
   String get tpName => tp.name;
 
-  String get name => tp == AttrTp.type ? "type_$ref" : tpName;
+  String get name => tp == AttrTp.type ? "${AttrTp.type.name}_$ref" : tpName;
 
   @override
   bool operator ==(Object other) =>
