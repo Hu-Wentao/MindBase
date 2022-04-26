@@ -327,7 +327,7 @@ class _AttributeListFormState extends State<AttributeListForm> {
                         labelText: '属性类型',
                         border: OutlineInputBorder(),
                       ),
-                      initialValue: a.type.name,
+                      initialValue: a.type.tpName,
                       items: AttrType.values
                           .map((e) => DropdownMenuItem<String>(
                                 value: e.name,

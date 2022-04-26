@@ -65,6 +65,8 @@ enum AttrTp {
 /// 如果[tp]为[AttrTp.type],则[ref]不能为空
 class AttrType {
   final AttrTp tp;
+
+  // todo #129 需要分为DTO, 本类应当持有 [RecordMeta], 否则无法获取到RecordMeta的名称, String ref则由DTO存储
   final String? ref;
 
   static const AttrType any = AttrType(AttrTp.any, null);
@@ -82,7 +84,7 @@ class AttrType {
       : AttrType(AttrTp.values.byName(name), ref);
 
   static Iterable<AttrTp> get values => AttrTp.values;
-
+  // todo #129 相关调用应该改为获取RecordMeta的名称,而不是`type`
   String get tpName => tp.name;
 
   String get name => tp == AttrTp.type ? "type_$ref" : tpName;
