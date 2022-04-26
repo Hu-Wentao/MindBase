@@ -52,7 +52,7 @@ class FuncManager {
   /// 相关 [AttrType]所有用的方法
   static Map<AttrType, Iterable<Func>> get methodMap => {
         AttrType.any: anyFunList,
-        AttrType.bool: boolFunList,
+        AttrType.boolean: boolFunList,
         AttrType.num: numFunList,
         AttrType.string: strFunList,
         // AttrType.date: dateFunList,
@@ -143,7 +143,7 @@ final anyFunList = <Func>[
   Func(
       name: "toBool",
       pTypes: const [AttrType.any],
-      rType: AttrType.bool,
+      rType: AttrType.boolean,
       logic: (p) {
         switch (p[0].runtimeType) {
           case bool:
@@ -159,13 +159,13 @@ final anyFunList = <Func>[
   Func(
     name: "equal",
     pTypes: const [AttrType.any, AttrType.any],
-    rType: AttrType.bool,
+    rType: AttrType.boolean,
     logic: (p) => (p[0]) == (p[1]),
   ),
   Func(
     name: "notEqual",
     pTypes: const [AttrType.any, AttrType.any],
-    rType: AttrType.bool,
+    rType: AttrType.boolean,
     logic: ((p) => p[0] != p[1]),
   ),
   noneFunction,
@@ -219,25 +219,25 @@ final numFunList = [
   Func(
     name: "greater",
     pTypes: const [AttrType.num, AttrType.num],
-    rType: AttrType.bool,
+    rType: AttrType.boolean,
     logic: ((p) => (p[0]) > (p[1])),
   ),
   Func(
     name: "greaterEqual",
     pTypes: const [AttrType.num, AttrType.num],
-    rType: AttrType.bool,
+    rType: AttrType.boolean,
     logic: ((p) => (p[0]) > (p[1])),
   ),
   Func(
     name: "little",
     pTypes: const [AttrType.num, AttrType.num],
-    rType: AttrType.bool,
+    rType: AttrType.boolean,
     logic: ((p) => (p[0]) < (p[1])),
   ),
   Func(
     name: "littleEqual",
     pTypes: const [AttrType.num, AttrType.num],
-    rType: AttrType.bool,
+    rType: AttrType.boolean,
     logic: ((p) => (p[0]) <= (p[1])),
   ),
 ];
@@ -247,20 +247,20 @@ final numFunList = [
 final boolFunList = [
   Func(
     name: "and",
-    pTypes: const [AttrType.bool, AttrType.bool],
-    rType: AttrType.bool,
+    pTypes: const [AttrType.boolean, AttrType.boolean],
+    rType: AttrType.boolean,
     logic: ((p) => (p[0]) && (p[1] is Function) ? p[1].call() : p[1]),
   ),
   Func(
     name: "or",
-    pTypes: const [AttrType.bool, AttrType.bool],
-    rType: AttrType.bool,
+    pTypes: const [AttrType.boolean, AttrType.boolean],
+    rType: AttrType.boolean,
     logic: ((p) => (p[0]) || (p[1] is Function) ? p[1].call() : p[1]),
   ),
   Func(
     name: "not",
-    pTypes: const [AttrType.bool],
-    rType: AttrType.bool,
+    pTypes: const [AttrType.boolean],
+    rType: AttrType.boolean,
     logic: ((p) => !(p[0])),
   ),
 ];
