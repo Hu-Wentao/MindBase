@@ -1,69 +1,85 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/infra/mongo_storage.dart';
 import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-final dto1 = RecordDto.builder(
-    // id: ObjectId.fromHexString("6232ae5d5c918fa41061f449"),
-    metaId: ObjectId.fromHexString("62314b932f929ede7dfebc8f"));
-
 main() async {
   var flowSign = 1;
   int getFlowSign([int add = 2]) => flowSign += add;
-  IMongoStorage client = BaseMongoStorage(MongoStorageConfig(
-    // auth: const MongoAuthBasic(
-    //   username: "root",
-    //   password: "example",
-    // ),
-    databaseName: 'test',
-    port: 30001,
+
+  final pRecordDto1 = RecordDto.builder(
+      id: ObjectId.fromHexString("6232ae5d5c918fa41061f449"),
+      metaId: ObjectId.fromHexString("623b5479ddef0b3eea5d1aa4"),
+      fields: {
+        2: Value.of("123"),
+      });
+
+  // final pClient = BaseMongoStorage(MongoStorageConfig(
+  //   // auth: const MongoAuthBasic(
+  //   //   username: "root",
+  //   //   password: "example",
+  //   // ),
+  //   databaseName: 'test',
+  //   port: 30001,
+  // ));
+  final pClient = BaseMongoStorage(MongoStorageConfig.ofUrl(
+    "mongodb://base.shuttlecloud.cn:11151/unit_test/?replicaSet=my-replica-set&authSource=admin",
   ));
-  final db = await client.asyncDb;
+
+  final db = await pClient.asyncDb;
 
   test("connect", () {
     expect(db.state, State.OPEN, reason: "db is not open");
   });
+  final pRcdAcc = RecordAccessor(db, pRecordDto1.metaId.toHexString());
 
-  test("dao ", () async {
-    print("start");
-    RecordAccessor acc = RecordAccessor(
-        db, ObjectId.parse("623b5479ddef0b3eea5d1aa4").toHexString());
-    // RecordAccessor acc = RecordAccessor(db,dto1.metaId.toHexString());
-
-    acc.watchAll().listen((event) {
-      print("receive# at[${DateTime.now()}]#:$event");
+  test("变更监听", () {
+    pRcdAcc.watchAll().listen((event) {
+      print("#监听变更receive# at[${DateTime.now()}]#:$event");
       // expect(event.entity, dto1);
     });
-    await Future.delayed(Duration(seconds: getFlowSign())).then((value) async {
-      print("等待后插入新Record[${DateTime.now()}]# $dto1");
-      final r = await acc.insert(dto1);
-      expect(r.writeError, null);
-      print("插入结果 id[${DateTime.now()}]# ${r.id}");
-      print("   结果 err.code# ${r.writeError?.code}");
-      print("   结果 err.eMsg# ${r.writeError?.errmsg}");
-      print("   结果 document# ${r.document}");
-    });
-    // await Future.delayed(Duration(seconds: getFlowSign())).then((value) {
-    //   print("等待后移除新Record# $dto1");
-    //   final r = acc.insert(dto1);
-    // });
-
-    // RecordMetaAccessor acc2 = RecordMetaAccessor(db);
-    // acc2.watchAll().listen((records) {
-    //   print("ac2 records $records");
-    // });
-    // RecordRepo repo = RecordRepo(mongoStorage, schemaRepo)
-    // SchemaRepo schemaRepo = SchemaRepo(client);
-    // schemaRepo.watchAll().listen((records) {
-    //   print("schemaRepo records $records");
-    // });
-    //
-    // schemaRepo.findAll().listen((event) {
-    //   print("schemaRepo findAll $event");
-    // });
-
-    await Future.delayed(const Duration(seconds: 20));
-    print("end");
   });
+  test("记录插入", () async {
+    await Future.delayed(Duration(seconds: getFlowSign()));
+    // print("等待后插入新Record[${DateTime.now()}]# $pRecordDto1");
+    final r = await pRcdAcc.insert(pRecordDto1);
+    print("插入结果 [${DateTime.now()}]# ${r.document}");
+  });
+  test("记录更新", () async {
+    final r = await pRcdAcc.replace(pRecordDto1..fields[2] = Value.of("456"));
+    print("更新结果 [${DateTime.now()}]# ${r.document}");
+  });
+  test("记录删除", () async {
+    final r = await pRcdAcc.deleteBy(pRecordDto1.id);
+    print("删除结果 [${DateTime.now()}]# ${r.document}");
+  });
+
+  test("移除表", () async {
+    // final r = await pRcdAcc.drop();
+    // print("移除结果# $r");
+  });
+
+  // await Future.delayed(Duration(seconds: getFlowSign())).then((value) {
+  //   print("等待后移除新Record# $dto1");
+  //   final r = acc.insert(dto1);
+  // });
+
+  // RecordMetaAccessor acc2 = RecordMetaAccessor(db);
+  // acc2.watchAll().listen((records) {
+  //   print("ac2 records $records");
+  // });
+  // RecordRepo repo = RecordRepo(mongoStorage, schemaRepo)
+  // SchemaRepo schemaRepo = SchemaRepo(pClient);
+  // schemaRepo.watchAll().listen((records) {
+  //   print("schemaRepo records $records");
+  // });
+  //
+  // schemaRepo.findAll().listen((event) {
+  //   print("schemaRepo findAll $event");
+  // });
+
+  await Future.delayed(const Duration(seconds: 5));
+  print("end");
 }
