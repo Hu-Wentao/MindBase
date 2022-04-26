@@ -83,7 +83,8 @@ Future<AttributeDto?> showAttributeEditDialog({
   // 表达式的参数<AttributeDto>, 暂时只支持输入单个参数, 默认首个参数为当前列
   AttributeDto currentArg = origin ?? AttributeDto.builder(metaId: selfMeta.id);
   Func currentFunc = FuncManager.selfFunc; // 当前选中的表达式
-  AttrType currentType = AttrType.string; // 当前表达式返回值类型
+  AttrTp currentType = AttrTp.string; // 当前表达式返回值类型
+  String? currentRef; // 如果是[type]类型,则ref不能为空
 
   print("debug originMeta: $origin");
 
@@ -312,7 +313,7 @@ Future<AttributeDto?> showAttributeEditDialog({
                     //     // FormBuilderValidators.required(context),
                     //   ]),
                     // ),
-                    FormBuilderSearchableDropdown<AttrType>(
+                    FormBuilderSearchableDropdown<AttrTp>(
                       decoration: const InputDecoration(labelText: '返回值类型'),
                       name: 'rType',
                       initialValue: currentType,

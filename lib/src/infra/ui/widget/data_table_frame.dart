@@ -286,20 +286,19 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
         final prop = meta.properties[cellColIndex];
         int index = c;
         late Widget cellWidget;
-        switch (prop.type) {
-          case AttrType.objectId:
+        switch (prop.type.tp) {
+          case AttrTp.objectId:
             cellWidget = _buildShowObjectId(cell.value!);
             break;
-          case AttrType.num:
-          case AttrType.string:
+          case AttrTp.num:
+          case AttrTp.string:
             cellWidget = _buildShowString(cell.value!);
             break;
-          case AttrType.bool:
+          case AttrTp.bool:
             cellWidget = _buildShowBool(cell.value!);
             break;
-          case AttrType.ref: // 处理引用类型
-          case AttrType.type:
-          case AttrType.any:
+          case AttrTp.type:
+          case AttrTp.any:
             /// fixme 考虑改用contextMenu
             cell.columnName == "a0"
                 ? cellWidget = _buildShowAnyButton(cell.value!, index++)
@@ -426,15 +425,15 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
     //       submitCell, _shipCity[shipCountry]!);
     // } else {\
     late Widget editWidget;
-    switch (sourceProp.type) {
-      case AttrType.objectId:
+    switch (sourceProp.type.tp) {
+      case AttrTp.objectId:
         if (sourceProp is Attribute) {
           editWidget = _buildEditObjectId(sourceProp, sourceValue, submitCell);
         } else {
           editWidget = const Text("暂不支持编辑Method");
         }
         break;
-      case AttrType.string:
+      case AttrTp.string:
         editWidget = DataTableEditText(
           editingController: editingController..text = displayText,
           // displayText: displayText,
@@ -443,11 +442,11 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
           submitCell: submitCell,
         );
         break;
-      case AttrType.any:
-      case AttrType.num:
-      case AttrType.bool:
-      case AttrType.ref: // todo 处理引用类型
-        // case AttrType.date:
+      case AttrTp.any:
+      case AttrTp.num:
+      case AttrTp.bool:
+      case AttrTp.type:
+      // case AttrTp.date:
         editWidget = DataTableEditText(
           editingController: editingController..text = displayText,
           // displayText: displayText,
@@ -455,9 +454,6 @@ class RecordDataGridSource2 extends IRecordDataGridSource {
           column: column,
           submitCell: submitCell,
         );
-        // TODO: Handle this case.
-        break;
-      case AttrType.type:
         // TODO: Handle this case.
         break;
     }

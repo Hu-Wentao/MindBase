@@ -443,7 +443,7 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
         k: int.parse(attrMap['k'] as String),
         name: attrMap['name'] as String,
         memo: attrMap['memo'] as String,
-        type: AttrType.values.byName(attrMap['type'] as String),
+        type: AttrType.by(attrMap['type'] as String),
       );
 
   AttributeDto.ofDomain(Attribute attr)
@@ -486,7 +486,7 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
           k: json['k'] as int,
           name: json['name'] as String,
           memo: json['memo'] as String,
-          type: AttrType.values.byName(json['type'] as String),
+          type: AttrType.by(json['type'] as String),
         );
 
   @override

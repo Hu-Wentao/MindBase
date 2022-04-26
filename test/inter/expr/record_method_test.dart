@@ -14,9 +14,9 @@ main() {
         memo: '记录一个学生的信息',
         maxKey: 2,
         attrs: const [
-          Attribute(k: 0, name: 'id', memo: 'memo', type: AttrType.objectId),
+          Attribute(k: 0, name: 'id', memo: 'memo', type: AttrType.string),
           Attribute(
-              k: 1, name: 'metaId', memo: 'memo', type: AttrType.objectId),
+              k: 1, name: 'metaId', memo: 'memo', type: AttrType.string),
           Attribute(k: 2, name: 'name', memo: '学生名称', type: AttrType.string),
           Attribute(k: 3, name: 'age', memo: '学生年龄', type: AttrType.string),
           Attribute(k: 4, name: '备注', memo: '备注信息', type: AttrType.string),

@@ -192,7 +192,7 @@ class AsFunc<T> implements Func {
   List<AttrType> get pTypes => [rType];
 
   @override
-  AttrType get rType => AttrType.values.byName("$T");
+  AttrType get rType => AttrType.by("$T");
 
   @override
   invoke([List<dynamic>? ag]) => logic(ag);

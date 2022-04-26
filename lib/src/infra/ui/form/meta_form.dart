@@ -89,7 +89,7 @@ class MetaForm extends StatelessWidget {
         // Form的序列化与原序列化不同
         name: json['name'] as String,
         memo: json['memo'] as String,
-        type: AttrType.values.byName(json['type'] as String),
+        type: AttrType.by(json['type'] as String),
       );
     }).toList();
 
