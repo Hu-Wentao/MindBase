@@ -23,6 +23,7 @@ class FuncManager {
   static get indexFuncName => indexFunc.name;
 
   static get thisFuncName => asThisFunc.name;
+
   static get refFuncName => asRefFunc.name;
 
   @Deprecated("使用 thisFunc")
@@ -33,8 +34,8 @@ class FuncManager {
   static Func get indexFunc => indexFunction;
 
   static AsFunc get asThisFunc => asFuncThis;
-  static AsFunc get asRefFunc => asFuncRef;
 
+  static AsFunc get asRefFunc => asFuncRef;
 
   static Iterable<Func> get funcList => [
         ...anyFunList,
@@ -108,13 +109,8 @@ const Func indexFunction = IndexFunc();
 /// 类比Java访问内存中的对象
 const Func memberFunction = MemberFunc();
 
-final Func noneFunction = Func(
-  name: FuncManager.noneFuncName,
-  pTypes: const [AttrType.any],
-  rType: AttrType.any,
-  logic: (p) => p[0],
-);
-final Func selfFunction = Func(
+@Deprecated("使用asThis")
+final Func selfFunction = BaseFunc(
   name: FuncManager.selfFuncName,
   pTypes: const [AttrType.any],
   rType: AttrType.any,
@@ -135,17 +131,17 @@ const asFuncList = <AsFunc>[
 
 /// 类型检查与转换表达式, 检查/转换失败则抛出异常
 final anyFunList = <Func>[
-  Func(
+  BaseFunc(
       name: "toStr",
       pTypes: const [AttrType.any],
       rType: AttrType.string,
       logic: (p) => "${p[0]}"),
-  Func(
+  BaseFunc(
       name: "toNum",
       pTypes: const [AttrType.any],
       rType: AttrType.num,
       logic: (p) => num.parse(p[0])),
-  Func(
+  BaseFunc(
       name: "toBool",
       pTypes: const [AttrType.any],
       rType: AttrType.boolean,
@@ -161,20 +157,20 @@ final anyFunList = <Func>[
             return false;
         }
       }),
-  Func(
+  BaseFunc(
     name: "equal",
     pTypes: const [AttrType.any, AttrType.any],
     rType: AttrType.boolean,
     logic: (p) => (p[0]) == (p[1]),
   ),
-  Func(
+  BaseFunc(
     name: "notEqual",
     pTypes: const [AttrType.any, AttrType.any],
     rType: AttrType.boolean,
     logic: ((p) => p[0] != p[1]),
   ),
   selfFunction,
-  Func(
+  BaseFunc(
     name: "complement",
     pTypes: const [AttrType.num],
     rType: AttrType.num,
@@ -184,61 +180,61 @@ final anyFunList = <Func>[
 
 /// 基础表达式
 final numFunList = [
-  Func(
+  BaseFunc(
     name: "add",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
     logic: ((p) => (p[0]) + (p[1])),
   ),
-  Func(
+  BaseFunc(
     name: "sub",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
     logic: ((p) => (p[0]) - (p[1])),
   ),
-  Func(
+  BaseFunc(
     name: "mul",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
     logic: ((p) => (p[0]) * (p[1])),
   ),
-  Func(
+  BaseFunc(
     name: "div",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
     logic: ((p) => (p[0]) / (p[1])),
   ),
-  Func(
+  BaseFunc(
     name: "mod",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
     logic: ((p) => (p[0]) % (p[1])),
   ),
-  Func(
+  BaseFunc(
     name: "pow",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
     logic: ((p) => math.pow((p[0]), (p[1]))),
   ),
-  Func(
+  BaseFunc(
     name: "greater",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.boolean,
     logic: ((p) => (p[0]) > (p[1])),
   ),
-  Func(
+  BaseFunc(
     name: "greaterEqual",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.boolean,
     logic: ((p) => (p[0]) > (p[1])),
   ),
-  Func(
+  BaseFunc(
     name: "little",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.boolean,
     logic: ((p) => (p[0]) < (p[1])),
   ),
-  Func(
+  BaseFunc(
     name: "littleEqual",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.boolean,
@@ -249,19 +245,19 @@ final numFunList = [
 /// `short-circuit` 短路表达式
 /// todo 考虑将参数2的类型改为 [AttrType.any] 或者对类型检查进行特殊处理
 final boolFunList = [
-  Func(
+  BaseFunc(
     name: "and",
     pTypes: const [AttrType.boolean, AttrType.boolean],
     rType: AttrType.boolean,
     logic: ((p) => (p[0]) && (p[1] is Function) ? p[1].call() : p[1]),
   ),
-  Func(
+  BaseFunc(
     name: "or",
     pTypes: const [AttrType.boolean, AttrType.boolean],
     rType: AttrType.boolean,
     logic: ((p) => (p[0]) || (p[1] is Function) ? p[1].call() : p[1]),
   ),
-  Func(
+  BaseFunc(
     name: "not",
     pTypes: const [AttrType.boolean],
     rType: AttrType.boolean,
@@ -269,7 +265,7 @@ final boolFunList = [
   ),
 ];
 final strFunList = [
-  Func(
+  BaseFunc(
     name: "len",
     pTypes: const [AttrType.string],
     rType: AttrType.num,
