@@ -27,7 +27,7 @@ abstract class IExpr with IFunctor {
   /// 调用后即为 [value]
   callee();
 
-  AttrType get type => fn.rType;
+  AttrType get type => fn.type(ag); // 自动推断类型
 
   List<dynamic> get ag;
 }
@@ -147,19 +147,26 @@ class Value extends IExpr with IFunctor, EquatableMixin {
 }
 
 /// Func 的实例相当于 Dart的external函数
-class Func with EquatableMixin {
-  final String name; // 全局唯一
-  final List<AttrType> pTypes;
+abstract class Func with EquatableMixin {
+  const Func();
 
-  // todo 新增一个动态获取 rType的方法，针对Any类型的返回值，可以通过方法得到实际的返回类型，而不是Any
-  final AttrType rType;
+  // 全局函数需要确保函数名全局唯一
+  String get name;
 
-  // 在调用之前,需要先检查Attr的类型匹配问题
-  @protected
-  final Function logic;
+  List<AttrType> get pTypes;
+
+  // 返回值类型可以在这里通过参数进行推断
+  AttrType type([List<dynamic>? ag]);
+
+  //
+  // // 在调用之前,需要先检查Attr的类型匹配问题
+  // @protected
+  // Function get logic;
 
   /// [ctx] 仅当函数作为方法体时才会被传入, 内容即对象的成员对象(属性和其他方法)
-  invoke([List<dynamic>? ag]) => logic(ag);
+  invoke([List<dynamic>? ag]);
+
+  // invoke([List<dynamic>? ag]) => logic(ag);
 
   IFunctor apply(List<IFunctor>? p) {
     throw UnimplementedError();
@@ -170,8 +177,37 @@ class Func with EquatableMixin {
     //   // return Value('', e.toString());
     // }
   }
+}
 
-  const Func({
+class BaseFunc extends Func {
+  @override
+  final String name; // 全局唯一
+  @override
+  final List<AttrType> pTypes;
+
+  // todo 新增一个动态获取 rType的方法，针对Any类型的返回值，可以通过方法得到实际的返回类型，而不是Any
+  final AttrType rType;
+
+  // 在调用之前,需要先检查Attr的类型匹配问题
+  @protected
+  final Function logic;
+
+  /// [ctx] 仅当函数作为方法体时才会被传入, 内容即对象的成员对象(属性和其他方法)
+  @override
+  invoke([List<dynamic>? ag]) => logic(ag);
+
+  @override
+  IFunctor apply(List<IFunctor>? p) {
+    throw UnimplementedError();
+    // try {
+    //   // fixme 未作细节处理，如保留原值等
+    //   return Function.apply(logic, p);
+    // } catch (e) {
+    //   // return Value('', e.toString());
+    // }
+  }
+
+  const BaseFunc({
     required this.name,
     required this.pTypes,
     required this.rType,
@@ -180,9 +216,13 @@ class Func with EquatableMixin {
 
   @override
   List<Object?> get props => [name, pTypes, rType, logic];
+
+  // 固定返回值的Func,一般直接用rType返回即可
+  @override
+  AttrType type([List<dynamic>? ag]) => rType;
 }
 
-class AsFunc<T> implements Func {
+class AsFunc<T> implements BaseFunc {
   const AsFunc();
 
   @override
@@ -193,6 +233,9 @@ class AsFunc<T> implements Func {
 
   @override
   AttrType get rType => AttrType.by("$T");
+
+  @override
+  AttrType type([List<dynamic>? ag]) => rType;
 
   @override
   invoke([List<dynamic>? ag]) => logic(ag);
@@ -292,12 +335,15 @@ class MemberFunc implements Func {
   @override
   final String name = "member";
 
-  /// [ctx]是隐式传递
   @override
-  List<AttrType> get pTypes => [rType];
+  List<AttrType> get pTypes => [AttrType.any];
 
   @override
-  AttrType get rType => AttrType.any;
+  AttrType type([List<dynamic>? ag]) {
+    if ((ag?.length ?? 0) < 2) throw "member函数需要两个参数";
+    final member = ag![1] as IExpr; // member 必须是一个表达式
+    return member.type;
+  }
 
   /// memberFunc就相当于 `.`, 必须要有两个参数!
   @override
@@ -305,9 +351,10 @@ class MemberFunc implements Func {
 
   @override
   Function get logic => (p) {
-        print("memberFunction# param # $p");
         final record = p[0];
         var propId = p[1];
+        print("memberFunction#A# ${record.runtimeType} # $record");
+        print("memberFunction#B# ${propId.runtimeType} # $propId");
         if (record is RecordMeta) {
           return record.getPropBy(propId).name;
         }
@@ -315,7 +362,7 @@ class MemberFunc implements Func {
       };
 
   @override
-  List<Object?> get props => [name, pTypes, rType, logic];
+  List<Object?> get props => [name, pTypes, logic];
 
   @override
   IFunctor apply(List<IFunctor>? p) {
@@ -328,7 +375,7 @@ class MemberFunc implements Func {
 }
 
 /// 访问数组对象
-class IndexFunc implements Func {
+class IndexFunc implements BaseFunc {
   const IndexFunc();
 
   @override
@@ -362,10 +409,12 @@ class IndexFunc implements Func {
 
   @override
   bool get stringify => true;
+
+  @override
+  AttrType type([List<dynamic>? ag]) => rType;
 }
 
 /// 可以构造[rType]用于表达式返回值类型推断
-/// todo 或许可以取代所有 asFunc类型
 class AsFuncRef implements AsFunc {
   @override
   final AttrType rType;
@@ -374,6 +423,9 @@ class AsFuncRef implements AsFunc {
 
   @override
   String get name => 'asRef';
+
+  @override
+  AttrType type([List<dynamic>? ag]) => rType;
 
   @override
   IFunctor apply(List<IFunctor>? p) {
@@ -398,8 +450,9 @@ class AsFuncRef implements AsFunc {
 
 ///
 /// [AsFuncThis] 是一个标记性的函数,没有固定Args,返回值从ctx中获取
-/// 用于表示当前类型的对象,描述了一种"相对的位置"
-///
+/// [AsFuncThis]与[AsFuncRef]
+/// asThis,用于表示当前类型的对象, 描述了一种"相对的位置",具体的ref值是从ctx中获取;
+/// asRef,是绝对位置,ref指定MetaId将会被持久化到数据库中
 class AsFuncThis implements AsFunc {
   /// 指定返回值类型, 可以帮助表达式确认Meta, 用于多层MemberFunc的转换
   /// 因此,[AsFuncThis]应当在convert或eval时,
@@ -409,6 +462,9 @@ class AsFuncThis implements AsFunc {
   final AttrType rType;
 
   const AsFuncThis([this.rType = AttrType.any]);
+
+  @override
+  AttrType type([List<dynamic>? ag]) => rType;
 
   // 如果上下文中存在`this`,则为其key值
   static const ctxSign = 'this';
