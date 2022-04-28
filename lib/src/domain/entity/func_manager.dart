@@ -7,32 +7,34 @@ class FuncManager {
 
   /// 返回所有的全局函数, 用于表达式解析
   static Iterable<MapEntry<String, Func>> get allFuncMapEntry =>
-      _funcMapCache ??=
-          funcList.map((e) => MapEntry(e.name, e)).followedBy(
-                al.entries.map((e) => MapEntry(e.key, findBy(e.key))),
-              );
+      _funcMapCache ??= funcList.map((e) => MapEntry(e.name, e)).followedBy(
+            al.entries.map((e) => MapEntry(e.key, findBy(e.key))),
+          );
 
   // 是否为短路运算符
   static bool isShortCircuit(String name) =>
       const ['&&', '||', "and", "or"].contains(name);
   static const noneFuncName = "none";
+  @Deprecated("使用 thisFunc")
   static const selfFuncName = "self";
 
   static get memberFuncName => memberFunc.name;
 
   static get indexFuncName => indexFunc.name;
 
-  // static get callFuncName => callFunc.name;
+  static get thisFuncName => asThisFunc.name;
+  static get refFuncName => asRefFunc.name;
 
+  @Deprecated("使用 thisFunc")
   static Func get selfFunc => selfFunction;
-
-  static Func get noneFunc => noneFunction;
 
   static Func get memberFunc => memberFunction;
 
   static Func get indexFunc => indexFunction;
 
-  // static Func get callFunc => callFunction;
+  static AsFunc get asThisFunc => asFuncThis;
+  static AsFunc get asRefFunc => asFuncRef;
+
 
   static Iterable<Func> get funcList => [
         ...anyFunList,
@@ -40,9 +42,8 @@ class FuncManager {
         ...numFunList,
         ...strFunList,
         ...asFuncList,
-        memberFunc,
-        indexFunc,
-        // callFunc,
+        memberFunction,
+        indexFunction,
       ];
 
   static bool isAsFunc(String name) =>
@@ -99,6 +100,8 @@ class FuncManager {
 
 // const Func callFunction = CallFunc();
 
+const AsFuncRef asFuncRef = AsFuncRef();
+const AsFunc asFuncThis = AsFuncThis();
 const Func indexFunction = IndexFunc();
 
 /// 通过RecordId查询当前工作区内的Record,并访问成员对象
@@ -126,6 +129,8 @@ const asFuncList = <AsFunc>[
   AsFuncDynamic(),
   AsFuncRecordMeta(),
   AsFuncRecord(),
+  asFuncThis,
+  asFuncRef,
 ];
 
 /// 类型检查与转换表达式, 检查/转换失败则抛出异常
@@ -168,7 +173,6 @@ final anyFunList = <Func>[
     rType: AttrType.boolean,
     logic: ((p) => p[0] != p[1]),
   ),
-  noneFunction,
   selfFunction,
   Func(
     name: "complement",
