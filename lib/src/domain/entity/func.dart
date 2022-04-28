@@ -12,11 +12,11 @@ abstract class IExpr with IFunctor {
   const IExpr();
 
   /// 不常用, 如果是 [ExpressionDto]转换成 [IExpr], 则需要使用 [ExprDtoToDomain],结合ctx上下文做转换
-  factory IExpr.of(Func fn, List<dynamic> ag) {
+  factory IExpr.of(Func fn, List<dynamic> ag, AttrType type) {
     if (fn is AsFunc) {
       return Value(fn: fn, ag: ag);
     } else if (ag is List<IExpr>) {
-      return Expression(fn, ag);
+      return Expression(fn: fn, ag: ag, type: type);
     } else {
       throw "IExpr.of构造失败#fn名称与类型: [${fn.name}][${fn.runtimeType}] #ag参数# ${ag.join(", ")}";
     }
@@ -27,7 +27,8 @@ abstract class IExpr with IFunctor {
   /// 调用后即为 [value]
   callee();
 
-  AttrType get type => fn.type(ag); // 自动推断类型
+  // 返回值类型
+  AttrType get type;
 
   List<dynamic> get ag;
 }
@@ -42,7 +43,14 @@ class Expression extends IExpr with IFunctor, EquatableMixin {
   @override
   final List<IExpr> ag;
 
-  const Expression(this.fn, [this.ag = const []]);
+  // expr-v12.1 表达式需要显式确定返回值类型
+  @override
+  final AttrType type;
+
+  // const Expression(this.fn, this.type, [this.ag = const []]);
+  const Expression({required this.fn, this.ag = const [], required this.type});
+
+  // const Expression(this.fn, [this.ag = const [], this.type = AttrType.any]);
 
   @override
   callee() => fn.invoke(ag.map((a) => a.callee()).toList());
@@ -78,6 +86,10 @@ class Value extends IExpr with IFunctor, EquatableMixin {
   final List<dynamic> ag; // ag[0]为实际值, ag[1]为错误值
   @override
   callee() => fn.logic.call(ag);
+
+  // expr-v12.1
+  @override
+  AttrType get type => fn.rType;
 
   @override
   dynamic get value => callee();
@@ -156,7 +168,7 @@ abstract class Func with EquatableMixin {
   List<AttrType> get pTypes;
 
   // 返回值类型可以在这里通过参数进行推断
-  AttrType type([List<dynamic>? ag]);
+  AttrType type([List<AttrType>? argTypes]);
 
   //
   // // 在调用之前,需要先检查Attr的类型匹配问题
