@@ -563,8 +563,9 @@ abstract class IExprJsonDto implements IMongoDtoMx {
       case ExprJsonDto:
         final dto = (this as ExprJsonDto);
         return Expression(
-          FuncManager.findBy(dto.fn!),
-          dto.ag.map((e) => e.toDomain()).toList(),
+          fn: FuncManager.findBy(dto.fn!),
+          ag: dto.ag.map((e) => e.toDomain()).toList(),
+          type: dto.type!,
         );
       default:
         throw "IExpr::toDomain 未知的类型 [$runtimeType]";
@@ -591,14 +592,18 @@ class ExprJsonDto extends IExprJsonDto with IMongoDtoMx {
   @override
   List<IExprJsonDto> ag;
 
+  AttrType? type;
+
   ExprJsonDto({
     this.fn,
     this.ag = const [],
+    this.type,
   });
 
   ExprJsonDto.builder({
     this.fn,
     this.ag = const [],
+    this.type,
   });
 
   factory ExprJsonDto.fromDomain(IExpr expr) => ExprJsonDto(
