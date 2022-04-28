@@ -1,27 +1,13 @@
 import 'dart:convert';
 
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:petitparser/petitparser.dart';
 
 import '../application/expression_parser.dart';
 import 'expr_dto_to_domain.dart';
-
-//
-// /// 后期替换 领域层的 Expression类
-// /// 作用： 将用户输入的表达式结合当前的上下文，进行持久化，以解决字段名，方法名变更导致表达式无效的问题
-// class Expression2 {
-//   // 函数名称名称,如果表达式就是一个值，则函数名称可以是self，这样可以表示一个Value（字面值）
-//   final Func func;
-//
-//   // 参数列表
-//   final List<Expression2> args;
-//
-//   Expression2(this.func, this.args);
-//
-//   Expression2.value(this.args) : func = FuncManager.selfFunc;
-// }
 
 /// 标识符 仅用于对用户输入的表达式解析
 /// 变量/方法的名称, 与上下文对应
@@ -59,11 +45,14 @@ abstract class ExpressionDto {
   /// 转换后将会被替换为持久化上下文，即 `<bob对象对应的Record::id>.<bob对应Meta::propId>`
   ExpressionDto toPersistence(Map<String, dynamic> currentContext);
 
-  /// 允许metaId为null, 用于解析没有使用`this`或者其他`全局函数`的表达式
-  IExpr toDomain([ObjectId? metaId]) => exprToDomain.convert(
+  /// 允许meta为null, 用于解析没有使用`this`或者其他`全局函数`的表达式
+  IExpr toDomain([RecordMeta? meta]) => exprToDomain.convert(
         this,
-        {if (metaId != null) ThisExpressionDto.sign: Value.ofMetaId(metaId)}
-          ..addEntries(FuncManager.allFuncMapEntry), // 添加全局Func到Ctx中
+        {
+          AsFuncThis.ctxTypeSign: meta,
+          // 由于没有`this`,只有`this`的类型(Meta)所以这里使用[ctxTypeSign]
+        }..addEntries(
+            FuncManager.allFuncMapEntry), // 注意,在Dto->Domain时,似乎仍然需要全局Func
       );
 }
 

@@ -278,6 +278,7 @@ class AsFuncDynamic extends AsFunc {
   AttrType get rType => AttrType.any;
 }
 
+@Deprecated("请使用[AsFuncRef]")
 class AsFuncRecord extends AsFunc<Record> {
   const AsFuncRecord();
 
@@ -302,6 +303,7 @@ class AsFuncRecord extends AsFunc<Record> {
   AttrType get rType => AttrType.any;
 }
 
+@Deprecated("没有实际意义")
 class AsFuncRecordMeta extends AsFunc<RecordMeta> {
   const AsFuncRecordMeta();
 
@@ -415,14 +417,25 @@ class IndexFunc implements BaseFunc {
 }
 
 /// 可以构造[rType]用于表达式返回值类型推断
+/// asRef_xx<某MetaId>xx([<this所属Meta的propId,并且与`某MetaId`不同>])
+/// 用于表示变量再ctx中是某个Meta下的实例, 其中,xx就代表该Meta的Id
+/// todo asRef描述的是,在表达式中,value的类型,
 class AsFuncRef implements AsFunc {
   @override
   final AttrType rType;
 
   const AsFuncRef([this.rType = AttrType.any]);
 
+  static const funPrefix = "asRef_";
+
+  static AsFuncRef? ofName(String funcName) {
+    if (!funcName.startsWith(funPrefix)) return null;
+    return AsFuncRef(AttrType.ref(funcName.substring(funPrefix.length)));
+  }
+
   @override
-  String get name => 'asRef';
+  // String get name => 'asRef';
+  String get name => "$funPrefix${rType.r}";
 
   @override
   AttrType type([List<dynamic>? ag]) => rType;

@@ -104,19 +104,26 @@ class MetaForm extends StatelessWidget {
       methodFormatMap[ik] ??= {};
       methodFormatMap[ik]![fk] = v;
     }
+    // expr12 由于持久化为Json,需要 Readable->Domain(Meta)->Json, 显然此时Meta尚未持久化(尚未被创建)
+    // 所以在expr12中, 无法在创建Meta之前,创建方法
     final metaId = ObjectId.fromHexString(metaMap['id'] as String);
-    final methods = methodFormatMap.entries.map((e) {
-      final json = e.value;
-      final key = int.parse(json['k'] as String);
-      return MethodDto(
-        k: key,
-        name: json['name'] as String,
-        memo: json['memo'] as String,
-        expr: IExprJsonDto.fromDomain(
-          ExpressionDto.of(exprParser, json['expr'] as String).toDomain(metaId),
-        ),
-      );
-    }).toList();
+    // 尝试查询Meta,如果查不到就取消添加方法(因为Meta还没被创建)
+    final meta = sl<WorkspaceDataHolder>().getMetaBy(metaId);
+    final methods = (meta == null)
+        ? const <MethodDto>[]
+        : methodFormatMap.entries.map((e) {
+            final json = e.value;
+            final key = int.parse(json['k'] as String);
+            return MethodDto(
+              k: key,
+              name: json['name'] as String,
+              memo: json['memo'] as String,
+              expr: IExprJsonDto.fromDomain(
+                ExpressionDto.of(exprParser, json['expr'] as String)
+                    .toDomain(meta),
+              ),
+            );
+          }).toList();
 
     // print("debug # attrs: $attrs");
     return RecordMetaDto.fromForm(metaMap, attrs, methods);

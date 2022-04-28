@@ -210,7 +210,8 @@ class MetaMemberAccessor implements MemberAccessor<RecordMeta> {
     );
     if (prop.type.tp == AttrTp.ref) {
       // 引用类型, 同时返回类型信息, 以便推断表达式返回值类型
-      return Value(fn: AsFuncRef(prop.type), ag: [prop.propId]);
+      return Value(fn: AsFuncRef(prop.type), ag: [prop.propId]); // 返回一个Value,同时通过 asRef将string转换成Meta
+      // return Expression(const AsFuncRecordMeta(), [prop.type, prop.propId]); // 返回一个Expr, 通过AsFuncMeta 将 prop转换为Meta, 此时就与propId无关了,
     } else {
       // 原始类型, 同时返回类型信息, 以便推断表达式返回值类型
       return Value.of(prop.propId);

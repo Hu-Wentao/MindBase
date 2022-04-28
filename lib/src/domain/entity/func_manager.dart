@@ -47,9 +47,11 @@ class FuncManager {
         indexFunction,
       ];
 
-  static bool isAsFunc(String name) =>
-      (name.startsWith('as')) &&
-      asFuncList.any((element) => element.name == name);
+  /// 规定 AsFunc (即ag均为dynamic类型)必须以 as开头, 否则会造成Json解析出错;
+  static bool isAsFunc(String name) => (name.startsWith('as'));
+  // 移除从asFuncList查询的步骤,因为 asFuncRef这样的Func没有固定的name;
+  // (name.startsWith('as')) &&
+  // asFuncList.any((element) => element.name == name);
 
   /// 相关 [AttrType]所有用的方法
   static Map<AttrType, Iterable<Func>> get methodMap => {
@@ -92,14 +94,15 @@ class FuncManager {
       (funcName.startsWith('as'))
           ? asFuncList.firstWhere(
               (f) => f.name == funcName,
-              orElse: () => (orElse == null)
-                  ? (throw "找不到`AsFunc`[$funcName]")
-                  : orElse.call() as AsFunc,
+              orElse: () =>
+                  // 如果都没查询到, 则尝试 AsFuncRef.ofName
+                  AsFuncRef.ofName(funcName) ??
+                  ((orElse == null)
+                      ? (throw "找不到`AsFunc`[$funcName]")
+                      : orElse.call() as AsFunc),
             )
           : throw "findAsFunc 的函数名必须以`as`开头,而不是[$funcName]";
 }
-
-// const Func callFunction = CallFunc();
 
 const AsFuncRef asFuncRef = AsFuncRef();
 const AsFunc asFuncThis = AsFuncThis();

@@ -1,12 +1,10 @@
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/application/expr_evaluator.dart';
 import 'package:mind_base/src/application/expression_parser.dart';
-import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' hide Type;
-
-import '../application/expression_evaluator.dart';
 
 /// 表 =========================================================================
 
@@ -71,21 +69,13 @@ class Record implements IEtt<ObjectId> {
               orElse?.call(methodKey) ??
               (throw "找不到attrKey: [$methods] 对应的Method"));
 
-  // todo 注入到容器中
-  static ExpressionEvaluator? _eval;
-
-  static ExpressionEvaluator get evaluator => _eval ??= ExpressionEvaluator(
-        memberAccessors: [
-          RecordMemberAccessor(sl<WorkspaceDataHolder>()),
-        ],
-      );
   static ExpressionParser parser = ExpressionParser();
 
   /// 根据属性名称获取属性值(同时调用表达式进行计算)
   Value getValueBy(Property prop) {
     if (prop is Method) {
       final method = prop;
-      return Value.of(method.invoke(this));
+      return Value.of(method.eval(this));
     } else {
       return getFieldBy(prop.k, orElse: (_) => Value.of(null)); // 填充一个null默认值
     }
@@ -186,8 +176,8 @@ class RecordMeta implements IEtt<ObjectId> {
   Property getPropBy(String propId) =>
       properties.firstWhere((prop) => prop.propId == propId);
 
-  bool hasPropBy(String member) =>
-      properties.any((prop) => prop.name == member);
+  bool hasPropBy(String propId) =>
+      properties.any((prop) => prop.propId == propId);
 
   RecordMetaDto toDto() => RecordMetaDto.fromDomain(this);
 
@@ -281,13 +271,15 @@ class Method extends Property {
 
   MethodDto toDto() => MethodDto.ofDomain(this);
 
-  // 方法被调用时, 就算是无参,也默认传入`this`
-  invoke(Record record) => expr.callee();
+  // 求值, 传入所在record为上下文'this'
+  dynamic eval(Record record) =>
+      exprEvaluator.eval(expr, {AsFuncThis.ctxSign: record});
 }
 
 class Attribute extends Property {
   @override
   final AttrType type; // 类型
+  @Deprecated("已将Meta集成到type中,使用 type.ref 访问MetaIdStr")
   final RecordMeta? meta; //如果type是"ref", 该值不为空,存储被引用的MetaId
 
   const Attribute({

@@ -2,22 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
-import 'package:get_arch_core/get_arch_core.dart';
-import 'package:logging/logging.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
-import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
-import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/infra/ui/dialog/confirm_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_edit_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
-import 'package:mind_base/src/infra/ui/widget/data_table_edit.dart';
 import 'package:mind_base/src/interface/dto.dart';
-import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import '../../../domain/entity/func.dart';
 import 'data_table_source.dart';
 
 class RecordDataGrid extends StatefulWidget {
