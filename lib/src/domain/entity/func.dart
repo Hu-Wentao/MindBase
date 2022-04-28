@@ -299,7 +299,7 @@ class MemberFunc implements Func {
   @override
   AttrType get rType => AttrType.any;
 
-  /// fixme 隐式传递 本身就是个错误的设计! 应当恢复成原有的样式, memberFunc就相当于 `.`, 必须要有两个参数!
+  /// memberFunc就相当于 `.`, 必须要有两个参数!
   @override
   invoke([List<dynamic>? ag]) => logic(ag);
 
@@ -364,40 +364,78 @@ class IndexFunc implements Func {
   bool get stringify => true;
 }
 
-/// 执行函数
-class CallFunc implements Func {
-  const CallFunc();
+/// 可以构造[rType]用于表达式返回值类型推断
+/// todo 或许可以取代所有 asFunc类型
+class AsFuncRef implements AsFunc {
+  @override
+  final AttrType rType;
+
+  const AsFuncRef([this.rType = AttrType.any]);
 
   @override
-  final String name = "call";
-
-  /// [callee, List参数列表]
-  /// todo 考虑新增 函数类型, List类型
-  @override
-  List<AttrType> get pTypes => [AttrType.any, AttrType.any];
+  String get name => 'asRef';
 
   @override
-  AttrType get rType => AttrType.any;
+  IFunctor apply(List<IFunctor>? p) {
+    throw UnimplementedError();
+  }
 
   @override
   invoke([List<dynamic>? ag]) => logic(ag);
 
   @override
-  Function get logic => (p) {
-        final callee = p[0];
-        final args = p[1];
-        return Function.apply(callee, args) ??
-            (throw "无法执行函数[$callee], 参数[$args]");
-      };
+  Function get logic => (p) => p[0];
+
+  @override
+  List<AttrType> get pTypes => throw UnimplementedError();
 
   @override
   List<Object?> get props => [name, pTypes, rType, logic];
+
+  @override
+  bool get stringify => true;
+}
+
+///
+/// [AsFuncThis] 是一个标记性的函数,没有固定Args,返回值从ctx中获取
+/// 用于表示当前类型的对象,描述了一种"相对的位置"
+///
+class AsFuncThis implements AsFunc {
+  /// 指定返回值类型, 可以帮助表达式确认Meta, 用于多层MemberFunc的转换
+  /// 因此,[AsFuncThis]应当在convert或eval时,
+  /// 从ctx中取[ctxTypeSign]作为[rType](是Meta的Id, 因为AttrType只能存储MetaId,暂时不能存储Meta)
+  /// 从ctx中取[ctxSign]作为ag:[0]的值(是Record)
+  @override
+  final AttrType rType;
+
+  const AsFuncThis([this.rType = AttrType.any]);
+
+  // 如果上下文中存在`this`,则为其key值
+  static const ctxSign = 'this';
+
+  /// 如果上下文没有`this`,但是有`this`的类型(Meta),(如表达式convert场景)则为其key值
+  /// 对应的value,应该是[RecordMeta]类型
+  static const ctxTypeSign = 'thisType';
+  @override
+  final String name = 'asThis';
 
   @override
   IFunctor apply(List<IFunctor>? p) {
     // TODO: implement apply
     throw UnimplementedError();
   }
+
+  @override
+  invoke([List<dynamic>? ag]) => logic(ag);
+
+  @override
+  Function get logic => (p) => p[0];
+
+  @override
+  List<AttrType> get pTypes => throw UnimplementedError();
+
+  @override
+  List<Object?> get props => [name, pTypes, rType, logic];
 
   @override
   bool get stringify => true;
