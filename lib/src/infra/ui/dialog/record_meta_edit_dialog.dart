@@ -181,8 +181,9 @@ Future<AttributeDto?> showAttributeEditDialog({
                       decoration: const InputDecoration(labelText: '表达式Func'),
                       name: 'calls',
                       initialValue: FuncManager.selfFunc,
-                      itemAsString: (fn) =>
-                          "${fn?.rType.name} ${fn?.name}( ${currentArg.name} )",
+                      itemAsString: (fn) => "${fn?.name}( ${currentArg.name} )",
+                      // 由于获取表达式可能需要参数列表,这里暂不展示
+                      // "${fn?.type().name} ${fn?.name}( ${currentArg.name} )",
                       // items: allCountries,
                       onChanged: (fn) {
                         print("修改表达式 [$fn]");
