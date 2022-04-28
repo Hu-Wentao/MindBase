@@ -1,8 +1,11 @@
-import 'package:flutter/foundation.dart';
-import 'package:mind_base/src/application/expression_evaluator.dart';
+import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/application/expr_evaluator.dart';
+import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
+import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/expression_dto.dart';
+import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
 const exprToDomain = ExprDtoToDomain(
   memberAccessors: [MetaMemberAccessor()],
@@ -58,17 +61,12 @@ class ExprDtoToDomain {
             (throw "在ctx中找不到变量[${variable.identifier.name}]"),
       );
 
+  // 这里是DTO转换, 传入ctx['this']作为ag,仅仅是为了下一步求值中,可以访问其member,以便保存propId
   @protected
-  Value convertThis(ThisExpressionDto expr, Map<String, dynamic> ctx) =>
-      Value.of(ctx['this']);
-
-  // Expression(
-  //   FuncManager.memberFunc,
-  //   [
-  //     Value.of(ctx),
-  //     Value.of(ctx['this']),
-  //   ]
-  // );
+  Value convertThis(ThisExpressionDto expr, Map<String, dynamic> ctx) => Value(
+      fn: AsFuncThis(
+          AttrType.ref((ctx[AsFuncThis.ctxTypeSign] as RecordMeta).id.$oid)),
+      ag: const []);
 
   /// 转换Member表达式:
   ///   1. 通过 expr.object, 从ctx中查询到`对象`,
@@ -84,16 +82,28 @@ class ExprDtoToDomain {
     MemberExpressionDto expr,
     Map<String, dynamic> ctx,
   ) {
-    // 用 `this`从ctx中获取到 MetaId, 而Value本身可以从 Workspace中得到Meta
-    final metaValue = convert(expr.object, ctx);
-    final propValue = Value.of(getMember(metaValue, expr.property.name));
-    // final obj
-    return Expression(FuncManager.memberFunc, [metaValue, propValue]);
+    // `expr.object`将被识别为`VariableDto`, `this`从ctx中获取到 MetaId, 而Value本身可以从 Workspace中得到Meta
+    // expr-v12 单独
+    final objectV = convert(expr.object, ctx); // 这是This表达式
+    final objectType = objectV.type;
+    // 下面是作类型推断
+    if (objectType.tp != AttrTp.ref) {
+      throw "MemberExpressionDto.object# Member表达式的类型为[$objectType],其tp与[${AttrTp.ref}]不符";
+    }
+    final meta = sl<WorkspaceDataHolder>()
+        .getMetaBy(ObjectId.fromHexString(objectType.r!))!;
+    // print("convertMemberExpression:objectType# $objectType");
+    // fixme 或许可以通过 rType来得到返回值类型, 这样还省去ThisFunc传参之类的, 还能与求值eval的逻辑分离
+    final propValue = Value.of(getMember(meta, expr.property.name));
+
+    return Expression(FuncManager.memberFunc, [objectV, propValue]);
   }
 
   @protected
   IExpr convertIndexExpression(
-          IndexExpressionDto expr, Map<String, dynamic> ctx) =>
+    IndexExpressionDto expr,
+    Map<String, dynamic> ctx,
+  ) =>
       Expression(FuncManager.indexFunc, [
         convert(expr.object, ctx),
         convert(expr.index, ctx),
@@ -105,7 +115,9 @@ class ExprDtoToDomain {
   /// 3. 将 callee与 arguments 组装成 Expression,并返回
   @protected
   IExpr convertCallExpression(
-      CallExpressionDto expr, Map<String, dynamic> ctx) {
+    CallExpressionDto expr,
+    Map<String, dynamic> ctx,
+  ) {
     final callee = convert(expr.callee, ctx).value; // .value才是Ctx中存储的Func实例
     return (callee is AsFunc) // AsFunc表示该IExpr是Value
         ? Value(
@@ -120,7 +132,9 @@ class ExprDtoToDomain {
   /// [-], [~], [!], [+]
   @protected
   IExpr convertUnaryExpression(
-      UnaryExpressionDto expr, Map<String, dynamic> ctx) {
+    UnaryExpressionDto expr,
+    Map<String, dynamic> ctx,
+  ) {
     var argument = convert(expr.argument, ctx);
     return Expression(
       FuncManager.findBy(expr.operator),
@@ -132,7 +146,9 @@ class ExprDtoToDomain {
 
   @protected
   IExpr convertBinaryExpression(
-      BinaryExpressionDto expr, Map<String, dynamic> ctx) {
+    BinaryExpressionDto expr,
+    Map<String, dynamic> ctx,
+  ) {
     var left = convert(expr.left, ctx);
     dynamic right;
     if (FuncManager.isShortCircuit(expr.operator)) {
@@ -147,10 +163,11 @@ class ExprDtoToDomain {
   }
 
   // 传入的时被Value包装过的对象,需要拆包使用
+  /// 从 [value]种获取成员变量[member]
   @protected
-  dynamic getMember(IExpr value, String member) {
-    final obj = value.value;
-    // final obj = value;
+  dynamic getMember(dynamic obj, String member) {
+    // dynamic getMember(IExpr value, String member) {
+    //   final obj = value.value;
     for (var a in memberAccessors) {
       if (a.canHandle(obj, member)) {
         return a.getMember(obj, member);
@@ -170,12 +187,10 @@ class ExpressionConvertException implements Exception {
       : this('`$type`类型的对象不支持成员`$member`访问,检查Evaluator中是否定义了成员访问器');
 }
 
+/// 传入 (Meta, propName), 返回 PropId
 /// 将对象名改成转换成 propId, 以便持久化
 class MetaMemberAccessor implements MemberAccessor<RecordMeta> {
   const MetaMemberAccessor();
-
-  // final WorkspaceDataHolder workspace;
-  // RecordMemberAccessor(this.workspace);
 
   @override
   bool canHandle(meta, String member) {
@@ -188,10 +203,17 @@ class MetaMemberAccessor implements MemberAccessor<RecordMeta> {
   /// 成员可以是值, 也可是函数[Function]
   /// 将成员名称-> 成员propId
   @override
-  getMember(RecordMeta meta, String member) => meta.properties
-      .firstWhere(
-        (element) => element.name == member,
-        orElse: () => throw "在Record[${meta.id}]找不到名称为[$member]的成员方法或变量",
-      )
-      .propId;
+  getMember(RecordMeta meta, String member) {
+    final prop = meta.properties.firstWhere(
+      (element) => element.name == member,
+      orElse: () => throw "在Record[${meta.id}]找不到名称为[$member]的成员方法或变量",
+    );
+    if (prop.type.tp == AttrTp.ref) {
+      // 引用类型, 同时返回类型信息, 以便推断表达式返回值类型
+      return Value(fn: AsFuncRef(prop.type), ag: [prop.propId]);
+    } else {
+      // 原始类型, 同时返回类型信息, 以便推断表达式返回值类型
+      return Value.of(prop.propId);
+    }
+  }
 }
