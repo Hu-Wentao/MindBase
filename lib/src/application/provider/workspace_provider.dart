@@ -40,8 +40,13 @@ class WorkspaceDataHolder {
 
   void clearMeta() => _cacheMeta.clear();
 
-  RecordMeta? getMetaBy(ObjectId? id) =>
-      id == null ? null : _cacheMeta.firstWhere((element) => element.id == id);
+  /// 只能查询已存在与workspace
+  RecordMeta? getMetaBy(ObjectId metaId) {
+    for (final m in _cacheMeta) {
+      if (m.id == metaId) return m;
+    }
+    return null;
+  }
 
   Iterable<RecordMeta> allMetas() => _cacheMeta;
 
@@ -261,8 +266,6 @@ class WorkspaceProvider extends ProviderSidecar {
 
   List<RecordMeta> get metaList => _dataHolder.allMetas().toList();
 
-  RecordMeta? getMeta(ObjectId? id) => _dataHolder.getMetaBy(id);
-
   Future<void> actInsertMeta(RecordMeta meta) =>
       actWrapper(() => setInitialized("新增Meta [$meta]", () async {
             await _metaRepo.insert(meta);
@@ -379,11 +382,10 @@ class WorkspaceProvider extends ProviderSidecar {
       _findCachedSource(metaId, (source) => source.onRemoveEvt(index));
 
   /// 返回当前meta对应的[IRecordDataGridSource]
-  Tuple2<RecordDataGridSource, DataGridController>
-      actGetDataSourceWithCtrl() => _getByMeta(watchedMeta!);
+  Tuple2<RecordDataGridSource, DataGridController> actGetDataSourceWithCtrl() =>
+      _getByMeta(watchedMeta!);
 
-  Tuple2<RecordDataGridSource, DataGridController> _getByMeta(
-      RecordMeta meta) {
+  Tuple2<RecordDataGridSource, DataGridController> _getByMeta(RecordMeta meta) {
     watchedMeta = meta;
     var cached = _cacheSourceWithCtrl[meta.id];
     return cached ?? _newDataSourceWithCtrl(meta);
