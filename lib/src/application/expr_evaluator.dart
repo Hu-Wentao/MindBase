@@ -60,10 +60,13 @@ class ExprEvaluator {
   evalMemberFunc(IExpr expr, ctx) {
     assert(expr is Expression);
     // 读取参数
-    final obj = eval(expr.ag[0], ctx);
+    var obj = eval(expr.ag[0], ctx);
     assert(obj != null, "找不到Member主对象,参数列表[${expr.ag}]");
-    // 如果obj不是Record,而是RecordId(是一个引用对象),则需要从工作空间中查询, fixme 这里做特殊处理, 或许有更好的方案,例如直接在持久化value的时候使用,asFuncRecord
-    // if(obj is String)
+    // 如果obj不是Record,而是RecordId(是一个引用对象),则需要从工作空间中查询,
+    // fixme #153 这里做特殊处理, 如果在持久化时value直接存储为asFuncRecord,这一步就不需要了,实现时,obj应当为Record的实例;而持久化时,仍然为ObjectIdHexString
+    if(obj is String && obj.length == 24){
+      obj = sl<WorkspaceDataHolder>().queryRecordBy(ObjectId.fromHexString(obj));
+    }
 
     final member = eval(expr.ag[1], ctx);
     // 选择相关的Accessor
@@ -278,10 +281,11 @@ class RecordMemberAccessor implements MemberAccessor<Record> {
 
   @override
   bool canHandle(object, String member) {
+    return object is Record; // 不再检查是否有成员, 如果真的不存在,则交给eval去处理
     // 只允许访问Record类型
-    if (object is! Record) return false;
-    // 是否存在对应的成员
-    return object.meta.hasPropBy(member);
+    // if (object is! Record) return false;
+    // // 是否存在对应的成员
+    // return object.meta.hasPropBy(member);
   }
 
   /// 成员可以是值, 也可是函数[Function]
