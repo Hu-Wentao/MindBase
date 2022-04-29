@@ -171,7 +171,7 @@ abstract class Func with EquatableMixin {
   /// 用于`求表达式返回值类型`
   @Deprecated(
       "从expr12.1开始, Func的type获取逻辑,大部分由DTO->Domain托管,如MemberFunc, 少部分如AsFunc,是直接在这里获取")
-  AttrType type([List<AttrType>? argTypes]);
+  AttrType type([List<IExpr>? args]);
 
   //
   // // 在调用之前,需要先检查Attr的类型匹配问题
@@ -370,11 +370,7 @@ class MemberFunc implements Func {
   List<AttrType> get pTypes => [AttrType.any];
 
   @override
-  AttrType type([List<dynamic>? ag]) {
-    if ((ag?.length ?? 0) < 2) throw "member函数需要两个参数";
-    final member = ag![1] as IExpr; // member 必须是一个表达式
-    return member.type;
-  }
+  AttrType type([List<IExpr>? ag]) => ag![1].type;
 
   /// memberFunc就相当于 `.`, 必须要有两个参数!
   @override

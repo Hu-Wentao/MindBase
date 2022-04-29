@@ -92,6 +92,7 @@ class ExprDtoToDomain {
     }
     final meta = sl<WorkspaceDataHolder>()
         .getMetaBy(ObjectId.fromHexString(objectType.r!))!;
+
     /// expr12.1 手动处理 prop的value与type问题, 可以考虑移除 asThis的Type
     final prop = getMember(meta, expr.property.name) as Property;
     final propValue = Value.of(prop.propId);
@@ -129,15 +130,21 @@ class ExprDtoToDomain {
     Map<String, dynamic> ctx,
   ) {
     final callee = convert(expr.callee, ctx).value; // .value才是Ctx中存储的Func实例
-    return (callee is AsFunc) // AsFunc表示该IExpr是Value
-        ? Value(
-            fn: callee,
-            ag: expr.arguments.map((e) => (e as ValueDto).value).toList())
-        : Expression(
-            fn: callee,
-            ag: expr.arguments.map((e) => convert(e, ctx)).toList(),
-            type: (callee as Func).type(),
-          );
+    // AsFunc表示该IExpr是Value
+    if (callee is AsFunc) {
+      return Value(
+          fn: callee,
+          ag: expr.arguments.map((e) => (e as ValueDto).value).toList());
+    }
+    // 对于非 AsFunc, type类型的获取逻辑暂时先放在 DTO->Domain中(此处)进行处理
+    // todo 某些func可能需要特殊处理
+    final args = expr.arguments.map((e) => convert(e, ctx)).toList();
+    var exprType = (callee as Func).type(args);
+    return Expression(
+      fn: callee,
+      ag: args,
+      type: exprType,
+    );
   }
 
   /// [-], [~], [!], [+]
