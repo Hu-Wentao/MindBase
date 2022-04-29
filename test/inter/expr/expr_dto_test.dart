@@ -72,21 +72,33 @@ main() {
             k: 0,
             name: 'getName',
             memo: 'memo2',
-            expr: Expression(FuncManager.findBy("member"), [
-              Value.of("a2"), // 表示attribute 0
-            ])),
+            expr: Expression(
+              fn: FuncManager.findBy("member"),
+              ag: [
+                Value.of("a2"), // 表示attribute 0
+              ],
+              type: AttrType.string,
+            )),
         Method(
             k: 1,
             name: 'sayHello',
             memo: 'memo',
             // ("'Hello every one! My name is'+this.name")
-            expr: Expression(FuncManager.findBy("add"), [
-              Value.of("Hello everyone! My name is "),
-              Expression(FuncManager.findBy("member"), [
-                // fixme ?? member应该有两个参数
-                Value.of("a2"), // 填入 propId
-              ]),
-            ])),
+            expr: Expression(
+              fn: FuncManager.findBy("add"),
+              ag: [
+                Value.of("Hello everyone! My name is "),
+                Expression(
+                  fn: FuncManager.findBy("member"),
+                  ag: [
+                    const Value(fn: AsFuncThis(), ag: []),
+                    Value.of("a2"), // 填入 propId
+                  ],
+                  type: AttrType.string,
+                )
+              ],
+              type: AttrType.string,
+            )),
         Method(
           k: 2,
           name: 'say学校',
@@ -174,13 +186,20 @@ main() {
     const pReadableL3 =
         'add(asString("My age is "), member(asThis(), asString("a3")))';
 
-    final pExpr = Expression(FuncManager.findBy("add"), [
-      Value.of("My age is "),
-      Expression(FuncManager.findBy("member"), [
-        Value(fn: FuncManager.asThisFunc, ag: []),
-        Value.of("a3"),
-      ]),
-    ]);
+    final pExpr = Expression(
+        fn: FuncManager.findBy("add"),
+        ag: [
+          Value.of("My age is "),
+          Expression(
+            fn: FuncManager.findBy("member"),
+            ag: [
+              Value(fn: FuncManager.asThisFunc, ag: []),
+              Value.of("a3"),
+            ],
+            type: AttrType.string,
+          )
+        ],
+        type: AttrType.string);
     final pExprJsonDto = ExprJsonDto(fn: "add", ag: [
       ValueJsonDto(fn: "asString", ag: ["My age is "]),
       ExprJsonDto(fn: FuncManager.memberFunc.name, ag: [

@@ -1,74 +1,94 @@
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
+import 'package:mind_base/src/domain/value.dart';
 
 main() {
-
   test("Expression2", () {
     final exp = Expression(
-      FuncManager.findBy("+"),
-      [
-        Value.of(1),
-        Value.of(2),
-      ],
-    );
+        fn: FuncManager.findBy("+"),
+        ag: [
+          Value.of(1),
+          Value.of(2),
+        ],
+        type: AttrType.num);
     final r = exp.value;
     print("$r");
     expect(r, Value.of(3).value);
   });
   test("Expression2#嵌套2", () {
     final exp = Expression(
-      FuncManager.findBy("+"),
-      [
-        Expression(FuncManager.findBy("*"), [
-          Value.of(4),
+        fn: FuncManager.findBy("+"),
+        ag: [
+          Expression(
+              fn: FuncManager.findBy("*"),
+              ag: [
+                Value.of(4),
+                Value.of(2),
+              ],
+              type: AttrType.num),
           Value.of(2),
-        ]),
-        Value.of(2),
-      ],
-    );
+        ],
+        type: AttrType.num);
     final r = exp.value;
     print("$r");
     expect(r, Value.of(10).value);
   });
   test("Expression2#嵌套3", () {
     final exp = Expression(
-      FuncManager.findBy("+"),
-      [
-        Expression(FuncManager.findBy("*"), [
-          Value.of(4),
-          Expression(FuncManager.findBy("/"), [
-            Value.of(6),
-            Value.of(2),
-          ])
-        ]),
-        Expression(FuncManager.findBy("-"), [
-          Value.of(2),
-          Value.of(4),
-        ]),
-      ],
-    );
+        fn: FuncManager.findBy("+"),
+        ag: [
+          Expression(
+              fn: FuncManager.findBy("*"),
+              ag: [
+                Value.of(4),
+                Expression(
+                    fn: FuncManager.findBy("/"),
+                    ag: [
+                      Value.of(6),
+                      Value.of(2),
+                    ],
+                    type: AttrType.num)
+              ],
+              type: AttrType.num),
+          Expression(
+              fn: FuncManager.findBy("-"),
+              ag: [
+                Value.of(2),
+                Value.of(4),
+              ],
+              type: AttrType.num),
+        ],
+        type: AttrType.num);
     final r = exp.value;
     print("$r");
     expect(r, Value.of(10.0).value);
   });
   test("Expression2#嵌套3", () {
     final exp = Expression(
-      FuncManager.findBy("+"),
-      [
-        Expression(FuncManager.findBy("*"), [
-          Value.of(4),
-          Expression(FuncManager.findBy("/"), [
-            Value.of(6),
-            Value.of(2),
-          ])
-        ]),
-        Expression(FuncManager.findBy("-"), [
-          Value.of(2),
-          Value.of(4),
-        ]),
-      ],
-    );
+        fn: FuncManager.findBy("+"),
+        ag: [
+          Expression(
+              fn: FuncManager.findBy("*"),
+              ag: [
+                Value.of(4),
+                Expression(
+                    fn: FuncManager.findBy("/"),
+                    ag: [
+                      Value.of(6),
+                      Value.of(2),
+                    ],
+                    type: AttrType.num)
+              ],
+              type: AttrType.num),
+          Expression(
+              fn: FuncManager.findBy("-"),
+              ag: [
+                Value.of(2),
+                Value.of(4),
+              ],
+              type: AttrType.num),
+        ],
+        type: AttrType.num);
     final r = exp.value;
     print("$r");
     expect(r, Value.of(10.0).value);

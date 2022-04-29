@@ -15,8 +15,7 @@ main() {
         maxKey: 2,
         attrs: const [
           Attribute(k: 0, name: 'id', memo: 'memo', type: AttrType.string),
-          Attribute(
-              k: 1, name: 'metaId', memo: 'memo', type: AttrType.string),
+          Attribute(k: 1, name: 'metaId', memo: 'memo', type: AttrType.string),
           Attribute(k: 2, name: 'name', memo: '学生名称', type: AttrType.string),
           Attribute(k: 3, name: 'age', memo: '学生年龄', type: AttrType.string),
           Attribute(k: 4, name: '备注', memo: '备注信息', type: AttrType.string),
@@ -26,20 +25,29 @@ main() {
               k: 0,
               name: 'getName',
               memo: 'memo2',
-              expr: Expression(FuncManager.findBy("member"), [
-                Value.of("a2"), // 表示attribute 0
-              ])),
+              expr: Expression(
+                  fn: FuncManager.findBy("member"),
+                  ag: [
+                    Value.of("a2"), // 表示attribute 0
+                  ],
+                  type: AttrType.string)),
           Method(
               k: 1,
               name: 'sayHello',
               memo: 'memo',
               // ("'Hello every one! My name is'+this.name")
-              expr: Expression(FuncManager.findBy("add"), [
-                Value.of("Hello everyone! My name is "),
-                Expression(FuncManager.findBy("member"), [
-                  Value.of("a2"), // 填入 propId
-                ]),
-              ]))
+              expr: Expression(
+                  fn: FuncManager.findBy("add"),
+                  ag: [
+                    Value.of("Hello everyone! My name is "),
+                    Expression(
+                        fn: FuncManager.findBy("member"),
+                        ag: [
+                          Value.of("a2"), // 填入 propId
+                        ],
+                        type: AttrType.string),
+                  ],
+                  type: AttrType.string)),
         ]);
     final rcd = Record(
       id: ObjectId(),
