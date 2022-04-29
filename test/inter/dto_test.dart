@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
+import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
@@ -131,10 +132,14 @@ main() {
       RecordMetaDto.builder(),
       RecordMetaDto.builder(methods: [
         MethodDto.builder(
-            expr: ExprJsonDto(fn: "add", ag: [
-          ValueJsonDto(fn: "asint", ag: ["1"]),
-          ValueJsonDto(fn: "asint", ag: ["2"]),
-        ])),
+            expr: ExprJsonDto(
+          fn: "add",
+          ag: [
+            ValueJsonDto(fn: "asint", ag: ["1"]),
+            ValueJsonDto(fn: "asint", ag: ["2"]),
+          ],
+          type: AttrType.num,
+        )),
       ]),
     ];
     for (var dto in list) {

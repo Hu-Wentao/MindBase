@@ -529,6 +529,7 @@ abstract class IExprJsonDto implements IMongoDtoMx {
       return ExprJsonDto(
         fn: expr.fn.name,
         ag: expr.ag.map(IExprJsonDto.fromDomain).toList(),
+        type: expr.type,
       );
     }
     throw Exception("不支持的IExpr类型[${expr.runtimeType}]");
@@ -595,9 +596,9 @@ class ExprJsonDto extends IExprJsonDto with IMongoDtoMx {
   AttrType? type;
 
   ExprJsonDto({
-    this.fn,
+    required this.fn,
     this.ag = const [],
-    this.type,
+    required this.type,
   });
 
   ExprJsonDto.builder({
@@ -609,13 +610,16 @@ class ExprJsonDto extends IExprJsonDto with IMongoDtoMx {
   factory ExprJsonDto.fromDomain(IExpr expr) => ExprJsonDto(
         fn: expr.fn.name,
         ag: expr.ag.map(IExprJsonDto.fromDomain).toList(),
+        type: expr.type,
       );
 
   factory ExprJsonDto.fromJson(Map<String, dynamic> json) => ExprJsonDto(
-      fn: json['fn'] as String,
-      ag: (json['ag'] as List<dynamic>)
-          .map((e) => IExprJsonDto.fromJson(e as Map<String, dynamic>))
-          .toList());
+        fn: json['fn'] as String,
+        ag: (json['ag'] as List<dynamic>)
+            .map((e) => IExprJsonDto.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        type: AttrType.by(json['type'] as String),
+      );
 
   /// 可视化的函数表达式字符串
   @override
@@ -626,6 +630,7 @@ class ExprJsonDto extends IExprJsonDto with IMongoDtoMx {
   Map<String, dynamic> toJson() => {
         'fn': fn,
         'ag': ag.map((e) => e.toJson()).toList(),
+        'type': type?.name,
       };
 }
 

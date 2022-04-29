@@ -112,16 +112,18 @@ main() {
                 'ag': [
                   {'fn': 'asThis', 'ag': []},
                   {
-                    'fn': 'asRef_626a109fd90369d16c2fbe0e',
+                    'fn': 'asString',
                     'ag': ['"a5"']
                   }
-                ]
+                ],
+                'type': 'ref_626a109fd90369d16c2fbe0e'
               },
               {
                 'fn': 'asString',
                 'ag': ['"a3"']
               }
-            ]
+            ],
+            'type': 'string'
           }).toDomain(),
           // expr: ExpressionDto.of(parser, '"我的学校是: "+ this.学校.name').toDomain(),
         )
@@ -200,13 +202,21 @@ main() {
           )
         ],
         type: AttrType.string);
-    final pExprJsonDto = ExprJsonDto(fn: "add", ag: [
-      ValueJsonDto(fn: "asString", ag: ["My age is "]),
-      ExprJsonDto(fn: FuncManager.memberFunc.name, ag: [
-        ValueJsonDto(fn: FuncManager.asThisFunc.name, ag: []),
-        ValueJsonDto(fn: "asString", ag: ["a3"])
-      ])
-    ]);
+    final pExprJsonDto = ExprJsonDto(
+      fn: "add",
+      ag: [
+        ValueJsonDto(fn: "asString", ag: ["My age is "]),
+        ExprJsonDto(
+          fn: FuncManager.memberFunc.name,
+          ag: [
+            ValueJsonDto(fn: FuncManager.asThisFunc.name, ag: []),
+            ValueJsonDto(fn: "asString", ag: ["a3"])
+          ],
+          type: AttrType.string,
+        )
+      ],
+      type: AttrType.string,
+    );
     final pExprJson = {
       "fn": "add",
       "ag": [
