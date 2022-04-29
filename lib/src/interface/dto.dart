@@ -419,9 +419,9 @@ class MethodDto with IMongoDtoMx, EquatableMixin {
 /// 表头/属性: 关系/表的一列叫属性
 class AttributeDto with IMongoDtoMx, EquatableMixin {
   final int k;
-  final String name;
-  final String memo;
-  final AttrType type;
+  String name;
+  String memo;
+  AttrType type;
 
   /// 供Form初始化
   AttributeDto.builder({
@@ -454,7 +454,7 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
           type: attr.type,
         );
 
-  const AttributeDto({
+  AttributeDto({
     required this.k,
     required this.name,
     required this.memo,
