@@ -232,9 +232,11 @@ main() {
               "fn": "asString",
               "ag": ["\"a3\""]
             }
-          ]
+          ],
+          'type': 'string'
         }
-      ]
+      ],
+      'type': 'string'
     };
     test("String -> ReadableDto -> Expression (Domain)", () {
       /// Readable -> ReadableDto
