@@ -254,7 +254,9 @@ class _AttributeListFormState extends State<AttributeListForm> {
 
   _onChangeType(AttributeDto attr, String? update) {
     // 如果类型切换了,就刷新一下UI, 以便更新 AttrType.ref 的类型选择器
-    if (attr.type.tpName != update) setState(() {});
+    if (attr.type.tpName != update) {
+      setState(() => attr.type = AttrType.by(update!));
+    }
   }
 
   @override
