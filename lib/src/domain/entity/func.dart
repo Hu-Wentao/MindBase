@@ -167,7 +167,10 @@ abstract class Func with EquatableMixin {
 
   List<AttrType> get pTypes;
 
-  // 返回值类型可以在这里通过参数进行推断
+  /// 用于获取返回值的逻辑, 输入值可以是Type,也可以是参数
+  /// 用于`求表达式返回值类型`
+  @Deprecated(
+      "从expr12.1开始, Func的type获取逻辑,大部分由DTO->Domain托管,如MemberFunc, 少部分如AsFunc,是直接在这里获取")
   AttrType type([List<AttrType>? argTypes]);
 
   //
@@ -244,7 +247,21 @@ class AsFunc<T> implements BaseFunc {
   List<AttrType> get pTypes => [rType];
 
   @override
-  AttrType get rType => AttrType.by("$T");
+  AttrType get rType {
+    switch (T) {
+      case String:
+        return AttrType.string;
+      case int:
+      case double:
+        return AttrType.num;
+      case bool:
+        return AttrType.boolean;
+      default:
+        print("debug# 未知的AsFunc返回值类型:[$T],已转换为 [${AttrType.any}]");
+        return AttrType.any;
+    }
+    return AttrType.by("$T");
+  }
 
   @override
   AttrType type([List<dynamic>? ag]) => rType;
