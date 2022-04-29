@@ -85,29 +85,39 @@ class ExprDtoToDomain {
     // `expr.object`将被识别为`VariableDto`, `this`从ctx中获取到 MetaId, 而Value本身可以从 Workspace中得到Meta
     // expr-v12 单独
     final objectV = convert(expr.object, ctx); // 这是This表达式
-    final objectType = objectV.type;
+    final objectType = objectV.type; // todo 类型推断关键点: 通过type方法,IExpr自行返回表达式的结果类型
     // 下面是作类型推断
     if (objectType.tp != AttrTp.ref) {
       throw "MemberExpressionDto.object# Member表达式的类型为[$objectType],其tp与[${AttrTp.ref}]不符";
     }
     final meta = sl<WorkspaceDataHolder>()
         .getMetaBy(ObjectId.fromHexString(objectType.r!))!;
-    // print("convertMemberExpression:objectType# $objectType");
-    // fixme 或许可以通过 rType来得到返回值类型, 这样还省去ThisFunc传参之类的, 还能与求值eval的逻辑分离
-    final propValue = Value.of(getMember(meta, expr.property.name));
+    /// expr12.1 手动处理 prop的value与type问题, 可以考虑移除 asThis的Type
+    final prop = getMember(meta, expr.property.name) as Property;
+    final propValue = Value.of(prop.propId);
 
-    return Expression(FuncManager.memberFunc, [objectV, propValue]);
+    return Expression(
+      fn: FuncManager.memberFunc,
+      ag: [objectV, propValue],
+      type: prop.type, // 表达式的返回值类型即对应prop的类型
+    );
   }
 
   @protected
   IExpr convertIndexExpression(
     IndexExpressionDto expr,
     Map<String, dynamic> ctx,
-  ) =>
-      Expression(FuncManager.indexFunc, [
-        convert(expr.object, ctx),
+  ) {
+    final obj = convert(expr.object, ctx);
+    return Expression(
+      fn: FuncManager.indexFunc,
+      ag: [
+        obj,
         convert(expr.index, ctx),
-      ]);
+      ],
+      type: obj.type,
+    );
+  }
 
   /// 将表达式Call 转换成 Domain
   /// 1. 读取DTO的callee, 从ctx中查询到callee对应的Func实例(Value.of(Func))
@@ -124,8 +134,9 @@ class ExprDtoToDomain {
             fn: callee,
             ag: expr.arguments.map((e) => (e as ValueDto).value).toList())
         : Expression(
-            callee,
-            expr.arguments.map((e) => convert(e, ctx)).toList(),
+            fn: callee,
+            ag: expr.arguments.map((e) => convert(e, ctx)).toList(),
+            type: (callee as Func).type(),
           );
   }
 
@@ -137,8 +148,9 @@ class ExprDtoToDomain {
   ) {
     var argument = convert(expr.argument, ctx);
     return Expression(
-      FuncManager.findBy(expr.operator),
-      [argument],
+      fn: FuncManager.findBy(expr.operator),
+      ag: [argument],
+      type: argument.type,
     );
   }
 
@@ -156,14 +168,20 @@ class ExprDtoToDomain {
     } else {
       right = _right(expr.right, ctx).call();
     }
-    return Expression(FuncManager.findBy(expr.operator), [
-      left,
-      right,
-    ]);
+    return Expression(
+      fn: FuncManager.findBy(expr.operator),
+      ag: [
+        left,
+        right,
+      ],
+      type: left.type,
+    );
   }
 
   // 传入的时被Value包装过的对象,需要拆包使用
   /// 从 [value]种获取成员变量[member]
+  /// DTO>Domain的 getMember应该返回什么?
+  /// 应该返回Meta中的prop,而不是propId,因为还涉及到类型推断逻辑
   @protected
   dynamic getMember(dynamic obj, String member) {
     // dynamic getMember(IExpr value, String member) {
@@ -187,8 +205,8 @@ class ExpressionConvertException implements Exception {
       : this('`$type`类型的对象不支持成员`$member`访问,检查Evaluator中是否定义了成员访问器');
 }
 
-/// 传入 (Meta, propName), 返回 PropId
-/// 将对象名改成转换成 propId, 以便持久化
+/// 传入 (Meta, propName), 返回 Prop
+/// 将对象名改成转换成 prop, 以便持久化和类型推断
 class MetaMemberAccessor implements MemberAccessor<RecordMeta> {
   const MetaMemberAccessor();
 
@@ -200,21 +218,23 @@ class MetaMemberAccessor implements MemberAccessor<RecordMeta> {
     return meta.properties.any((element) => element.name == member);
   }
 
-  /// 成员可以是值, 也可是函数[Function]
-  /// 将成员名称-> 成员propId
+  /// 将成员名称-> 成员prop
   @override
   getMember(RecordMeta meta, String member) {
     final prop = meta.properties.firstWhere(
       (element) => element.name == member,
       orElse: () => throw "在Record[${meta.id}]找不到名称为[$member]的成员方法或变量",
     );
-    if (prop.type.tp == AttrTp.ref) {
-      // 引用类型, 同时返回类型信息, 以便推断表达式返回值类型
-      return Value(fn: AsFuncRef(prop.type), ag: [prop.propId]); // 返回一个Value,同时通过 asRef将string转换成Meta
-      // return Expression(const AsFuncRecordMeta(), [prop.type, prop.propId]); // 返回一个Expr, 通过AsFuncMeta 将 prop转换为Meta, 此时就与propId无关了,
-    } else {
-      // 原始类型, 同时返回类型信息, 以便推断表达式返回值类型
-      return Value.of(prop.propId);
-    }
+    return prop;
+    // if (prop.type.tp == AttrTp.ref) {
+    //   // 引用类型, 同时返回类型信息, 以便推断表达式返回值类型
+    //   return Value(
+    //       fn: AsFuncRef(prop.type),
+    //       ag: [prop.propId]); // 返回一个Value,同时通过 asRef将string转换成Meta
+    //   // return Expression(const AsFuncRecordMeta(), [prop.type, prop.propId]); // 返回一个Expr, 通过AsFuncMeta 将 prop转换为Meta, 此时就与propId无关了,
+    // } else {
+    //   // 原始类型, 同时返回类型信息, 以便推断表达式返回值类型
+    //   return Value.of(prop.propId);
+    // }
   }
 }
