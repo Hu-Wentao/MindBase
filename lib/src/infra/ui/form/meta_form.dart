@@ -252,16 +252,9 @@ class _AttributeListFormState extends State<AttributeListForm> {
   late List<AttributeDto> _origin;
   late GlobalKey<FormBuilderState> _kAttrBuilder;
 
-  /// 用于存储 第{a.k}个属性的Type是否为 [AttrTp.ref]类型, 以便展示"Meta选择器"
-  final Map<int, bool> _isAttrTpType = {};
-
-  _onChangeType(int index, Object? type) {
-    final origin = _isAttrTpType[index];
-    final update = type == AttrTp.ref.name;
-    if (origin == update) return;
-    setState(() {
-      _isAttrTpType[index] = update;
-    });
+  _onChangeType(AttributeDto attr, String? update) {
+    // 如果类型切换了,就刷新一下UI, 以便更新 AttrType.ref 的类型选择器
+    if (attr.type.tpName != update) setState(() {});
   }
 
   @override
@@ -356,13 +349,13 @@ class _AttributeListFormState extends State<AttributeListForm> {
                                 child: Text(e.name),
                               ))
                           .toList(),
-                      onChanged: (v) => _onChangeType(a.k, v),
+                      onChanged: (v) => _onChangeType(a, v),
                     ),
                   ),
                   const SizedBox(width: 8),
 
                   /// Meta选择器
-                  if (_isAttrTpType[a.k] ?? false)
+                  if (a.type.tp == AttrTp.ref)
                     SizedBox(
                       width: 200,
                       child: FormBuilderDropdown<String>(
@@ -371,7 +364,7 @@ class _AttributeListFormState extends State<AttributeListForm> {
                           labelText: '类型选择',
                           border: OutlineInputBorder(),
                         ),
-                        initialValue: null,
+                        initialValue: a.type.r,
                         // 注意: 必须为空,否则报错 https://github.com/danvick/flutter_form_builder/issues/220
                         items: sl<WorkspaceDataHolder>()
                             .allMetas()
@@ -382,7 +375,7 @@ class _AttributeListFormState extends State<AttributeListForm> {
                             .toList(),
                       ),
                     ),
-                  if (_isAttrTpType[a.k] ?? false) const SizedBox(width: 8),
+                  if (a.type.tp == AttrTp.ref) const SizedBox(width: 8),
                   SizedBox(
                     width: 150,
                     child: FormBuilderTextField(
