@@ -27,7 +27,7 @@ abstract class IRecordDataGridSource {
   onUpdateEvt(Record record, int index);
 
   // 后端移除事件
-  onRemoveEvt(int index);
+  onRemoveEvt(ObjectId recordId, int index);
 }
 
 extension PlutoRecordMetaX on RecordMeta {
@@ -207,8 +207,11 @@ class RecordDataGridSourcePluto extends IRecordDataGridSource {
   }
 
   @override
-  onRemoveEvt(int index) {
+  onRemoveEvt(ObjectId recordId, int index) {
     print("onRemoveEvt $index");
+    final row =
+        manager.rows.firstWhere((element) => element.key == ValueKey(recordId));
+    manager.removeRows([row]);
   }
 }
 
@@ -258,7 +261,7 @@ class RecordDataGridSource extends DataGridSource
 
   // 源数据List 删除
   @override
-  void onRemoveEvt(int index) => removeRecordBy(index);
+  void onRemoveEvt(ObjectId recordId, int index) => removeRecordBy(index);
 
   /// [rowIndex]为null时, 表示新增
   void renderRecord(Record entity, int? rowIndex, {bool notify = true}) {
