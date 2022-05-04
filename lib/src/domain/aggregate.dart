@@ -226,10 +226,7 @@ abstract class Property extends Equatable {
   /// 在字符串开头使用 m标识[Methods], 使用 a标识[Attribute]
   String get propId => '${(this is Attribute) ? 'a' : 'm'}$k';
 
-  static Tuple2<String, int> parsePropId(String propId) => Tuple2(
-        propId.substring(0, 1),
-        int.parse(propId.substring(1)),
-      );
+  static Tuple2<String, int> parsePropId(String propId) => propId.parsePropId();
 
   const Property(this.k, this.name, this.memo);
 

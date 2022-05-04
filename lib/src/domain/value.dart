@@ -148,3 +148,14 @@ enum FuncScope {
   check, // 字段检查, input完成后被调用,检查字段值是否符合要求,不符合则将错误信息添加到e中
   output, // 输出处理, 将`存储值`转换为需要数据.如 func为 "数值*2", 则存储"A1",输出为 A1*2的值
 }
+
+extension PropertyX on String {
+  String get parsePropType => substring(0, 1);
+
+  int get parsePropK => int.parse(substring(1));
+
+  Tuple2<String, int> parsePropId() => Tuple2(
+    parsePropType,
+    parsePropK,
+  );
+}
