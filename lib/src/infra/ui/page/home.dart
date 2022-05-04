@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
-import 'package:mind_base/src/infra/ui/widget/data_table_frame.dart';
+import 'package:mind_base/src/infra/ui/widget/data_table_grid.dart';
+import 'package:mind_base/src/infra/ui/widget/data_table_source.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -42,10 +43,10 @@ class _HomePageState extends State<HomePage> {
                       child: Center(child: Text("请选择/创建 一个Meta")),
                     ),
                   if (pWorkspace.watchedMeta != null)
-                    RecordDataGrid.build(
+                    RecordDataGrid(
                       key: ValueKey(pWorkspace.watchedMeta),
-                      dataGridSourceWithCtrl:
-                          pWorkspace.actGetDataSourceWithCtrl(),
+                      dataGridSource: pWorkspace.actGetDataSource()
+                          as RecordDataGridSourcePluto,
                       onSaveRecord: pWorkspace.actSaveRecord,
                       onSaveMeta: pWorkspace.actSaveMeta,
                     ),
