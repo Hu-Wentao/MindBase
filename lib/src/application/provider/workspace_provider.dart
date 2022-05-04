@@ -381,7 +381,7 @@ class WorkspaceProvider extends ProviderSidecar {
       );
 
   void _onEvtRemoveRecordSource(ObjectId ettId, ObjectId metaId, int index) =>
-      _findCachedSource(metaId, (source) => source.onRemoveEvt(index));
+      _findCachedSource(metaId, (source) => source.onRemoveEvt(ettId,index));
 
   /// 创建数据源
   IRecordDataGridSource actGetDataSource() => _getByMeta(watchedMeta!);
