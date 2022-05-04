@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/repo.dart';
-import 'package:mind_base/src/infra/ui/widget/data_table_frame.dart';
+import 'package:mind_base/src/infra/ui/widget/data_table_grid.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_source.dart';
 import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
@@ -60,6 +60,7 @@ class WorkspaceDataHolder {
     return record;
   }
 
+  @Deprecated("意义不大, record现在是非const, 可以直接更新record实例的属性, 无需在space中查询后更新")
   int updateRecord(Record record) {
     final index = (getRecords(record.meta.id))
         .indexWhere((element) => element.id == record.id);
@@ -79,16 +80,17 @@ class WorkspaceDataHolder {
 
   Iterable<List<Record>> allRecords() => _cacheRecord.values;
 
-  Record queryRecordBy(ObjectId recordId) {
-    Record? r;
+  Record queryRecordBy(ObjectId recordId, {ObjectId? metaId}) {
+    if (metaId != null) {
+      return getRecords(metaId).firstWhere((record) => record.id == recordId);
+    }
     for (var recordList in allRecords()) {
       final i = recordList.indexWhere((element) => element.id == recordId);
       if (i != -1) {
-        r = recordList[i];
-        break;
+        return recordList[i];
       }
     }
-    return r ?? (throw "Workspace中找不到ID为[$recordId]的Record");
+    throw "Workspace中找不到ID为[$recordId]的Record";
   }
 }
 
@@ -119,8 +121,9 @@ class WorkspaceProvider extends ProviderSidecar {
   /// 数据同步 ===================================================================
   _cacheAllMetaByWorkspace() {
     // 先查询有所元素 // 然后开始监听变更
-    _metaRepo.findAll().listen(_onEvtInsertMeta);
-    _metaRepo.watchAll().listen(_onWatchMetaEvt);
+    _metaRepo
+      ..findAll().listen(_onEvtInsertMeta)
+      ..watchAll().listen(_onWatchMetaEvt);
   }
 
   void _onEvtInsertMeta(RecordMeta meta) => setInitialized("插入Meta", () {
@@ -335,7 +338,7 @@ class WorkspaceProvider extends ProviderSidecar {
         log("actSaveRecord ${dto?.toJson()}");
         // 无需set,因为插入成功后, watch会监听到新的变更
         if (dto == null) return;
-        await RecordAccessor(sl<Db>(), dto.metaId.toHexString())
+        await RecordAccessor(sl<Db>(), dto.metaIdHex)
             .save(dto.id, dto)
             .then((value) {
           log("actSaveRecord 插入成功");
@@ -354,14 +357,13 @@ class WorkspaceProvider extends ProviderSidecar {
       });
 
   // <MetaId, 数据源>
-  final Map<ObjectId, Tuple2<RecordDataGridSource, DataGridController>>
-      _cacheSourceWithCtrl = {};
+  final Map<ObjectId, IRecordDataGridSource> _cacheSource = {};
 
   void _findCachedSource(
     ObjectId metaId,
-    Function(RecordDataGridSource source) onFind,
+    Function(IRecordDataGridSource source) onFind,
   ) {
-    final source = _cacheSourceWithCtrl[metaId]?.head;
+    final source = _cacheSource[metaId];
     if (source != null) {
       onFind(source);
     }
@@ -381,27 +383,31 @@ class WorkspaceProvider extends ProviderSidecar {
   void _onEvtRemoveRecordSource(ObjectId ettId, ObjectId metaId, int index) =>
       _findCachedSource(metaId, (source) => source.onRemoveEvt(index));
 
-  /// 返回当前meta对应的[IRecordDataGridSource]
-  Tuple2<RecordDataGridSource, DataGridController> actGetDataSourceWithCtrl() =>
-      _getByMeta(watchedMeta!);
+  /// 创建数据源
+  IRecordDataGridSource actGetDataSource() => _getByMeta(watchedMeta!);
 
-  Tuple2<RecordDataGridSource, DataGridController> _getByMeta(RecordMeta meta) {
+  IRecordDataGridSource _getByMeta(RecordMeta meta) {
     watchedMeta = meta;
-    var cached = _cacheSourceWithCtrl[meta.id];
+    var cached = _cacheSource[meta.id];
     return cached ?? _newDataSourceWithCtrl(meta);
   }
 
   /// 创建数据源, 以及数据源对应的[DataGridController]
-  Tuple2<RecordDataGridSource, DataGridController> _newDataSourceWithCtrl(
-          RecordMeta meta) =>
-      _cacheSourceWithCtrl[meta.id] = Tuple2(
-          RecordDataGridSource(
-            meta,
-            actSaveRecord,
-            getCachedRecordsByMeta,
-            getCachedRecordByIndex,
-          ),
-          DataGridController());
+  RecordDataGridSourcePluto _newDataSourceWithCtrl(RecordMeta meta) =>
+      RecordDataGridSourcePluto.of(
+          meta: meta,
+          cachedRecords: getCachedRecordsByMeta(meta.id),
+          queryRecord: _dataHolder.queryRecordBy,
+          onSaveRecord: actSaveRecord,
+          onRemoveRecord: actRemoveRecord,
+          // 创建标题栏, 标题栏带有数据操作功能
+          createTitleBar: (manager) => DataFrameTitlePluto(
+                stateManager: manager,
+                meta: watchedMeta!,
+                onSaveMeta: actSaveMeta,
+                onSaveRecord: actSaveRecord,
+
+              ));
 
   List<Record> getCachedRecordsByMeta(ObjectId metaId) =>
       _dataHolder.getRecords(metaId);
