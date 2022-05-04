@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
-import 'package:get_arch_core/get_arch_core.dart';
 import 'package:logging/logging.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/config/common_config.dart';
@@ -15,83 +14,26 @@ import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 /// 用于构建一张表的数据源, 包含Meta和Rows的数据, 相关Rows的Stream
-abstract class IRecordDataGridSource extends DataGridSource {
+abstract class IRecordDataGridSource {
+  const IRecordDataGridSource();
+
   RecordMeta get meta;
 
-  Future<void> Function(RecordDto? dto) get actSaveRecord;
+  onInsertEvt(Record record);
 
-  void renderRecord(Record entity, int? rowIndex, {bool notify = true});
+  onUpdateEvt(Record record, int index);
 
-  void removeRecordBy(int rowIndex);
-
-  /// 构建Header
-  List<GridColumn> buildColumn(BuildContext context, WorkspaceProvider pMeta);
-
-  /// 实体类-> Row对象
-  /// todo 在这里指定Row的类型
-  @visibleForOverriding
-  DataGridRow entityToRow(Record recordDto);
-
-  /// DataGridRow -> Widget
-  /// DataGridRow由[entityToRow]构成
-  /// 在这里为不同Attr的数据返回不同类型的 Show Widget
-  @override
-  DataGridRowAdapter? buildRow(DataGridRow row) => DataGridRowAdapter(
-      cells: row
-          .getCells()
-          .map((e) => Container(
-                padding: const EdgeInsets.all(8.0),
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  e.value.toString(),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ))
-          .toList());
-
-  /// 在这里为不同Attr的数据返回不同类型的 Edit Widget
-  @override
-  Widget? buildEditWidget(
-    DataGridRow dataGridRow,
-    RowColumnIndex rowColumnIndex,
-    GridColumn column,
-    CellSubmit submitCell,
-  );
-
-  /// 本方法结束后将会自动刷新指定[RowColumnIndex]对应的Cell
-  /// fixme 当前是假设 [cache]和[_cacheRows]对视index一一对应的,
-  /// 一旦后期允许row重排序,对应关系将只能依赖::firstWhere遍历查询得到,详见官方示例代码
-  @override
-  void onCellSubmit(
-    DataGridRow dataGridRow,
-    RowColumnIndex rowColumnIndex,
-    GridColumn col,
-  );
-
-  // 更新一整行
-  @visibleForOverriding
-  notifyDataRow(int rowIndex, Record entity);
-
-  // 更新全体数据, 当row新增或移除时调用
-  @visibleForOverriding
-  notifyAll() {
-    // log.info("刷新全部数据");
-    notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  onRemoveEvt(int index);
 }
 
-class RecordDataGridSource extends IRecordDataGridSource {
+/// Syncfusion DataGrid的数据源
+class RecordDataGridSource extends DataGridSource
+    implements IRecordDataGridSource {
   late final Logger log;
 
   @override
   final RecordMeta meta;
 
-  @override
   final Future<void> Function(RecordDto? dto) actSaveRecord;
 
   final List<Record> Function(ObjectId metaId) getCachedRecords;
@@ -121,16 +63,18 @@ class RecordDataGridSource extends IRecordDataGridSource {
   }
 
   // 源数据List 新增
+  @override
   void onInsertEvt(Record record) => renderRecord(record, null);
 
   // 源数据List 更新
+  @override
   void onUpdateEvt(Record record, int index) => renderRecord(record, index);
 
   // 源数据List 删除
+  @override
   void onRemoveEvt(int index) => removeRecordBy(index);
 
   /// [rowIndex]为null时, 表示新增
-  @override
   void renderRecord(Record entity, int? rowIndex, {bool notify = true}) {
     if (rowIndex == null) {
       _cacheRows.add(entityToRow(entity));
@@ -141,7 +85,6 @@ class RecordDataGridSource extends IRecordDataGridSource {
     }
   }
 
-  @override
   void removeRecordBy(int rowIndex) {
     // print("removeRecordBy: $rowIndex");
     _cacheRows.removeAt(rowIndex);
@@ -153,7 +96,6 @@ class RecordDataGridSource extends IRecordDataGridSource {
 
   /// 构建Header
   /// todo #3 后期根据`视图表`,控制列展示顺序(List<GridColumn> buildColumn的元素排列顺序)与Attr的对应关系(显式)
-  @override
   List<GridColumn> buildColumn(BuildContext context, WorkspaceProvider pMeta) =>
       meta.properties
           .map((prop) => GridColumn(
@@ -254,8 +196,7 @@ class RecordDataGridSource extends IRecordDataGridSource {
           .toList();
 
   /// 实体类-> Row对象
-  /// todo 在这里指定Row的类型
-  @override
+  /// 在这里指定Row的类型
   DataGridRow entityToRow(Record record) => DataGridRow(
         cells: meta.properties.map((prop) {
           final value = record.getValueBy(prop);
@@ -265,9 +206,8 @@ class RecordDataGridSource extends IRecordDataGridSource {
 
   /// DataGridRow -> Widget
   /// DataGridRow由[entityToRow]构成
-  /// todo 在这里为不同Attr的数据返回不同类型的Widget
-  /// todo 可以考虑提交一个而入Column的PR, 以便实现调整Column顺序的功能
-
+  /// 在这里为不同Attr的数据返回不同类型的 Show Widget
+  /// 可以考虑提交一个而入Column的PR, 以便实现调整Column顺序的功能
   int c = 0; // 记录删除记录的index值
   @override
   DataGridRowAdapter? buildRow(DataGridRow row) => DataGridRowAdapter(
@@ -379,7 +319,7 @@ class RecordDataGridSource extends IRecordDataGridSource {
   TextEditingController editingController = TextEditingController();
 
   // String? newCellValue;
-
+  /// 在这里为不同Attr的数据返回不同类型的 Edit Widget
   @override
   Widget? buildEditWidget(
     DataGridRow dataGridRow,
@@ -566,7 +506,6 @@ class RecordDataGridSource extends IRecordDataGridSource {
   }
 
   // 更新一整行
-  @override
   notifyDataRow(int rowIndex, Record entity) {
     log.info("刷新一行数据");
     // fixme 如果后期支持手动排序列,本方法将出错
@@ -581,13 +520,11 @@ class RecordDataGridSource extends IRecordDataGridSource {
   }
 
   // 更新全体数据, 当row新增或移除时调用
-  @override
   notifyAll() {
     log.info("刷新全部数据");
     notifyListeners();
   }
 
-  @override
   void dispose() {
     // recordSub.cancel();
     super.dispose();
