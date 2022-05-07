@@ -388,8 +388,7 @@ class WorkspaceProvider extends ProviderSidecar {
 
   IRecordDataGridSource _getByMeta(RecordMeta meta) {
     watchedMeta = meta;
-    var cached = _cacheSource[meta.id];
-    return cached ?? _newDataSourceWithCtrl(meta);
+    return _cacheSource[meta.id] ??= _newDataSourceWithCtrl(meta);
   }
 
   /// 创建数据源, 以及数据源对应的[DataGridController]
