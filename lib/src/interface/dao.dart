@@ -78,6 +78,7 @@ abstract class IMongoAccessor<T extends IMongoEntityDto> {
 
 abstract class BaseMongoAccessor<T extends IMongoEntityDto>
     implements IMongoAccessor<T> {
+  const BaseMongoAccessor();
   @override
   T? mongoJsonToDtoOr(Map<String, dynamic>? mgJson) =>
       (mgJson == null) ? null : mongoJsonToDto(mgJson);
@@ -158,7 +159,7 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
 class RecordAccessor extends BaseMongoAccessor<RecordDto> {
   final String metaId;
 
-  RecordAccessor(this.db, this.metaId);
+ const RecordAccessor(this.db, this.metaId);
 
   factory RecordAccessor.of(ObjectId metaId, {Db? db}) {
     db ??= sl<Db>();
