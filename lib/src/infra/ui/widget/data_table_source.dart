@@ -14,7 +14,7 @@ import 'package:pluto_grid/pluto_grid.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-/// 用于构建一张表的数据源, 包含Meta和Rows的数据, 相关Rows的Stream
+/// 用于缓存一个表格的Cell Widget, 当数据源更新时,也同步更新Widget
 abstract class IRecordDataGridSource {
   const IRecordDataGridSource();
 
@@ -90,128 +90,48 @@ extension PlutoRecordDtoX on RecordDto {
   }
 }
 
-/// Pluto 表格实现
+/// Pluto 表格数据源实现
 class RecordDataGridSourcePluto extends IRecordDataGridSource {
-  const RecordDataGridSourcePluto(this.meta, this.manager);
-
-  factory RecordDataGridSourcePluto.of({
-    required RecordMeta meta,
-    required List<Record> cachedRecords,
-    required Record Function(ObjectId recordId, {ObjectId? metaId}) queryRecord,
-    required Future<void> Function(RecordDto? dto) onSaveRecord,
-    required Widget Function(PlutoGridStateManager manager) createTitleBar,
-    required Future<void> Function(ObjectId ettId) onRemoveRecord,
-  }) =>
-      RecordDataGridSourcePluto(
-        meta,
-        // actSaveRecord,
-        PlutoGridStateManager(
-          columns: meta.toColumnsHeader,
-          rows: cachedRecords.map((e) => e.toPlutoRow()).toList(),
-          // scroll: , // 可空, 自动填充
-          // columnGroups: columnGroups, // 列组,暂不需要
-          // select 选择模式: 配合 onSelect回调,执行被选中时的事件
-          mode: PlutoGridMode.normal,
-          onChangedEventCallback: (e) {
-            assert(e.row != null, "row is null!");
-            assert(e.column != null, "column is null!");
-            // 更新一整行数据 todo 在这里修改更新单个字段
-            final recordId = (e.row!.key as ValueKey<ObjectId>).value;
-            // 查询本地已缓存数据,并得到用于提交的DTO
-            final dto = queryRecord(recordId, metaId: meta.id)
-                .toDto()
-                .updateBy(meta, e.row!);
-            // print("debug # 更新数据 $dto");
-            onSaveRecord(dto);
-          },
-          onSelectedEventCallback: (e) {
-            print("onSelectedEventCallback $e");
-          },
-          onRowCheckedEventCallback: (e) {
-            print("onRowCheckedEventCallback $e");
-          },
-          onRowDoubleTapEventCallback: (e) {
-            print("onRowDoubleTapEventCallback $e");
-          },
-          onRowSecondaryTapEventCallback: (e) {
-            print("onRowSecondaryTapEventCallback $e");
-          },
-          onRowsMovedEventCallback: (e) {
-            print("onRowsMovedEventCallback $e");
-            assert(e.rows != null, "row is null!");
-            for (var row in e.rows!) {
-              final recordId = (row!.key as ValueKey<ObjectId>).value;
-              onRemoveRecord(recordId);
-            }
-          },
-          // 这是表格标题! 不是列头
-          createHeader: createTitleBar,
-          // createFooter: createFooter,
-          configuration: const PlutoGridConfiguration(
-            // columnHeight: 30.0,
-            // columnFilterHeight: 30.0,
-            // rowHeight: 30.0,
-            // defaultCellPadding: 15,
-            // defaultColumnTitlePadding: 15,
-            // iconSize: 15,
-            enableColumnBorder: true,
-            // enableGridBorderShadow: true,
-            enableMoveHorizontalInEditing: true,
-            // enableRowColorAnimation: false,
-            // checkedColor: const Color(0x876FB0FF),
-            /// 以下两项配置列移动,
-            enableMoveDownAfterSelecting: true,
-            enterKeyAction: PlutoGridEnterKeyAction.editingAndMoveDown,
-            gridBorderRadius: BorderRadius.all(Radius.circular(10)),
-            gridPopupBorderRadius: BorderRadius.all(Radius.circular(7)),
-            scrollbarConfig: PlutoGridScrollbarConfig(
-              isAlwaysShown: false,
-              scrollbarThickness: 8,
-              scrollbarThicknessWhileDragging: 10,
-            ),
-            // localeText: const PlutoGridLocaleText.korean(),
-            //   columnFilterConfig: PlutoGridColumnFilterConfig(
-            //     filters: const [
-            //       ...FilterHelper.defaultFilters,
-            //       // ClassYouImplemented(),
-            //     ],
-            //     resolveDefaultColumnFilter: (column, resolver) {
-            //       if (column.field == 'column3') {
-            //         return resolver<PlutoFilterTypeGreaterThan>()
-            //             as PlutoFilterType;
-            //       }
-            //
-            //       return resolver<PlutoFilterTypeContains>() as PlutoFilterType;
-            //     },
-            //   ),
-          ),
-          // rowColorCallback: rowColorCallback,  // 行颜色
-        ),
-      );
+  RecordDataGridSourcePluto({
+    required this.meta,
+    required this.cachedRows,
+    required this.cachedColumns,
+    this.stateManager,
+  });
 
   @override
-  final RecordMeta meta;
-  final PlutoGridStateManager manager;
+  final RecordMeta meta; // 地址不变,但属性值会变
+
+  final List<PlutoRow> cachedRows;
+
+  final List<PlutoColumn> cachedColumns;
+
+  // 在活跃时,通过[stateManager]更新UI
+  PlutoGridStateManager? stateManager;
 
   @override
   onInsertEvt(Record record) {
     print("onInsertEvt $record");
-    manager.appendRows([
-      record.toPlutoRow(),
-    ]);
+    // 如果是非活跃状态下... 则只添加Widget, 因为不需要刷新UI
+    cachedRows.add(record.toPlutoRow());
+    // 活跃状态下, 提醒刷新UI, 由于List<Row>地址值是一致的, manager内部的List也会被更新
+    // todo 优化:只刷新指定行
+    stateManager?.notifyListeners();
   }
 
   @override
   onUpdateEvt(Record record, int index) {
     print("onUpdateEvt $record $index");
+    // todo 优化:只刷新指定行
+    stateManager?.notifyListeners();
   }
 
   @override
   onRemoveEvt(ObjectId recordId, int index) {
     print("onRemoveEvt $index");
-    final row =
-        manager.rows.firstWhere((element) => element.key == ValueKey(recordId));
-    manager.removeRows([row]);
+    // 如果是非活跃状态下... 则只移除Widget, 因为不需要刷新UI
+    cachedRows.removeWhere((element) => element.key == ValueKey(recordId));
+    // todo 优化:只刷新指定行
+    stateManager?.notifyListeners();
   }
 }
-
