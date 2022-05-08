@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/repo.dart';
-import 'package:mind_base/src/infra/ui/widget/data_table_grid.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_source.dart';
 import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
@@ -334,15 +333,14 @@ class WorkspaceProvider extends ProviderSidecar {
         ),
       );
 
+  Record actQueryRecordBy(ObjectId recordId, {RecordMeta? meta}) =>
+      _dataHolder.queryRecordBy(recordId, metaId: (meta ?? watchedMeta)?.id);
+
   Future<void> actSaveRecord(RecordDto? dto) => actWrapper(() async {
         log("actSaveRecord ${dto?.toJson()}");
         // 无需set,因为插入成功后, watch会监听到新的变更
         if (dto == null) return;
-        await RecordAccessor(sl<Db>(), dto.metaIdHex)
-            .save(dto.id, dto)
-            .then((value) {
-          log("actSaveRecord 插入成功");
-        });
+        await RecordAccessor(sl<Db>(), dto.metaIdHex).save(dto.id, dto);
       });
 
   Future<void> actRemoveRecordBy(int rowIndex) {
@@ -381,36 +379,29 @@ class WorkspaceProvider extends ProviderSidecar {
       );
 
   void _onEvtRemoveRecordSource(ObjectId ettId, ObjectId metaId, int index) =>
-      _findCachedSource(metaId, (source) => source.onRemoveEvt(ettId,index));
+      _findCachedSource(metaId, (source) => source.onRemoveEvt(ettId, index));
 
-  /// 创建数据源
+  /// 获取已缓存的数据源
   IRecordDataGridSource actGetDataSource() => _getByMeta(watchedMeta!);
 
   IRecordDataGridSource _getByMeta(RecordMeta meta) {
     watchedMeta = meta;
-    return _cacheSource[meta.id] ??= _newDataSourceWithCtrl(meta);
+    return _cacheSource[meta.id] ??= _newDataSource(meta);
   }
 
   /// 创建数据源, 以及数据源对应的[DataGridController]
-  RecordDataGridSourcePluto _newDataSourceWithCtrl(RecordMeta meta) =>
-      RecordDataGridSourcePluto.of(
-          meta: meta,
-          cachedRecords: getCachedRecordsByMeta(meta.id),
-          queryRecord: _dataHolder.queryRecordBy,
-          onSaveRecord: actSaveRecord,
-          onRemoveRecord: actRemoveRecord,
-          // 创建标题栏, 标题栏带有数据操作功能
-          createTitleBar: (manager) => DataFrameTitlePluto(
-                stateManager: manager,
-                meta: watchedMeta!,
-                onSaveMeta: actSaveMeta,
-                onSaveRecord: actSaveRecord,
-
-              ));
+  RecordDataGridSourcePluto _newDataSource(RecordMeta meta) =>
+      RecordDataGridSourcePluto(
+        meta: meta,
+        cachedColumns: meta.toColumnsHeader,
+        cachedRows:
+            getCachedRecordsByMeta(meta.id).map((e) => e.toPlutoRow()).toList(),
+      );
 
   List<Record> getCachedRecordsByMeta(ObjectId metaId) =>
       _dataHolder.getRecords(metaId);
 
-  Record getCachedRecordByIndex(ObjectId metaId, int index) =>
-      getCachedRecordsByMeta(metaId)[index];
+//
+// Record getCachedRecordByIndex(ObjectId metaId, int index) =>
+//     getCachedRecordsByMeta(metaId)[index];
 }

@@ -8,6 +8,7 @@ import 'package:mind_base/src/infra/ui/dialog/confirm_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_edit_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
 import 'package:mind_base/src/interface/dto.dart';
+import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:provider/provider.dart';
 
@@ -47,19 +48,104 @@ class _RecordDataGridState extends State<RecordDataGrid> {
 
   @override
   Widget build(BuildContext context) => Consumer<WorkspaceProvider>(
-        builder: (c, pMeta, _) => Expanded(
-          child: PlutoGrid.of(
-            stateManager: widget.dataGridSource.manager,
-          ),
-        ),
+        builder: (c, pWorkspace, _) {
+          final meta = pWorkspace.watchedMeta!;
+          final data =
+              pWorkspace.actGetDataSource() as RecordDataGridSourcePluto;
+          return Expanded(
+            child: PlutoGrid(
+              rows: data.cachedRows,
+              columns: data.cachedColumns,
+              onLoaded: (_) {
+                // 为数据源绑定新的stateManager, 以便在数据源更新的时候,能够同时刷新UI
+                data.stateManager = _.stateManager;
+              },
+              onChanged: (_) {
+                print("#debug #onChanged $_");
+                final row = _.row!;
+                final ettId = row.key as ValueKey<ObjectId>;
+
+                // 更新的DTO
+                final dto = pWorkspace
+                    .actQueryRecordBy(ettId.value, meta: meta)
+                    .toDto()
+                    .updateBy(meta, row);
+                pWorkspace.actSaveRecord(dto); // 同步到服务器
+              },
+              onSelected: (_) {
+                print("#debug #onSelected $_");
+              },
+              onRowChecked: (_) {
+                print("#debug #onRowChecked $_");
+              },
+              // 开启双击会导致单击事件延迟, 在视觉上造成卡顿的效果
+              // onRowDoubleTap: (_) {
+              //   print("#debug #onRowDoubleTap $_");
+              // },
+              onRowSecondaryTap: (_) {
+                print("#debug #onRowSecondaryTap $_");
+              },
+              onRowsMoved: (_) {
+                print("#debug #onRowsMoved $_");
+              },
+              createHeader: (manager) => DataFrameTitlePluto(
+                meta: meta,
+                stateManager: manager,
+                onSaveMeta: pWorkspace.actSaveMeta,
+                onSaveRecord: pWorkspace.actSaveRecord,
+              ),
+              // createFooter: (_) {             },
+              // rowColorCallback: (_) {},
+              configuration: const PlutoGridConfiguration(
+                // columnHeight: 30.0,
+                // columnFilterHeight: 30.0,
+                // rowHeight: 30.0,
+                // defaultCellPadding: 15,
+                // defaultColumnTitlePadding: 15,
+                // iconSize: 15,
+                enableColumnBorder: true,
+                // enableGridBorderShadow: true,
+                enableMoveHorizontalInEditing: true,
+                // enableRowColorAnimation: false,
+                // checkedColor: const Color(0x876FB0FF),
+                /// 以下两项配置列移动,
+                enableMoveDownAfterSelecting: true,
+                enterKeyAction: PlutoGridEnterKeyAction.editingAndMoveDown,
+                gridBorderRadius: BorderRadius.all(Radius.circular(10)),
+                gridPopupBorderRadius: BorderRadius.all(Radius.circular(7)),
+                scrollbarConfig: PlutoGridScrollbarConfig(
+                  isAlwaysShown: false,
+                  scrollbarThickness: 8,
+                  scrollbarThicknessWhileDragging: 10,
+                ),
+                // localeText: const PlutoGridLocaleText.korean(),
+                //   columnFilterConfig: PlutoGridColumnFilterConfig(
+                //     filters: const [
+                //       ...FilterHelper.defaultFilters,
+                //       // ClassYouImplemented(),
+                //     ],
+                //     resolveDefaultColumnFilter: (column, resolver) {
+                //       if (column.field == 'column3') {
+                //         return resolver<PlutoFilterTypeGreaterThan>()
+                //             as PlutoFilterType;
+                //       }
+                //
+                //       return resolver<PlutoFilterTypeContains>() as PlutoFilterType;
+                //     },
+                //   ),
+              ),
+              mode: PlutoGridMode.normal, // 可以通过manager动态切换,以实现对不同类型列的处理
+            ),
+          );
+        },
       );
 
-  // @override
-  // void dispose() {
-  //   super.dispose();
-  //   // timer.cancel();
-  //   // todo 关闭监听
-  // }
+// @override
+// void dispose() {
+//   super.dispose();
+//   // timer.cancel();
+//   // todo 关闭监听
+// }
 }
 
 ///
