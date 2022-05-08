@@ -64,9 +64,9 @@ dependencies:
   quiver:
   json_annotation: ">=4.4.0" # json_serializable 要求
   pluto_grid:
-    git:
-      url: https://github.com/Hu-Wentao/pluto_grid.git
-      ref: refactor_move_manager_to_constructor
+#    git:
+#      url: https://github.com/Hu-Wentao/pluto_grid.git
+#      ref: refactor_move_manager_to_constructor
   linked_scroll_controller: # pluto_grid 需要使用
 
 dev_dependencies:
@@ -86,9 +86,9 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
 
-dependency_overrides:
-  pluto_grid:
-    path: ../pluto_grid
+#dependency_overrides:
+#  pluto_grid:
+#    path: ../pluto_grid
 #  get_arch_core:
 #    path: ../get_arch/get_arch_core
 #  provider_sidecar:
