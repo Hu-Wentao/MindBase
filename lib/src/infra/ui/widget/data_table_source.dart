@@ -1,18 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
-import 'package:logging/logging.dart';
-import 'package:mind_base/src/application/provider/workspace_provider.dart';
-import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
-import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
-import 'package:mind_base/src/infra/ui/widget/data_table_edit.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:pluto_grid/pluto_grid.dart';
-import 'package:provider/provider.dart';
-import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 /// 用于缓存一个表格的Cell Widget, 当数据源更新时,也同步更新Widget
 abstract class IRecordDataGridSource {
