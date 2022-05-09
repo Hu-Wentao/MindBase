@@ -40,16 +40,16 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'0.8.2';
+const String version = r'0.9.0';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 0;
 
 /// The minor version number: "2" in "1.2.3".
-const int minor = 8;
+const int minor = 9;
 
 /// The patch version number: "3" in "1.2.3".
-const int patch = 2;
+const int patch = 0;
 
 /// The pre-release identifier: "foo" in "1.2.3-foo".
 const List<String> pre = <String>[];
@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1651256259;
+const int timestamp = 1652075290;
 
 /// Name [name]
 const String name = r'mind_base';
