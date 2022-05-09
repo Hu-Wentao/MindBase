@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
 import 'package:mind_base/src/domain/entity/func.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:pluto_grid/pluto_grid.dart';
+import 'package:provider/provider.dart';
 
 /// 用于缓存一个表格的Cell Widget, 当数据源更新时,也同步更新Widget
 abstract class IRecordDataGridSource {
@@ -23,7 +25,7 @@ abstract class IRecordDataGridSource {
 }
 
 extension PlutoRecordMetaX on RecordMeta {
-  List<PlutoColumn> get toColumnsHeader => properties
+  List<PlutoColumn> get toPlutoCols => properties
       .map((prop) => PlutoColumn(
             title: prop.name,
             // 展示在UI的列标题
@@ -38,8 +40,12 @@ extension PlutoRecordMetaX on RecordMeta {
             enableColumnDrag: true,
             enableAutoEditing: true,
             // 自动切换编辑
-            enableEditingMode: true, // 允许编辑
+            enableEditingMode: true,
+            // 允许编辑
             // this.hide = false,// 隐藏列
+            renderer: prop.type.isRef
+                ? (rdCtx) => GridRefCellWidget(prop, rdCtx, this)
+                : null,
           ))
       .toList()
     ..[0].enableRowDrag = true
@@ -63,6 +69,89 @@ extension PlutoRecordMetaX on RecordMeta {
   }
 }
 
+/// Ref单元格, 可以通过弹出GridPopup来选择其他记录
+class GridRefCellWidget extends StatefulWidget {
+  final RecordMeta meta;
+  final Property prop;
+  final PlutoColumnRendererContext rdCtx;
+
+  const GridRefCellWidget(this.prop, this.rdCtx, this.meta, {Key? key})
+      : super(key: key);
+
+  @override
+  State<GridRefCellWidget> createState() => _GridRefCellWidgetState();
+}
+
+class _GridRefCellWidgetState extends State<GridRefCellWidget> {
+  @override
+  Widget build(BuildContext context) {
+    Property prop = widget.prop;
+    PlutoColumnRendererContext rdCtx = widget.rdCtx;
+
+    // todo 本地单元格更新, 需要操作Manager, 如果网速够快, 直接provider更新数据源问题不大
+    // final manager =
+    final refMetaId = ObjectId.fromHexString(prop.type.r!);
+    return Consumer<WorkspaceProvider>(
+        builder: (context, pWorkspace, child) => TextButton(
+              onPressed: () {
+                final refDataSource = pWorkspace.actGetDataSource(refMetaId)
+                    as RecordDataGridSourcePluto;
+                // final cols = meta.toPlutoCols;
+                // pop菜单
+                PlutoGridPopup(
+                  context: context,
+                  columns: refDataSource.cachedColumns,
+                  rows: refDataSource.cachedRows,
+                  width: 600,
+                  mode: PlutoGridMode.select,
+                  // onLoaded: (PlutoGridOnLoadedEvent event) {
+                  //   // rows
+                  //   //     .asMap()
+                  //   //     .entries
+                  //   //     .forEach((element) {
+                  //   //   final cell = element.value.cells[selectFieldName]!;
+                  //   //
+                  //   //   if (cell.value.toString() == controller.text) {
+                  //   //     event.stateManager.setCurrentCell(cell, element.key);
+                  //   //     event.stateManager
+                  //   //         .moveScrollByRow(PlutoMoveDirection.up, element.key + 1);
+                  //   //   }
+                  //   // });
+                  //   // event.stateManager.setShowColumnFilter(true);
+                  // },
+                  onSelected: (PlutoGridOnSelectedEvent event) {
+                    // 选择记录之后..
+                    print("onSelected $event, ${event.row!.cells}");
+                    // 选中记录的Id
+                    final selectRefRecordId =
+                        (event.row!.key as ValueKey<ObjectId>).value;
+                    // final dto = pWorkspace
+                    //     .actQueryRecordBy(selectRefRecordId, metaId: refMetaId)
+                    //     .toDto()
+                    //     .updateBy(meta, row);
+                    final ettId = rdCtx.row.key as ValueKey<ObjectId>;
+
+                    // 更新的DTO
+                    final dto = pWorkspace
+                        .actQueryRecordBy(ettId.value,
+                            metaId: widget.meta.id) // todo 性能优化
+                        .toDto()
+                        .updateOnlyBy(rdCtx.column, selectRefRecordId.$oid);
+                    pWorkspace.actSaveRecord(dto);
+                    // controller.text = event.row!.cells[selectFieldName]!.value.toString();
+                  },
+                );
+              },
+              child: Text(
+                // 展示RecordId
+                '${rdCtx.row.cells[rdCtx.column.field]!.value}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ));
+  }
+}
+
 extension PlutoRecordX on Record {
   PlutoRow toPlutoRow() => PlutoRow(
         key: ValueKey<ObjectId>(id), // 将id作为key,以便接收更新事件时,查询是哪一个record
@@ -82,6 +171,21 @@ extension PlutoRecordDtoX on RecordDto {
     });
     return this;
   }
+
+  /// 更新某个属性
+  RecordDto updateOnly(PlutoColumn col, PlutoRow row) {
+    final propId = col.field;
+    final newValue = row.cells[propId]!.value;
+    return updateOnlyBy(col, newValue);
+  }
+
+  /// 更新某个属性
+  RecordDto updateOnlyBy(PlutoColumn col, dynamic value) {
+    final propId = col.field;
+    fields[propId.parsePropK] = Value.of(value);
+    return this;
+  }
+
 }
 
 /// Pluto 表格数据源实现
