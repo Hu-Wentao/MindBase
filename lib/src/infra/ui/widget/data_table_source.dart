@@ -41,7 +41,9 @@ extension PlutoRecordMetaX on RecordMeta {
             enableEditingMode: true, // 允许编辑
             // this.hide = false,// 隐藏列
           ))
-      .toList();
+      .toList()
+    ..[0].enableRowDrag = true
+    ..[0].enableRowChecked = true;
 
   PlutoColumnType _buildColumnTypeBy(Property prop) {
     switch (prop.type.tp) {
