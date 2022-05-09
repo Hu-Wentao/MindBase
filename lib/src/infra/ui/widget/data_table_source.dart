@@ -220,6 +220,7 @@ class RecordDataGridSourcePluto extends IRecordDataGridSource {
   @override
   onUpdateEvt(Record record, int index) {
     print("onUpdateEvt $record $index");
+    cachedRows[index] = record.toPlutoRow();
     // todo 优化:只刷新指定行
     stateManager?.notifyListeners();
   }
