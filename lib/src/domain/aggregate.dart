@@ -30,7 +30,7 @@ class Record implements IEtt<ObjectId> {
     required RecordMeta meta,
     required Map<int, Value> fields,
   }) {
-    final recordId = id ?? ObjectId();
+    final recordId = id ?? ObjectId(clientMode: true);
     return Record(
       id: recordId,
       meta: meta,

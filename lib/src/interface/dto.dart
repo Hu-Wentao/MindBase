@@ -63,7 +63,7 @@ class RecordDto extends IMongoEntityDto {
       RecordDto(
         fields: {
           //      填入默认值
-          0: Value.of((id ?? ObjectId()).toHexString()),
+          0: Value.of((id ?? ObjectId(clientMode: true)).toHexString()),
           1: Value.of(metaId.toHexString()),
         }..addAll(fields),
       );
@@ -186,7 +186,7 @@ class RecordMetaDto extends IMongoEntityDto {
     List<AttributeDto>? attributes,
     List<MethodDto> methods = const [],
   }) {
-    final metaId = id == null ? ObjectId() : ObjectId.fromHexString(id);
+    final metaId = id == null ? ObjectId(clientMode: true) : ObjectId.fromHexString(id);
     final attrs = attributes ??
         [
           AttributeDto.builder(
