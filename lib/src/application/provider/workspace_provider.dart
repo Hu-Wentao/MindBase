@@ -333,7 +333,8 @@ class WorkspaceProvider extends ProviderSidecar {
         ),
       );
 
-  Record actQueryRecordBy(ObjectId recordId, {
+  Record actQueryRecordBy(
+    ObjectId recordId, {
     ObjectId? metaId,
     @Deprecated("使用metaId查询") RecordMeta? meta,
     bool queryGlobal = false, // true表示查询所有类型的MetaId下的记录,只要recordId相符即可
@@ -399,7 +400,7 @@ class WorkspaceProvider extends ProviderSidecar {
   RecordDataGridSourcePluto _newDataSource(RecordMeta meta) =>
       RecordDataGridSourcePluto(
         meta: meta,
-        cachedColumns: meta.toColumnsHeader,
+        cachedColumns: meta.toPlutoCols,
         cachedRows:
             getCachedRecordsByMeta(meta.id).map((e) => e.toPlutoRow()).toList(),
       );
