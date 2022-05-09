@@ -333,8 +333,15 @@ class WorkspaceProvider extends ProviderSidecar {
         ),
       );
 
-  Record actQueryRecordBy(ObjectId recordId, {RecordMeta? meta}) =>
-      _dataHolder.queryRecordBy(recordId, metaId: (meta ?? watchedMeta)?.id);
+  Record actQueryRecordBy(ObjectId recordId, {
+    ObjectId? metaId,
+    @Deprecated("使用metaId查询") RecordMeta? meta,
+    bool queryGlobal = false, // true表示查询所有类型的MetaId下的记录,只要recordId相符即可
+  }) =>
+      _dataHolder.queryRecordBy(
+        recordId,
+        metaId: queryGlobal ? null : metaId ?? (meta ?? watchedMeta)?.id,
+      );
 
   Future<void> actSaveRecord(RecordDto? dto) => actWrapper(() async {
         log("actSaveRecord ${dto?.toJson()}");
