@@ -93,6 +93,8 @@ class AttrType {
 
   String get name => tp == AttrTp.ref ? "$refPrefix$r" : tpName;
 
+  bool get isRef => tp == AttrTp.ref;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -155,7 +157,7 @@ extension PropertyX on String {
   int get parsePropK => int.parse(substring(1));
 
   Tuple2<String, int> parsePropId() => Tuple2(
-    parsePropType,
-    parsePropK,
-  );
+        parsePropType,
+        parsePropK,
+      );
 }
