@@ -382,12 +382,11 @@ class WorkspaceProvider extends ProviderSidecar {
       _findCachedSource(metaId, (source) => source.onRemoveEvt(ettId, index));
 
   /// 获取已缓存的数据源
-  IRecordDataGridSource actGetDataSource() => _getByMeta(watchedMeta!);
+  IRecordDataGridSource actGetDataSource([ObjectId? metaId]) =>
+      _getByMetaId(metaId ?? watchedMeta!.id);
 
-  IRecordDataGridSource _getByMeta(RecordMeta meta) {
-    watchedMeta = meta;
-    return _cacheSource[meta.id] ??= _newDataSource(meta);
-  }
+  IRecordDataGridSource _getByMetaId(ObjectId metaId) =>
+      _cacheSource[metaId] ??= _newDataSource(_dataHolder.getMetaBy(metaId)!);
 
   /// 创建数据源, 以及数据源对应的[DataGridController]
   RecordDataGridSourcePluto _newDataSource(RecordMeta meta) =>
