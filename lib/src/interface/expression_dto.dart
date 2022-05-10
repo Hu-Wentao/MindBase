@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
-import 'package:mind_base/src/domain/entity/func.dart';
+import 'package:mind_base/src/domain/entity/functor.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:petitparser/petitparser.dart';
 
@@ -52,7 +52,7 @@ abstract class ExpressionDto {
           AsFuncThis.ctxTypeSign: meta,
           // 由于没有`this`,只有`this`的类型(Meta)所以这里使用[ctxTypeSign]
         }..addEntries(
-            FuncManager.allFuncMapEntry), // 注意,在Dto->Domain时,似乎仍然需要全局Func
+            IFunc.allFuncMapEntry), // 注意,在Dto->Domain时,似乎仍然需要全局Func
       );
 }
 

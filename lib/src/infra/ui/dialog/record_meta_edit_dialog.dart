@@ -3,7 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/domain/entity/func.dart';
+import 'package:mind_base/src/domain/entity/functor.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/infra/ui/form/meta_form.dart';
 import 'package:mind_base/src/interface/dao.dart';
@@ -82,7 +82,7 @@ Future<AttributeDto?> showAttributeEditDialog({
   var currentMeta = selfMeta; // 选中的引用目标Meta
   // 表达式的参数<AttributeDto>, 暂时只支持输入单个参数, 默认首个参数为当前列
   AttributeDto currentArg = origin ?? AttributeDto.builder(metaId: selfMeta.id);
-  Func currentFunc = FuncManager.selfFunc; // 当前选中的表达式
+  Func currentFunc = IFunc.selfFunc; // 当前选中的表达式
   AttrTp currentType = AttrTp.string; // 当前表达式返回值类型
   String? currentRef; // 如果是[type]类型,则ref不能为空
 
@@ -180,7 +180,7 @@ Future<AttributeDto?> showAttributeEditDialog({
                     FormBuilderSearchableDropdown<Func>(
                       decoration: const InputDecoration(labelText: '表达式Func'),
                       name: 'calls',
-                      initialValue: FuncManager.selfFunc,
+                      initialValue: IFunc.selfFunc,
                       itemAsString: (fn) => "${fn?.name}( ${currentArg.name} )",
                       // 由于获取表达式可能需要参数列表,这里暂不展示
                       // "${fn?.type().name} ${fn?.name}( ${currentArg.name} )",
@@ -198,7 +198,7 @@ Future<AttributeDto?> showAttributeEditDialog({
                           return [];
                         } else {
                           final lowerText = text!.toLowerCase();
-                          return FuncManager.funcList
+                          return IFunc.funcList
                               .where((element) => element.name
                                   .toLowerCase()
                                   .contains(lowerText))

@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_arch_core/get_arch_core.dart' hide test;
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
-import 'package:mind_base/src/domain/entity/func.dart';
+import 'package:mind_base/src/domain/entity/functor.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
@@ -26,7 +26,7 @@ main() {
               name: 'getName',
               memo: 'memo2',
               expr: Expression(
-                  fn: FuncManager.findBy("member"),
+                  fn: IFunc.findBy("member"),
                   ag: [
                     Value.of("a2"), // 表示attribute 0
                   ],
@@ -37,11 +37,11 @@ main() {
               memo: 'memo',
               // ("'Hello every one! My name is'+this.name")
               expr: Expression(
-                  fn: FuncManager.findBy("add"),
+                  fn: IFunc.findBy("add"),
                   ag: [
                     Value.of("Hello everyone! My name is "),
                     Expression(
-                        fn: FuncManager.findBy("member"),
+                        fn: IFunc.findBy("member"),
                         ag: [
                           Value.of("a2"), // 填入 propId
                         ],

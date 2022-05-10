@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
-import 'package:mind_base/src/domain/entity/func.dart';
+import 'package:mind_base/src/domain/entity/functor.dart';
 import 'package:mind_base/src/domain/repo.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/infra/mongo_storage.dart';
@@ -40,7 +40,7 @@ main() async {
             name: 'name',
             memo: 'memo',
             expr: Expression(
-                fn:FuncManager.findBy('add'), ag:[
+                fn:IFunc.findBy('add'), ag:[
               Value.of(1),
               Value.of(2),
             ],type: AttrType.num))

@@ -2,7 +2,7 @@ import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/application/expr_evaluator.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
-import 'package:mind_base/src/domain/entity/func.dart';
+import 'package:mind_base/src/domain/entity/functor.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/expression_dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
@@ -98,7 +98,7 @@ class ExprDtoToDomain {
     final propValue = Value.of(prop.propId);
 
     return Expression(
-      fn: FuncManager.memberFunc,
+      fn: IFunc.memberFunc,
       ag: [objectV, propValue],
       type: prop.type, // 表达式的返回值类型即对应prop的类型
     );
@@ -111,7 +111,7 @@ class ExprDtoToDomain {
   ) {
     final obj = convert(expr.object, ctx);
     return Expression(
-      fn: FuncManager.indexFunc,
+      fn: IFunc.indexFunc,
       ag: [
         obj,
         convert(expr.index, ctx),
@@ -155,7 +155,7 @@ class ExprDtoToDomain {
   ) {
     var argument = convert(expr.argument, ctx);
     return Expression(
-      fn: FuncManager.findBy(expr.operator),
+      fn: IFunc.findBy(expr.operator),
       ag: [argument],
       type: argument.type,
     );
@@ -170,13 +170,13 @@ class ExprDtoToDomain {
   ) {
     var left = convert(expr.left, ctx);
     dynamic right;
-    if (FuncManager.isShortCircuit(expr.operator)) {
+    if (IFunc.isShortCircuit(expr.operator)) {
       right = _right(expr.right, ctx);
     } else {
       right = _right(expr.right, ctx).call();
     }
     return Expression(
-      fn: FuncManager.findBy(expr.operator),
+      fn: IFunc.findBy(expr.operator),
       ag: [
         left,
         right,

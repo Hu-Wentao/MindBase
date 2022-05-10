@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/application/expr_evaluator.dart';
-import 'package:mind_base/src/domain/entity/func.dart';
+import 'package:mind_base/src/domain/entity/functor.dart';
 import 'package:mind_base/src/domain/value.dart';
 
 main() {
@@ -8,7 +8,7 @@ main() {
   const evaluator = exprEvaluator;
   test("纯函数求值", () {
     final expr = Expression(
-      fn: FuncManager.findBy('add'),
+      fn: IFunc.findBy('add'),
       ag: [
         Value.of(3),
         Value.of(4),

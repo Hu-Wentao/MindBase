@@ -6,7 +6,7 @@ import 'package:mind_base/src/application/expr_evaluator.dart';
 import 'package:mind_base/src/application/expression_parser.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
-import 'package:mind_base/src/domain/entity/func.dart';
+import 'package:mind_base/src/domain/entity/functor.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mind_base/src/interface/expression_dto.dart';
@@ -73,7 +73,7 @@ main() {
             name: 'getName',
             memo: 'memo2',
             expr: Expression(
-              fn: FuncManager.findBy("member"),
+              fn: IFunc.findBy("member"),
               ag: [
                 Value.of("a2"), // 表示attribute 0
               ],
@@ -85,11 +85,11 @@ main() {
             memo: 'memo',
             // ("'Hello every one! My name is'+this.name")
             expr: Expression(
-              fn: FuncManager.findBy("add"),
+              fn: IFunc.findBy("add"),
               ag: [
                 Value.of("Hello everyone! My name is "),
                 Expression(
-                  fn: FuncManager.findBy("member"),
+                  fn: IFunc.findBy("member"),
                   ag: [
                     const Value(fn: AsFuncThis(), ag: []),
                     Value.of("a2"), // 填入 propId
@@ -189,13 +189,13 @@ main() {
         'add(asString("My age is "), member(asThis(), asString("a3")))';
 
     final pExpr = Expression(
-        fn: FuncManager.findBy("add"),
+        fn: IFunc.findBy("add"),
         ag: [
           Value.of("My age is "),
           Expression(
-            fn: FuncManager.findBy("member"),
+            fn: IFunc.findBy("member"),
             ag: [
-              Value(fn: FuncManager.asThisFunc, ag: []),
+              Value(fn: IFunc.asThisFunc, ag: []),
               Value.of("a3"),
             ],
             type: AttrType.string,
@@ -207,9 +207,9 @@ main() {
       ag: [
         ValueJsonDto(fn: "asString", ag: ["My age is "]),
         ExprJsonDto(
-          fn: FuncManager.memberFunc.name,
+          fn: IFunc.memberFunc.name,
           ag: [
-            ValueJsonDto(fn: FuncManager.asThisFunc.name, ag: []),
+            ValueJsonDto(fn: IFunc.asThisFunc.name, ag: []),
             ValueJsonDto(fn: "asString", ag: ["a3"])
           ],
           type: AttrType.string,
@@ -227,7 +227,7 @@ main() {
         {
           "fn": "member",
           "ag": [
-            {"fn": FuncManager.asThisFunc.name, "ag": []},
+            {"fn": IFunc.asThisFunc.name, "ag": []},
             {
               "fn": "asString",
               "ag": ["\"a3\""]

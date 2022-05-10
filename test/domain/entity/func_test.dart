@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mind_base/src/domain/entity/func.dart';
+import 'package:mind_base/src/domain/entity/functor.dart';
 import 'package:mind_base/src/domain/value.dart';
 
 main() {
   test("Expression2", () {
     final exp = Expression(
-        fn: FuncManager.findBy("+"),
+        fn: IFunc.findBy("+"),
         ag: [
           Value.of(1),
           Value.of(2),
@@ -17,10 +17,10 @@ main() {
   });
   test("Expression2#嵌套2", () {
     final exp = Expression(
-        fn: FuncManager.findBy("+"),
+        fn: IFunc.findBy("+"),
         ag: [
           Expression(
-              fn: FuncManager.findBy("*"),
+              fn: IFunc.findBy("*"),
               ag: [
                 Value.of(4),
                 Value.of(2),
@@ -35,14 +35,14 @@ main() {
   });
   test("Expression2#嵌套3", () {
     final exp = Expression(
-        fn: FuncManager.findBy("+"),
+        fn: IFunc.findBy("+"),
         ag: [
           Expression(
-              fn: FuncManager.findBy("*"),
+              fn: IFunc.findBy("*"),
               ag: [
                 Value.of(4),
                 Expression(
-                    fn: FuncManager.findBy("/"),
+                    fn: IFunc.findBy("/"),
                     ag: [
                       Value.of(6),
                       Value.of(2),
@@ -51,7 +51,7 @@ main() {
               ],
               type: AttrType.num),
           Expression(
-              fn: FuncManager.findBy("-"),
+              fn: IFunc.findBy("-"),
               ag: [
                 Value.of(2),
                 Value.of(4),
@@ -65,14 +65,14 @@ main() {
   });
   test("Expression2#嵌套3", () {
     final exp = Expression(
-        fn: FuncManager.findBy("+"),
+        fn: IFunc.findBy("+"),
         ag: [
           Expression(
-              fn: FuncManager.findBy("*"),
+              fn: IFunc.findBy("*"),
               ag: [
                 Value.of(4),
                 Expression(
-                    fn: FuncManager.findBy("/"),
+                    fn: IFunc.findBy("/"),
                     ag: [
                       Value.of(6),
                       Value.of(2),
@@ -81,7 +81,7 @@ main() {
               ],
               type: AttrType.num),
           Expression(
-              fn: FuncManager.findBy("-"),
+              fn: IFunc.findBy("-"),
               ag: [
                 Value.of(2),
                 Value.of(4),

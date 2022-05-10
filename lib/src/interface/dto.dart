@@ -3,7 +3,7 @@ import 'dart:math' as math;
 
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/aggregate.dart';
-import 'package:mind_base/src/domain/entity/func.dart';
+import 'package:mind_base/src/domain/entity/functor.dart';
 import 'package:mind_base/src/domain/value.dart';
 import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:quiver/core.dart' as quiver;
@@ -537,7 +537,7 @@ abstract class IExprJsonDto implements IMongoDtoMx {
 
   static IExprJsonDto fromJson(Map<String, dynamic> json) {
     final fnName = json['fn'] as String;
-    if (FuncManager.isAsFunc(fnName)) {
+    if (IFunc.isAsFunc(fnName)) {
       return ValueJsonDto.fromJson(json);
     } else {
       return ExprJsonDto.fromJson(json);
@@ -554,7 +554,7 @@ abstract class IExprJsonDto implements IMongoDtoMx {
     switch (runtimeType) {
       case ValueJsonDto:
         final dto = this as ValueJsonDto;
-        final fn = FuncManager.findAsFunc(dto.fn!);
+        final fn = IFunc.findAsFunc(dto.fn!);
         var ag = dto.ag;
         if ((fn is AsFuncRecord || fn is AsFuncRecordMeta) &&
             ag[0] is! ObjectId) {
@@ -564,7 +564,7 @@ abstract class IExprJsonDto implements IMongoDtoMx {
       case ExprJsonDto:
         final dto = (this as ExprJsonDto);
         return Expression(
-          fn: FuncManager.findBy(dto.fn!),
+          fn: IFunc.findBy(dto.fn!),
           ag: dto.ag.map((e) => e.toDomain()).toList(),
           type: dto.type!,
         );
