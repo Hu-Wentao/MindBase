@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/domain/entity/functor.dart';
-import 'package:mind_base/src/domain/value.dart';
+import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 

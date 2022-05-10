@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_arch_core/get_arch_core.dart' hide test;
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
-import 'package:mind_base/src/domain/aggregate.dart';
+import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/entity/functor.dart';
-import 'package:mind_base/src/domain/value.dart';
+import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 main() {

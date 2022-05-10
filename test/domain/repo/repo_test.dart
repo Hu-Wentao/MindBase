@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mind_base/src/domain/aggregate.dart';
+import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/entity/functor.dart';
-import 'package:mind_base/src/domain/repo.dart';
-import 'package:mind_base/src/domain/value.dart';
+import 'package:mind_base/src/domain/repo/repo.dart';
+import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mind_base/src/infra/mongo_storage.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';

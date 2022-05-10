@@ -6,7 +6,7 @@ import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-import 'aggregate.dart';
+import '../aggregate/aggregate.dart';
 
 /// 当前是照抄mongoDB的event [WatchEventType]
 enum RepoEventType {

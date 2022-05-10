@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/domain/aggregate.dart';
-import 'package:mind_base/src/domain/repo.dart';
+import 'package:mind_base/src/domain/aggregate/aggregate.dart';
+import 'package:mind_base/src/domain/repo/repo.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_source.dart';
 import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';

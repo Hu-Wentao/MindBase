@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mind_base/src/domain/aggregate.dart';
+import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/infra/ui/form/record_form.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:ndialog/ndialog.dart';

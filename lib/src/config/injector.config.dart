@@ -11,7 +11,7 @@ import 'package:mongo_dart/mongo_dart.dart' as _i8;
 
 import '../application.dart' as _i5;
 import '../application/provider/workspace_provider.dart' as _i7;
-import '../domain/repo.dart' as _i6;
+import '../domain/repo/repo.dart' as _i6;
 import '../infra/mongo_storage.dart' as _i3;
 import '../interface/dao.dart' as _i9;
 import 'common_config.dart' as _i11;
