@@ -186,7 +186,8 @@ class RecordMetaDto extends IMongoEntityDto {
     List<AttributeDto>? attributes,
     List<MethodDto> methods = const [],
   }) {
-    final metaId = id == null ? ObjectId(clientMode: true) : ObjectId.fromHexString(id);
+    final metaId =
+        id == null ? ObjectId(clientMode: true) : ObjectId.fromHexString(id);
     final attrs = attributes ??
         [
           AttributeDto.builder(
@@ -655,7 +656,6 @@ class ValueJsonDto extends IExprJsonDto with IMongoDtoMx {
   factory ValueJsonDto.fromDomain(IExpr expr) => ValueJsonDto(
         fn: expr.fn.name,
         ag: expr.ag,
-        // ag: expr.ag.map((e) => jsonEncode(e)).toList(),
       );
 
   static ValueJsonDto fromJson(Map<String, dynamic> json) => ValueJsonDto(
@@ -689,4 +689,38 @@ class ValueJsonDto extends IExprJsonDto with IMongoDtoMx {
         }
     }
   }
+}
+
+class WorkspaceDto extends IMongoEntityDto {
+  @override
+  ObjectId id;
+  String name;
+  List<String> metas;
+
+  WorkspaceDto({
+    required this.id,
+    required this.name,
+    required this.metas,
+  });
+
+  @override
+  List<Object?> get props => [id, name, metas];
+
+  // todo fromJson
+
+  @override
+  Map<String, dynamic> toJson() => toMongoJson()..['_id'] = id.toHexString();
+
+  @override
+  toMongoJson({AttrType type = AttrType.string}) => {
+        '_id': id,
+        'name': name,
+        'metas': metas,
+      };
+
+  Workspace toDomain(RecordMeta Function(String metaId) toMeta) => Workspace(
+      id: id,
+      name: name,
+      metas: metas.map((e) => toMeta(e)).toList(),
+      records: {});
 }
