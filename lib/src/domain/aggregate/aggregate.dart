@@ -8,3 +8,4 @@ part 'record.dart';
 
 part 'record_meta.dart';
 
+part 'workspace.dart';
