@@ -1,12 +1,5 @@
-import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/application/provider/workspace_provider.dart';
-import 'package:mind_base/src/domain/aggregate/aggregate.dart';
-import 'package:mind_base/src/domain/value/value.dart';
-import 'dart:math' as math;
+part of 'entity.dart';
 
-import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
-
-part 'func.dart';
 
 abstract class IExpr with IFunctor {
   const IExpr();

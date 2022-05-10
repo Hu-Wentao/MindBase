@@ -3,7 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/domain/entity/functor.dart';
+import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mind_base/src/infra/ui/form/meta_form.dart';
 import 'package:mind_base/src/interface/dao.dart';

@@ -6,7 +6,7 @@ import 'package:mind_base/src/application/expr_evaluator.dart';
 import 'package:mind_base/src/application/expression_parser.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
-import 'package:mind_base/src/domain/entity/functor.dart';
+import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mind_base/src/interface/expression_dto.dart';

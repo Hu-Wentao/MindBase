@@ -1,4 +1,4 @@
-part of 'functor.dart';
+part of 'entity.dart';
 
 class IFunc {
   static Iterable<MapEntry<String, Func>>? _funcMapCache;
