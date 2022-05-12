@@ -260,58 +260,6 @@ class AsFuncDynamic extends AsFunc {
   AttrType get rType => AttrType.any;
 }
 
-@Deprecated("请使用[AsFuncRef]")
-class AsFuncRecord extends AsFunc<Record> {
-  const AsFuncRecord();
-
-  @override
-  IFunctor apply(List<IFunctor>? p) {
-    // TODO: implement apply
-    throw UnimplementedError();
-  }
-
-  /// 存储的是RecordId
-  @override
-  Function get logic => (_) {
-        final recordId = _[0];
-        final record = sl<WorkspaceDataHolder>().queryRecordBy(recordId);
-        return record;
-      };
-
-  @override
-  String get name => "asFuncRecord";
-
-  @override
-  AttrType get rType => AttrType.any;
-}
-
-@Deprecated("没有实际意义")
-class AsFuncRecordMeta extends AsFunc<RecordMeta> {
-  const AsFuncRecordMeta();
-
-  @override
-  IFunctor apply(List<IFunctor>? p) {
-    // TODO: implement apply
-    throw UnimplementedError();
-  }
-
-  /// 存储的是MetaId
-  @override
-  Function get logic => (_) {
-        // fixme 这里做特殊处理,
-        final metaId = (_[0] is ObjectId)
-            ? _[0]
-            : ObjectId.fromHexString(_[0]); // ObjectId (MetaId), 注册在Workspace中
-        final meta = sl<WorkspaceDataHolder>().getMetaBy(metaId);
-        return meta;
-      };
-
-  @override
-  String get name => "asFuncRecordMeta";
-
-  @override
-  AttrType get rType => AttrType.any;
-}
 
 class MemberFunc implements Func {
   const MemberFunc();
@@ -502,8 +450,6 @@ const asFuncList = <AsFunc>[
   AsFunc<num>(),
   AsFunc<bool>(),
   AsFuncDynamic(),
-  AsFuncRecordMeta(),
-  AsFuncRecord(),
   asFuncThis,
   asFuncRef,
 ];
