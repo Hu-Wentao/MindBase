@@ -28,11 +28,15 @@ Future<_i1.GetIt> $initGetIt(_i1.GetIt get,
   gh.factory<_i4.Logger>(() => configCommon.logger(get<_i5.MindBaseConfig>()));
   gh.lazySingleton<_i6.MetaRepo>(() => _i6.MetaRepo(get<_i3.IMongoStorage>()));
   gh.singleton<_i7.WorkspaceDataHolder>(_i7.WorkspaceDataHolder());
+  gh.lazySingleton<_i6.WorkspaceRepo>(
+      () => _i6.WorkspaceRepo(get<_i3.IMongoStorage>()));
   await gh.factoryAsync<_i8.Db>(
       () => configMongo.getDb(get<_i3.IMongoStorage>()),
       preResolve: true);
   gh.lazySingleton<_i9.RecordMetaAccessor>(
       () => _i9.RecordMetaAccessor(get<_i8.Db>()));
+  gh.lazySingleton<_i9.WorkspaceAccessor>(
+      () => _i9.WorkspaceAccessor(get<_i8.Db>()));
   return get;
 }
 

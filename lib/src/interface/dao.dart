@@ -79,6 +79,7 @@ abstract class IMongoAccessor<T extends IMongoEntityDto> {
 abstract class BaseMongoAccessor<T extends IMongoEntityDto>
     implements IMongoAccessor<T> {
   const BaseMongoAccessor();
+
   @override
   T? mongoJsonToDtoOr(Map<String, dynamic>? mgJson) =>
       (mgJson == null) ? null : mongoJsonToDto(mgJson);
@@ -159,7 +160,7 @@ abstract class BaseMongoAccessor<T extends IMongoEntityDto>
 class RecordAccessor extends BaseMongoAccessor<RecordDto> {
   final String metaId;
 
- const RecordAccessor(this.db, this.metaId);
+  const RecordAccessor(this.db, this.metaId);
 
   factory RecordAccessor.of(ObjectId metaId, {Db? db}) {
     db ??= sl<Db>();
@@ -200,4 +201,18 @@ class RecordMetaAccessor extends BaseMongoAccessor<RecordMetaDto> {
   @override
   RecordMetaDto mongoJsonToDto(Map<String, Object?> mgJson) =>
       RecordMetaDto.fromMongoJson(mgJson);
+}
+
+@lazySingleton
+class WorkspaceAccessor extends BaseMongoAccessor<WorkspaceDto> {
+  WorkspaceAccessor(this.db);
+
+  @override
+  String get collectionName => 'workspace';
+  @override
+  final Db db;
+
+  @override
+  WorkspaceDto mongoJsonToDto(Map<String, dynamic> mgJson) =>
+      WorkspaceDto.fromMongoJson(mgJson);
 }
