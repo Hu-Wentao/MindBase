@@ -8,7 +8,6 @@ import 'package:mind_base/src/interface/dao.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show Db, ObjectId, where;
 import 'package:provider_sidecar/provider_sidecar.dart';
-import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 /// 本类缓存一个工作空间内的所有数据, 类比Jvm中存在的对象
 @singleton
