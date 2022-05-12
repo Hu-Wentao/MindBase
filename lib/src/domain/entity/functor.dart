@@ -120,12 +120,6 @@ class Value extends IExpr with IFunctor, EquatableMixin {
       case bool:
         fn = const AsFunc<bool>();
         break;
-      case RecordMeta:
-        return Value.ofMetaId(v.id);
-      case Record:
-        fn = const AsFuncRecord();
-        value = v.id;
-        break;
       case IExpr:
         return v;
       case Value: // 无法被IExpr取代, 原因未知
@@ -141,10 +135,6 @@ class Value extends IExpr with IFunctor, EquatableMixin {
       ag: [value, if (e != null) e],
     );
   }
-
-  /// 特殊处理 对于[RecordMeta], 直接存储 metaId:[ObjectId]
-  Value.ofMetaId(ObjectId metaId)
-      : this(fn: const AsFuncRecordMeta(), ag: [metaId]);
 
   factory Value.err(String? e) => Value.of("", e);
 

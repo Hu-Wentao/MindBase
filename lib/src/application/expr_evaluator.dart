@@ -43,15 +43,6 @@ class ExprEvaluator {
       return ctx[AsFuncThis.ctxSign];
     } else if (expr.fn is AsFuncRef) {
       return expr.value;
-
-      // final rcdId = eval(expr,ctx);
-      // 从工作空间中查询Record
-      // return sl<WorkspaceDataHolder>()
-      //     .queryRecordBy(ObjectId.fromHexString(expr.value));
-    } else if (expr.fn is AsFuncRecord) {
-      // 通过存储的id, 在ws种查询对应的Record
-      return sl<WorkspaceDataHolder>()
-          .queryRecordBy(ObjectId.fromHexString(expr.value));
     }
     // 直接返回v,而不是value, 后期考虑移除value等自带求值功能|或者将这里的功能移动到Func中
     return (expr as Value).v;
