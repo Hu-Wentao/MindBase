@@ -213,7 +213,6 @@ class AsFunc<T> implements BaseFunc {
         print("debug# 未知的AsFunc返回值类型:[$T],已转换为 [${AttrType.any}]");
         return AttrType.any;
     }
-    return AttrType.by("$T");
   }
 
   @override
@@ -259,7 +258,6 @@ class AsFuncDynamic extends AsFunc {
   @override
   AttrType get rType => AttrType.any;
 }
-
 
 class MemberFunc implements Func {
   const MemberFunc();
@@ -356,7 +354,10 @@ class AsFuncRef implements AsFunc {
 
   static AsFuncRef? ofName(String funcName) {
     if (!funcName.startsWith(funPrefix)) return null;
-    return AsFuncRef(AttrType.ref(funcName.substring(funPrefix.length)));
+    // return AsFuncRef(AttrType.ref(funcName.substring(funPrefix.length)));
+    print(
+        "AsFuncRef# 不允许通过 ofName进行构造! 即不允许持久化 AsFuncRef, 应当持久化为AsFuncString, 值为RecordId或MetaId.funcName:[$funcName]");
+    return null;
   }
 
   @override

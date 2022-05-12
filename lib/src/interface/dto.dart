@@ -29,7 +29,7 @@ abstract class IMongoDto extends Equatable with IMongoDtoMx {
 mixin IMongoDtoMx implements IDto {
   // 返回的结果与json的Map相似,但 id是 ObjectId类型,而不是String
   // todo 可以在这里实现保存 int， bool， 等原始类型的需求
-  dynamic toMongoJson({AttrType type = AttrType.string});
+  dynamic toMongoJson({AttrTypeDto type = AttrTypeDto.string});
 
   @override
   String toString() => toMongoJson().toString();
@@ -113,7 +113,7 @@ class RecordDto extends IMongoEntityDto {
   /// 适配 MongoDart的ObjectId
   /// 这里直接使用json,无需将value转换为String
   @override
-  Map<String, dynamic> toMongoJson({AttrType type = AttrType.string}) =>
+  Map<String, dynamic> toMongoJson({AttrTypeDto type = AttrTypeDto.string}) =>
       fields.map((key, value) =>
           MapEntry("$key", ValueJsonDto.fromDomain(value).toMongoJson()))
         ..['metaId'] = metaId
@@ -283,7 +283,7 @@ class RecordMetaDto extends IMongoEntityDto {
         );
 
   @override
-  Map<String, dynamic> toMongoJson({AttrType type = AttrType.string}) => {
+  Map<String, dynamic> toMongoJson({AttrTypeDto type = AttrTypeDto.string}) => {
         '_id': id, // 必须要有 '_id'
         'name': name,
         'memo': memo,
@@ -414,7 +414,7 @@ class MethodDto with IMongoDtoMx, EquatableMixin {
   String toString() => toJson().toString();
 
   @override
-  toMongoJson({AttrType type = AttrType.string}) => toJson();
+  toMongoJson({AttrTypeDto type = AttrTypeDto.string}) => toJson();
 }
 
 /// 表头/属性: 关系/表的一列叫属性
@@ -422,7 +422,7 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
   final int k;
   String name;
   String memo;
-  AttrType type;
+  AttrTypeDto type;
 
   /// 供Form初始化
   AttributeDto.builder({
@@ -430,7 +430,7 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
     int k = 0,
     String name = "",
     String memo = "",
-    AttrType type = AttrType.any,
+    AttrTypeDto type = AttrTypeDto.any,
   }) : this(
           k: k,
           name: name,
@@ -444,7 +444,7 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
         k: int.parse(attrMap['k'] as String),
         name: attrMap['name'] as String,
         memo: attrMap['memo'] as String,
-        type: AttrType.by(attrMap['type'] as String),
+        type: AttrTypeDto.by(attrMap['type'] as String),
       );
 
   AttributeDto.ofDomain(Attribute attr)
@@ -452,7 +452,7 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
           k: attr.k,
           name: attr.name,
           memo: attr.memo,
-          type: attr.type,
+          type: attr.type.toDto(),
         );
 
   AttributeDto({
@@ -487,7 +487,7 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
           k: json['k'] as int,
           name: json['name'] as String,
           memo: json['memo'] as String,
-          type: AttrType.by(json['type'] as String),
+          type: AttrTypeDto.by(json['type'] as String),
         );
 
   @override
@@ -504,14 +504,14 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
         k: k,
         name: name,
         memo: memo,
-        type: type,
+        type: type.toDomain((metaId) => null),
       );
 
   @override
   String toString() => toJson().toString();
 
   @override
-  toMongoJson({AttrType type = AttrType.string}) => toJson();
+  toMongoJson({AttrTypeDto type = AttrTypeDto.string}) => toJson();
 }
 
 abstract class IExprJsonDto implements IMongoDtoMx {
@@ -530,7 +530,7 @@ abstract class IExprJsonDto implements IMongoDtoMx {
       return ExprJsonDto(
         fn: expr.fn.name,
         ag: expr.ag.map(IExprJsonDto.fromDomain).toList(),
-        type: expr.type,
+        type: expr.type.toDto(),
       );
     }
     throw Exception("不支持的IExpr类型[${expr.runtimeType}]");
@@ -549,7 +549,7 @@ abstract class IExprJsonDto implements IMongoDtoMx {
   String toReadableString();
 
   @override
-  toMongoJson({AttrType type = AttrType.string}) => toJson();
+  toMongoJson({AttrTypeDto type = AttrTypeDto.string}) => toJson();
 
   IExpr toDomain() {
     switch (runtimeType) {
@@ -567,7 +567,7 @@ abstract class IExprJsonDto implements IMongoDtoMx {
         return Expression(
           fn: IFunc.findBy(dto.fn!),
           ag: dto.ag.map((e) => e.toDomain()).toList(),
-          type: dto.type!,
+          type: dto.type?.toDomain((metaId) => null),
         );
       default:
         throw "IExpr::toDomain 未知的类型 [$runtimeType]";
@@ -594,7 +594,7 @@ class ExprJsonDto extends IExprJsonDto with IMongoDtoMx {
   @override
   List<IExprJsonDto> ag;
 
-  AttrType? type;
+  AttrTypeDto? type;
 
   ExprJsonDto({
     required this.fn,
@@ -611,7 +611,7 @@ class ExprJsonDto extends IExprJsonDto with IMongoDtoMx {
   factory ExprJsonDto.fromDomain(IExpr expr) => ExprJsonDto(
         fn: expr.fn.name,
         ag: expr.ag.map(IExprJsonDto.fromDomain).toList(),
-        type: expr.type,
+        type: expr.type.toDto(),
       );
 
   factory ExprJsonDto.fromJson(Map<String, dynamic> json) => ExprJsonDto(
@@ -619,7 +619,7 @@ class ExprJsonDto extends IExprJsonDto with IMongoDtoMx {
         ag: (json['ag'] as List<dynamic>)
             .map((e) => IExprJsonDto.fromJson(e as Map<String, dynamic>))
             .toList(),
-        type: AttrType.by(json['type'] as String),
+        type: AttrTypeDto.by(json['type'] as String),
       );
 
   /// 可视化的函数表达式字符串
@@ -720,7 +720,7 @@ class WorkspaceDto extends IMongoEntityDto {
   Map<String, dynamic> toJson() => toMongoJson()..['_id'] = id.toHexString();
 
   @override
-  toMongoJson({AttrType type = AttrType.string}) => {
+  toMongoJson({AttrTypeDto type = AttrTypeDto.string}) => {
         '_id': id,
         'name': name,
         'metas': metas,
@@ -746,4 +746,62 @@ class WorkspaceDto extends IMongoEntityDto {
         metas: metas.map(toMeta).toList(),
         records: {},
       );
+}
+
+extension AttrTypeX on AttrType {
+  AttrTypeDto toDto() => AttrTypeDto(tp, meta?.id.toHexString());
+}
+
+/// 如果[tp]为[AttrTp.ref],则[r]不能为空
+class AttrTypeDto {
+  final AttrTp tp;
+
+  // todo #129 需要分为DTO, 本类应当持有 [RecordMeta], 否则无法获取到RecordMeta的名称, String ref则由DTO存储
+  final String? r;
+
+  static const AttrTypeDto any = AttrTypeDto(AttrTp.any, null);
+  static const AttrTypeDto num = AttrTypeDto(AttrTp.num, null);
+  static const AttrTypeDto string = AttrTypeDto(AttrTp.string, null);
+  static const AttrTypeDto boolean = AttrTypeDto(AttrTp.bool, null);
+
+  const AttrTypeDto.ref(String r) : this(AttrTp.ref, r);
+
+  const AttrTypeDto(this.tp, this.r);
+
+  /// [name]可以仅为 AttrTp.name, 也可以是 type_$ref
+  factory AttrTypeDto.by(String name, [String? ref]) =>
+      (name.startsWith(refPrefix))
+          ? AttrTypeDto.ref(name.substring(refPrefix.length))
+          : AttrTypeDto(AttrTp.values.byName(name), ref);
+
+  static Iterable<AttrTp> get values => AttrTp.values;
+
+  /// [AttrTp.ref]类型的[r]前缀
+  static final refPrefix = "${AttrTp.ref.name}_";
+
+  // todo #129 相关调用应该改为获取RecordMeta的名称,而不是`type`
+  String get tpName => tp.name;
+
+  String get name => tp == AttrTp.ref ? "$refPrefix$r" : tpName;
+
+  bool get isRef => tp == AttrTp.ref;
+
+  AttrType toDomain(RecordMeta Function(String metaId) toMeta) => AttrType(
+    tp,
+    r == null ? null : toMeta(r!),
+  );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is AttrTypeDto &&
+              runtimeType == other.runtimeType &&
+              tp == other.tp &&
+              r == other.r;
+
+  @override
+  int get hashCode => tp.hashCode ^ r.hashCode;
+
+  @override
+  String toString() => 'AttrType{tp: $tp, ref: $r}';
 }

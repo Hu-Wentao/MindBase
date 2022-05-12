@@ -329,10 +329,10 @@ Future<AttributeDto?> showAttributeEditDialog({
                       compareFn: (ex, selected) => ex == selected,
                       onFind: (text) async {
                         if (text?.isEmpty ?? true) {
-                          return AttrType.values.toList();
+                          return AttrTypeDto.values.toList();
                         } else {
                           final lowerText = text!.toLowerCase();
-                          return AttrType.values
+                          return AttrTypeDto.values
                               .where((element) => element.name
                                   .toLowerCase()
                                   .contains(lowerText))

@@ -65,7 +65,7 @@ main() {
             k: 5,
             name: '学校',
             memo: '学校引用',
-            type: AttrType.ref(pMetaSchool.id.$oid)),
+            type: AttrType.ref(pMetaSchool)),
       ],
       methods: [
         Method(
@@ -212,10 +212,10 @@ main() {
             ValueJsonDto(fn: IFunc.asThisFunc.name, ag: []),
             ValueJsonDto(fn: "asString", ag: ["a3"])
           ],
-          type: AttrType.string,
+          type: AttrTypeDto.string,
         )
       ],
-      type: AttrType.string,
+      type: AttrTypeDto.string,
     );
     final pExprJson = {
       "fn": "add",

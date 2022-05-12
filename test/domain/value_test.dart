@@ -1,12 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/domain/value/value.dart';
+import 'package:mind_base/src/interface/dto.dart';
 
 main() {
   group("AttrType", () {
-    const pTypeStr = AttrType.string;
+    const pTypeStr = AttrTypeDto.string;
     const pTypeTpRef = "62675acbd53ccfe2d07ceb63";
     const pTypeTpName = "type_$pTypeTpRef";
-    const pTypeType = AttrType.ref(pTypeTpRef);
+    const pTypeType = AttrTypeDto.ref(pTypeTpRef);
 
     test("name", () {
       expect(pTypeStr.name, "string");
@@ -19,8 +20,8 @@ main() {
     });
 
     test("by", () {
-      expect(AttrType.by(pTypeTpName), pTypeType);
-      expect(AttrType.by("string"), pTypeStr);
+      expect(AttrTypeDto.by(pTypeTpName), pTypeType);
+      expect(AttrTypeDto.by("string"), pTypeStr);
     });
   });
 }

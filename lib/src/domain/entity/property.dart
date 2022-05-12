@@ -61,19 +61,16 @@ class Method extends Property {
 class Attribute extends Property {
   @override
   final AttrType type; // 类型
-  @Deprecated("已将Meta集成到type中,使用 type.ref 访问MetaIdStr")
-  final RecordMeta? meta; //如果type是"ref", 该值不为空,存储被引用的MetaId
+  // @Deprecated("已将Meta集成到type中,使用 type.ref 访问MetaIdStr")
+  // final RecordMeta? meta; //如果type是"ref", 该值不为空,存储被引用的MetaId
 
   const Attribute({
     required int k,
     required String name,
     required String memo,
     required this.type,
-    this.meta,
+    // this.meta,
   }) : super(k, name, memo);
-
-  @override
-  List<Object> get props => super.props..addAll([if (meta != null) meta!]);
 
   AttributeDto toDto() => AttributeDto.ofDomain(this);
 

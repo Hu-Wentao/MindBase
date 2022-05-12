@@ -138,7 +138,7 @@ main() {
             ValueJsonDto(fn: "asint", ag: ["1"]),
             ValueJsonDto(fn: "asint", ag: ["2"]),
           ],
-          type: AttrType.num,
+          type: AttrTypeDto.num,
         )),
       ]),
     ];

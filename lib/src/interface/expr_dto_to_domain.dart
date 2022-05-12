@@ -64,8 +64,7 @@ class ExprDtoToDomain {
   // 这里是DTO转换, 传入ctx['this']作为ag,仅仅是为了下一步求值中,可以访问其member,以便保存propId
   @protected
   Value convertThis(ThisExpressionDto expr, Map<String, dynamic> ctx) => Value(
-      fn: AsFuncThis(
-          AttrType.ref((ctx[AsFuncThis.ctxTypeSign] as RecordMeta).id.$oid)),
+      fn: AsFuncThis(AttrType.ref((ctx[AsFuncThis.ctxTypeSign] as RecordMeta))),
       ag: const []);
 
   /// 转换Member表达式:
@@ -90,6 +89,7 @@ class ExprDtoToDomain {
     if (objectType.tp != AttrTp.ref) {
       throw "MemberExpressionDto.object# Member表达式的类型为[$objectType],其tp与[${AttrTp.ref}]不符";
     }
+    // todo 从Ws中查询Meta(id->Meta)
     final meta = sl<WorkspaceDataHolder>()
         .getMetaBy(ObjectId.fromHexString(objectType.r!))!;
 

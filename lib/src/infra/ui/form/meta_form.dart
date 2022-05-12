@@ -91,7 +91,7 @@ class MetaForm extends StatelessWidget {
         // Form的序列化与原序列化不同
         name: json['name'] as String,
         memo: json['memo'] as String,
-        type: AttrType.by(json['type'] as String, json['ref']),
+        type: AttrTypeDto.by(json['type'] as String, json['ref']),
       );
     }).toList();
 
@@ -255,7 +255,7 @@ class _AttributeListFormState extends State<AttributeListForm> {
   _onChangeType(AttributeDto attr, String? update) {
     // 如果类型切换了,就刷新一下UI, 以便更新 AttrType.ref 的类型选择器
     if (attr.type.tpName != update) {
-      setState(() => attr.type = AttrType.by(update!));
+      setState(() => attr.type = AttrTypeDto.by(update!));
     }
   }
 
@@ -345,7 +345,7 @@ class _AttributeListFormState extends State<AttributeListForm> {
                         border: OutlineInputBorder(),
                       ),
                       initialValue: a.type.tpName,
-                      items: AttrType.values
+                      items: AttrTypeDto.values
                           .map((e) => DropdownMenuItem<String>(
                                 value: e.name,
                                 child: Text(e.name),

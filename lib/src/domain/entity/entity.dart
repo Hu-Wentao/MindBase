@@ -12,3 +12,4 @@ import '../../application/expr_evaluator.dart';
 part 'func.dart';
 part 'functor.dart';
 part 'property.dart';
+part 'attr_type.dart';
