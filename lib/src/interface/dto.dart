@@ -557,10 +557,10 @@ abstract class IExprJsonDto implements IMongoDtoMx {
         final dto = this as ValueJsonDto;
         final fn = IFunc.findAsFunc(dto.fn!);
         var ag = dto.ag;
-        if ((fn is AsFuncRecord || fn is AsFuncRecordMeta) &&
-            ag[0] is! ObjectId) {
-          ag[0] = ObjectId.fromHexString(ag[0] as String);
-        }
+        // if ((fn is AsFuncRecord || fn is AsFuncRecordMeta) &&
+        //     ag[0] is! ObjectId) {
+        //   ag[0] = ObjectId.fromHexString(ag[0] as String);
+        // }
         return Value(fn: fn, ag: dto.ag);
       case ExprJsonDto:
         final dto = (this as ExprJsonDto);
@@ -691,6 +691,14 @@ class ValueJsonDto extends IExprJsonDto with IMongoDtoMx {
   }
 }
 
+extension WorkspaceX on Workspace {
+  WorkspaceDto toDto() => WorkspaceDto(
+        id: id,
+        name: name,
+        metas: metas.map((e) => e.id.toHexString()).toList(),
+      );
+}
+
 class WorkspaceDto extends IMongoEntityDto {
   @override
   ObjectId id;
@@ -723,4 +731,19 @@ class WorkspaceDto extends IMongoEntityDto {
       name: name,
       metas: metas.map((e) => toMeta(e)).toList(),
       records: {});
+
+  static WorkspaceDto fromMongoJson(Map<String, dynamic> mgJson) =>
+      WorkspaceDto(
+        id: mgJson['_id'] as ObjectId,
+        name: mgJson['name'] as String,
+        metas:
+            (mgJson['metas'] as List<dynamic>).map((e) => e as String).toList(),
+      );
+
+  Workspace toDm(RecordMeta Function(String metaId) toMeta) => Workspace(
+        id: id,
+        name: name,
+        metas: metas.map(toMeta).toList(),
+        records: {},
+      );
 }
