@@ -227,3 +227,41 @@ class MetaRepo extends BaseMongoRepo<RecordMeta, RecordMetaDto> {
     return RecordMetaAccessor(sync);
   }
 }
+
+@lazySingleton
+class WorkspaceRepo extends BaseMongoRepo<Workspace, WorkspaceDto> {
+  final IMongoStorage mongoStorage;
+
+  WorkspaceRepo(this.mongoStorage);
+
+  @override
+  Future<Workspace> futureDtoToEtt(WorkspaceDto dto) async {
+    final metaAcc = await asyncMetaAccessor;
+    final allMetaId = dto.metas.map((e) => ObjectId.fromHexString(e));
+    final List<RecordMeta> metaList = [];
+    for (var metaId in allMetaId) {
+      final meta = (await metaAcc.findById(metaId))!;
+      metaList.add(meta.toDm((dto) => dto.toDomain()));
+    }
+    return Workspace(
+      id: dto.id,
+      name: dto.name,
+      metas: metaList,
+      records: {},
+    );
+  }
+
+  @override
+  WorkspaceDto ettToDto(Workspace ett) => ett.toDto();
+
+  @override
+  Future<BaseMongoAccessor<WorkspaceDto>> get asyncAccessor async {
+    final sync = await mongoStorage.asyncDb;
+    return WorkspaceAccessor(sync);
+  }
+
+  Future<BaseMongoAccessor<RecordMetaDto>> get asyncMetaAccessor async {
+    final sync = await mongoStorage.asyncDb;
+    return RecordMetaAccessor(sync);
+  }
+}
