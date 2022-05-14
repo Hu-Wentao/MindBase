@@ -106,9 +106,9 @@ class UserProvider extends ProviderSidecar {
   }
 
   Future<BaseException?> actCheckLoggedUser() async {
-    print("debug# 检查登录状态");
+    print("debug# 检查登录状F态 $isLogged");
     return await actWrapper(() async =>
-        isLogged ? UnLoginException('尚未登录', 'actCheckLoggedUser') : null);
+        isLogged ? null : UnLoginException('尚未登录', 'actCheckLoggedUser'));
   }
 
   User loggedUser() => user!;
