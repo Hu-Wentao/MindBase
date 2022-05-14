@@ -3,6 +3,8 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'value.g.dart';
 
+part 'user_value.dart';
+
 // 异常
 class TypeCastException extends BaseException {
   TypeCastException(String msg) : super(msg);
