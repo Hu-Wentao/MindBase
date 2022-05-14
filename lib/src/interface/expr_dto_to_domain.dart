@@ -88,17 +88,12 @@ class ExprDtoToDomain {
     // `expr.object`将被识别为`VariableDto`, `this`从ctx中获取到 MetaId, 而Value本身可以从 Workspace中得到Meta
     // expr-v12 单独
     final objectV = convert(expr.object, ctx); // 这是This表达式
-    final objectType = objectV.type; // todo 类型推断关键点: 通过type方法,IExpr自行返回表达式的结果类型
+    final objectType = objectV.type; //  类型推断关键点: 通过type方法,IExpr自行返回表达式的结果类型
     // 下面是作类型推断
     if (objectType.tp != AttrTp.ref) {
-      throw "MemberExpressionDto.object# Member表达式的类型为[$objectType],其tp与[${AttrTp.ref}]不符";
+      throw "MemberExpressionDto.object# Member表达式的类型为[$objectType],其tp只能是[${AttrTp.ref}]";
     }
-    // todo 从Ws中查询Meta(id->Meta)
-    final meta = sl<WorkspaceDataHolder>()
-        .getMetaBy(ObjectId.fromHexString(objectType.r!))!;
-
-    /// expr12.1 手动处理 prop的value与type问题, 可以考虑移除 asThis的Type
-    final prop = getMember(meta, expr.property.name) as Property;
+    final prop = getMember(objectType.meta, expr.property.name) as Property;
     final propValue = Value.of(prop.propId);
 
     return Expression(
