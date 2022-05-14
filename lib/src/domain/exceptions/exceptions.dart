@@ -1,4 +1,7 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:get_arch_core/get_arch_core.dart';
+
+part 'exception_adapter.dart';
 
 /// 用户尚未登录
 /// 将会触发 "跳转登录Dialog"
@@ -13,8 +16,6 @@ class ServerAppException extends BaseException {
   ServerAppException(this.code, String msg, String debugInfo)
       : super(msg, debugInfo: debugInfo);
 
-// ServerAppException.by(HttpResult result)
-//     : this(result.code, result.msg, result.data);
 }
 
 /// 对错误信息和StackTrace进行包装
