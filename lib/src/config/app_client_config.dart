@@ -1,6 +1,9 @@
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:appwrite/appwrite.dart';
 
+// 如果需要由服务器创建的ID, 则使用该值
+const genUniqueId = 'unique()';
+
 @module
 abstract class AppClientConfig {
   Client get client => Client()
