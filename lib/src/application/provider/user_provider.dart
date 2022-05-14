@@ -112,4 +112,8 @@ class UserProvider extends ProviderSidecar {
   }
 
   User loggedUser() => user!;
+
+  actLogout() async => await actWrapper(() {
+        if (cachedSession != null) _accountService.logout(cachedSession!.$id);
+      });
 }
