@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1652517430;
+const int timestamp = 1652534276;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -142,9 +142,9 @@ const Map<String, Object> source = <String, Object>{
   'flutter': <String, Object>{
     'uses-material-design': true,
     'assets': <Object>[
-      r'assets/',
       r'assets/icon/',
       r'assets/icon/auth/',
+      r'assets/image/',
     ],
   },
 };

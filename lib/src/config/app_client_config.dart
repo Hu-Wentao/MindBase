@@ -12,4 +12,12 @@ abstract class AppClientConfig {
 
   // Subscribe to files channel
   Realtime get realtime => Realtime(client);
+
+  Teams get teams => Teams(client);
+
+  Database get database => Database(client);
+
+  Storage get storage => Storage(client);
+
+  Avatars get avatars => Avatars(client);
 }
