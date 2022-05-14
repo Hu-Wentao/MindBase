@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1652075290;
+const int timestamp = 1652517430;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -108,7 +108,6 @@ const Map<String, Object> dependencies = <String, Object>{
     },
   },
   'form_builder_validators': r'7.9.0',
-  'syncfusion_flutter_datagrid': r'20.1.47',
   'json_annotation': r'>=4.4.0',
 };
 
@@ -142,5 +141,10 @@ const Map<String, Object> source = <String, Object>{
   'dependency_overrides': dependencyOverrides,
   'flutter': <String, Object>{
     'uses-material-design': true,
+    'assets': <Object>[
+      r'assets/',
+      r'assets/icon/',
+      r'assets/icon/auth/',
+    ],
   },
 };
