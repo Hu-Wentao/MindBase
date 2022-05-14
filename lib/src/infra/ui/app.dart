@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:form_builder_validators/localization/l10n.dart';
+import 'package:mind_base/src/application/provider/user_provider.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/infra/ui/routes_config.gr.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +20,8 @@ class MindBaseApp extends StatelessWidget {
           //     create: (_) => RecordProvider()..actInitializing()),
           ChangeNotifierProvider(
               create: (_) => WorkspaceProvider()..actInitializing()),
+          ChangeNotifierProvider(
+              create: (_) => UserProvider()..actInitializing()),
         ],
         child: MaterialApp.router(
           routerDelegate: _router.delegate(),
