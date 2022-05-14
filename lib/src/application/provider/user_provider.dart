@@ -9,7 +9,10 @@ class UserProvider extends ProviderSidecar {
   late final AccountService _accountService;
 
   // 表示已登陆的用户, 后期考虑持久化到本地,以便客户端/网页自动登录
+  User? user;
   Session? cachedSession;
+
+  bool get isLogged => user != null && cachedSession != null;
 
   @override
   onInitializing() {
@@ -31,7 +34,7 @@ class UserProvider extends ProviderSidecar {
       await actWrapper(() async {
         // 先注册
         if (isRegister) {
-          await _onRegister(authVerify, identityStr, password);
+          user = await _onRegister(authVerify, identityStr, password);
         }
         // 注册完成后自动登录
         await _onLogin(authVerify, identityStr, password);
@@ -84,6 +87,10 @@ class UserProvider extends ProviderSidecar {
         throw BaseException('尚未支持的登录方式[$authVerify]');
     }
     cachedSession = nSession;
+    if (user == null || user!.$id != cachedSession!.userId) {
+      user = await _accountService.getUser();
+    }
+    setInitialized("已登陆");
     return null;
 
     // // 新建还是更新 nSession
@@ -97,4 +104,12 @@ class UserProvider extends ProviderSidecar {
     // // 刷新 info
     // _updateUser();
   }
+
+  Future<BaseException?> actCheckLoggedUser() async {
+    print("debug# 检查登录状态");
+    return await actWrapper(() async =>
+        isLogged ? UnLoginException('尚未登录', 'actCheckLoggedUser') : null);
+  }
+
+  User loggedUser() => user!;
 }
