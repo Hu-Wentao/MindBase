@@ -54,9 +54,9 @@ class ExprEvaluator {
     var obj = eval(expr.ag[0], ctx);
     assert(obj != null, "找不到Member主对象,参数列表[${expr.ag}]");
     // 如果obj不是Record,而是RecordId(是一个引用对象),则需要从工作空间中查询,
-    // fixme #153 这里做特殊处理, 如果在持久化时value直接存储为asFuncRecord,这一步就不需要了,实现时,obj应当为Record的实例;而持久化时,仍然为ObjectIdHexString
-    if(obj is String && obj.length == 24){
-      obj = sl<WorkspaceDataHolder>().queryRecordBy(ObjectId.fromHexString(obj));
+    if (obj is String && obj.length == 24) {
+      final queryMetaFn = ctx[Workspace.ctxQueryMetaSign];
+      obj = queryMetaFn(obj); // MetaId(HexString) -> Meta
     }
 
     final member = eval(expr.ag[1], ctx);
@@ -67,7 +67,9 @@ class ExprEvaluator {
       }
     }
     throw ExpressionEvaluatorException.memberAccessNotSupported(
-        obj.runtimeType, member);
+      obj.runtimeType,
+      member,
+    );
   }
 
   @protected
