@@ -15,18 +15,20 @@ class AccountService {
     return account.createSession(email: email, password: password);
   }
 
-  Future signup({
-    required String name,
+  Future<User> signup({
+    String? name,
     required String email,
     required String password,
-  }) {
-    return account.create(
-        name: name, email: email, password: password, userId: 'unique()');
-  }
+    String userId = 'unique()',
+  }) =>
+      account.create(
+        userId: userId,
+        name: name,
+        email: email,
+        password: password,
+      );
 
-  Future logout() {
-    return account.deleteSession(sessionId: 'current');
-  }
+  Future logout(String sessionId) => account.deleteSession(sessionId: sessionId);
 
   Future<User> getUser() async => await account.get();
 }
