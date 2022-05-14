@@ -9,88 +9,6 @@ import 'package:mind_base/src/interface/dto.dart';
 import 'package:mongo_dart/mongo_dart.dart' show Db, ObjectId, where;
 import 'package:provider_sidecar/provider_sidecar.dart';
 
-/// 本类缓存一个工作空间内的所有数据, 类比Jvm中存在的对象
-@singleton
-class WorkspaceDataHolder {
-  final String name = 'default'; // 目前全局只有一个workspace
-  // WorkspaceDataHolder({this.name = 'default'}); // 有参数,导致依赖注入失败
-  ///
-  final List<RecordMeta> _cacheMeta = [];
-
-  @protected
-  RecordMeta insertMeta(RecordMeta meta) {
-    _cacheMeta.add(meta);
-    return meta;
-  }
-
-  RecordMeta updateMeta(RecordMeta meta) {
-    final i = _cacheMeta.indexWhere((element) => element.id == meta.id);
-    if (i != -1) {
-      _cacheMeta[i].update(meta);
-    } else {
-      _cacheMeta.add(meta);
-    }
-    return meta;
-  }
-
-  void removeMeta(ObjectId metaId) =>
-      _cacheMeta.removeWhere((meta) => meta.id == metaId);
-
-  void clearMeta() => _cacheMeta.clear();
-
-  /// 只能查询已存在与workspace
-  RecordMeta? getMetaBy(ObjectId metaId) {
-    for (final m in _cacheMeta) {
-      if (m.id == metaId) return m;
-    }
-    return null;
-  }
-
-  Iterable<RecordMeta> allMetas() => _cacheMeta;
-
-  ///
-  final Map<ObjectId, List<Record>> _cacheRecord = {};
-
-  @protected
-  Record insertRecord(Record record) {
-    _cacheRecord.putIfAbsent(record.meta.id, () => []);
-    _cacheRecord[record.meta.id]!.add(record);
-    return record;
-  }
-
-  @Deprecated("意义不大, record现在是非const, 可以直接更新record实例的属性, 无需在space中查询后更新")
-  int updateRecord(Record record) {
-    final index = (getRecords(record.meta.id))
-        .indexWhere((element) => element.id == record.id);
-    if (index == -1) {
-      insertRecord(record);
-    } else {
-      getRecords(record.meta.id)[index].update(record);
-    }
-    return index;
-  }
-
-  List<Record>? removeRecords(ObjectId metaId) => _cacheRecord.remove(metaId);
-
-  void clearRecord() => _cacheRecord.clear();
-
-  List<Record> getRecords(ObjectId metaId) => _cacheRecord[metaId] ??= [];
-
-  Iterable<List<Record>> allRecords() => _cacheRecord.values;
-
-  Record queryRecordBy(ObjectId recordId, {ObjectId? metaId}) {
-    if (metaId != null) {
-      return getRecords(metaId).firstWhere((record) => record.id == recordId);
-    }
-    for (var recordList in allRecords()) {
-      final i = recordList.indexWhere((element) => element.id == recordId);
-      if (i != -1) {
-        return recordList[i];
-      }
-    }
-    throw "Workspace中找不到ID为[$recordId]的Record";
-  }
-}
 /// 操作Workspace类, 以实现相关操作
 extension WorkspaceX on Workspace {
   @protected
@@ -155,60 +73,32 @@ extension WorkspaceX on Workspace {
     }
     throw "Workspace中找不到ID为[$recordId]的Record";
   }
-}
 
-/// 统一监听与处理工作空间内的所有数据
-/// todo 当前假定本数据库为一个工作空间
-class WorkspaceProvider extends ProviderSidecar {
-  late final MetaRepo _metaRepo;
+  /// 打开工作空间
+  /// 1. 同步,监听内部所有Meta
+  /// 2. 同步,监听内幕所有Meta下的Record
+  void open() {
 
-  // 在此处直接赋值,避免出现 _dataHolder未初始化的问题;
-  final WorkspaceDataHolder _dataHolder = sl<WorkspaceDataHolder>();
-
-  Workspace get workspace => throw "尚未实现 `获取当前Workspace功能`";
-
-  // RecordRepo 无法监听数据
-  // late final RecordRepo _recordRepo;
-  RecordAccessor _recordAccessor(String metaId) =>
-      RecordAccessor(sl<Db>(), metaId);
-
-  // 监听更新事件
-  // <MetaId, StreamController<..>>
-  final Map<ObjectId, StreamController<RepoEvent<Record>>> _cacheSubject = {};
-
-  @override
-  onInitializing() {
-    _metaRepo = sl<MetaRepo>();
-    // _recordRepo = RecordRepo(sl<IMongoStorage>(), _metaRepo, null);
-    _cacheAllMetaByWorkspace();
-  }
-
-  /// 数据同步 ===================================================================
-  _cacheAllMetaByWorkspace() {
-    // 先查询有所元素 // 然后开始监听变更
-    _metaRepo
-      ..findAll().listen(_onEvtInsertMeta)
-      ..watchAll().listen(_onWatchMetaEvt);
   }
 
   void _onEvtInsertMeta(RecordMeta meta) => setInitialized("插入Meta", () {
-        _dataHolder.insertMeta(meta);
-        // 缓存并监听Meta下Record
-        _cacheRecordByMeta(meta);
-      });
+    workspace.insertMeta(meta);
+    // 缓存并监听Meta下Record
+    _cacheRecordByMeta(meta);
+  });
 
   void _onEvtUpdateMeta(RecordMeta meta) => setInitialized("更新/替换Meta", () {
-        _dataHolder.updateMeta(meta);
-        if (watchedMeta?.id == meta.id) {
-          watchedMeta = meta; // 提示UI可以刷新
-        }
-      });
+    workspace.updateMeta(meta);
+    if (watchedMeta?.id == meta.id) {
+      watchedMeta = meta; // 提示UI可以刷新
+    }
+  });
 
   void _onEvtRemoveMeta(ObjectId ettId) => setInitialized("移除Meta", () {
-        _dataHolder.removeMeta(ettId);
-        // 取消缓存和监听Meta下Record
-        _disposeSubject(ettId);
-      });
+    workspace.removeMeta(ettId);
+    // 取消缓存和监听Meta下Record
+    _disposeSubject(ettId);
+  });
 
   void _onWatchMetaEvt(RepoEvent<RecordMeta> event) {
     switch (event.type) {
@@ -244,26 +134,70 @@ class WorkspaceProvider extends ProviderSidecar {
     // 同步广播流,Provider中始终有一个监听器用于刷新数据；其他监听器只用于刷新UI(可能会有丢失UI数据..)
     _cacheSubject[meta.id]?.close();
     _cacheSubject[meta.id] =
-        StreamController<RepoEvent<Record>>.broadcast(sync: false)
-          ..addStream(
-            acc.watchAll().map((dtoEvt) => RepoEvent.of<Record, RecordDto>(
-                  dtoEvt,
-                  (dto) => dto?.toDomainOr(meta),
-                )),
-          )
-          // ..addStream(_recordRepo.watchAllByMeta(meta))
-          ..stream.listen((evt) => _onWatchRecord(evt, meta.id));
+    StreamController<RepoEvent<Record>>.broadcast(sync: false)
+      ..addStream(
+        acc.watchAll().map((dtoEvt) => RepoEvent.of<Record, RecordDto>(
+          dtoEvt,
+              (dto) => dto?.toDomainOr(meta),
+        )),
+      )
+    // ..addStream(_recordRepo.watchAllByMeta(meta))
+      ..stream.listen((evt) => _onWatchRecord(evt, meta.id));
   }
+}
+
+/// 统一监听与处理工作空间内的所有数据
+/// todo 当前假定本数据库为一个工作空间
+class WorkspaceProvider extends ProviderSidecar {
+  final Workspace workspace;
+  late final RecordMetaAccessor _metaAccessor;
+
+  WorkspaceProvider(this.workspace);
+  // late final MetaRepo _metaRepo;
+  //
+  // // 在此处直接赋值,避免出现 _dataHolder未初始化的问题;
+  // final WorkspaceDataHolder workspace = sl<WorkspaceDataHolder>();
+  //
+  // Workspace get workspace => throw "尚未实现 `获取当前Workspace功能`";
+
+  // RecordRepo 无法监听数据
+  // late final RecordRepo _recordRepo;
+  RecordAccessor _recordAccessor(String metaId) =>
+      RecordAccessor(sl<Db>(), metaId);
+
+  // 监听更新事件
+  // <MetaId, StreamController<..>>
+  final Map<ObjectId, StreamController<RepoEvent<Record>>> _cacheSubject = {};
+
+  @override
+  onInitializing() {
+    // _metaRepo = sl<MetaRepo>();
+    // _recordRepo = RecordRepo(sl<IMongoStorage>(), _metaRepo, null);
+    // _cacheAllMetaByWorkspace();
+    _metaAccessor = sl<RecordMetaAccessor>();
+
+    workspace.open(_metaAccessor.findById, _metaAccessor.watchById);
+  }
+
+  /// 数据同步 ===================================================================
+  _cacheAllMetaByWorkspace() {
+    // 先查询有所元素 // 然后开始监听变更
+    // _metaRepo
+    //   ..findAll().listen(_onEvtInsertMeta)
+    //   ..watchAll().listen(_onWatchMetaEvt);
+  }
+
+
 
   // 不指定则移除所有的监听
   _disposeSubject([ObjectId? metaId]) {
     if (metaId != null) {
-      _dataHolder.removeMeta(metaId);
-      _dataHolder.removeRecords(metaId);
+      workspace.removeMeta(metaId);
+      workspace.removeRecords(metaId);
       _cacheSubject.remove(metaId)?.close();
     } else {
-      _dataHolder.clearMeta();
-      _dataHolder.clearRecord();
+      workspace.clearMeta();
+      workspace.clearRecord();
       for (var element in _cacheSubject.values) {
         element.close();
       }
@@ -272,19 +206,19 @@ class WorkspaceProvider extends ProviderSidecar {
   }
 
   void _onEvtInsertRecord(Record record) => setInitialized(
-      "插入Record", () => _dataHolder.getRecords(record.meta.id).add(record));
+      "插入Record", () => workspace.getRecords(record.meta.id).add(record));
 
   // 返回被更新的元素index
   int _onEvtUpdateRecord(Record record) =>
       setInitialized<int>("更新/替换Record", () {
-        return _dataHolder.updateRecord(record);
+        return workspace.updateRecord(record);
       })!;
 
   // 返回被更新的元素index
   int _onEvtRemoveRecord(ObjectId ettId) => setInitialized<int>("移除Record", () {
         // 遍历所有的 <RecordId,Record>
         var index = -1;
-        for (var recordList in _dataHolder.allRecords()) {
+        for (var recordList in workspace.allRecords()) {
           index = recordList.indexWhere((element) => element.id == ettId);
           if (index != -1) {
             recordList.removeAt(index);
@@ -332,7 +266,7 @@ class WorkspaceProvider extends ProviderSidecar {
   /// 业务逻辑-Meta ==============================================================
   /// MetaProvider
 
-  List<RecordMeta> get metaList => _dataHolder.allMetas().toList();
+  List<RecordMeta> get metaList => workspace.allMetas().toList();
 
   Future<void> actInsertMeta(RecordMeta meta) =>
       actWrapper(() => setInitialized("新增Meta [$meta]", () async {
@@ -405,7 +339,7 @@ class WorkspaceProvider extends ProviderSidecar {
     @Deprecated("使用metaId查询") RecordMeta? meta,
     bool queryGlobal = false, // true表示查询所有类型的MetaId下的记录,只要recordId相符即可
   }) =>
-      _dataHolder.queryRecordBy(
+      workspace.queryRecordBy(
         recordId,
         metaId: queryGlobal ? null : metaId ?? (meta ?? watchedMeta)?.id,
       );
@@ -419,7 +353,7 @@ class WorkspaceProvider extends ProviderSidecar {
 
   Future<void> actRemoveRecordBy(int rowIndex) {
     final meta = watchedMeta;
-    final rcd = _dataHolder.getRecords(meta!.id)[rowIndex];
+    final rcd = workspace.getRecords(meta!.id)[rowIndex];
     return actRemoveRecord(rcd.id);
   }
 
@@ -460,7 +394,7 @@ class WorkspaceProvider extends ProviderSidecar {
       _getByMetaId(metaId ?? watchedMeta!.id);
 
   IRecordDataGridSource _getByMetaId(ObjectId metaId) =>
-      _cacheSource[metaId] ??= _newDataSource(_dataHolder.getMetaBy(metaId)!);
+      _cacheSource[metaId] ??= _newDataSource(workspace.getMetaBy(metaId)!);
 
   /// 创建数据源, 以及数据源对应的[DataGridController]
   RecordDataGridSourcePluto _newDataSource(RecordMeta meta) =>
@@ -472,7 +406,7 @@ class WorkspaceProvider extends ProviderSidecar {
       );
 
   List<Record> getCachedRecordsByMeta(ObjectId metaId) =>
-      _dataHolder.getRecords(metaId);
+      workspace.getRecords(metaId);
 
 //
 // Record getCachedRecordByIndex(ObjectId metaId, int index) =>
