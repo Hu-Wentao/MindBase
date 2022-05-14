@@ -411,7 +411,14 @@ class AsFuncThis implements AsFunc {
 
   /// 如果上下文没有`this`,但是有`this`的类型(Meta),(如表达式convert场景)则为其key值
   /// 对应的value,应该是[RecordMeta]类型
+  @Deprecated("使用ctxMetaIdSign")
   static const ctxTypeSign = 'thisType';
+
+  /// 作用与[ctxTypeSign] 相同
+  /// 如果上下文没有`this`,但是有`this`的类型Id(MetaId),(如表达式convert场景)则为其key值
+  /// value是 metaId: String;
+  /// (`>>`用于防止用户输入同名变量)
+  static const ctxMetaIdSign = '>>thisMetaId';
   @override
   final String name = 'asThis';
 

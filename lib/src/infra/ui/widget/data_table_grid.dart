@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
+import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/infra/ui/dialog/confirm_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_edit_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
@@ -93,6 +94,7 @@ class _RecordDataGridState extends State<RecordDataGrid> {
                 stateManager: manager,
                 onSaveMeta: pWorkspace.actSaveMeta,
                 onSaveRecord: pWorkspace.actSaveRecord,
+                queryMetaFn: pWorkspace.workspace.queryMeta,
               ),
               // createFooter: (_) {             },
               // rowColorCallback: (_) {},
@@ -159,6 +161,7 @@ class DataFrameTitlePluto extends StatelessWidget {
   final kMetaBuilder = GlobalKey<FormBuilderState>();
   final kAttrBuilder = GlobalKey<FormBuilderState>();
   final kMethodBuilder = GlobalKey<FormBuilderState>();
+  final QueryMetaFn? queryMetaFn;
 
   DataFrameTitlePluto({
     Key? key,
@@ -166,6 +169,7 @@ class DataFrameTitlePluto extends StatelessWidget {
     required this.stateManager,
     required this.onSaveMeta,
     required this.onSaveRecord,
+    required this.queryMetaFn,
   }) : super(key: key);
 
   @override
@@ -179,6 +183,7 @@ class DataFrameTitlePluto extends StatelessWidget {
                 kMetaBuilder: kMetaBuilder,
                 kAttrBuilder: kAttrBuilder,
                 kMethodBuilder: kMethodBuilder,
+                queryMetaFn: queryMetaFn,
               ),
             ),
             icon: const Icon(Icons.edit),

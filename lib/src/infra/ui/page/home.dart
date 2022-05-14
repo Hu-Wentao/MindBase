@@ -68,6 +68,7 @@ class _HomePageState extends State<HomePage> {
               kAttrBuilder: _kAttrBuilder,
               kMetaBuilder: _kMetaBuilder,
               kMethodBuilder: _kMethodBuilder,
+              queryMetaFn: t.workspace.queryMeta,
             ),
           ),
         ),

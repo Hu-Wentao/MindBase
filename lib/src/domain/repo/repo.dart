@@ -208,6 +208,8 @@ class RecordRepo extends IMongoRepo<Record, RecordDto>
   }
 }
 
+@Deprecated(
+    "为了确保数据完整性, Meta与Record不应当存在Repo, 应当直接使用Assessor读取Dto, 最后在Workspace中组装")
 @lazySingleton
 class MetaRepo extends BaseMongoRepo<RecordMeta, RecordMetaDto> {
   final IMongoStorage mongoStorage;
@@ -216,7 +218,9 @@ class MetaRepo extends BaseMongoRepo<RecordMeta, RecordMetaDto> {
 
   @override
   Future<RecordMeta> futureDtoToEtt(RecordMetaDto dto) async =>
-      dto.toDm((attr) => attr.toDomain());
+      throw "应当直接使用Assessor读取Dto";
+
+  // dto.toDm((attr) => attr.toDomain());
 
   @override
   RecordMetaDto ettToDto(RecordMeta ett) => ett.toDto();
@@ -239,16 +243,18 @@ class WorkspaceRepo extends BaseMongoRepo<Workspace, WorkspaceDto> {
     final metaAcc = await asyncMetaAccessor;
     final allMetaId = dto.metas.map((e) => ObjectId.fromHexString(e));
     final List<RecordMeta> metaList = [];
-    for (var metaId in allMetaId) {
-      final meta = (await metaAcc.findById(metaId))!;
-      metaList.add(meta.toDm((dto) => dto.toDomain()));
-    }
-    return Workspace(
+    // 预先创建Workspace实例, 结合[::queryMeta]解决循环依赖问题
+    final workspace = Workspace(
       id: dto.id,
       name: dto.name,
       metas: metaList,
       records: {},
     );
+    for (var metaId in allMetaId) {
+      final meta = (await metaAcc.findById(metaId))!;
+      metaList.add(meta.toDm(workspace.queryMeta));
+    }
+    return workspace;
   }
 
   @override

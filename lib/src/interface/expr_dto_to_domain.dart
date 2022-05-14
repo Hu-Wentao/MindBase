@@ -64,7 +64,11 @@ class ExprDtoToDomain {
   // 这里是DTO转换, 传入ctx['this']作为ag,仅仅是为了下一步求值中,可以访问其member,以便保存propId
   @protected
   Value convertThis(ThisExpressionDto expr, Map<String, dynamic> ctx) => Value(
-      fn: AsFuncThis(AttrType.ref((ctx[AsFuncThis.ctxTypeSign] as RecordMeta))),
+      // fn: AsFuncThis(AttrType.ref((ctx[AsFuncThis.ctxTypeSign] as RecordMeta))),
+      fn: AsFuncThis(AttrType.ref(
+        ctx[AsFuncThis.ctxMetaIdSign],
+        ctx[Workspace.ctxQueryMetaSign],
+      )),
       ag: const []);
 
   /// 转换Member表达式:

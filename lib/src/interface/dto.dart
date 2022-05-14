@@ -78,7 +78,7 @@ class RecordDto extends IMongoEntityDto {
               .where((element) => element.value is Map<String, dynamic>)
               .map((e) => MapEntry(
                     int.parse(e.key),
-                    ValueJsonDto.fromJson(e.value).toDomain() as Value,
+                    ValueJsonDto.fromJson(e.value).toDomain(null) as Value,
                   )),
         ),
       );
@@ -106,7 +106,7 @@ class RecordDto extends IMongoEntityDto {
             .where((element) => element.value is Map<String, dynamic>)
             .map((e) => MapEntry(
                   int.parse(e.key),
-                  ValueJsonDto.fromJson(e.value).toDomain() as Value,
+                  ValueJsonDto.fromJson(e.value).toDomain(null) as Value,
                 )),
       ));
 
@@ -119,8 +119,7 @@ class RecordDto extends IMongoEntityDto {
         ..['metaId'] = metaId
         ..['_id'] = id;
 
-  Record toDm(RecordMeta Function(ObjectId metaId) getMeta) =>
-      toDomain(getMeta(metaId));
+  Record toDm(QueryMetaFn getMeta) => toDomain(getMeta(metaIdHex));
 
   Record toDomain(RecordMeta m) => Record(
         id: id,
@@ -292,12 +291,9 @@ class RecordMetaDto extends IMongoEntityDto {
         'methods': methods.map((e) => e.toJson()).toList(),
       };
 
-  RecordMeta toDm(
-    Attribute Function(AttributeDto dto) attrToDm,
-  ) =>
-      toDomain(
-        attrs.map(attrToDm).toList(),
-        methods.map((e) => e.toDomain()).toList(),
+  RecordMeta toDm(QueryMetaFn toMeta) => toDomain(
+        attrs.map((e) => e.toDomain(toMeta)).toList(),
+        methods.map((e) => e.toDomain(toMeta)).toList(),
       );
 
   RecordMeta toDomain(List<Attribute> attrs, List<Method> methods) =>
@@ -403,11 +399,11 @@ class MethodDto with IMongoDtoMx, EquatableMixin {
         'expr': expr.toJson(),
       };
 
-  Method toDomain() => Method(
+  Method toDomain(QueryMetaFn toMeta) => Method(
         k: k,
         name: name,
         memo: memo,
-        expr: expr.toDomain(),
+        expr: expr.toDomain(toMeta),
       );
 
   @override
@@ -498,13 +494,13 @@ class AttributeDto with IMongoDtoMx, EquatableMixin {
         'type': type.name,
       };
 
-  Attribute toDm() => toDomain();
+  Attribute toDm(QueryMetaFn toMeta) => toDomain(toMeta);
 
-  Attribute toDomain() => Attribute(
+  Attribute toDomain(QueryMetaFn toMeta) => Attribute(
         k: k,
         name: name,
         memo: memo,
-        type: type.toDomain((metaId) => null),
+        type: type.toDomain(toMeta),
       );
 
   @override
@@ -519,7 +515,7 @@ abstract class IExprJsonDto implements IMongoDtoMx {
 
   List<dynamic> get ag;
 
-  static IExprJsonDto fromDomain(dynamic expr) {
+  static IExprJsonDto fromDomain(IExpr expr) {
     if (expr is Value) {
       return ValueJsonDto(
         fn: expr.fn.name,
@@ -551,12 +547,14 @@ abstract class IExprJsonDto implements IMongoDtoMx {
   @override
   toMongoJson({AttrTypeDto type = AttrTypeDto.string}) => toJson();
 
-  IExpr toDomain() {
+  /// 根据 Attr-v7.1开始的`#存储metaId`特性, Value的[AsFunc]构造不应当使用[toMeta],
+  ///因此[toMeta]确定结果为 Value时,可以传入null
+  IExpr toDomain(QueryMetaFn? toMeta) {
     switch (runtimeType) {
       case ValueJsonDto:
         final dto = this as ValueJsonDto;
         final fn = IFunc.findAsFunc(dto.fn!);
-        var ag = dto.ag;
+        // var ag = dto.ag;
         // if ((fn is AsFuncRecord || fn is AsFuncRecordMeta) &&
         //     ag[0] is! ObjectId) {
         //   ag[0] = ObjectId.fromHexString(ag[0] as String);
@@ -566,8 +564,8 @@ abstract class IExprJsonDto implements IMongoDtoMx {
         final dto = (this as ExprJsonDto);
         return Expression(
           fn: IFunc.findBy(dto.fn!),
-          ag: dto.ag.map((e) => e.toDomain()).toList(),
-          type: dto.type?.toDomain((metaId) => null),
+          ag: dto.ag.map((e) => e.toDomain(toMeta)).toList(),
+          type: dto.type!.toDomain(toMeta!),
         );
       default:
         throw "IExpr::toDomain 未知的类型 [$runtimeType]";
@@ -594,6 +592,7 @@ class ExprJsonDto extends IExprJsonDto with IMongoDtoMx {
   @override
   List<IExprJsonDto> ag;
 
+  // 如果是"非表达式",则type==null
   AttrTypeDto? type;
 
   ExprJsonDto({
@@ -610,7 +609,7 @@ class ExprJsonDto extends IExprJsonDto with IMongoDtoMx {
 
   factory ExprJsonDto.fromDomain(IExpr expr) => ExprJsonDto(
         fn: expr.fn.name,
-        ag: expr.ag.map(IExprJsonDto.fromDomain).toList(),
+        ag: expr.ag.map((e) => IExprJsonDto.fromDomain(e as IExpr)).toList(),
         type: expr.type.toDto(),
       );
 
@@ -726,7 +725,7 @@ class WorkspaceDto extends IMongoEntityDto {
         'metas': metas,
       };
 
-  Workspace toDomain(RecordMeta Function(String metaId) toMeta) => Workspace(
+  Workspace toDomain(QueryMetaFn toMeta) => Workspace(
       id: id,
       name: name,
       metas: metas.map((e) => toMeta(e)).toList(),
@@ -740,7 +739,7 @@ class WorkspaceDto extends IMongoEntityDto {
             (mgJson['metas'] as List<dynamic>).map((e) => e as String).toList(),
       );
 
-  Workspace toDm(RecordMeta Function(String metaId) toMeta) => Workspace(
+  Workspace toDm(QueryMetaFn toMeta) => Workspace(
         id: id,
         name: name,
         metas: metas.map(toMeta).toList(),
@@ -786,18 +785,19 @@ class AttrTypeDto {
 
   bool get isRef => tp == AttrTp.ref;
 
-  AttrType toDomain(RecordMeta Function(String metaId) toMeta) => AttrType(
-    tp,
-    r == null ? null : toMeta(r!),
-  );
+  AttrType toDomain(QueryMetaFn toMeta) => AttrType(
+        tp,
+        r,
+        toMeta,
+      );
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is AttrTypeDto &&
-              runtimeType == other.runtimeType &&
-              tp == other.tp &&
-              r == other.r;
+      other is AttrTypeDto &&
+          runtimeType == other.runtimeType &&
+          tp == other.tp &&
+          r == other.r;
 
   @override
   int get hashCode => tp.hashCode ^ r.hashCode;

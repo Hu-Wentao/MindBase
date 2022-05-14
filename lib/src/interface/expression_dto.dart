@@ -46,11 +46,13 @@ abstract class ExpressionDto {
   ExpressionDto toPersistence(Map<String, dynamic> currentContext);
 
   /// 允许meta为null, 用于解析没有使用`this`或者其他`全局函数`的表达式
-  IExpr toDomain([RecordMeta? meta]) => exprToDomain.convert(
+  IExpr toDomain([String? metaId, QueryMetaFn? queryMetaFn]) => exprToDomain.convert(
         this,
         {
-          AsFuncThis.ctxTypeSign: meta,
           // 由于没有`this`,只有`this`的类型(Meta)所以这里使用[ctxTypeSign]
+          AsFuncThis.ctxMetaIdSign: metaId,
+          // 注入当前工作空间, 用于通过metaId查询Meta
+          Workspace.ctxQueryMetaSign: queryMetaFn,
         }..addEntries(
             IFunc.allFuncMapEntry), // 注意,在Dto->Domain时,似乎仍然需要全局Func
       );

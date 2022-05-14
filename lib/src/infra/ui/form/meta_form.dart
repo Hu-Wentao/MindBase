@@ -5,6 +5,7 @@ import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/application/expression_parser.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/config/common_config.dart';
+import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mind_base/src/interface/dto.dart';
 import 'package:mind_base/src/interface/expression_dto.dart';
@@ -64,6 +65,7 @@ class MetaForm extends StatelessWidget {
     required GlobalKey<FormBuilderState> kMetaBuilder,
     required GlobalKey<FormBuilderState> kAttrBuilder,
     required GlobalKey<FormBuilderState> kMethodBuilder,
+    required QueryMetaFn? queryMetaFn,
   }) {
     if (!checkBy(kMetaBuilder, kAttrBuilder, kMethodBuilder)) {
       return null;
@@ -106,10 +108,11 @@ class MetaForm extends StatelessWidget {
     }
     // expr12 由于持久化为Json,需要 Readable->Domain(Meta)->Json, 显然此时Meta尚未持久化(尚未被创建)
     // 所以在expr12中, 无法在创建Meta之前,创建方法
-    final metaId = ObjectId.fromHexString(metaMap['id'] as String);
+    final metaId = metaMap['id'] as String?;
     // 尝试查询Meta,如果查不到就取消添加方法(因为Meta还没被创建)
-    final meta = sl<WorkspaceDataHolder>().getMetaBy(metaId);
-    final methods = (meta == null)
+    // final meta = sl<WorkspaceDataHolder>().getMetaBy(ObjectId.fromHexString(metaId));
+    // 注意, 由于 attr-v7.2 新增QueryMetaFn, 所以只要MetaId!=null,就可以新建方法
+    final methods = (metaId == null)
         ? const <MethodDto>[]
         : methodFormatMap.entries.map((e) {
             final json = e.value;
@@ -118,9 +121,12 @@ class MetaForm extends StatelessWidget {
               k: key,
               name: json['name'] as String,
               memo: json['memo'] as String,
+              // 可读Token->Domain(包含上下文)->IExprJson(持久化)
               expr: IExprJsonDto.fromDomain(
-                ExpressionDto.of(exprParser, json['expr'] as String)
-                    .toDomain(meta),
+                ExpressionDto.of(exprParser, json['expr'] as String).toDomain(
+                  metaId,
+                  queryMetaFn,
+                ),
               ),
             );
           }).toList();

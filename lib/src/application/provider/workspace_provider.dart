@@ -91,6 +91,71 @@ class WorkspaceDataHolder {
     throw "Workspace中找不到ID为[$recordId]的Record";
   }
 }
+/// 操作Workspace类, 以实现相关操作
+extension WorkspaceX on Workspace {
+  @protected
+  RecordMeta insertMeta(RecordMeta meta) {
+    metas.add(meta);
+    return meta;
+  }
+
+  RecordMeta updateMeta(RecordMeta meta) {
+    final i = metas.indexWhere((element) => element.id == meta.id);
+    if (i != -1) {
+      metas[i].update(meta);
+    } else {
+      metas.add(meta);
+    }
+    return meta;
+  }
+
+  void removeMeta(ObjectId metaId) =>
+      metas.removeWhere((meta) => meta.id == metaId);
+
+  void clearMeta() => metas.clear();
+
+  Iterable<RecordMeta> allMetas() => metas;
+
+  @protected
+  Record insertRecord(Record record) {
+    records.putIfAbsent(record.meta.id, () => []);
+    records[record.meta.id]!.add(record);
+    return record;
+  }
+
+  @Deprecated("意义不大, record现在是非const, 可以直接更新record实例的属性, 无需在space中查询后更新")
+  int updateRecord(Record record) {
+    final index = (getRecords(record.meta.id))
+        .indexWhere((element) => element.id == record.id);
+    if (index == -1) {
+      insertRecord(record);
+    } else {
+      getRecords(record.meta.id)[index].update(record);
+    }
+    return index;
+  }
+
+  List<Record>? removeRecords(ObjectId metaId) => records.remove(metaId);
+
+  void clearRecord() => records.clear();
+
+  List<Record> getRecords(ObjectId metaId) => records[metaId] ??= [];
+
+  Iterable<List<Record>> allRecords() => records.values;
+
+  Record queryRecordBy(ObjectId recordId, {ObjectId? metaId}) {
+    if (metaId != null) {
+      return getRecords(metaId).firstWhere((record) => record.id == recordId);
+    }
+    for (var recordList in allRecords()) {
+      final i = recordList.indexWhere((element) => element.id == recordId);
+      if (i != -1) {
+        return recordList[i];
+      }
+    }
+    throw "Workspace中找不到ID为[$recordId]的Record";
+  }
+}
 
 /// 统一监听与处理工作空间内的所有数据
 /// todo 当前假定本数据库为一个工作空间
@@ -99,6 +164,8 @@ class WorkspaceProvider extends ProviderSidecar {
 
   // 在此处直接赋值,避免出现 _dataHolder未初始化的问题;
   final WorkspaceDataHolder _dataHolder = sl<WorkspaceDataHolder>();
+
+  Workspace get workspace => throw "尚未实现 `获取当前Workspace功能`";
 
   // RecordRepo 无法监听数据
   // late final RecordRepo _recordRepo;
@@ -277,7 +344,7 @@ class WorkspaceProvider extends ProviderSidecar {
             if (dto == null) {
               return null;
             }
-            final meta = dto.toDm((dto) => dto.toDm());
+            final meta = dto.toDm(workspace.queryMeta);
             await _metaRepo.save(meta);
           }));
 

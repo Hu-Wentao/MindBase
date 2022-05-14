@@ -32,7 +32,7 @@ main() async {
         AttributeDto.builder(
           k: 3,
           name: "test",
-        ).toDm(),
+        ).toDm((_) => throw "none getMeta fun"),
       ],
       methods: [
         Method(
@@ -40,10 +40,12 @@ main() async {
             name: 'name',
             memo: 'memo',
             expr: Expression(
-                fn:IFunc.findBy('add'), ag:[
-              Value.of(1),
-              Value.of(2),
-            ],type: AttrType.num))
+                fn: IFunc.findBy('add'),
+                ag: [
+                  Value.of(1),
+                  Value.of(2),
+                ],
+                type: AttrType.num))
         // MethodDto.builder(expr: "3+4"
         //         // expr: ExpressionDto(
         //         //   func: "sum",

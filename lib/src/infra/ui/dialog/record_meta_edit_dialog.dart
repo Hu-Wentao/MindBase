@@ -17,6 +17,7 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
   required GlobalKey<FormBuilderState> kMetaBuilder,
   required GlobalKey<FormBuilderState> kAttrBuilder,
   required GlobalKey<FormBuilderState> kMethodBuilder,
+  required QueryMetaFn? queryMetaFn,
 }) async =>
     await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: false),
@@ -44,6 +45,7 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
                   kMetaBuilder: kMetaBuilder,
                   kAttrBuilder: kAttrBuilder,
                   kMethodBuilder: kMethodBuilder,
+                  queryMetaFn: queryMetaFn,
                 );
                 Navigator.pop<RecordMetaDto>(context, dto);
               } else {
