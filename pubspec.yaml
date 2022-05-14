@@ -68,6 +68,7 @@ dependencies:
 #      url: https://github.com/Hu-Wentao/pluto_grid.git
 #      ref: refactor_move_manager_to_constructor
   linked_scroll_controller: # pluto_grid 需要使用
+  appwrite:
 
 dev_dependencies:
   flutter_test:
