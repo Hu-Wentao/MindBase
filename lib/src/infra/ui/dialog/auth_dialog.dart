@@ -23,7 +23,7 @@ Future<bool?> showAuthDialog({
 }) =>
     NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: true),
-      content: Body(initIsRegister: true, actAuthWith: actAuthWith),
+      content: Body(actAuthWith: actAuthWith),
     ).show(context);
 
 class Body extends StatefulWidget {
@@ -39,7 +39,7 @@ class Body extends StatefulWidget {
 
   const Body({
     Key? key,
-    required this.initIsRegister,
+    this.initIsRegister = false,
     required this.actAuthWith,
     this.authList = const [
       AuthVerify.email,
