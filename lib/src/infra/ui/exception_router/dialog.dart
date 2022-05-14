@@ -39,7 +39,8 @@ class DialogFactory {
             child: const Text("前往登录页"),
             onPressed: () => showAuthDialog(
               context: context,
-              actAuthWith: Provider.of<UserProvider>(context).actAuthWith,
+              actAuthWith:
+                  Provider.of<UserProvider>(context, listen: false).actAuthWith,
             ),
           ),
           TextButton(
