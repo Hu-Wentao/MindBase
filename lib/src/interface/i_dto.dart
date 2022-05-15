@@ -17,6 +17,10 @@ abstract class IEntityDto extends IDto {
   String get id;
 }
 
+extension RecordX on Record {
+  RecordDto toDto() => RecordDto.fromDomain(this);
+}
+
 ///
 /// fields[0] 表示ID : ObjectId
 /// fields[1] 表示MetaID ObjectId
@@ -74,6 +78,10 @@ class RecordDto extends IEntityDto {
 
   @override
   Map<String, dynamic> toJson() => throw UnimplementedError("请引用相关Extension");
+}
+
+extension RecordMetaX on RecordMeta {
+  RecordMetaDto toDto() => RecordMetaDto.fromDomain(this);
 }
 
 /// attributes固定 0:表示Record的ID, 1:表示Record的metaId
@@ -195,6 +203,10 @@ class RecordMetaDto extends IEntityDto {
       );
 }
 
+extension MethodX on Method {
+  MethodDto toDto() => MethodDto.ofDomain(this);
+}
+
 class MethodDto extends IDto {
   int k;
   String name;
@@ -263,6 +275,10 @@ class MethodDto extends IDto {
 
   @override
   Map<String, dynamic> toJson() => throw UnimplementedError("使用相关Extension的方法");
+}
+
+extension AttrbuteX on Attribute {
+  AttributeDto toDto() => AttributeDto.ofDomain(this);
 }
 
 /// 表头/属性: 关系/表的一列叫属性

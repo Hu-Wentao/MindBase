@@ -57,11 +57,6 @@ class RecordMeta implements IEtt<ObjectId> {
   bool hasPropBy(String propId) =>
       properties.any((prop) => prop.propId == propId);
 
-  RecordMetaDto toDto() => RecordMetaDto.fromDomain(this);
-
-  @override
-  String toString() => "RecordMeta#${toDto()}";
-
   void update(RecordMeta meta) {
     assert(id == meta.id, "Meta::update,当前ID[$id]与更新ID[${meta.id}]不一致!");
     name = meta.name;

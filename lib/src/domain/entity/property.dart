@@ -51,8 +51,6 @@ class Method extends Property {
   @override
   List<Object> get props => super.props..addAll([expr]);
 
-  MethodDto toDto() => MethodDto.ofDomain(this);
-
   // 求值, 传入所在record为上下文'this'
   dynamic eval(Record record) =>
       exprEvaluator.eval(expr, {AsFuncThis.ctxSign: record});
@@ -71,9 +69,4 @@ class Attribute extends Property {
     required this.type,
     // this.meta,
   }) : super(k, name, memo);
-
-  AttributeDto toDto() => AttributeDto.ofDomain(this);
-
-  @override
-  String toString() => toDto().toString();
 }

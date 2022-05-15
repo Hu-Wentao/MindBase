@@ -34,10 +34,6 @@ class Record implements IEtt<ObjectId> {
     );
   }
 
-  RecordDto toDto() => RecordDto.fromDomain(this);
-
-  @override
-  String toString() => toDto().toString();
 
   /// Value不存在时返回一个空Value
   Value getFieldByColumn(String name) =>
