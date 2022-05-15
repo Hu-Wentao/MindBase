@@ -3,13 +3,11 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/application/expression_parser.dart';
-import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/config/common_config.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/domain/value/value.dart';
-import 'package:mind_base/src/interface/dto.dart';
+import 'package:mind_base/src/interface/i_dto.dart';
 import 'package:mind_base/src/interface/expression_dto.dart';
-import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:ndialog/ndialog.dart';
 
 class MetaForm extends StatelessWidget {
@@ -178,7 +176,7 @@ class _MetaMainFormState extends State<MetaMainForm> {
                 padding: const EdgeInsets.all(8.0),
                 child: FormBuilderTextField(
                   name: 'id',
-                  initialValue: _origin.id.toHexString(),
+                  initialValue: _origin.id,
                   decoration: const InputDecoration(
                     labelText: 'ID',
                     border: OutlineInputBorder(),
