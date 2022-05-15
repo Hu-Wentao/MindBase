@@ -313,7 +313,7 @@ class AttributeDto extends IDto {
         k: int.parse(attrMap['k'] as String),
         name: attrMap['name'] as String,
         memo: attrMap['memo'] as String,
-        type: AttrType.by(attrMap['type'] as String),
+        type: AttrTypeDto.by(attrMap['type'] as String),
       );
 
   AttributeDto.ofDomain(Attribute attr)
@@ -384,10 +384,10 @@ abstract class IExprJsonDto extends IDto {
         final dto = this as ValueJsonDto;
         final fn = IFunc.findAsFunc(dto.fn!);
         var ag = dto.ag;
-        if ((fn is AsFuncRecord || fn is AsFuncRecordMeta) &&
-            ag[0] is! ObjectId) {
-          ag[0] = ObjectId.fromHexString(ag[0] as String);
-        }
+        // if ((fn is AsFuncRecord || fn is AsFuncRecordMeta) &&
+        //     ag[0] is! ObjectId) {
+        //   ag[0] = ObjectId.fromHexString(ag[0] as String);
+        // }
         return Value(fn: fn, ag: dto.ag);
       case ExprJsonDto:
         final dto = (this as ExprJsonDto);
@@ -522,4 +522,61 @@ class WorkspaceDto extends IEntityDto {
 
   @override
   toJson() => throw UnimplementedError("使用Extension的方法");
+}
+
+extension AttrTypeX on AttrType {
+  AttrTypeDto toDto() => AttrTypeDto(tp, meta?.id.toHexString());
+}
+
+/// 如果[tp]为[AttrTp.ref],则[r]不能为空
+class AttrTypeDto {
+  final AttrTp tp;
+
+  final String? r;
+
+  static const AttrTypeDto any = AttrTypeDto(AttrTp.any, null);
+  static const AttrTypeDto num = AttrTypeDto(AttrTp.num, null);
+  static const AttrTypeDto string = AttrTypeDto(AttrTp.string, null);
+  static const AttrTypeDto boolean = AttrTypeDto(AttrTp.bool, null);
+
+  const AttrTypeDto.ref(String r) : this(AttrTp.ref, r);
+
+  const AttrTypeDto(this.tp, this.r);
+
+  /// [name]可以仅为 AttrTp.name, 也可以是 type_$ref
+  factory AttrTypeDto.by(String name, [String? ref]) =>
+      (name.startsWith(refPrefix))
+          ? AttrTypeDto.ref(name.substring(refPrefix.length))
+          : AttrTypeDto(AttrTp.values.byName(name), ref);
+
+  static Iterable<AttrTp> get values => AttrTp.values;
+
+  /// [AttrTp.ref]类型的[r]前缀
+  static final refPrefix = "${AttrTp.ref.name}_";
+
+  String get tpName => tp.name;
+
+  String get name => tp == AttrTp.ref ? "$refPrefix$r" : tpName;
+
+  bool get isRef => tp == AttrTp.ref;
+
+  AttrType toDomain(QueryMetaFn toMeta) => AttrType(
+        tp,
+        r,
+        toMeta,
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AttrTypeDto &&
+          runtimeType == other.runtimeType &&
+          tp == other.tp &&
+          r == other.r;
+
+  @override
+  int get hashCode => tp.hashCode ^ r.hashCode;
+
+  @override
+  String toString() => 'AttrType{tp: $tp, ref: $r}';
 }
