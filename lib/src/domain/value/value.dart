@@ -1,3 +1,4 @@
+import 'package:bson/bson.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -63,7 +64,6 @@ enum AttrTp {
   // func, // 函数类型 相当于Dart的Function,Excel的函数 暂不实现
 }
 
-
 /// 与 [AttrTypeDto] 对应
 mixin ITypeMx {
   String get asString;
@@ -114,4 +114,10 @@ extension PropertyX on String {
         parsePropType,
         parsePropK,
       );
+}
+
+abstract class ObjectIdX {
+  static ObjectId get create => ObjectId(clientMode: true);
+
+  static String get createHex => create.toHexString();
 }
