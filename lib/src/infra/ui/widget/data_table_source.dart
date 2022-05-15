@@ -4,7 +4,7 @@ import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
-import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
+import 'package:mongo_dart/mongo_dart.dart' show String;
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:provider/provider.dart';
 
@@ -21,7 +21,7 @@ abstract class IRecordDataGridSource {
   onUpdateEvt(Record record, int index);
 
   // 后端移除事件
-  onRemoveEvt(ObjectId recordId, int index);
+  onRemoveEvt(String recordId, int index);
 }
 
 extension PlutoRecordMetaX on RecordMeta {
@@ -90,7 +90,7 @@ class _GridRefCellWidgetState extends State<GridRefCellWidget> {
 
     // todo 本地单元格更新, 需要操作Manager, 如果网速够快, 直接provider更新数据源问题不大
     // final manager =
-    final refMetaId = ObjectId.fromHexString(prop.type.r!);
+    final refMetaId = (prop.type.r!);
     return Consumer<WorkspaceProvider>(
         builder: (context, pWorkspace, child) => TextButton(
               onPressed: () {
@@ -124,19 +124,19 @@ class _GridRefCellWidgetState extends State<GridRefCellWidget> {
                     print("onSelected $event, ${event.row!.cells}");
                     // 选中记录的Id
                     final selectRefRecordId =
-                        (event.row!.key as ValueKey<ObjectId>).value;
+                        (event.row!.key as ValueKey<String>).value;
                     // final dto = pWorkspace
                     //     .actQueryRecordBy(selectRefRecordId, metaId: refMetaId)
                     //     .toDto()
                     //     .updateBy(meta, row);
-                    final ettId = rdCtx.row.key as ValueKey<ObjectId>;
+                    final ettId = rdCtx.row.key as ValueKey<String>;
 
                     // 更新的DTO
                     final dto = pWorkspace
                         .actQueryRecordBy(ettId.value,
                             metaId: widget.meta.id) // todo 性能优化
                         .toDto()
-                        .updateOnlyBy(rdCtx.column, selectRefRecordId.$oid);
+                        .updateOnlyBy(rdCtx.column, selectRefRecordId);
                     pWorkspace.actSaveRecord(dto);
                     // controller.text = event.row!.cells[selectFieldName]!.value.toString();
                   },
@@ -154,7 +154,7 @@ class _GridRefCellWidgetState extends State<GridRefCellWidget> {
 
 extension PlutoRecordX on Record {
   PlutoRow toPlutoRow() => PlutoRow(
-        key: ValueKey<ObjectId>(id), // 将id作为key,以便接收更新事件时,查询是哪一个record
+        key: ValueKey<String>(id), // 将id作为key,以便接收更新事件时,查询是哪一个record
         cells: Map.fromEntries(meta.properties.map((prop) => MapEntry(
               prop.propId,
               PlutoCell(value: getValueBy(prop).v),
@@ -165,7 +165,7 @@ extension PlutoRecordX on Record {
 extension PlutoRecordDtoX on RecordDto {
   // 更新全部,(其实可以只更新一个字段)
   RecordDto updateBy(RecordMeta meta, PlutoRow row) {
-    assert(meta.id.$oid == metaIdHex);
+    assert(meta.id == metaIdHex);
     row.cells.forEach((propId, value) {
       fields[propId.parsePropK] = Value.of(value.value);
     });
@@ -185,7 +185,6 @@ extension PlutoRecordDtoX on RecordDto {
     fields[propId.parsePropK] = Value.of(value);
     return this;
   }
-
 }
 
 /// Pluto 表格数据源实现
@@ -226,7 +225,7 @@ class RecordDataGridSourcePluto extends IRecordDataGridSource {
   }
 
   @override
-  onRemoveEvt(ObjectId recordId, int index) {
+  onRemoveEvt(String recordId, int index) {
     print("onRemoveEvt $index");
     // 如果是非活跃状态下... 则只移除Widget, 因为不需要刷新UI
     cachedRows.removeWhere((element) => element.key == ValueKey(recordId));

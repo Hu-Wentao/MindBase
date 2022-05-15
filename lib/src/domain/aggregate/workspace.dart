@@ -15,7 +15,7 @@ class Workspace implements IEtt<String> {
   final List<RecordMeta> metas;
 
   // 空间内的记录
-  final Map<ObjectId, List<Record>> records;
+  final Map<String, List<Record>> records;
 
   Workspace({
     required this.id,
@@ -26,10 +26,10 @@ class Workspace implements IEtt<String> {
 
   // QueryMetaFn 的包装
   RecordMeta queryMeta(String metaId) =>
-      getMetaBy(ObjectId.fromHexString(metaId))!;
+      getMetaBy((metaId))!;
 
   /// 只能查询已存在与workspace
-  RecordMeta? getMetaBy(ObjectId metaId) {
+  RecordMeta? getMetaBy(String metaId) {
     for (final m in metas) {
       if (m.id == metaId) return m;
     }

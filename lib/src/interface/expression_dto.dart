@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
-import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 import 'package:petitparser/petitparser.dart';
 
 import '../application/expression_parser.dart';

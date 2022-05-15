@@ -9,7 +9,7 @@ import 'package:mind_base/src/infra/ui/dialog/confirm_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_edit_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
-import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
+import 'package:mongo_dart/mongo_dart.dart' show String;
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:provider/provider.dart';
 
@@ -64,7 +64,7 @@ class _RecordDataGridState extends State<RecordDataGrid> {
               onChanged: (_) {
                 print("#debug #onChanged $_");
                 final row = _.row!;
-                final ettId = row.key as ValueKey<ObjectId>;
+                final ettId = row.key as ValueKey<String>;
 
                 // 更新的DTO
                 final dto = pWorkspace

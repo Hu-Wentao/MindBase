@@ -7,7 +7,7 @@ import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mind_base/src/infra/dto/dto_json_impl.dart'
     show IExprJsonDtoJsonX;
-import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
+import 'package:mongo_dart/mongo_dart.dart' show String;
 import 'package:quiver/core.dart' as quiver;
 
 /// 实体类对应的Dto需要实现本类, 并添加`_id`字段/get方法
@@ -22,13 +22,13 @@ extension RecordX on Record {
 }
 
 ///
-/// fields[0] 表示ID : ObjectId
-/// fields[1] 表示MetaID ObjectId
+/// fields[0] 表示ID : String
+/// fields[1] 表示MetaID String
 class RecordDto extends IEntityDto {
   @override
   String get id => idHex;
 
-  ObjectId get metaId => ObjectId.fromHexString(metaIdHex);
+  String get metaId => metaIdHex;
 
   String get idHex => fields[0]!.value;
 
@@ -39,17 +39,16 @@ class RecordDto extends IEntityDto {
   const RecordDto({this.fields = const {}});
 
   factory RecordDto.builder({
-    ObjectId? id,
-    ObjectId? metaId,
+    String? id,
+    String? metaId,
     Map<int, Value> fields = const {},
   }) =>
       RecordDto(
-        fields: {
-          //      填入默认值
-          0: Value.of((id ?? ObjectId(clientMode: true)).toHexString()),
-          // 1: Value.of(metaId.toHexString()),
-        }..addAll(fields),
-      );
+          fields: {
+        //      填入默认值
+        0: Value.of(id ??= ObjectIdX.createHex),
+        1: Value.of(metaId),
+      }..addAll(fields));
 
   factory RecordDto.fromDomain(Record record) => RecordDto(
         fields: record.fields,
@@ -65,11 +64,11 @@ class RecordDto extends IEntityDto {
     );
   }
 
-  Record toDm(RecordMeta Function(ObjectId metaId) getMeta) =>
+  Record toDm(RecordMeta Function(String metaId) getMeta) =>
       toDomain(getMeta(metaId));
 
   Record toDomain(RecordMeta m) => Record(
-        id: ObjectId.fromHexString(idHex),
+        id: idHex,
         meta: m,
         fields: fields,
       );
@@ -116,7 +115,7 @@ class RecordMetaDto extends IEntityDto {
     List<AttributeDto>? attributes,
     List<MethodDto> methods = const [],
   }) {
-    final metaId = id ?? ObjectId(clientMode: true).toHexString();
+    final metaId = id ??= ObjectIdX.createHex;
     final attrs = attributes ??
         [
           AttributeDto.builder(
@@ -173,7 +172,7 @@ class RecordMetaDto extends IEntityDto {
       );
 
   factory RecordMetaDto.fromDomain(RecordMeta meta) => RecordMetaDto(
-        id: meta.id.$oid,
+        id: meta.id,
         name: meta.name,
         memo: meta.memo,
         maxKey: meta.maxKey,
@@ -195,7 +194,7 @@ class RecordMetaDto extends IEntityDto {
 
   RecordMeta toDomain(List<Attribute> attrs, List<Method> methods) =>
       RecordMeta(
-        id: ObjectId.fromHexString(id),
+        id: id,
         name: name,
         memo: memo,
         maxKey: maxKey,
@@ -223,7 +222,7 @@ class MethodDto extends IDto {
 
   /// 供Form初始化
   MethodDto.builder({
-    ObjectId? metaId,
+    String? metaId,
     int k = 0,
     String name = "",
     String memo = "",
@@ -386,8 +385,8 @@ abstract class IExprJsonDto extends IDto {
         final fn = IFunc.findAsFunc(dto.fn!);
         // var ag = dto.ag;
         // if ((fn is AsFuncRecord || fn is AsFuncRecordMeta) &&
-        //     ag[0] is! ObjectId) {
-        //   ag[0] = ObjectId.fromHexString(ag[0] as String);
+        //     ag[0] is! String) {
+        //   ag[0] = String.fromHexString(ag[0] as String);
         // }
         return Value(fn: fn, ag: dto.ag);
       case ExprJsonDto:
@@ -483,9 +482,9 @@ class ValueJsonDto extends IExprJsonDto {
       case IExprJsonDto:
         return e.toJson();
       case Record:
-        return jsonEncode((e as Record).id.toHexString());
+        return jsonEncode((e as Record).id);
       case RecordMeta:
-        return jsonEncode((e as RecordMeta).id.toHexString());
+        return jsonEncode((e as RecordMeta).id);
       default:
         try {
           return jsonEncode(e);
@@ -516,7 +515,7 @@ class WorkspaceDto extends IEntityDto {
   });
 
   Workspace toDomain(RecordMeta Function(String metaId) toMeta) => Workspace(
-      id: ObjectId.fromHexString(id),
+      id: id,
       name: name,
       metas: metas.map((e) => toMeta(e)).toList(),
       records: {});
@@ -526,7 +525,7 @@ class WorkspaceDto extends IEntityDto {
 }
 
 extension AttrTypeX on AttrType {
-  AttrTypeDto toDto() => AttrTypeDto(tp, meta?.id.toHexString());
+  AttrTypeDto toDto() => AttrTypeDto(tp, meta?.id);
 }
 
 /// 如果[tp]为[AttrTp.ref],则[r]不能为空
