@@ -96,16 +96,13 @@ abstract class BaseEttAccessor<T extends IEntityDto> implements IAccessor<T> {
 // Future<bool> drop() => db.dropCollection(collectionId);
 }
 
-/// 根据 Meta-v3.1
-/// 集合名称: ws_$teamId
-/// [collectionId] ObjectId()
+/// 根据 Meta-v3.1C 实现
 class WorkspaceEttAccessor extends BaseEttAccessor<WorkspaceDto> {
   @override
   final String collectionId;
 
-  const WorkspaceEttAccessor(Database db, String teamId)
-      : collectionId = teamId,
-        super(db);
+  const WorkspaceEttAccessor(Database db, this.collectionId)
+      : super(db);
 
   @override
   WorkspaceDto jsonToDto(Map<String, Object?> js) =>
