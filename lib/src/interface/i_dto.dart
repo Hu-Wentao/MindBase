@@ -183,12 +183,8 @@ class RecordMetaDto extends IEntityDto {
   @override
   Map<String, dynamic> toJson() => throw UnimplementedError("使用相关Extension的方法");
 
-  RecordMeta toDm(
-    Attribute Function(AttributeDto dto) attrToDm,
-    QueryMetaFn toMeta,
-  ) =>
-      toDomain(
-        attrs.map(attrToDm).toList(),
+  RecordMeta toDm(QueryMetaFn toMeta) => toDomain(
+        attrs.map((a) => a.toDomain(toMeta)).toList(),
         methods.map((e) => e.toDomain(toMeta)).toList(),
       );
 
