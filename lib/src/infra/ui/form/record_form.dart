@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
-import 'package:mind_base/src/interface/dto.dart';
+import 'package:mind_base/src/interface/i_dto.dart';
 
 /// 创建指定[RecordMeta]对应的Record
 class RecordForm extends StatefulWidget {
