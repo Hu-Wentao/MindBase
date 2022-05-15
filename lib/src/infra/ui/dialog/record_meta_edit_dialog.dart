@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/infra/ui/form/meta_form.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
 import 'package:ndialog/ndialog.dart';
@@ -10,6 +11,7 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
   required GlobalKey<FormBuilderState> kMetaBuilder,
   required GlobalKey<FormBuilderState> kAttrBuilder,
   required GlobalKey<FormBuilderState> kMethodBuilder,
+  required QueryMetaFn? queryMetaFn,
 }) async =>
     await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: false),
@@ -37,6 +39,7 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
                   kMetaBuilder: kMetaBuilder,
                   kAttrBuilder: kAttrBuilder,
                   kMethodBuilder: kMethodBuilder,
+                  queryMetaFn: queryMetaFn,
                 );
                 Navigator.pop<RecordMetaDto>(context, dto);
               } else {
