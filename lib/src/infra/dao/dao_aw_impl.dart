@@ -1,5 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
+import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/infra/dto/dto_aw_impl.dart';
 import 'package:mind_base/src/interface/i_dao.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
@@ -129,11 +130,15 @@ class RecordEttAccessor extends BaseEttAccessor<RecordDto> {
   @override
   final String collectionId;
 
-  const RecordEttAccessor(Database db, String metaId)
+  // Record所在Workspace的Meta查询方法.
+  // 显然,在查询Record之前,应当先保存Workspace内所有的Meta,以供查询
+  final QueryMetaFn toMeta;
+
+  const RecordEttAccessor(Database db, String metaId, this.toMeta)
       : collectionId = metaId,
         super(db);
 
   @override
   RecordDto jsonToDto(Map<String, dynamic> json) =>
-      RecordDtoAppwriteX.fromJson(json);
+      RecordDtoAppwriteX.fromJson(json, toMeta);
 }

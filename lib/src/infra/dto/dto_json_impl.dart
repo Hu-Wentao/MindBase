@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:appwrite/appwrite.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
@@ -7,13 +8,15 @@ import 'package:mind_base/src/interface/i_dto.dart';
 /// Json实现
 
 extension RecordDtoJsonX on RecordDto {
-  static RecordDto fromJson(Map<String, dynamic> json) => RecordDto(
-      fields: Map.fromEntries(json.entries
-          .where((element) => element.value is Map<String, dynamic>)
-          .map((e) => MapEntry(
-                int.parse(e.key),
-                ValueJsonDtoJsonX.fromJson(e.value).toDomain() as Value,
-              ))));
+  static RecordDto fromJson(Map<String, dynamic> json, QueryMetaFn toMeta) =>
+      RecordDto(
+          fields: Map.fromEntries(json.entries
+              .where((element) => element.value is Map<String, dynamic>)
+              .map((e) => MapEntry(
+                    int.parse(e.key),
+                    ValueJsonDtoJsonX.fromJson(e.value).toDomain(toMeta)
+                        as Value,
+                  ))));
 
   Map<String, dynamic> toJson() => fields.map((key, value) =>
       MapEntry("$key", ValueJsonDto.fromDomain(value).toJson()));
@@ -64,7 +67,7 @@ extension AttributeDtoJsonX on AttributeDto {
         k: json['k'] as int,
         name: json['name'] as String,
         memo: json['memo'] as String,
-        type: AttrType.by(json['type'] as String),
+        type: AttrTypeDto.by(json['type'] as String),
       );
 
   toJson() => {
@@ -92,7 +95,7 @@ extension ExprJsonDtoJsonX on ExprJsonDto {
         ag: (json['ag'] as List<dynamic>)
             .map((e) => IExprJsonDtoJsonX.fromJson(e as Map<String, dynamic>))
             .toList(),
-        type: AttrType.by(json['type'] as String),
+        type: AttrTypeDto.by(json['type'] as String),
       );
 
   toJson() => {

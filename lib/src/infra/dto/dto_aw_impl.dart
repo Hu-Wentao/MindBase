@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/domain/value/value.dart';
@@ -30,7 +31,7 @@ extension ExprJsonDtoAppwriteX on ExprJsonDto {
             .map((e) =>
                 IExprJsonDtoAppwriteX.fromJson(e as Map<String, dynamic>))
             .toList(),
-        type: AttrType.by(json['type'] as String),
+        type: AttrTypeDto.by(json['type'] as String),
       );
 }
 
@@ -55,16 +56,19 @@ extension RecordDtoAppwriteX on RecordDto {
         ValueJsonDto.fromDomain(value).toJson(),
       ));
 
-  static RecordDto fromDocument(Document doc) => fromJson(doc.data);
+  static RecordDto fromDocument(Document doc, QueryMetaFn toMeta) =>
+      fromJson(doc.data, toMeta);
 
-  static RecordDto fromJson(Map<String, dynamic> json) => RecordDto(
+  static RecordDto fromJson(Map<String, dynamic> json, QueryMetaFn toMeta) =>
+      RecordDto(
           fields: Map.fromEntries(
         json.entries
             .where((element) => element.value is Map<String, dynamic>)
             .map(
               (e) => MapEntry(
                 int.parse(e.key),
-                ValueJsonDtoAppwriteX.fromJson(e.value).toDomain() as Value,
+                ValueJsonDtoAppwriteX.fromJson(e.value).toDomain(toMeta)
+                    as Value,
               ),
             ),
       ));
@@ -126,7 +130,7 @@ extension AttributeDtoAppwriteX on AttributeDto {
         k: jsonDecode(json['k']),
         name: json['name'] as String,
         memo: json['memo'] as String,
-        type: AttrType.by(json['type'] as String),
+        type: AttrTypeDto.by(json['type'] as String),
       );
 }
 

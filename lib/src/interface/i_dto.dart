@@ -186,10 +186,11 @@ class RecordMetaDto extends IEntityDto {
 
   RecordMeta toDm(
     Attribute Function(AttributeDto dto) attrToDm,
+    QueryMetaFn toMeta,
   ) =>
       toDomain(
         attrs.map(attrToDm).toList(),
-        methods.map((e) => e.toDomain()).toList(),
+        methods.map((e) => e.toDomain(toMeta)).toList(),
       );
 
   RecordMeta toDomain(List<Attribute> attrs, List<Method> methods) =>
@@ -263,11 +264,11 @@ class MethodDto extends IDto {
         expr: expr ?? this.expr,
       );
 
-  Method toDomain() => Method(
+  Method toDomain(QueryMetaFn toMeta) => Method(
         k: k,
         name: name,
         memo: memo,
-        expr: expr.toDomain(),
+        expr: expr.toDomain(toMeta),
       );
 
   @override
@@ -286,7 +287,7 @@ class AttributeDto extends IDto {
   int k;
   String name;
   String memo;
-  AttrType type;
+  AttrTypeDto type;
 
   AttributeDto({
     required this.k,
@@ -301,7 +302,7 @@ class AttributeDto extends IDto {
     int k = 0,
     String name = "",
     String memo = "",
-    AttrType type = AttrType.any,
+    AttrTypeDto type = AttrTypeDto.any,
   }) : this(
           k: k,
           name: name,
@@ -321,7 +322,7 @@ class AttributeDto extends IDto {
           k: attr.k,
           name: attr.name,
           memo: attr.memo,
-          type: attr.type,
+          type: attr.type.toDto(),
         );
 
   AttributeDto copyWith({
@@ -337,13 +338,13 @@ class AttributeDto extends IDto {
         type: type ?? this.type,
       );
 
-  Attribute toDm() => toDomain();
+  Attribute toDm(QueryMetaFn toMeta) => toDomain(toMeta);
 
-  Attribute toDomain() => Attribute(
+  Attribute toDomain(QueryMetaFn toMeta) => Attribute(
         k: k,
         name: name,
         memo: memo,
-        type: type,
+        type: type.toDomain(toMeta),
       );
 
   @override
@@ -369,7 +370,7 @@ abstract class IExprJsonDto extends IDto {
       return ExprJsonDto(
         fn: expr.fn.name,
         ag: expr.ag.map(IExprJsonDto.fromDomain).toList(),
-        type: expr.type,
+        type: expr.type.toDto(),
       );
     }
     throw Exception("不支持的IExpr类型[${expr.runtimeType}]");
@@ -378,12 +379,12 @@ abstract class IExprJsonDto extends IDto {
   /// 可视化的表达式字符串， 例如 foo('1', '2')
   String toReadableString();
 
-  IExpr toDomain() {
+  IExpr toDomain(QueryMetaFn? toMeta) {
     switch (runtimeType) {
       case ValueJsonDto:
         final dto = this as ValueJsonDto;
         final fn = IFunc.findAsFunc(dto.fn!);
-        var ag = dto.ag;
+        // var ag = dto.ag;
         // if ((fn is AsFuncRecord || fn is AsFuncRecordMeta) &&
         //     ag[0] is! ObjectId) {
         //   ag[0] = ObjectId.fromHexString(ag[0] as String);
@@ -393,8 +394,8 @@ abstract class IExprJsonDto extends IDto {
         final dto = (this as ExprJsonDto);
         return Expression(
           fn: IFunc.findBy(dto.fn!),
-          ag: dto.ag.map((e) => e.toDomain()).toList(),
-          type: dto.type!,
+          ag: dto.ag.map((e) => e.toDomain(toMeta)).toList(),
+          type: dto.type!.toDomain(toMeta!),
         );
       default:
         throw "IExpr::toDomain 未知的类型 [$runtimeType]";
@@ -424,7 +425,7 @@ class ExprJsonDto extends IExprJsonDto {
   @override
   List<IExprJsonDto> ag;
 
-  AttrType? type;
+  AttrTypeDto? type;
 
   ExprJsonDto({
     required this.fn,
@@ -441,7 +442,7 @@ class ExprJsonDto extends IExprJsonDto {
   factory ExprJsonDto.fromDomain(IExpr expr) => ExprJsonDto(
         fn: expr.fn.name,
         ag: expr.ag.map(IExprJsonDto.fromDomain).toList(),
-        type: expr.type,
+        type: expr.type.toDto(),
       );
 
   /// 可视化的函数表达式字符串
