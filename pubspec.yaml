@@ -58,19 +58,19 @@ dependencies:
   ndialog:
   #  data_table2:
   #  responsive_table:
-#  syncfusion_flutter_datagrid: "20.1.47"
+  #  syncfusion_flutter_datagrid: "20.1.47"
   freezed_annotation:
   petitparser:
   quiver:
   json_annotation: ">=4.4.0" # json_serializable 要求
   pluto_grid:
-#    git:
-#      url: https://github.com/Hu-Wentao/pluto_grid.git
-#      ref: refactor_move_manager_to_constructor
+  #    git:
+  #      url: https://github.com/Hu-Wentao/pluto_grid.git
+  #      ref: refactor_move_manager_to_constructor
   linked_scroll_controller: # pluto_grid 需要使用
   appwrite:
   flutter_svg:
-
+  bson:
 dev_dependencies:
   flutter_test:
     sdk: flutter
