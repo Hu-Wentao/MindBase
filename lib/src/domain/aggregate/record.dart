@@ -1,12 +1,13 @@
 part of 'aggregate.dart';
+
 /// 表 =========================================================================
 
 /// 记录
 /// 必须通过DTO转换 [RecordDto]
 /// fields[0] 始终为 [id]
-class Record implements IEtt<ObjectId> {
+class Record implements IEtt<String> {
   @override
-  final ObjectId id;
+  final String id;
   final RecordMeta meta; // Aggregate组装得到,实际只存储Id
   Map<int, Value> fields;
 
@@ -19,21 +20,18 @@ class Record implements IEtt<ObjectId> {
   });
 
   factory Record.of({
-    ObjectId? id,
+    String? id,
     required RecordMeta meta,
     required Map<int, Value> fields,
-  }) {
-    final recordId = id ?? ObjectId(clientMode: true);
-    return Record(
-      id: recordId,
-      meta: meta,
-      fields: {
-        0: Value.of(recordId.toHexString()),
-        1: Value.of(meta.id.toHexString()),
-      }..addAll(fields),
-    );
-  }
-
+  }) =>
+      Record(
+        id: id ??= ObjectIdX.createHex,
+        meta: meta,
+        fields: {
+          0: Value.of(id),
+          1: Value.of(meta.id),
+        }..addAll(fields),
+      );
 
   /// Value不存在时返回一个空Value
   Value getFieldByColumn(String name) =>
@@ -46,8 +44,8 @@ class Record implements IEtt<ObjectId> {
 
   Value getFieldBy(int attrKey, {Value Function(int k)? orElse}) =>
       tryGetFieldBy(attrKey) ??
-          orElse?.call(attrKey) ??
-          (throw "找不到attrKey: [$attrKey] 对应的Field");
+      orElse?.call(attrKey) ??
+      (throw "找不到attrKey: [$attrKey] 对应的Field");
 
   Value? tryGetFieldBy(int attrKey, {Value Function(int k)? orElse}) =>
       fields[attrKey] ?? orElse?.call(attrKey);
@@ -55,7 +53,7 @@ class Record implements IEtt<ObjectId> {
   Method? tryGetMethodBy(int methodKey, {Method Function(int k)? orElse}) =>
       methods.firstWhere((mth) => mth.k == methodKey,
           orElse: () =>
-          orElse?.call(methodKey) ??
+              orElse?.call(methodKey) ??
               (throw "找不到attrKey: [$methods] 对应的Method"));
 
   static ExpressionParser parser = ExpressionParser();
@@ -99,12 +97,12 @@ class Record implements IEtt<ObjectId> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Record &&
-              runtimeType == other.runtimeType &&
-              id == other.id &&
-              meta == other.meta &&
-              fields == other.fields &&
-              methods == other.methods;
+      other is Record &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          meta == other.meta &&
+          fields == other.fields &&
+          methods == other.methods;
 
   @override
   int get hashCode =>

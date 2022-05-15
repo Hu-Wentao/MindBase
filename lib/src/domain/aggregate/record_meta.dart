@@ -2,9 +2,9 @@ part of 'aggregate.dart';
 
 /// Meta信息
 /// 必须通过DTO转换 [RecordMetaDto]
-class RecordMeta implements IEtt<ObjectId> {
+class RecordMeta implements IEtt<String> {
   @override
-  final ObjectId id;
+  final String id;
   String name;
   String memo;
   int maxKey; // 等于Table中出现过key的数量, 用于新增Attr,只能增加
