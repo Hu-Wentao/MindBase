@@ -4,6 +4,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/application/expression_parser.dart';
 import 'package:mind_base/src/config/common_config.dart';
+import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
@@ -13,6 +14,7 @@ import 'package:ndialog/ndialog.dart';
 class MetaForm extends StatelessWidget {
   final bool isCreate;
   final RecordMetaDto origin;
+  final Iterable<RecordMeta> Function() allMetas;
   final GlobalKey<FormBuilderState> kMetaBuilder;
   final GlobalKey<FormBuilderState> kAttrBuilder;
   final GlobalKey<FormBuilderState> kMethodBuilder;
@@ -20,6 +22,7 @@ class MetaForm extends StatelessWidget {
   const MetaForm({
     Key? key,
     required this.isCreate,
+    required this.allMetas,
     required this.kMetaBuilder,
     required this.kAttrBuilder,
     required this.kMethodBuilder,
@@ -36,6 +39,7 @@ class MetaForm extends StatelessWidget {
           ),
           AttributeListForm.build(
             isCreate: isCreate,
+            allMetas: allMetas,
             kAttrBuilder: kAttrBuilder,
             origin: origin,
           ),
@@ -224,6 +228,7 @@ class AttributeListForm extends StatefulWidget {
   final bool isCreate; // true:表单将会新增一个待编辑的属性
   final int nextKey; // ::nextKey()
   final List<AttributeDto> originList;
+  final Iterable<RecordMeta> Function() allMetas;
 
   final GlobalKey<FormBuilderState>? kAttrBuilder;
 
@@ -231,10 +236,12 @@ class AttributeListForm extends StatefulWidget {
     Key? key,
     required isCreate,
     required RecordMetaDto origin,
+    required Iterable<RecordMeta> Function() allMetas,
     GlobalKey<FormBuilderState>? kAttrBuilder,
   }) =>
       AttributeListForm(
         isCreate: isCreate,
+        allMetas: allMetas,
         nextKey: origin.nextKey(),
         originList: origin.attrs,
         kAttrBuilder: kAttrBuilder,
@@ -244,6 +251,7 @@ class AttributeListForm extends StatefulWidget {
     Key? key,
     required this.isCreate,
     required this.originList,
+    required this.allMetas,
     required this.nextKey,
     this.kAttrBuilder,
   }) : super(key: key);
@@ -372,10 +380,10 @@ class _AttributeListFormState extends State<AttributeListForm> {
                         ),
                         initialValue: a.type.r,
                         // 注意: 必须为空,否则报错 https://github.com/danvick/flutter_form_builder/issues/220
-                        items: sl<WorkspaceDataHolder>()
+                        items: widget
                             .allMetas()
                             .map((e) => DropdownMenuItem<String>(
-                                  value: e.id.toHexString(),
+                                  value: e.id,
                                   child: Text(e.name),
                                 ))
                             .toList(),
