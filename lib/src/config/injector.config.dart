@@ -12,13 +12,14 @@ import 'package:mongo_dart/mongo_dart.dart' as _i11;
 
 import '../application.dart' as _i7;
 import '../application/service/account_service.dart' as _i4;
+import '../application/service/realtime_service.dart' as _i12;
 import '../application/service/workspace_service.dart' as _i10;
 import '../domain/repo/repo.dart' as _i9;
 import '../infra/dao/dao_aw_impl.dart' as _i8;
 import '../infra/mongo_storage.dart' as _i5;
-import 'app_client_config.dart' as _i12;
-import 'common_config.dart' as _i14;
-import 'mongo_config.dart' as _i13; // ignore_for_file: unnecessary_lambdas
+import 'app_client_config.dart' as _i13;
+import 'common_config.dart' as _i15;
+import 'mongo_config.dart' as _i14; // ignore_for_file: unnecessary_lambdas
 
 // ignore_for_file: lines_longer_than_80_chars
 /// initializes the registration of provided dependencies inside of [GetIt]
@@ -49,11 +50,13 @@ Future<_i1.GetIt> $initGetIt(_i1.GetIt get,
   await gh.factoryAsync<_i11.Db>(
       () => configMongo.getDb(get<_i5.IMongoStorage>()),
       preResolve: true);
+  gh.lazySingleton<_i12.RealTimeService>(
+      () => _i12.RealTimeService(get<_i3.Realtime>()));
   return get;
 }
 
-class _$AppClientConfig extends _i12.AppClientConfig {}
+class _$AppClientConfig extends _i13.AppClientConfig {}
 
-class _$ConfigMongo extends _i13.ConfigMongo {}
+class _$ConfigMongo extends _i14.ConfigMongo {}
 
-class _$ConfigCommon extends _i14.ConfigCommon {}
+class _$ConfigCommon extends _i15.ConfigCommon {}
