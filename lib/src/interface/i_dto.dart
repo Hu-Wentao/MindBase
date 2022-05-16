@@ -513,8 +513,7 @@ class WorkspaceDto extends IEntityDto {
   Workspace toDomain(RecordMeta Function(String metaId) toMeta) => Workspace(
       id: id,
       name: name,
-      metas: metas.map((e) => toMeta(e)).toList(),
-      records: {});
+      metas: metas.map((e) => toMeta(e)).toList());
 
   @override
   toJson() => throw UnimplementedError("使用Extension的方法");
