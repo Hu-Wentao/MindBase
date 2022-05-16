@@ -41,8 +41,8 @@ Future<_i1.GetIt> $initGetIt(_i1.GetIt get,
   gh.factory<_i3.Storage>(() => appClientConfig.storage);
   gh.factory<_i3.Teams>(() => appClientConfig.teams);
   gh.factory<_i8.WorkspaceEttAccessor>(() => appClientConfig.wsEttAcc);
-  gh.lazySingleton<_i9.WorkspaceRepo>(() => _i9.WorkspaceRepo(
-      get<_i8.WorkspaceEttAccessor>(), get<_i8.RecordMetaEttAccessor>()));
+  gh.lazySingleton<_i9.WorkspaceRepo>(() =>
+      _i9.WorkspaceRepo(get<_i3.Database>(), get<_i8.WorkspaceEttAccessor>()));
   gh.lazySingleton<_i10.WorkspaceService>(() => _i10.WorkspaceService(
       get<_i3.Teams>(),
       get<_i9.WorkspaceRepo>(),
