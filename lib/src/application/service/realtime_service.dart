@@ -48,7 +48,7 @@ class SubChannel {
   const SubChannel.watchMeta(String workspaceId) : this.collection(workspaceId);
 
   /// 监听一个Meta下所有Record的`增删改`事件
-  const SubChannel.watchDoc(String metaId) : this.collection(metaId);
+  const SubChannel.watchRecord(String metaId) : this.collection(metaId);
 
   //
   const SubChannel.team(String teamId) : this("$_teamsL1.$teamId");
