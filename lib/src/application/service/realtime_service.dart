@@ -36,27 +36,32 @@ class SubChannel {
   static const _documentsL2 = "documents";
   static const _filesL2 = "files";
 
-  final String channel;
+  final String tag; // 自定义标签
+  final String channel; // 用于订阅的channel字符串
 
-  const SubChannel(this.channel);
+  const SubChannel(this.channel, this.tag);
 
   // 监听某个集合(表)的增删改事件
-  const SubChannel.collection(String collectionId)
-      : this("$_collectionsL1.$collectionId.$_documentsL2");
+  const SubChannel.collection(String collectionId, {String tag = ''})
+      : this("$_collectionsL1.$collectionId.$_documentsL2", tag);
 
   /// 监听一个工作空间内所有Meta的`增删改`事件
-  const SubChannel.watchMeta(String workspaceId) : this.collection(workspaceId);
+  const SubChannel.watchMeta(String workspaceId, {String tag = ''})
+      : this.collection(workspaceId, tag: tag);
 
   /// 监听一个Meta下所有Record的`增删改`事件
-  const SubChannel.watchRecord(String metaId) : this.collection(metaId);
+  const SubChannel.watchRecord(String metaId, {String tag = ''})
+      : this.collection(metaId, tag: tag);
 
   //
-  const SubChannel.team(String teamId) : this("$_teamsL1.$teamId");
+  const SubChannel.team(String teamId, {String tag = ''})
+      : this("$_teamsL1.$teamId", tag);
 
   //
   // SubChannel.member(String teamId) : this("$_membershipsL1.$teamId");
   /// 监听指定团队的 `删改` 事件
-  const SubChannel.watchTeam(String teamId) : this.team(teamId);
+  const SubChannel.watchTeam(String teamId, {String tag = ''})
+      : this.team(teamId, tag: tag);
 }
 
 // class DocEventSubscription {
