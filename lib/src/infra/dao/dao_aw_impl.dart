@@ -61,7 +61,7 @@ abstract class BaseEttAccessor<T extends IEntityDto> implements IAccessor<T> {
   Future<Document> insert(T dto) async => await db.createDocument(
         collectionId: collectionId,
         documentId: dto.id,
-        data: dto.toJson(),
+        data: dtoToJson(dto),
       );
 
   // /// 如果已存在,
@@ -86,7 +86,7 @@ abstract class BaseEttAccessor<T extends IEntityDto> implements IAccessor<T> {
   Future<Document> replace(T dto) async => await db.updateDocument(
         collectionId: collectionId,
         documentId: dto.id,
-        data: dto.toJson(),
+        data: dtoToJson(dto),
       );
 
   @override
@@ -108,6 +108,10 @@ class WorkspaceEttAccessor extends BaseEttAccessor<WorkspaceDto> {
   @override
   WorkspaceDto jsonToDto(Map<String, Object?> js) =>
       WorkspaceDtoAppwriteX.fromJson(js);
+
+  @override
+  Map<String, dynamic> dtoToJson(WorkspaceDto dto) =>
+      WorkspaceDtoAppwriteX(dto).toJson();
 }
 
 /// 即Meta
@@ -126,6 +130,10 @@ class RecordMetaEttAccessor extends BaseEttAccessor<RecordMetaDto> {
   Stream<RecordMetaDto> findAllBy(String metaName) => findAll([
         "name.equal('$metaName')",
       ]);
+
+  @override
+  Map<String, dynamic> dtoToJson(RecordMetaDto dto) =>
+      RecordMetaDtoAppwriteX(dto).toJson();
 }
 
 class RecordEttAccessor extends BaseEttAccessor<RecordDto> {
@@ -143,4 +151,8 @@ class RecordEttAccessor extends BaseEttAccessor<RecordDto> {
   @override
   RecordDto jsonToDto(Map<String, dynamic> json) =>
       RecordDtoAppwriteX.fromJson(json, toMeta);
+
+  @override
+  Map<String, dynamic> dtoToJson(RecordDto dto) =>
+      RecordDtoAppwriteX(dto).toJson();
 }
