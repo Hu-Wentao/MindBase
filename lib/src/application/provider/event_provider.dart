@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:appwrite/appwrite.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/application/service/reailtime_service.dart';
+import 'package:mind_base/src/application/service/realtime_service.dart';
+import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
 abstract class Event {}
@@ -31,15 +33,48 @@ class EventProvider extends ProviderSidecar {
 
   Stream<Event> get eventStream => _streamController.stream;
 
+  actOnUserLogged() {
+    // todo
+    // actAddChannel(SubChannel.watchTeam());
+  }
+
+  actOnUserLogout() {
+    // todo
+  }
+
+  /// 打开某个工作空间
+  actOnOpenWorkspace(Workspace workspace) {
+    final tag = workspace.id;
+    actAddChannel(SubChannel.watchMeta(workspace.id, tag: tag));
+    for (var meta in workspace.metas) {
+      actAddChannel(SubChannel.watchRecord(meta.id, tag: tag));
+    }
+  }
+
+  actOnCloseWorkspace(Workspace workspace) {
+    final tag = workspace.id;
+    actRemoveChannelBy(tag);
+  }
+
   // 添加订阅
   actAddChannel(SubChannel channel) {
     _subChannels.add(channel);
-    _actUpdateChannels();
+    // 防抖
+    EasyDebounce.debounce('刷新订阅', const Duration(milliseconds: 500), () {
+      _actUpdateChannels();
+    });
   }
 
   // 移除订阅
   actRemoveChannel(SubChannel channel, {bool immediate = false}) {
     _readyRemoveChannels.add(channel);
+    if (immediate) {
+      _actUpdateChannels();
+    }
+  }
+
+  actRemoveChannelBy(String tag, {bool immediate = false}) {
+    _readyRemoveChannels.addAll(_subChannels.where((e) => e.tag == tag));
     if (immediate) {
       _actUpdateChannels();
     }
@@ -59,11 +94,9 @@ class EventProvider extends ProviderSidecar {
 
     // 订阅流绑定到Controller
     _streamController.addStream(
-      _cachedRealTimeSub!.stream.map(RealTimeEvt.new),
+      _cachedRealTimeSub!.stream.map(RealTimeEvt.new).doOnData((data) {
+        print("debug#收到消息: ${data.msg}");
+      }),
     );
-  }
-
-  actOnUserLogged() {
-    // todo
   }
 }
