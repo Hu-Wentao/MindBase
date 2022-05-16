@@ -95,6 +95,7 @@ class _RecordDataGridState extends State<RecordDataGrid> {
                 onSaveMeta: pWorkspace.actSaveMeta,
                 onSaveRecord: pWorkspace.actSaveRecord,
                 queryMetaFn: pWorkspace.workspace.queryMeta,
+                allMetas: pWorkspace.workspace.allMetas,
               ),
               // createFooter: (_) {             },
               // rowColorCallback: (_) {},
@@ -162,6 +163,7 @@ class DataFrameTitlePluto extends StatelessWidget {
   final kAttrBuilder = GlobalKey<FormBuilderState>();
   final kMethodBuilder = GlobalKey<FormBuilderState>();
   final QueryMetaFn? queryMetaFn;
+  final Iterable<RecordMeta> Function() allMetas;
 
   DataFrameTitlePluto({
     Key? key,
@@ -170,6 +172,7 @@ class DataFrameTitlePluto extends StatelessWidget {
     required this.onSaveMeta,
     required this.onSaveRecord,
     required this.queryMetaFn,
+    required this.allMetas,
   }) : super(key: key);
 
   @override
@@ -184,6 +187,7 @@ class DataFrameTitlePluto extends StatelessWidget {
                 kAttrBuilder: kAttrBuilder,
                 kMethodBuilder: kMethodBuilder,
                 queryMetaFn: queryMetaFn,
+                allMetas: allMetas,
               ),
             ),
             icon: const Icon(Icons.edit),

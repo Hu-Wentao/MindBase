@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/infra/ui/form/meta_form.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
@@ -12,6 +13,7 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
   required GlobalKey<FormBuilderState> kAttrBuilder,
   required GlobalKey<FormBuilderState> kMethodBuilder,
   required QueryMetaFn? queryMetaFn,
+  required Iterable<RecordMeta> Function() allMetas,
 }) async =>
     await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: false),
@@ -21,6 +23,7 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
       ),
       content: MetaForm(
         isCreate: originMeta == null,
+        allMetas: allMetas,
         kMetaBuilder: kMetaBuilder,
         kAttrBuilder: kAttrBuilder,
         kMethodBuilder: kMethodBuilder,
