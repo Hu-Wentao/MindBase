@@ -30,6 +30,8 @@ abstract class IAccessor<T extends IEntityDto> {
 
   T? jsonToDtoOr(Map<String, Object?>? mgJson);
 
+  Map<String, dynamic> dtoToJson(T dto);
+
   Future<T?> findById(String id);
 
   Stream<T> findAll();
