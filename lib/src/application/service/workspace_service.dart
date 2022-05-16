@@ -17,7 +17,10 @@ class WorkspaceService {
       this._teams, this._workspaceRepo, this._workspaceEttAcc);
 
   Future<Map<Team, List<Workspace>>> getWorkspaces(List<Team> teams) async {
-    final r = Map.fromIterables(teams, <List<Workspace>>[]);
+    final r = Map.fromIterables(
+      teams,
+      List.generate(teams.length, (index) => <Workspace>[]),
+    );
     for (final t in teams) {
       final w = await _workspaceRepo.findById(t.$id);
       if (w != null) {
