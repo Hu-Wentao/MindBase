@@ -22,8 +22,9 @@ abstract class BaseEttAccessor<T extends IEntityDto> implements IAccessor<T> {
       .then((e) => jsonToDtoOr(e.data));
 
   @override
-  Stream<T> findAll() async* {
-    final r = await db.listDocuments(collectionId: collectionId);
+  Stream<T> findAll([List<String>? queries]) async* {
+    final r =
+        await db.listDocuments(collectionId: collectionId, queries: queries);
     for (final e in r.documents) {
       yield jsonToDto(e.data);
     }
@@ -92,8 +93,9 @@ abstract class BaseEttAccessor<T extends IEntityDto> implements IAccessor<T> {
   Future deleteBy(String id) =>
       db.deleteDocument(collectionId: collectionId, documentId: id);
 
-// @override
-// Future<bool> drop() => db.dropCollection(collectionId);
+  // todo
+  @override
+  Future<bool> drop() => throw "需要Server Client";
 }
 
 /// 根据 Meta-v3.1C 实现
@@ -101,8 +103,7 @@ class WorkspaceEttAccessor extends BaseEttAccessor<WorkspaceDto> {
   @override
   final String collectionId;
 
-  const WorkspaceEttAccessor(Database db, this.collectionId)
-      : super(db);
+  const WorkspaceEttAccessor(Database db, this.collectionId) : super(db);
 
   @override
   WorkspaceDto jsonToDto(Map<String, Object?> js) =>
@@ -121,6 +122,10 @@ class RecordMetaEttAccessor extends BaseEttAccessor<RecordMetaDto> {
   @override
   RecordMetaDto jsonToDto(Map<String, Object?> mgJson) =>
       RecordMetaDtoAppwriteX.fromJson(mgJson);
+
+  Stream<RecordMetaDto> findAllBy(String metaName) => findAll([
+        "name.equal('$metaName')",
+      ]);
 }
 
 class RecordEttAccessor extends BaseEttAccessor<RecordDto> {
