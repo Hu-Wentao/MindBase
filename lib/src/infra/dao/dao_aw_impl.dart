@@ -7,6 +7,10 @@ import 'package:mind_base/src/interface/i_dto.dart';
 
 /// 适配Appwrite读写
 
+extension DocumentX on Document {
+  toFullJson() => data..['id'] = $id;
+}
+
 abstract class BaseEttAccessor<T extends IEntityDto> implements IAccessor<T> {
   final Database db;
 
@@ -19,14 +23,14 @@ abstract class BaseEttAccessor<T extends IEntityDto> implements IAccessor<T> {
   @override
   Future<T?> findById(String id) => db
       .getDocument(collectionId: collectionId, documentId: id)
-      .then((e) => jsonToDtoOr(e.data));
+      .then((e) => jsonToDtoOr(e.toFullJson()));
 
   @override
   Stream<T> findAll([List<String>? queries]) async* {
     final r =
         await db.listDocuments(collectionId: collectionId, queries: queries);
     for (final e in r.documents) {
-      yield jsonToDto(e.data);
+      yield jsonToDto(e.toFullJson());
     }
   }
 
