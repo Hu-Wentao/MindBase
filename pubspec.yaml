@@ -73,6 +73,7 @@ dependencies:
   bson:
   easy_debounce:
   dart_appwrite:
+  event_bus:
 dev_dependencies:
   flutter_test:
     sdk: flutter
