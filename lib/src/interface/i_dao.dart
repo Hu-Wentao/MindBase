@@ -40,6 +40,8 @@ abstract class IAccessor<T extends IEntityDto> {
 
   Future<Document> insert(T dto);
 
+  Future<Document> update(T dto);
+
   Future<Document> replace(T dto);
 
   /// 删除记录
