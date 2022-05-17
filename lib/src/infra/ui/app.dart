@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:form_builder_validators/localization/l10n.dart';
+import 'package:mind_base/src/application/provider/event_provider.dart';
 import 'package:mind_base/src/application/provider/user_provider.dart';
+import 'package:mind_base/src/application/provider/workspace_manager_provider.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/infra/ui/routes_config.gr.dart';
 import 'package:provider/provider.dart';
@@ -14,14 +16,25 @@ class MindBaseApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MultiProvider(
         providers: [
-          // ChangeNotifierProvider(
-          //     create: (_) => MetaProvider()..actInitializing()),
-          // ChangeNotifierProvider(
-          //     create: (_) => RecordProvider()..actInitializing()),
-          ChangeNotifierProvider(
-              create: (_) => WorkspaceProvider()..actInitializing()),
-          ChangeNotifierProvider(
-              create: (_) => UserProvider()..actInitializing()),
+          ChangeNotifierProvider<EventProvider>(
+            create: (_) => EventProvider()..actInitializing(),
+          ),
+          ChangeNotifierProxyProvider<EventProvider, UserProvider>(
+            create: (_) => UserProvider()..actInitializing(),
+            update: (_, e, pre) => pre!..actUpdate(e),
+          ),
+          ChangeNotifierProxyProvider2<EventProvider, UserProvider,
+                  WorkspaceManagerProvider>(
+              create: (_) => WorkspaceManagerProvider(null),
+              update: (c, e, u, pre) => pre!
+                ..actUpdate(u.user)),
+          ChangeNotifierProxyProvider2<EventProvider, WorkspaceManagerProvider,
+              WorkspaceProvider>(
+            create: (_) => WorkspaceProvider(null),
+            update: (c, e, wm, pre) =>
+                // fixme 固定选择首个工作空间
+                pre!..actInitializing(),
+          ),
         ],
         child: MaterialApp.router(
           routerDelegate: _router.delegate(),
