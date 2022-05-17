@@ -87,7 +87,7 @@ class WorkspaceProvider extends ProviderSidecar {
   }
 
   Future<List<RecordMetaDto>> actQueryMetaByName(String metaName) async =>
-      _metaAccessor.findAllBy(metaName).drain();
+      _metaAccessor.findAllBy(metaName).toList();
 
   void actRemoveMeta(String metaId) =>
       actWrapper(() => setInitialized("删除Meta [$metaId]", () async {
