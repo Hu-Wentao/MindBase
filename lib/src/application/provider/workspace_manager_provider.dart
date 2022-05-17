@@ -8,7 +8,7 @@ import 'package:mind_base/src/domain/exceptions/exceptions.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
 /// 管理用户名下的所有工作空间
-/// todo
+/// 包括对`已打开的的Workspace的数据同步工作`
 class WorkspaceManagerProvider extends ProviderSidecar {
   late WorkspaceService workspaceSrv;
 
@@ -78,18 +78,17 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   closeWorkspace(Workspace workspace) =>
       openedWorkspaces.removeWhere((element) => element.workspace == workspace);
 
-  // 打开工作空间, 并缓存
+  _openWorkspaceById(String workspaceId) => _openWorkspace(workspaces.values
+      .expand((element) => element)
+      .firstWhere((element) => element.id == workspaceId));
+
+  // `real` 打开工作空间, 并缓存
   _openWorkspace(Workspace workspace) {
-    final w = workspace.open();
+    final w = workspace.open(
+      sl<EventBus>().on<RealTimeEvt>(),
+    );
     openedWorkspaces.add(w);
     return w;
-  }
-
-  _openWorkspaceById(String workspaceId) {
-    final w = workspaces.values
-        .expand((element) => element)
-        .firstWhere((element) => element.id == workspaceId);
-    return _openWorkspace(w);
   }
 
   _isOpened(String workspaceId) =>
