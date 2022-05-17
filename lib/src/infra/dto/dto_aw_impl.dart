@@ -136,13 +136,14 @@ extension AttributeDtoAppwriteX on AttributeDto {
 
 extension WorkspaceDtoAppwriteX on WorkspaceDto {
   Map<String, dynamic> toJson() => {
-        'id': id,
+        // 'id': id, // 没有id属性
         'name': name,
         'metas': jsonEncode(metas),
       };
 
   static WorkspaceDto fromJson(Map<String, dynamic> json) => WorkspaceDto(
-        id: json['id'] as String,
+        // 因为Appwrite.data 没有id属性, 不过新增 `toFullJson`方法,再次注入了id属性
+        id: (json['id'] as String?) ?? '请注入ID或使用toFullJson',
         name: json['name'] as String,
         metas: ((jsonDecode(json['metas'] as String)) as List<dynamic>)
             .map((metaId) => metaId as String)
