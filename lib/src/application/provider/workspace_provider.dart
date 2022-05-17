@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/application/provider/workspace_manager_provider.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_source.dart';
@@ -15,19 +16,33 @@ class WorkspaceProvider extends ProviderSidecar {
 
   // <MetaId,Accessor>
   final Map<String, RecordEttAccessor> _recordAccessors = {};
-  final OpenedWorkspace workspace;
+  OpenedWorkspace? openedWorkspace;
 
-  WorkspaceProvider(this.workspace);
+  OpenedWorkspace get workspace => openedWorkspace!;
+
+  WorkspaceProvider(this.openedWorkspace);
 
   @override
   onInitializing() {
+    if (openedWorkspace == null) {
+      setUninitialized("尚未打开工作空间");
+      return;
+    }
     _metaAccessor =
         RecordMetaEttAccessor(sl<Database>(), workspace.workspace.id);
+    setInitialized("工作空间[${openedWorkspace!.workspace.id}]初始化完成");
   }
 
   RecordEttAccessor _recordAccessor(String metaId) =>
       _recordAccessors[metaId] ??= RecordEttAccessor(
           sl<Database>(), metaId, workspace.workspace.queryMeta);
+
+  actSelectWorkspace(WorkspaceManagerProvider pManager, String wsId) async {
+    setInitializing("正在打开工作空间[$wsId]");
+    final opendsWs = await pManager.getOpenedWorkspace(wsId);
+    openedWorkspace = opendsWs;
+    setInitialized("已打开工作空间[${opendsWs.workspace.name}:$wsId]");
+  }
 
   /// 业务逻辑-Meta ==============================================================
   /// MetaProvider
@@ -173,7 +188,6 @@ class WorkspaceProvider extends ProviderSidecar {
 
   List<Record> getCachedRecordsByMeta(String metaId) =>
       workspace.getRecords(metaId);
-
 //
 // Record getCachedRecordByIndex(String metaId, int index) =>
 //     getCachedRecordsByMeta(metaId)[index];
