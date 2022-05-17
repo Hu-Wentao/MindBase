@@ -54,8 +54,13 @@ class WorkspaceService {
       metas: [],
     );
     // 行级别的读写权限控制
-    final permit = ["team:${team.$id}"];
-    final r = await _workspaceEttAcc.insert(dto, read: permit, write: permit);
+    final readPermit = ["team:${team.$id}"]; // 团队成员可读
+    final writePermit = ["team:${team.$id}/owner"]; // 团队所有者可写(指`owner`可以更改工作空间名称等字段)
+    final r = await _workspaceEttAcc.insert(
+      dto,
+      read: readPermit,
+      write: writePermit,
+    );
     // print("debug #新建 Workspace成功$r");
     final ws = (await _workspaceRepo.findById(r.$id))!;
     return Tuple2(team, ws);
