@@ -47,7 +47,8 @@ class WorkspaceService {
       // roles: []
     );
     final dto = WorkspaceDto(
-      id: team.$id,
+      id: ObjectIdX.createHex,
+      teamId: team.$id,
       name: spaceName,
       metas: [],
     );
