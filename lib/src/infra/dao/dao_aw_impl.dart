@@ -76,6 +76,9 @@ abstract class BaseEttAccessor<T extends IEntityDto> implements IAccessor<T> {
         write: write,
       );
 
+  @override
+  Future<Document> update(T dto) => replace(dto);
+
   // /// 如果已存在,
   // Future<Document> save(String id, T dto) async {
   //   final exist = await findById(id);
