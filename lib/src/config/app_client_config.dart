@@ -9,7 +9,7 @@ const genUniqueId = 'unique()';
 abstract class AppClientConfig {
   @lazySingleton
   Client get client => Client()
-    ..setEndpoint("http://app.shuttlecloud.cn/v1")
+    ..setEndpoint("https://app.shuttlecloud.cn/v1")
     ..setProject("627f35455d30081f4a5c")
     ..setSelfSigned(status: true); // 可能只适用于dev环境
   @lazySingleton
