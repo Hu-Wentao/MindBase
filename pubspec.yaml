@@ -45,7 +45,7 @@ dependencies:
   provider:
   provider_sidecar:
     git:
-      url: https://github.com/Hu-Wentao/provider_sidecar.git
+      url: https://e.coding.net/shuttlecloud/company/provider_sidecar.git
       ref: v1.1
 
   # form

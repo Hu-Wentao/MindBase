@@ -868,8 +868,8 @@ packages:
     description:
       path: "."
       ref: "v1.1"
-      resolved-ref: "8dfea4af6f44d72a00671ad1a3e7cb007f9f24b7"
-      url: "https://github.com/Hu-Wentao/provider_sidecar.git"
+      resolved-ref: "88d15751faa081d3a92d74f315f7b0bc7ee298ef"
+      url: "https://e.coding.net/shuttlecloud/company/provider_sidecar.git"
     source: git
     version: "1.0.0"
   pub_semver:
