@@ -90,6 +90,17 @@ class UserProvider extends ProviderSidecar {
       user = await _accountService.getUser();
     }
     setInitialized("已登陆");
+    final rl = sl<Realtime>()
+      ..subscribe(const [
+        'account',
+        'collections',
+        'users',
+        'database',
+        'documents',
+        'documents.6283a01b62f3e884203e',
+      ]).stream.listen((event) {
+        print("debug realtime# event: ${event.event}, ${event.payload}");
+      });
     return null;
 
     // // 新建还是更新 nSession
