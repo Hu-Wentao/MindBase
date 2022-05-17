@@ -1,5 +1,7 @@
 import 'package:appwrite/models.dart';
+import 'package:event_bus/event_bus.dart';
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/application/provider/event_provider.dart';
 import 'package:mind_base/src/application/service/workspace_service.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/exceptions/exceptions.dart';
@@ -61,13 +63,14 @@ class WorkspaceManagerProvider extends ProviderSidecar {
       });
 
   /// 打开或返回已存在的OpenedWorkspace
-  actOpenWorkspace(Workspace workspace) => actOpenWorkspaceById(workspace.id);
+  // actOpenWorkspace(Workspace workspace) => actOpenWorkspaceById(workspace.id);
 
   actOpenWorkspaceById(String workspaceId) => actWrapper(() {
-        openedWorkspaces.firstWhere(
+        final ws = openedWorkspaces.firstWhere(
           (opened) => opened.workspace.id == workspaceId,
           orElse: () => _openWorkspaceById(workspaceId),
         );
+        sl<EventBus>().fire(WorkspaceOpenedEvt(ws.workspace));
         setInitialized("打开工作空间$workspaceId成功");
       });
 
@@ -88,6 +91,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
         .firstWhere((element) => element.id == workspaceId);
     return _openWorkspace(w);
   }
+
   _isOpened(String workspaceId) =>
       openedWorkspaces.any((element) => element.workspace.id == workspaceId);
 
@@ -97,11 +101,12 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   }
 
   getOpenedWorkspace(String workspaceId) async {
-    if(_isOpened(workspaceId)) {
-      return openedWorkspaces.firstWhere((element) => element.workspace.id == workspaceId);
-    }else{
+    if (_isOpened(workspaceId)) {
+      return openedWorkspaces
+          .firstWhere((element) => element.workspace.id == workspaceId);
+    } else {
       final err = await actOpenWorkspaceById(workspaceId);
-      if(err != null) {
+      if (err != null) {
         throw err;
       }
       return getOpenedWorkspace(workspaceId);
