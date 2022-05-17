@@ -26,7 +26,8 @@ class WorkspaceService {
     );
     for (final t in teams) {
       final w = await _workspaceRepo.findAllByTeam(t.$id).toList();
-      if (w.isEmpty) {
+      // print("debug workspaceList $w");
+      if (w.isNotEmpty) {
         r[t] ??= <Workspace>[];
         r[t]!.addAll(w);
       }
