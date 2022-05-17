@@ -58,10 +58,18 @@ abstract class BaseEttAccessor<T extends IEntityDto> implements IAccessor<T> {
 
   /// 当ObjectId已存在时,更新无效
   @override
-  Future<Document> insert(T dto) async => await db.createDocument(
+  Future<Document> insert(
+    T dto, {
+    // 记录级别的读写权限控制
+    List<String>? read,
+    List<String>? write,
+  }) async =>
+      await db.createDocument(
         collectionId: collectionId,
         documentId: dto.id,
         data: dtoToJson(dto),
+        read: read,
+        write: write,
       );
 
   // /// 如果已存在,
