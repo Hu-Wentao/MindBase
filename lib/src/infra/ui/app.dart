@@ -19,42 +19,42 @@ class MindBaseApp extends StatelessWidget {
           ChangeNotifierProvider<EventProvider>(
             create: (_) => EventProvider()..actInitializing(),
           ),
-          ChangeNotifierProxyProvider<EventProvider, UserProvider>(
+          ChangeNotifierProvider<UserProvider>(
             create: (_) => UserProvider()..actInitializing(),
-            update: (_, e, pre) => pre!..actUpdate(e),
           ),
-          ChangeNotifierProxyProvider2<EventProvider, UserProvider,
-                  WorkspaceManagerProvider>(
+          ChangeNotifierProxyProvider<UserProvider, WorkspaceManagerProvider>(
               create: (_) => WorkspaceManagerProvider(null),
-              update: (c, e, u, pre) => pre!
-                ..actUpdate(u.user)),
-          ChangeNotifierProxyProvider2<EventProvider, WorkspaceManagerProvider,
+              update: (c, u, pre) => pre!..actUpdate(u.user)),
+          ChangeNotifierProxyProvider<WorkspaceManagerProvider,
               WorkspaceProvider>(
             create: (_) => WorkspaceProvider(null),
-            update: (c, e, wm, pre) =>
+            update: (c, wm, pre) =>
                 // fixme 固定选择首个工作空间
                 pre!..actInitializing(),
           ),
         ],
-        child: MaterialApp.router(
-          routerDelegate: _router.delegate(),
-          routeInformationParser: _router.defaultRouteParser(),
-          title: 'Mind Base',
-          localizationsDelegates: const [
-            FormBuilderLocalizations.delegate,
-            ...GlobalMaterialLocalizations.delegates,
-          ],
-          supportedLocales: const [
-            Locale('zh', ''),
-            Locale('en', ''),
-            Locale('es', ''),
-            Locale('fa', ''),
-            Locale('fr', ''),
-            Locale('ja', ''),
-            Locale('pt', ''),
-            Locale('sk', ''),
-            Locale('pl', ''),
-          ],
+        child: Consumer<EventProvider>(
+          // 必须使用Consumer，否则无法获取到EventProvider
+          builder: (c, p, __) => MaterialApp.router(
+            routerDelegate: _router.delegate(),
+            routeInformationParser: _router.defaultRouteParser(),
+            title: 'Mind Base',
+            localizationsDelegates: const [
+              FormBuilderLocalizations.delegate,
+              ...GlobalMaterialLocalizations.delegates,
+            ],
+            supportedLocales: const [
+              Locale('zh', ''),
+              Locale('en', ''),
+              Locale('es', ''),
+              Locale('fa', ''),
+              Locale('fr', ''),
+              Locale('ja', ''),
+              Locale('pt', ''),
+              Locale('sk', ''),
+              Locale('pl', ''),
+            ],
+          ),
         ),
       );
 }
