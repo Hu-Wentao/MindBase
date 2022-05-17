@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1652724567;
+const int timestamp = 1652762132;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -103,7 +103,7 @@ const Map<String, Object> dependencies = <String, Object>{
   },
   'provider_sidecar': <String, Object>{
     'git': <String, Object>{
-      'url': r'https://github.com/Hu-Wentao/provider_sidecar.git',
+      'url': r'https://e.coding.net/shuttlecloud/company/provider_sidecar.git',
       'ref': r'v1.1',
     },
   },

@@ -232,6 +232,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.4"
+  dart_appwrite:
+    dependency: "direct main"
+    description:
+      name: dart_appwrite
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "4.0.2"
   dart_style:
     dependency: transitive
     description:

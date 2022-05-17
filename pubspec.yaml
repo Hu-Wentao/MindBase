@@ -72,6 +72,7 @@ dependencies:
   flutter_svg:
   bson:
   easy_debounce:
+  dart_appwrite:
 dev_dependencies:
   flutter_test:
     sdk: flutter
