@@ -2,10 +2,10 @@
 
 import 'dart:convert';
 
-import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/domain/value/value.dart';
+import 'package:mind_base/src/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
 
 extension ValueJsonDtoAppwriteX on ValueJsonDto {
@@ -76,26 +76,30 @@ extension RecordDtoAppwriteX on RecordDto {
 
 extension RecordMetaDtoAppwriteX on RecordMetaDto {
   toJson() => {
-        'id': id,
+        // 'id': id, // 存储时已擦除`id`,该值应当为空
         'name': name,
         'memo': memo,
         'maxKey': maxKey,
-        'attrs': jsonEncode(attrs.map((e) => e.toJson())),
-        'methods': jsonEncode(methods.map((e) => e.toJson())),
+        'attrs': jsonEncode(
+          attrs.map((e) => AttributeDtoAppwriteX(e).toJson()).toList(),
+        ),
+        'methods': jsonEncode(
+          methods.map((e) => MethodDtoAppwriteX(e).toJson()).toList(),
+        ),
       };
 
-  static RecordMetaDto fromDocument(Document doc) => fromJson(doc.data);
+  static RecordMetaDto fromDocument(Document doc) => fromJson(doc.toFullJson());
 
   static RecordMetaDto fromJson(Map<String, dynamic> json) => RecordMetaDto(
-        id: (json['id'] as String),
+        id: (json['id'] as String?) ?? '请注入id或使用toFullJson',
         name: json['name'] as String,
         memo: json['memo'] as String,
         maxKey: json['maxKey'] as int,
-        attrs: (jsonEncode(json['attrs'] as String) as List<dynamic>)
+        attrs: (jsonDecode(json['attrs'] as String) as List<dynamic>)
             .map((e) =>
                 AttributeDtoAppwriteX.fromJson(e as Map<String, dynamic>))
             .toList(),
-        methods: (jsonEncode(json['methods'] as String) as List<dynamic>)
+        methods: (jsonDecode(json['methods'] as String) as List<dynamic>)
             .map((e) => MethodDtoAppwriteX.fromJson(e as Map<String, dynamic>))
             .toList(),
       );
@@ -118,19 +122,35 @@ extension MethodDtoAppwriteX on MethodDto {
       );
 }
 
+extension AttrTypeDtoAppwriteX on AttrTypeDto {
+  toJson() => {
+        'tp': tp.name,
+        'r': r,
+      };
+
+  static AttrTypeDto fromJson(Map<String, dynamic> json) => AttrTypeDto(
+        AttrTp.values.byName(json['tp'] as String),
+        json['r'] as String?,
+      );
+
+  String toJsonStr() => jsonEncode(toJson());
+
+  static AttrTypeDto fromJsonStr(String json) => fromJson(jsonDecode(json));
+}
+
 extension AttributeDtoAppwriteX on AttributeDto {
   toJson() => {
         'k': jsonEncode(k),
         'name': name,
         'memo': memo,
-        'type': type.toString(),
+        'type': AttrTypeDtoAppwriteX(type).toJsonStr(),
       };
 
   static AttributeDto fromJson(Map<String, dynamic> json) => AttributeDto(
-        k: jsonDecode(json['k']),
+        k: jsonDecode(json['k']) as int,
         name: json['name'] as String,
         memo: json['memo'] as String,
-        type: AttrTypeDto.by(json['type'] as String),
+        type: AttrTypeDtoAppwriteX.fromJsonStr(json['type'] as String),
       );
 }
 
