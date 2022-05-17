@@ -1,6 +1,6 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/application/provider/event_provider.dart';
 import 'package:mind_base/src/application/service/account_service.dart';
 import 'package:mind_base/src/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/domain/value/value.dart';
@@ -22,7 +22,6 @@ class UserProvider extends ProviderSidecar {
 
   UserProvider() : super(onCatch: ExceptionAdapter.of);
 
-  actUpdate(EventProvider e) {}
 
   // 注册/登录
   Future<BaseException?> actAuthWith(
