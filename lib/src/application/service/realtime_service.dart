@@ -62,6 +62,9 @@ class SubChannel {
   /// 监听指定团队的 `删改` 事件
   const SubChannel.watchTeam(String teamId, {String tag = ''})
       : this.team(teamId, tag: tag);
+
+  @override
+  String toString() => 'SubChannel{tag: $tag, channel: $channel}';
 }
 
 // class DocEventSubscription {
