@@ -12,6 +12,7 @@ set slLogger(l) => _logger = l;
 @module
 abstract class ConfigCommon {
   // 注入Logger， 配置日志打印输出
+  @lazySingleton
   Logger logger(MindBaseConfig config) {
     Logger.root
       ..level = Level.CONFIG

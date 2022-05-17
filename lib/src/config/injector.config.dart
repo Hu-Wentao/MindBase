@@ -35,25 +35,26 @@ Future<_i1.GetIt> $initGetIt(_i1.GetIt get,
   final eventBusConfig = _$EventBusConfig();
   final configMongo = _$ConfigMongo();
   final configCommon = _$ConfigCommon();
-  gh.factory<_i3.Account>(() => appClientConfig.account);
-  gh.factory<_i4.Account>(() => appServerConfig.account);
+  gh.lazySingleton<_i3.Account>(() => appClientConfig.account);
+  gh.lazySingleton<_i4.Account>(() => appServerConfig.account);
   gh.lazySingleton<_i5.AccountService>(
       () => _i5.AccountService(get<_i3.Account>()));
-  gh.factory<_i3.Avatars>(() => appClientConfig.avatars);
-  gh.factory<_i4.Avatars>(() => appServerConfig.avatars);
-  gh.factory<_i3.Client>(() => appClientConfig.client);
-  gh.factory<_i4.Client>(() => appServerConfig.client);
-  gh.factory<_i3.Database>(() => appClientConfig.database);
-  gh.factory<_i4.Database>(() => appServerConfig.database);
-  gh.factory<_i6.EventBus>(() => eventBusConfig.eventBus);
+  gh.lazySingleton<_i3.Avatars>(() => appClientConfig.avatars);
+  gh.lazySingleton<_i4.Avatars>(() => appServerConfig.avatars);
+  gh.lazySingleton<_i3.Client>(() => appClientConfig.client);
+  gh.lazySingleton<_i4.Client>(() => appServerConfig.client);
+  gh.lazySingleton<_i3.Database>(() => appClientConfig.database);
+  gh.lazySingleton<_i4.Database>(() => appServerConfig.database);
+  gh.lazySingleton<_i6.EventBus>(() => eventBusConfig.eventBus);
   gh.factory<_i7.IMongoStorage>(() => configMongo.mongoStorage);
-  gh.factory<_i8.Logger>(() => configCommon.logger(get<_i9.MindBaseConfig>()));
-  gh.factory<_i3.Realtime>(() => appClientConfig.realtime);
-  gh.factory<_i3.Storage>(() => appClientConfig.storage);
-  gh.factory<_i4.Storage>(() => appServerConfig.storage);
-  gh.factory<_i3.Teams>(() => appClientConfig.teams);
-  gh.factory<_i4.Teams>(() => appServerConfig.teams);
-  gh.factory<_i10.WorkspaceEttAccessor>(() => appClientConfig.wsEttAcc);
+  gh.lazySingleton<_i8.Logger>(
+      () => configCommon.logger(get<_i9.MindBaseConfig>()));
+  gh.lazySingleton<_i3.Realtime>(() => appClientConfig.realtime);
+  gh.lazySingleton<_i3.Storage>(() => appClientConfig.storage);
+  gh.lazySingleton<_i4.Storage>(() => appServerConfig.storage);
+  gh.lazySingleton<_i3.Teams>(() => appClientConfig.teams);
+  gh.lazySingleton<_i4.Teams>(() => appServerConfig.teams);
+  gh.lazySingleton<_i10.WorkspaceEttAccessor>(() => appClientConfig.wsEttAcc);
   gh.lazySingleton<_i11.WorkspaceRepo>(() => _i11.WorkspaceRepo(
       get<_i3.Database>(), get<_i10.WorkspaceEttAccessor>()));
   gh.lazySingleton<_i12.WorkspaceService>(() => _i12.WorkspaceService(

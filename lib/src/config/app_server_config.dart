@@ -3,6 +3,7 @@ import 'package:dart_appwrite/dart_appwrite.dart';
 
 @module
 abstract class AppServerConfig {
+  @lazySingleton
   Client get client => Client()
     ..setEndpoint("http://app.shuttlecloud.cn/v1")
     ..setProject("627f35455d30081f4a5c")
@@ -11,13 +12,18 @@ abstract class AppServerConfig {
     ..setSelfSigned(status: true); // 可能只适用于dev环境
 
   // Register User
+  @lazySingleton
   Account get account => Account(sl<Client>());
 
+  @lazySingleton
   Teams get teams => Teams(sl<Client>());
 
+  @lazySingleton
   Database get database => Database(sl<Client>());
 
+  @lazySingleton
   Storage get storage => Storage(sl<Client>());
 
+  @lazySingleton
   Avatars get avatars => Avatars(sl<Client>());
 }
