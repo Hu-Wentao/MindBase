@@ -76,7 +76,8 @@ class RecordDto extends IEntityDto {
   Record? toDomainOr(RecordMeta? m) => m == null ? null : toDomain(m);
 
   @override
-  Map<String, dynamic> toJson() => throw UnimplementedError("请引用相关Extension");
+  Map<String, dynamic> toJson() =>
+      throw UnimplementedError("使用[$runtimeType]相关Extension的方法");
 }
 
 extension RecordMetaX on RecordMeta {
@@ -181,7 +182,8 @@ class RecordMetaDto extends IEntityDto {
       );
 
   @override
-  Map<String, dynamic> toJson() => throw UnimplementedError("使用相关Extension的方法");
+  Map<String, dynamic> toJson() =>
+      throw UnimplementedError("使用[$runtimeType]相关Extension的方法");
 
   RecordMeta toDm(QueryMetaFn toMeta) => toDomain(
         attrs.map((a) => a.toDomain(toMeta)).toList(),
@@ -197,6 +199,11 @@ class RecordMetaDto extends IEntityDto {
         attrs: attrs,
         methods: methods,
       );
+
+  @override
+  String toString() {
+    return 'RecordMetaDto{id: $id, name: $name, memo: $memo, maxKey: $maxKey, attrs: $attrs, methods: $methods}';
+  }
 }
 
 extension MethodX on Method {
@@ -270,7 +277,8 @@ class MethodDto extends IDto {
   String toString() => toJson().toString();
 
   @override
-  Map<String, dynamic> toJson() => throw UnimplementedError("使用相关Extension的方法");
+  Map<String, dynamic> toJson() =>
+      throw UnimplementedError("使用[$runtimeType]相关Extension的方法");
 }
 
 extension AttrbuteX on Attribute {
@@ -343,10 +351,13 @@ class AttributeDto extends IDto {
       );
 
   @override
-  String toString() => toJson().toString();
+  String toString() {
+    return 'AttributeDto{k: $k, name: $name, memo: $memo, type: $type}';
+  }
 
   @override
-  Map<String, dynamic> toJson() => throw UnimplementedError("使用相关Extension方法");
+  Map<String, dynamic> toJson() =>
+      throw UnimplementedError("使用[$runtimeType]相关Extension的方法");
 }
 
 abstract class IExprJsonDto extends IDto {
@@ -398,7 +409,8 @@ abstract class IExprJsonDto extends IDto {
   }
 
   @override
-  Map<String, dynamic> toJson() => throw UnimplementedError("使用相关Extension方法");
+  Map<String, dynamic> toJson() =>
+      throw UnimplementedError("使用[$runtimeType]相关Extension的方法");
 
   @override
   bool operator ==(Object other) =>
@@ -517,7 +529,7 @@ class WorkspaceDto extends IEntityDto {
       id: id, name: name, metas: metas.map((e) => toMeta(e)).toList());
 
   @override
-  toJson() => throw UnimplementedError("使用Extension的方法");
+  toJson() => throw UnimplementedError("使用[$runtimeType]相关Extension的方法");
 }
 
 extension AttrTypeX on AttrType {
