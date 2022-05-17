@@ -3,7 +3,7 @@ part of 'exceptions.dart';
 /// 异常适配器
 abstract class ExceptionAdapter {
   static BaseException of(dynamic e,[StackTrace? s]) {
-    print("ExceptionAdapter.of: ${e.runtimeType}# ${s?.toString()}");
+    print("ExceptionAdapter.of: ${e.runtimeType}# \n${s?.toString()}");
     switch (e.runtimeType) {
       case AppwriteException:
         return _adapterAppwriteException(e);
