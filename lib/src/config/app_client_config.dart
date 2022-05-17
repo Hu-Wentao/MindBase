@@ -12,21 +12,21 @@ abstract class AppClientConfig {
     ..setProject("627f35455d30081f4a5c")
     ..setSelfSigned(status: true); // 可能只适用于dev环境
   WorkspaceEttAccessor get wsEttAcc => WorkspaceEttAccessor(
-        database,
+        sl<Database>(),
         "627faa18b854b07aa9a8",
       );
 
   // Register User
-  Account get account => Account(client);
+  Account get account => Account(sl<Client>());
 
   // Subscribe to files channel
-  Realtime get realtime => Realtime(client);
+  Realtime get realtime => Realtime(sl<Client>());
 
-  Teams get teams => Teams(client);
+  Teams get teams => Teams(sl<Client>());
 
-  Database get database => Database(client);
+  Database get database => Database(sl<Client>());
 
-  Storage get storage => Storage(client);
+  Storage get storage => Storage(sl<Client>());
 
-  Avatars get avatars => Avatars(client);
+  Avatars get avatars => Avatars(sl<Client>());
 }
