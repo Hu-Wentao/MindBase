@@ -4,6 +4,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/application/provider/workspace_manager_provider.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
+import 'package:mind_base/src/domain/repo/repo.dart';
 import 'package:mind_base/src/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_source.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
@@ -12,7 +13,7 @@ import 'package:provider_sidecar/provider_sidecar.dart';
 /// 统一监听与处理工作空间内的所有数据
 /// todo 当前假定本数据库为一个工作空间
 class WorkspaceProvider extends ProviderSidecar {
-  late RecordMetaEttAccessor _metaAccessor;
+  late MetaDtoRepo _metaDtoRepo;
 
   // <MetaId,Accessor>
   final Map<String, RecordEttAccessor> _recordAccessors = {};
@@ -28,8 +29,7 @@ class WorkspaceProvider extends ProviderSidecar {
       setUninitialized("尚未打开工作空间");
       return;
     }
-    _metaAccessor =
-        RecordMetaEttAccessor(sl<Database>(), workspace.workspace.id);
+    _metaDtoRepo = MetaDtoRepo.withDI(sl, workspace.workspace.id);
     setInitialized("工作空间[${openedWorkspace!.workspace.id}]初始化完成");
   }
 
@@ -52,7 +52,7 @@ class WorkspaceProvider extends ProviderSidecar {
   // todo 考虑改成 MetaDto
   Future<void> actInsertMeta(RecordMeta meta) =>
       actWrapper(() => setInitialized("新增Meta [$meta]", () async {
-            await _metaAccessor.insert(meta.toDto());
+            await _metaDtoRepo.insert(meta.toDto());
           }));
 
   Future<void> actSaveMeta(RecordMetaDto? dto) =>
@@ -60,11 +60,11 @@ class WorkspaceProvider extends ProviderSidecar {
             if (dto == null) {
               return null;
             }
-            await _metaAccessor.insert(dto);
+            await _metaDtoRepo.update(dto);
           }));
 
   Future<RecordMetaDto?> actQueryMeta(String metaId) =>
-      _metaAccessor.findById(metaId);
+      _metaDtoRepo.findById(metaId);
 
   // 更新meta的指定Attr
   Future<void> actEditAttribute(
@@ -87,14 +87,14 @@ class WorkspaceProvider extends ProviderSidecar {
   }
 
   Future<List<RecordMetaDto>> actQueryMetaByName(String metaName) async =>
-      _metaAccessor.findAllBy(metaName).toList();
+      _metaDtoRepo.findAllBy(metaName).toList();
 
   void actRemoveMeta(String metaId) =>
       actWrapper(() => setInitialized("删除Meta [$metaId]", () async {
             // 取消meta的监听
             actWatchMeta(null);
             // 从数据库中删除 Meta记录
-            await _metaAccessor.deleteBy(metaId);
+            await _metaDtoRepo.deleteBy(metaId);
             // 从数据库中删除 Meta对应的Record集合
             await _recordAccessor(metaId).drop();
           }));
