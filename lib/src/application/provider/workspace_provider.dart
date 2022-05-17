@@ -41,7 +41,7 @@ class WorkspaceProvider extends ProviderSidecar {
     setInitializing("正在打开工作空间[$wsId]");
     final opendsWs = await pManager.getOpenedWorkspace(wsId);
     openedWorkspace = opendsWs;
-    setInitialized("已打开工作空间[${opendsWs.workspace.name}:$wsId]");
+    setInitialized("已打开工作空间[${opendsWs.workspace.name}],ID[$wsId]");
   }
 
   /// 业务逻辑-Meta ==============================================================
