@@ -39,7 +39,7 @@ dependencies:
     git:
       url: https://github.com/GetArch/get_arch_core.git
       ref: v3.0
-  mongo_dart:
+#  mongo_dart:
   logging:
   # provider
   provider:
@@ -68,7 +68,7 @@ dependencies:
   #      url: https://github.com/Hu-Wentao/pluto_grid.git
   #      ref: refactor_move_manager_to_constructor
   linked_scroll_controller: # pluto_grid 需要使用
-  appwrite:
+  appwrite: 4.0.2
   flutter_svg:
   bson:
   easy_debounce:

@@ -5,7 +5,6 @@ import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mind_base/src/interface/expression_dto.dart';
-import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 
 const exprToDomain = ExprDtoToDomain(
   memberAccessors: [MetaMemberAccessor()],

@@ -9,7 +9,6 @@ import 'package:mind_base/src/infra/ui/dialog/confirm_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_edit_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
-import 'package:mongo_dart/mongo_dart.dart' show String;
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:provider/provider.dart';
 

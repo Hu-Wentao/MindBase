@@ -71,13 +71,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.2.3"
-  basic_utils:
-    dependency: transitive
-    description:
-      name: basic_utils
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "3.9.4"
   boolean_selector:
     dependency: transitive
     description:
@@ -92,13 +85,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.4"
-  buffer:
-    dependency: transitive
-    description:
-      name: buffer
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.1.1"
   build:
     dependency: transitive
     description:
@@ -667,20 +653,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.2"
-  mongo_dart:
-    dependency: "direct main"
-    description:
-      name: mongo_dart
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.7.4+1"
-  mongo_dart_query:
-    dependency: transitive
-    description:
-      name: mongo_dart_query
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.0.2"
   ndialog:
     dependency: "direct main"
     description:
@@ -814,13 +786,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.0.6"
-  pedantic:
-    dependency: transitive
-    description:
-      name: pedantic
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.11.1"
   petitparser:
     dependency: "direct main"
     description:
@@ -849,13 +814,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.9.3"
-  pointycastle:
-    dependency: transitive
-    description:
-      name: pointycastle
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "3.6.0"
   pool:
     dependency: transitive
     description:
@@ -928,20 +886,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.27.3"
-  sasl_scram:
-    dependency: transitive
-    description:
-      name: sasl_scram
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.1.0"
-  saslprep:
-    dependency: transitive
-    description:
-      name: saslprep
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.0.2"
   shelf:
     dependency: transitive
     description:
@@ -1066,13 +1010,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.0.4"
-  unorm_dart:
-    dependency: transitive
-    description:
-      name: unorm_dart
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.2.0"
   uuid:
     dependency: transitive
     description:
@@ -1087,13 +1024,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.1.1"
-  vy_string_utils:
-    dependency: transitive
-    description:
-      name: vy_string_utils
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.4.3"
   watcher:
     dependency: transitive
     description:

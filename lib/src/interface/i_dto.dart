@@ -7,7 +7,6 @@ import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mind_base/src/infra/dto/dto_json_impl.dart'
     show IExprJsonDtoJsonX;
-import 'package:mongo_dart/mongo_dart.dart' show String;
 import 'package:quiver/core.dart' as quiver;
 
 /// 实体类对应的Dto需要实现本类, 并添加`_id`字段/get方法
