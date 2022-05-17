@@ -1,8 +1,6 @@
 import 'dart:convert';
 
-import 'package:appwrite/appwrite.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
-import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
 
 /// Json实现
@@ -122,6 +120,7 @@ extension WorkspaceDtoJsonX on WorkspaceDto {
         name: json['name'] as String,
         metas:
             (json['metas'] as List<dynamic>).map((e) => e as String).toList(),
+        teamId: json['teamId'] as String,
       );
 
   Map<String, dynamic> toJson() => {

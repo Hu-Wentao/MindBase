@@ -137,6 +137,7 @@ extension AttributeDtoAppwriteX on AttributeDto {
 extension WorkspaceDtoAppwriteX on WorkspaceDto {
   Map<String, dynamic> toJson() => {
         // 'id': id, // 没有id属性
+        'teamId': teamId,
         'name': name,
         'metas': jsonEncode(metas),
       };
@@ -148,5 +149,6 @@ extension WorkspaceDtoAppwriteX on WorkspaceDto {
         metas: ((jsonDecode(json['metas'] as String)) as List<dynamic>)
             .map((metaId) => metaId as String)
             .toList(),
+        teamId: json['teamId'] as String,
       );
 }

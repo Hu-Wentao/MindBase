@@ -496,24 +496,25 @@ class WorkspaceDto extends IEntityDto {
   @override
   String id;
   String name;
+  String teamId;
   List<String> metas;
 
   WorkspaceDto({
     required this.id,
+    required this.teamId,
     required this.name,
     required this.metas,
   });
 
   WorkspaceDto.builder({
     this.id = '',
+    this.teamId = '',
     this.name = '',
     this.metas = const [],
   });
 
   Workspace toDomain(RecordMeta Function(String metaId) toMeta) => Workspace(
-      id: id,
-      name: name,
-      metas: metas.map((e) => toMeta(e)).toList());
+      id: id, name: name, metas: metas.map((e) => toMeta(e)).toList());
 
   @override
   toJson() => throw UnimplementedError("使用Extension的方法");
