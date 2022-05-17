@@ -1,5 +1,6 @@
 import 'package:adaptive_navigation/adaptive_navigation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:mind_base/src/application/provider/user_provider.dart';
@@ -7,6 +8,7 @@ import 'package:mind_base/src/application/provider/workspace_manager_provider.da
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/infra/ui/dialog/auth_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/confirm_dialog.dart';
+import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
 import 'package:mind_base/src/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/infra/ui/widget/RadiusInkWell.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_grid.dart';
@@ -211,8 +213,17 @@ class WorkspaceSelectorTitle extends StatelessWidget {
       );
 }
 
-class WorkspaceScreen extends StatelessWidget {
+class WorkspaceScreen extends StatefulWidget {
   const WorkspaceScreen({Key? key}) : super(key: key);
+
+  @override
+  State<WorkspaceScreen> createState() => _WorkspaceScreenState();
+}
+
+class _WorkspaceScreenState extends State<WorkspaceScreen> {
+  final _kMetaBuilder = GlobalKey<FormBuilderState>();
+  final _kAttrBuilder = GlobalKey<FormBuilderState>();
+  final _kMethodBuilder = GlobalKey<FormBuilderState>();
 
   @override
   Widget build(BuildContext context) =>
@@ -239,17 +250,42 @@ class WorkspaceScreen extends StatelessWidget {
   }
 
   /// 工作空间内容
-  _buildWorkspaceDetail(context, pWorkspace) => Row(
+  _buildWorkspaceDetail(context, WorkspaceProvider pWorkspace) => Row(
         children: [
           /// 左侧Meta List
           SizedBox(
             width: 200,
-            child: ListView.builder(
-              itemCount: pWorkspace.metaList.length,
-              itemBuilder: (c, i) => ListTile(
-                title: Text(pWorkspace.metaList[i].name),
-                onTap: () => pWorkspace.actWatchMeta(pWorkspace.metaList[i]),
-              ),
+            child: Stack(
+              children: [
+                ListView.builder(
+                  itemCount: pWorkspace.metaList.length,
+                  itemBuilder: (c, i) => ListTile(
+                    title: Text(pWorkspace.metaList[i].name),
+                    onTap: () =>
+                        pWorkspace.actWatchMeta(pWorkspace.metaList[i]),
+                  ),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ListTile(
+                      title: const Text("新建一个表"),
+                      trailing: const Icon(Icons.add),
+                      onTap: () async {
+                        await pWorkspace
+                            .actSaveMeta(await showRecordMetaEditDialog(
+                          context: context,
+                          kAttrBuilder: _kAttrBuilder,
+                          kMetaBuilder: _kMetaBuilder,
+                          kMethodBuilder: _kMethodBuilder,
+                          queryMetaFn: pWorkspace.workspace.queryMeta,
+                          allMetas: pWorkspace.workspace.allMetas,
+                        ));
+                      },
+                    ),
+                  ],
+                )
+              ],
             ),
           ),
 
