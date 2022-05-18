@@ -91,20 +91,28 @@ extension RecordMetaDtoAppwriteX on RecordMetaDto {
 
   static RecordMetaDto fromDocument(Document doc) => fromJson(doc.toFullJson());
 
-  static RecordMetaDto fromJson(Map<String, dynamic> json) => RecordMetaDto(
-        id: (json['id'] as String?) ?? '请注入id或使用toFullJson',
-        name: json['name'] as String,
-        memo: json['memo'] as String,
-        maxKey: json['maxKey'] as int,
-        attrs: (jsonDecode((json['attrs'] as String?) ?? '') as List<dynamic>)
-            .map((e) =>
-                AttributeDtoAppwriteX.fromJson(e as Map<String, dynamic>))
-            .toList(),
-        methods: (jsonDecode((json['methods'] as String?) ?? '')
-                as List<dynamic>)
-            .map((e) => MethodDtoAppwriteX.fromJson(e as Map<String, dynamic>))
-            .toList(),
-      );
+  static RecordMetaDto fromJson(Map<String, dynamic> json) {
+    final a = json['attrs'] as String? ?? '';
+    final m = json['methods'] as String? ?? '';
+    return RecordMetaDto(
+      id: (json['id'] as String?) ?? '请注入id或使用toFullJson',
+      name: json['name'] as String,
+      memo: json['memo'] as String,
+      maxKey: json['maxKey'] as int,
+      attrs: a.isEmpty
+          ? []
+          : (jsonDecode(a) as List<dynamic>)
+              .map((e) =>
+                  AttributeDtoAppwriteX.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      methods: m.isEmpty
+          ? []
+          : (jsonDecode(m) as List<dynamic>)
+              .map(
+                  (e) => MethodDtoAppwriteX.fromJson(e as Map<String, dynamic>))
+              .toList(),
+    );
+  }
 }
 
 extension MethodDtoAppwriteX on MethodDto {
