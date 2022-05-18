@@ -7,6 +7,7 @@ import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/application/service/realtime_service.dart';
 import 'package:mind_base/src/application/service/workspace_service.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
+import 'package:mind_base/src/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
@@ -130,7 +131,7 @@ class EventProvider extends ProviderSidecar {
             onError: _ignoreCollectionNotFoundE,
           );
 
-  static void _ignoreCollectionNotFoundE(dynamic e) {
+  static void _ignoreCollectionNotFoundE(dynamic e, [dynamic s]) {
     if (e is AppwriteException &&
         e.code == 404 &&
         e.type == "collection_not_found") {
@@ -138,7 +139,7 @@ class EventProvider extends ProviderSidecar {
       return;
     } else {
       // 如果不是这种情况,则确实需要抛出异常
-      throw e;
+      throw ExceptionAdapter.of(e, s);
     }
   }
 
