@@ -67,6 +67,7 @@ extension RecordDtoAppwriteX on RecordDto {
             .map(
               (e) => MapEntry(
                 int.parse(e.key),
+                // fixme #324 因为这里已经确认是ValueJsonDto, 对于Value, 其toDomain是不需要的 `toMeta`的,这里的传参可以移除;
                 ValueJsonDtoAppwriteX.fromJson(e.value).toDomain(toMeta)
                     as Value,
               ),
@@ -95,11 +96,12 @@ extension RecordMetaDtoAppwriteX on RecordMetaDto {
         name: json['name'] as String,
         memo: json['memo'] as String,
         maxKey: json['maxKey'] as int,
-        attrs: (jsonDecode(json['attrs'] as String) as List<dynamic>)
+        attrs: (jsonDecode((json['attrs'] as String?) ?? '') as List<dynamic>)
             .map((e) =>
                 AttributeDtoAppwriteX.fromJson(e as Map<String, dynamic>))
             .toList(),
-        methods: (jsonDecode(json['methods'] as String) as List<dynamic>)
+        methods: (jsonDecode((json['methods'] as String) ?? '')
+                as List<dynamic>)
             .map((e) => MethodDtoAppwriteX.fromJson(e as Map<String, dynamic>))
             .toList(),
       );
