@@ -55,8 +55,8 @@ class WorkspaceProvider extends ProviderSidecar {
             await _metaDtoRepo.insert(meta.toDto());
           }));
 
-  Future<void> actSaveMeta(RecordMetaDto? dto) =>
-      actWrapper(() => setInitialized("保存元素 [$dto]", () async {
+  Future<BaseException?> actSaveMeta(RecordMetaDto? dto) async =>
+      await actWrapper(() => setInitialized("保存元素 [$dto]", () async {
             if (dto == null) {
               return null;
             }
@@ -67,12 +67,12 @@ class WorkspaceProvider extends ProviderSidecar {
       _metaDtoRepo.findById(metaId);
 
   // 更新meta的指定Attr
-  Future<void> actEditAttribute(
+  Future<BaseException?> actEditAttribute(
     RecordMetaDto metaDto,
     AttributeDto? attr,
   ) async {
     if (attr == null) {
-      return;
+      return null;
     }
     print("debug 更新meta的指定Attr [$metaDto] [$attr]");
     // todo 后期改为update
