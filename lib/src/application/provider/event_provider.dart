@@ -33,8 +33,8 @@ class RealTimeEvt extends Event {
 class EventProvider extends ProviderSidecar {
   late EventBus eventBus;
   late RealTimeService _realtimeService;
-  final List<SubChannel> _subChannels = [];
-  final List<SubChannel> _readyRemoveChannels = [];
+  final Set<SubChannel> _subChannels = {};
+  final Set<SubChannel> _readyRemoveChannels = {};
   RealtimeSubscription? _cachedRealTimeSub;
 
   @override
@@ -78,7 +78,7 @@ class EventProvider extends ProviderSidecar {
     actRemoveChannelBy(tag);
   }
 
-  // 添加订阅
+  // 添加订阅并择时刷新
   actAddChannel(SubChannel channel) {
     _subChannels.add(channel);
     // 防抖
@@ -113,7 +113,7 @@ class EventProvider extends ProviderSidecar {
 
     // 关闭原有订阅, 重新订阅新的频道
     _cachedRealTimeSub?.close;
-    _cachedRealTimeSub = _realtimeService.sub(_subChannels);
+    _cachedRealTimeSub = _realtimeService.sub(_subChannels.toList());
 
     // 订阅流绑定到Controller
 
