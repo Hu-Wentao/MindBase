@@ -53,6 +53,7 @@ _i1.GetIt $initGetIt(_i1.GetIt get,
   gh.lazySingleton<_i10.WorkspaceRepo>(() =>
       _i10.WorkspaceRepo(get<_i3.Database>(), get<_i9.WorkspaceEttAccessor>()));
   gh.lazySingleton<_i11.WorkspaceService>(() => _i11.WorkspaceService(
+      get<_i3.Database>(),
       get<_i3.Teams>(),
       get<_i10.WorkspaceRepo>(),
       get<_i9.WorkspaceEttAccessor>()));

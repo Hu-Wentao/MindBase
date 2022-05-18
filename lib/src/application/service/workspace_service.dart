@@ -10,13 +10,31 @@ import 'package:mind_base/src/interface/i_dto.dart';
 @lazySingleton
 class WorkspaceService {
   final Teams _teams;
+  final Database _db;
   final WorkspaceRepo _workspaceRepo;
 
   // 全局唯一的集合,已经注入在容器中,可以直接依赖
   final WorkspaceEttAccessor _workspaceEttAcc;
 
   const WorkspaceService(
-      this._teams, this._workspaceRepo, this._workspaceEttAcc);
+    this._db,
+    this._teams,
+    this._workspaceRepo,
+    this._workspaceEttAcc,
+  );
+
+  RecordMetaEttAccessor _getMetaAcc(String workspaceId) =>
+      RecordMetaEttAccessor(_db, workspaceId);
+
+  RecordEttAccessor _getRecordAcc(Workspace ws, String meatId) =>
+      RecordEttAccessor(_db, meatId, ws.queryMeta);
+
+  /// 查询一个工作空间内的所有Meta
+  Stream<RecordMetaDto> queryMetasBy(String workspaceId) =>
+      _getMetaAcc(workspaceId).findAll();
+
+  Stream<RecordDto> queryRecordsBy(Workspace workspace, String metaId) =>
+      _getRecordAcc(workspace, metaId).findAll();
 
   // 查询用户名下所有team,以及team对应的工作空间列表
   Future<Map<Team, List<Workspace>>> queryWorkspacesBy(List<Team> teams) async {
