@@ -19,7 +19,7 @@ class WorkspaceService {
       this._teams, this._workspaceRepo, this._workspaceEttAcc);
 
   // 查询用户名下所有team,以及team对应的工作空间列表
-  Future<Map<Team, List<Workspace>>> getWorkspaces(List<Team> teams) async {
+  Future<Map<Team, List<Workspace>>> queryWorkspacesBy(List<Team> teams) async {
     final r = Map.fromIterables(
       teams,
       List.generate(teams.length, (index) => <Workspace>[]),
@@ -35,7 +35,11 @@ class WorkspaceService {
     return r;
   }
 
-  Future<List<Team>> allTeams() async => (await _teams.list()).teams;
+  /// 获取用户的所有Team
+  Future<List<Team>> queryAllUserTeams() async => (await _teams.list()).teams;
+
+  Future<Map<Team, List<Workspace>>> queryAllUserWorkspaces() async =>
+      queryWorkspacesBy(await queryAllUserTeams());
 
   /// 创建团队工作空间(没有团队的话将会自动创建团队)
   Future<Tuple2<Team, Workspace>> createWorkspace(
@@ -55,7 +59,9 @@ class WorkspaceService {
     );
     // 行级别的读写权限控制
     final readPermit = ["team:${team.$id}"]; // 团队成员可读
-    final writePermit = ["team:${team.$id}/owner"]; // 团队所有者可写(指`owner`可以更改工作空间名称等字段)
+    final writePermit = [
+      "team:${team.$id}/owner"
+    ]; // 团队所有者可写(指`owner`可以更改工作空间名称等字段)
     final r = await _workspaceEttAcc.insert(
       dto,
       read: readPermit,

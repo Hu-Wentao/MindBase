@@ -10,7 +10,8 @@ import 'package:provider_sidecar/provider_sidecar.dart';
 /// 管理用户名下的所有工作空间
 /// 包括对`已打开的的Workspace的数据同步工作`
 class WorkspaceManagerProvider extends ProviderSidecar {
-  late WorkspaceService workspaceSrv;
+  late EventBus _eventBus;
+  late WorkspaceService _workspaceSrv;
 
   // 父级状态
   User? user;
@@ -29,15 +30,23 @@ class WorkspaceManagerProvider extends ProviderSidecar {
       setUninitialized("尚未登录");
       return;
     }
-    workspaceSrv = sl<WorkspaceService>();
-    // realTimeSrv = sl<RealTimeService>();
-    // 同步当前用户的工作空间 等
-    final teams = await workspaceSrv.allTeams();
-    workspaces = await (workspaceSrv.getWorkspaces(teams));
-    // print("teams: ${teams.map((e) => e.toMap())}");
-    // print("workspaces: $workspaces");
+    //
+    _workspaceSrv = sl<WorkspaceService>();
+    _eventBus = sl<EventBus>();
+    //
+    _initEventBus();
+    _initWorkspaces();
     setInitialized("工作空间同步完成");
   }
+
+  _initEventBus() => _eventBus
+    ..on<WorkspaceOpenedEvt>().listen((event) {
+      // 获取数据
+    });
+
+  // 同步当前用户的工作空间 等
+  _initWorkspaces() async => workspaces =
+      await (_workspaceSrv.queryAllUserWorkspaces());
 
   actUpdate(User? nUser) {
     // print("actUpdate user: $nUser, judge: ${nUser != user}; ${nUser == null}");
@@ -57,7 +66,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
     String spaceName,
   ) async =>
       await actWrapper(() async {
-        final r = await workspaceSrv.createWorkspace(team, spaceName);
+        final r = await _workspaceSrv.createWorkspace(team, spaceName);
         _addWorkspace(r.value1, r.value2);
         setInitialized("创建工作空间成功");
       });
@@ -66,21 +75,25 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   // actOpenWorkspace(Workspace workspace) => actOpenWorkspaceById(workspace.id);
 
   actOpenWorkspaceById(String workspaceId) => actWrapper(() {
-        final ws = openedWorkspaces.firstWhere(
+        openedWorkspaces.firstWhere(
           (opened) => opened.workspace.id == workspaceId,
           orElse: () => _openWorkspaceById(workspaceId),
         );
-        sl<EventBus>().fire(WorkspaceOpenedEvt(ws.workspace));
-        setInitialized("打开工作空间$workspaceId成功");
+        setInitialized("打开工作空间[$workspaceId]成功");
       });
 
   /// 关闭工作空间
   closeWorkspace(Workspace workspace) =>
       openedWorkspaces.removeWhere((element) => element.workspace == workspace);
 
-  _openWorkspaceById(String workspaceId) => _openWorkspace(workspaces.values
-      .expand((element) => element)
-      .firstWhere((element) => element.id == workspaceId));
+  _openWorkspaceById(String workspaceId) {
+    final ws = _openWorkspace(workspaces.values
+        .expand((element) => element)
+        .firstWhere((element) => element.id == workspaceId));
+    // 首次打开,发送事件
+    _eventBus.fire(WorkspaceOpenedEvt(ws.workspace));
+    return ws;
+  }
 
   // `real` 打开工作空间, 并缓存
   _openWorkspace(Workspace workspace) {
