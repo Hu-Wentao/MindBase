@@ -13,15 +13,46 @@ class UserProvider extends ProviderSidecar {
   User? user;
   Session? cachedSession;
 
-  bool get isLogged => user != null && cachedSession != null;
+  bool get isLogged => user != null;
+
+  // bool get isLogged => user != null && cachedSession != null;
 
   @override
-  onInitializing() {
+  onInitializing() async {
     _accountService = sl<AccountService>();
+    _tryRecoveryUser();
   }
 
   UserProvider() : super(onCatch: ExceptionAdapter.of);
 
+  // 尝试恢复用户登录状态, 如果之前的session还有效,在这里可以直接自动登录
+  _tryRecoveryUser() async {
+    try {
+      final u = await _accountService.getUser();
+      _setLogged(u, "已恢复登录状态[$user]");
+    } catch (e, s) {
+      // print("debug #尝试恢复用户登录状态时出错,\n[$e],\n[$s]");
+      // 如果用户已退出登录, 则抛出下面的错误提示
+      // AppwriteException: general_unauthorized_scope, User (role: guest) missing scope (account) (401)],
+      if (e is AppwriteException &&
+          e.code == 401 &&
+          e.type == 'general_unauthorized_scope') {
+        _setLogout("尚未登录");
+      }
+      setInitialized("初始化出错,$e");
+    }
+  }
+
+  _setLogout([String m = '已退出登录']) {
+    user = null;
+    cachedSession = null;
+    setInitialized(m);
+  }
+
+  _setLogged(User u, [String m = '已登陆']) {
+    user = u;
+    setInitialized(m);
+  }
 
   // 注册/登录
   Future<BaseException?> actAuthWith(
@@ -89,18 +120,7 @@ class UserProvider extends ProviderSidecar {
     if (user == null || user!.$id != cachedSession!.userId) {
       user = await _accountService.getUser();
     }
-    setInitialized("已登陆");
-    final rl = sl<Realtime>()
-      ..subscribe(const [
-        'account',
-        'collections',
-        'users',
-        'database',
-        'documents',
-        'documents.6283a01b62f3e884203e',
-      ]).stream.listen((event) {
-        print("debug realtime# event: ${event.event}, ${event.payload}");
-      });
+    _setLogged(user!, "已登陆");
     return null;
 
     // // 新建还是更新 nSession
@@ -124,6 +144,8 @@ class UserProvider extends ProviderSidecar {
   User loggedUser() => user!;
 
   actLogout() async => await actWrapper(() {
-        if (cachedSession != null) _accountService.logout(cachedSession!.$id);
+        // 'current' 代表登录登录的用户的session
+        _accountService.logout(cachedSession?.$id ?? 'current');
+        _setLogout('已退出登录');
       });
 }
