@@ -5,20 +5,55 @@ import 'package:easy_debounce/easy_debounce.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/application/service/realtime_service.dart';
+import 'package:mind_base/src/application/service/workspace_service.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
+import 'package:mind_base/src/interface/i_dto.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
 abstract class Event {}
 
+// 首次打开
 class WorkspaceOpenedEvt implements Event {
   final Workspace workspace;
 
   WorkspaceOpenedEvt(this.workspace);
 }
+
 class WorkspaceCloseEvt implements Event {
   final Workspace workspace;
 
   WorkspaceCloseEvt(this.workspace);
+}
+
+enum WatchEventType {
+  insert, // 元素插入
+  delete, // 某个元素被移除 - 只返回id
+  replace, // 某个元素被替换 - 返回新的完整对象
+  update, // 某个元素被更新
+  // drop, // 所监听的集合被删除
+}
+
+class WatchEvent<DTO> implements Event {
+  final WatchEventType type;
+  final DTO data;
+
+  const WatchEvent(this.type, this.data);
+
+  const WatchEvent.insert(DTO event) : this(WatchEventType.insert, event);
+
+  const WatchEvent.delete(DTO event) : this(WatchEventType.delete, event);
+
+  const WatchEvent.replace(DTO event) : this(WatchEventType.replace, event);
+
+  const WatchEvent.update(DTO event) : this(WatchEventType.update, event);
+}
+
+// 临时包装一下
+class RealTimeEvtFactory extends Event {
+  static Event of(RealtimeMessage msg) {
+    print("RealTimeEvtFactory of $msg");
+    return RealTimeEvt(msg);
+  }
 }
 
 // 临时包装一下
@@ -29,7 +64,8 @@ class RealTimeEvt extends Event {
 }
 
 /// 整个App的事件提供者, 生命周期与App一致
-/// todo 重命名为RealtimeProvider
+/// todo 重命名为RealtimeProvider,
+/// todo 由于Realtime生命周期是大于User的,考虑改为全局`有状态Service`(主要状态是Channel)
 class EventProvider extends ProviderSidecar {
   late EventBus eventBus;
   late RealTimeService _realtimeService;
@@ -48,34 +84,67 @@ class EventProvider extends ProviderSidecar {
 
   void _listen(EventBus bus) {
     bus
-      ..on<WorkspaceOpenedEvt>().listen((event) {
-        print("debug EventProvider._listen# log [${event.runtimeType}], $event");
-        actOnOpenWorkspace(event.workspace);
-      })
-      ..on<WorkspaceCloseEvt>().listen((event) {
-        print("debug EventProvider._listen# log [${event.runtimeType}], $event");
-        actOnCloseWorkspace(event.workspace);
-      })
+      ..on<WorkspaceOpenedEvt>().listen(onOpenWorkspaceEvt)
+      ..on<WorkspaceCloseEvt>().listen(onCloseWorkspaceEvt)
       // 全局日志
       ..on().listen((event) {
-        print("debug EventProvider._listen#Global#log [${event.runtimeType}], $event");
+        print(
+            "debug EventProvider._listen#Global#log [${event.runtimeType}], $event");
       });
   }
 
   Stream<Event> get eventStream => eventBus.on<Event>();
 
+  _getWsSubTag(Workspace workspace) => 'tag_ws_${workspace.id}';
+
   /// 打开某个工作空间
-  actOnOpenWorkspace(Workspace workspace) {
-    final tag = 'tag_ws_${workspace.id}';
+  onOpenWorkspaceEvt(WorkspaceOpenedEvt evt) {
+    final workspace = evt.workspace;
+    // <订阅更新> 添加内部所有Meta,Record事件订阅
+    final tag = _getWsSubTag(workspace);
     actAddChannel(SubChannel.watchMeta(workspace.id, tag: tag));
     for (var meta in workspace.metas) {
       actAddChannel(SubChannel.watchRecord(meta.id, tag: tag));
     }
+    // <获取Meta所在集合记录和Record所在集合记录>
+    _fetchMetaAndRecord(workspace);
   }
 
-  actOnCloseWorkspace(Workspace workspace) {
-    final tag = workspace.id;
-    actRemoveChannelBy(tag);
+  // (根据Workspace, 推测对应的Meta集合的Id(对应集合名称为meta_$workspaceId), 并进行查询)
+  void _fetchMetaAndRecord(Workspace workspace) =>
+      sl<WorkspaceService>().queryMetasBy(workspace.id).listen(
+        (metaDto) {
+          // <初始化Record记录>
+          _fetchRecord(metaDto, workspace);
+          // 发送查询到的Meta
+          eventBus.fire(WatchEvent<RecordMetaDto>.insert(metaDto));
+        },
+        onError: _ignoreCollectionNotFoundE,
+      );
+
+  // (根据Meta,推测对应的Record集合Id(对应集合名称为rcd_$metaId), 并进行查询)
+  void _fetchRecord(RecordMetaDto metaDto, Workspace workspace) =>
+      sl<WorkspaceService>().queryRecordsBy(workspace, metaDto.id).listen(
+            // 发送查询到的Record
+            (event) => eventBus.fire(WatchEvent<RecordDto>.insert(event)),
+            onError: _ignoreCollectionNotFoundE,
+          );
+
+  static void _ignoreCollectionNotFoundE(dynamic e) {
+    if (e is AppwriteException &&
+        e.code == 404 &&
+        e.type == "collection_not_found") {
+      // 是则忽略
+      return;
+    } else {
+      // 如果不是这种情况,则确实需要抛出异常
+      throw e;
+    }
+  }
+
+  /// 关闭某个工作空间
+  onCloseWorkspaceEvt(WorkspaceCloseEvt evt) {
+    return actRemoveChannelBy(_getWsSubTag(evt.workspace));
   }
 
   // 添加订阅并择时刷新
@@ -116,9 +185,6 @@ class EventProvider extends ProviderSidecar {
     _cachedRealTimeSub = _realtimeService.sub(_subChannels.toList());
 
     // 订阅流绑定到Controller
-
-    _cachedRealTimeSub!.stream.map(RealTimeEvt.new).doOnData((data) {
-      print("debug#收到消息: ${data.msg}");
-    }).listen(eventBus.fire);
+    _cachedRealTimeSub!.stream.map(RealTimeEvtFactory.of).listen(eventBus.fire);
   }
 }
