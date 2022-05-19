@@ -35,7 +35,7 @@ class Workspace implements IAgg<String> {
   /// 打开工作空间
   /// 1. 同步,监听内部所有Meta
   /// 2. 同步,监听内幕所有Meta下的Record
-  OpenedWorkspace open(Stream<RealTimeEvt> realtimeStream) => OpenedWorkspace(
+  OpenedWorkspace open(Stream<DatabaseEvent> realtimeStream) => OpenedWorkspace(
         workspace: this,
         records: {},
         realtimeStream: realtimeStream,
@@ -49,7 +49,7 @@ class OpenedWorkspace {
 
   // 空间内的记录 <Record集合Id, Record>
   final Map<String, List<Record>> records;
-  final Stream<RealTimeEvt> realtimeStream;
+  final Stream<DatabaseEvent> realtimeStream;
 
   List<RecordMeta> get metas => workspace.metas;
 
@@ -59,7 +59,8 @@ class OpenedWorkspace {
     required this.realtimeStream,
   }) {
     realtimeStream.listen((event) {
-      print("#OpenedWorkspace#realtimeStream: $event");
+      print("#OpenedWorkspace#realtimeStream: ${event}");
+
     });
   }
 

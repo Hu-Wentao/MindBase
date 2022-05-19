@@ -98,7 +98,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   // `real` 打开工作空间, 并缓存
   _openWorkspace(Workspace workspace) {
     final w = workspace.open(
-      sl<EventBus>().on<RealTimeEvt>(),
+      sl<EventBus>().on<DatabaseEvent>(),
     );
     openedWorkspaces.add(w);
     return w;
