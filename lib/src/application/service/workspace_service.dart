@@ -92,7 +92,7 @@ class WorkspaceService {
 
   openWorkspace(Workspace workspace) => OpenedWorkspace.openBy(
       workspace: workspace,
-      // records: {},
+      getAllMeta: _getMetaAcc(workspace.id).findAll,
       watchMetasEvt: _getMetaAcc(workspace.id).watchAll(),
       getWatchRecords: (String metaId) => _getRecordAcc(workspace, metaId).watchAll(),
     );

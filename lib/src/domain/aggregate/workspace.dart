@@ -41,6 +41,8 @@ class OpenedWorkspace {
 
 // todo 改为 _workspace;  考虑直接用WorkspaceDto
   final Workspace workspace;
+
+  // fixme 本类缺少 openMeta的代码,导致选中meta后,openedMetas里面没有被选中的openedMeta
   final List<OpenedMeta> openedMetas = [];
 
   String get id => workspace.id;
@@ -59,14 +61,19 @@ class OpenedWorkspace {
 
   OpenedWorkspace.openBy({
     required this.workspace,
+    required Stream<RecordMetaDto> Function() getAllMeta,
     required Stream<AccessorEvt<RecordMetaDto>> watchMetasEvt,
     required this.getWatchRecords,
   }) {
+    // 获取全部 fixme (执行成功了,但是没有刷新到UI上)
+    getAllMeta().listen(_onEvtInsertMeta);
+    // 开始监听
     _metasSub = watchMetasEvt.listen((event) {
       print("#OpenedWorkspace#realtimeStream: $event");
       onWatchMetaEvt(event);
     });
   }
+
   StreamSubscription<AccessorEvt<RecordMetaDto>> get subs => _metasSub;
 
   @protected
