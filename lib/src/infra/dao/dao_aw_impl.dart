@@ -148,7 +148,7 @@ mixin AppwriteAccessorWatchableMx<T extends IEntityDto>
               _collectionEvt2AccessorEvtTp(event.event),
               id,
               collectionId,
-              jsonToDtoOr(event.payload),
+              jsonToDtoOr(event.payload..['id'] = id),
             ))
         .doOnCancel(() {
       print(
@@ -163,18 +163,20 @@ mixin AppwriteAccessorWatchableMx<T extends IEntityDto>
     hub.actAddChannel(channel);
     return hub.stream
         .where(
-          (event) =>
-              // todo 转换操作需要转移到其他类中, 例如[RealTimeEvtFactory]
-              event.event.startsWith(collectionEvtTag) &&
-              event.payload['\$collection'] == collectionId,
-        )
-        .map((event) => AccessorEvt<T>(
-              _collectionEvt2AccessorEvtTp(event.event),
-              event.payload['\$id'],
-              collectionId,
-              jsonToDtoOr(event.payload),
-            ))
-        .doOnCancel(() {
+      (event) =>
+          // todo 转换操作需要转移到其他类中, 例如[RealTimeEvtFactory]
+          event.event.startsWith(collectionEvtTag) &&
+          event.payload['\$collection'] == collectionId,
+    )
+        .map((event) {
+      final id = event.payload['\$id'];
+      return AccessorEvt<T>(
+        _collectionEvt2AccessorEvtTp(event.event),
+        id, collectionId,
+        // fixme 需要类似 toFullJson方法
+        jsonToDtoOr(event.payload..['id'] = id),
+      );
+    }).doOnCancel(() {
       print(
           "debug #AppwriteAccessorWatchableMx::watchAll cancel! 添加移除channel任务 ${DateTime.now()}");
       hub.actRemoveChannel(channel);
