@@ -34,6 +34,9 @@ class AccessorEvt<T> implements Event {
 
   AccessorEvt.update(this.ettId, this.collectionId, this.dto)
       : type = AccessorEvtTp.update;
+
+  @override
+  String toString() => 'AccessorEvt{[$T] type: $type, ettId: $ettId, collectionId: $collectionId, dto: $dto}';
 }
 
 abstract class IAccessor<T extends IDto> {
