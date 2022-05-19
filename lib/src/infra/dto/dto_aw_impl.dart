@@ -22,17 +22,22 @@ extension ExprJsonDtoAppwriteX on ExprJsonDto {
   Map<String, dynamic> toJson() => {
         'fn': fn,
         'ag': jsonEncode(ag.map((e) => e.toJson())),
-        'type': '$type',
+        'type': '${type?.name}',
       };
 
-  static fromJson(Map<String, dynamic> json) => ExprJsonDto(
-        fn: json['fn'] as String,
-        ag: (json['ag'] as List<dynamic>)
-            .map((e) =>
-                IExprJsonDtoAppwriteX.fromJson(e as Map<String, dynamic>))
-            .toList(),
-        type: AttrTypeDto.by(json['type'] as String),
-      );
+  static fromJson(Map<String, dynamic> json) {
+    final ag = json['ag'] as String? ?? '';
+    return ExprJsonDto(
+      fn: json['fn'] as String,
+      ag: ag.isEmpty
+          ? []
+          : (jsonDecode(ag) as List<dynamic>)
+              .map((e) =>
+                  IExprJsonDtoAppwriteX.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      type: AttrTypeDto.by(json['type'] as String),
+    );
+  }
 }
 
 extension IExprJsonDtoAppwriteX on IExprJsonDto {
@@ -53,7 +58,7 @@ extension IExprJsonDtoAppwriteX on IExprJsonDto {
 extension RecordDtoAppwriteX on RecordDto {
   Map<String, dynamic> toJson() => fields.map((key, value) => MapEntry(
         jsonEncode(key),
-        ValueJsonDto.fromDomain(value).toJson(),
+        ValueJsonDtoAppwriteX(ValueJsonDto.fromDomain(value)).toJson(),
       ));
 
   static RecordDto fromDocument(Document doc) => fromJson(doc.data);

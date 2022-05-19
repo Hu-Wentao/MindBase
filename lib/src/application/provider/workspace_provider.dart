@@ -160,6 +160,7 @@ class WorkspaceProvider extends ProviderSidecar {
         log("actSaveRecord [${dto?.id}]");
         // 无需set,因为插入成功后, watch会监听到新的变更
         if (dto == null) return;
+        // fixme 需要用到recordRepo, 包装save方法
         await _recordAccessor(dto.metaId).replace(dto);
         // await RecordAccessor(sl<Db>(), dto.metaIdHex).save(dto.id, dto);
       });
