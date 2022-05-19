@@ -89,4 +89,11 @@ class WorkspaceService {
     final ws = (await _workspaceRepo.findById(r.$id))!;
     return Tuple2(team, ws);
   }
+
+  openWorkspace(Workspace workspace) => OpenedWorkspace.openBy(
+      workspace: workspace,
+      // records: {},
+      watchMetasEvt: _getMetaAcc(workspace.id).watchAll(),
+      getWatchRecords: (String metaId) => _getRecordAcc(workspace, metaId).watchAll(),
+    );
 }
