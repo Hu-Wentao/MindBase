@@ -56,20 +56,17 @@ extension RecordDtoAppwriteX on RecordDto {
         ValueJsonDto.fromDomain(value).toJson(),
       ));
 
-  static RecordDto fromDocument(Document doc, QueryMetaFn toMeta) =>
-      fromJson(doc.data, toMeta);
+  static RecordDto fromDocument(Document doc) => fromJson(doc.data);
 
-  static RecordDto fromJson(Map<String, dynamic> json, QueryMetaFn toMeta) =>
-      RecordDto(
+  static RecordDto fromJson(Map<String, dynamic> json) => RecordDto(
           fields: Map.fromEntries(
         json.entries
             .where((element) => element.value is Map<String, dynamic>)
             .map(
               (e) => MapEntry(
                 int.parse(e.key),
-                // fixme #324 因为这里已经确认是ValueJsonDto, 对于Value, 其toDomain是不需要的 `toMeta`的,这里的传参可以移除;
-                ValueJsonDtoAppwriteX.fromJson(e.value).toDomain(toMeta)
-                    as Value,
+                // fixme #324 考虑移除Value包装;
+                ValueJsonDtoAppwriteX.fromJson(e.value).toDomain(null) as Value,
               ),
             ),
       ));
