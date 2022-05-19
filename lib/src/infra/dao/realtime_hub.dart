@@ -57,7 +57,7 @@ class RealtimeChannelHub {
     _readyAddChannels.removeWhere((ch) => _readyRemoveChannels.contains(ch));
     _readyRemoveChannels.clear();
     // 如果新的订阅和旧的不同,则需要刷新
-    if (_readyAddChannels.difference(_subChannels).isNotEmpty) {
+    if (_readyAddChannels.union(_subChannels).length == _subChannels.length) {
       _cachedRealTimeSub?.close;
       _cachedRealTimeSub = sub(_readyAddChannels.toList());
     }
@@ -161,4 +161,15 @@ class SubChannel {
 
   @override
   String toString() => 'SubChannel{tag: $tag, channel: $channel}';
+
+  /// 注意, 只有 [channel] 参与比较
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SubChannel &&
+          runtimeType == other.runtimeType &&
+          channel == other.channel;
+
+  @override
+  int get hashCode => channel.hashCode;
 }
