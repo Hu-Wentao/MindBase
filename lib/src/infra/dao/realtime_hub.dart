@@ -9,8 +9,9 @@ import 'package:get_arch_core/get_arch_core.dart';
 @lazySingleton
 class RealtimeChannelHub {
   final Realtime _realtime;
-  final Set<SubChannel> _subChannels = {};
+  final Set<SubChannel> _readyAddChannels = {};
   final Set<SubChannel> _readyRemoveChannels = {};
+  Set<SubChannel> _subChannels = {}; // 存储当前的订阅状态
   RealtimeSubscription? _cachedRealTimeSub;
 
   final StreamController<RealtimeMessage> _messageStreamController =
@@ -26,7 +27,7 @@ class RealtimeChannelHub {
 
   // 添加订阅并择时刷新
   actAddChannel(SubChannel channel) {
-    _subChannels.add(channel);
+    _readyAddChannels.add(channel);
     // 防抖
     EasyDebounce.debounce('刷新订阅', const Duration(milliseconds: 500), () {
       _actUpdateChannels();
@@ -52,17 +53,16 @@ class RealtimeChannelHub {
   _actUpdateChannels() {
     print("debug 刷新订阅Channel# 待移除# $_readyRemoveChannels, 新增# $_subChannels");
     // 处理待订阅的频道
-    _subChannels.removeWhere(
-      (element) => _readyRemoveChannels.contains(element),
-    );
+    _readyAddChannels.addAll(_subChannels);
+    _readyAddChannels.removeWhere((ch) => _readyRemoveChannels.contains(ch));
     _readyRemoveChannels.clear();
-
-    // 关闭原有订阅, 重新订阅新的频道
-    _cachedRealTimeSub?.close;
-    _cachedRealTimeSub = sub(_subChannels.toList());
-
-    // // 订阅流绑定到Controller
-    // _cachedRealTimeSub!.stream.map(RealTimeEvtFactory.of).listen(eventBus.fire);
+    // 如果新的订阅和旧的不同,则需要刷新
+    if (_readyAddChannels.difference(_subChannels).isNotEmpty) {
+      _cachedRealTimeSub?.close;
+      _cachedRealTimeSub = sub(_readyAddChannels.toList());
+    }
+    // 更新已订阅频道数据
+    _subChannels = _readyAddChannels;
   }
 
   sub(List<SubChannel> channels) =>
