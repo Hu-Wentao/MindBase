@@ -49,9 +49,10 @@ class _RecordDataGridState extends State<RecordDataGrid> {
   @override
   Widget build(BuildContext context) => Consumer<WorkspaceProvider>(
         builder: (c, pWorkspace, _) {
-          final meta = pWorkspace.watchedMeta!;
-          final data =
-              pWorkspace.actGetDataSource() as RecordDataGridSourcePluto;
+          final openedMeta = pWorkspace.selectedMeta!;
+          // final meta = pWorkspace.watchedMeta!;
+          final data = openedMeta.dataSource;
+              // pWorkspace.actGetDataSource() as RecordDataGridSourcePluto;
           return Expanded(
             child: PlutoGrid(
               rows: data.cachedRows,
@@ -67,9 +68,9 @@ class _RecordDataGridState extends State<RecordDataGrid> {
 
                 // 更新的DTO
                 final dto = pWorkspace
-                    .actQueryRecordBy(ettId.value, meta: meta)
+                    .actQueryRecordBy(ettId.value, metaId: openedMeta.id)
                     .toDto()
-                    .updateBy(meta, row);
+                    .updateBy(openedMeta.meta, row);
                 pWorkspace.actSaveRecord(dto); // 同步到服务器
               },
               onSelected: (_) {
@@ -89,7 +90,7 @@ class _RecordDataGridState extends State<RecordDataGrid> {
                 print("#debug #onRowsMoved $_");
               },
               createHeader: (manager) => DataFrameTitlePluto(
-                meta: meta,
+                meta: openedMeta.meta,
                 stateManager: manager,
                 onSaveMeta: pWorkspace.actSaveMeta,
                 onSaveRecord: pWorkspace.actSaveRecord,
