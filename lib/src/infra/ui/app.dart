@@ -18,15 +18,15 @@ class MindBaseApp extends StatelessWidget {
           ChangeNotifierProvider<UserProvider>(
             create: (_) => UserProvider()..actInitializing(),
           ),
+          // 根据User登录状态自动切换状态
           ChangeNotifierProxyProvider<UserProvider, WorkspaceManagerProvider>(
               create: (_) => WorkspaceManagerProvider(),
-              update: (c, u, pre) => pre!..actUpdate(u.user)),
+              update: (c, u, pre) => pre!..actOnUserUpdate(u.user)),
           ChangeNotifierProxyProvider<WorkspaceManagerProvider,
               WorkspaceProvider>(
-            create: (_) => WorkspaceProvider(null),
+            create: (_) => WorkspaceProvider(),
             update: (c, wm, pre) =>
-                // fixme 固定选择首个工作空间
-                pre!..actInitializing(),
+                pre!..actOnSelectedWorkspaceUpdate(wm.selectedWorkspace),
           ),
         ],
         child: MaterialApp.router(
