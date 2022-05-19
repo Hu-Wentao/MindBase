@@ -11,8 +11,8 @@ import 'package:provider_sidecar/provider_sidecar.dart';
 /// 管理用户名下的所有工作空间
 /// 包括对`已打开的的Workspace的数据同步工作`
 class WorkspaceManagerProvider extends ProviderSidecar {
-  late EventBus _eventBus;
-  late WorkspaceService _workspaceSrv;
+  final EventBus _eventBus = sl<EventBus>();
+  final WorkspaceService _workspaceSrv = sl<WorkspaceService>();
 
   // 父级状态 缓存当前已登录的用户, 确保登录用户与缓存的工作空间是一致的;
   User? user;
@@ -27,10 +27,10 @@ class WorkspaceManagerProvider extends ProviderSidecar {
 
   @override
   onInitializing() async {
-    _workspaceSrv = sl<WorkspaceService>();
-    _eventBus = sl<EventBus>();
+    // _workspaceSrv =;
+    // _eventBus = ;
     // _initEventBus();
-    _initWorkspaces();
+    // _initWorkspaces();
     // todo 考虑添加一层OpenTeam,以监听工作空间的创建与关闭
     setInitialized("工作空间同步完成");
   }
@@ -40,21 +40,21 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   //     // 获取数据
   //   });
 
-  // 同步当前用户的工作空间 等
-  _initWorkspaces() async =>
-      workspaces = await (_workspaceSrv.queryAllUserWorkspaces());
-
   actOnUserUpdate(User? nUser) {
     if (nUser != user) {
-      if (nUser == null) {
-        setUninitialized("尚未登录");
-      } else {
-        setInitialized("更新已登录用户信息", () {
-          user = nUser;
-        });
-      }
+      return (nUser == null)
+          ? setUninitialized("尚未登录")
+          : actSyncUserInfo(nUser);
     }
   }
+
+  actSyncUserInfo(User nUser) async => await actWrapper(() async {
+        setInitialized("刷新已登录用户", () {
+          user = nUser;
+        });
+        workspaces = await (_workspaceSrv.queryAllUserWorkspaces());
+        setInitialized("已同步用户数据");
+      });
 
   /// 新建工作空间
   Future<BaseException?> actCreateWorkspace(
@@ -70,7 +70,8 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   /// 打开或返回已存在的OpenedWorkspace
   // actOpenWorkspace(Workspace workspace) => actOpenWorkspaceById(workspace.id);
 
-  Future<BaseException?> actOpenWorkspaceById(String workspaceId) async =>
+  Future<BaseException?> actOpenWorkspaceById(String workspaceId,
+          {bool andSelect = true}) async =>
       await actWrapper(() {
         // 选中工作空间
         setInitialized("打开工作空间[$workspaceId]成功", () {
@@ -78,7 +79,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
             (opened) => opened.workspace.id == workspaceId,
             orElse: () => _openWorkspaceById(workspaceId),
           );
-          selectedWorkspace = ws;
+          if (andSelect) selectedWorkspace = ws;
         });
       });
 
