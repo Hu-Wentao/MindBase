@@ -84,12 +84,14 @@ class OpenedWorkspace extends ChangeNotifier {
     return meta;
   }
 
-  void removeMeta(String metaId) =>
-      metas.removeWhere((meta) => meta.id == metaId);
+  void removeMeta(String metaId) {
+    __indexByMetas(metaId,onFind: (i,m)=> metas.remove(m));
+    __indexByOpenedMetas(metaId,onFind: (i,m)=> openedMetas.remove(m));
+  }
 
-  List<Record>? closeMeta(String metaId) =>
-      openedMetas.firstWhere((element) => element.id == metaId).close();
+  void closeMeta(String metaId) => __indexByOpenedMetas(metaId,onFind: (i,m)=> m.close());
 
+  @Deprecated("应当使用 selectedMeta.getRecords()")
   List<Record> getRecords(String metaId) =>
       openedMetas.firstWhere((element) => element.id == metaId).records;
 
@@ -107,6 +109,28 @@ class OpenedWorkspace extends ChangeNotifier {
       }
     }
     throw "Workspace中找不到ID为[$recordId]的Record";
+  }
+
+  int __indexByOpenedMetas(
+    String metaId, {
+    Function(int index, OpenedMeta meta)? onFind,
+  }) {
+    final i = openedMetas.indexWhere((element) => element.id == metaId);
+    if (i != -1) {
+      onFind?.call(i, openedMetas[i]);
+    }
+    return i;
+  }
+
+  int __indexByMetas(
+    String metaId, {
+    Function(int index, RecordMeta meta)? onFind,
+  }) {
+    final i = metas.indexWhere((element) => element.id == metaId);
+    if (i != -1) {
+      onFind?.call(i, metas[i]);
+    }
+    return i;
   }
 
   /// 数据同步 ===================================================================
