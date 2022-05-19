@@ -130,8 +130,6 @@ class OpenedWorkspace extends ChangeNotifier {
   void _onEvtInsertMeta(RecordMetaDto metaDto) {
     final meta = metaDto.toDm(queryMeta);
     insertMeta(meta);
-    // 缓存并监听Meta下Record
-    _openCacheMeta(meta);
   }
 
   void _onEvtUpdateMeta(RecordMetaDto metaDto) {
