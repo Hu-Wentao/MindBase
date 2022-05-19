@@ -51,7 +51,8 @@ class RealtimeChannelHub {
 
   // 刷新订阅流
   _actUpdateChannels() {
-    print("debug 刷新订阅Channel# 待移除# $_readyRemoveChannels, 新增# $_readyAddChannels");
+    print(
+        "debug 刷新订阅Channel# 待移除# $_readyRemoveChannels, 新增# $_readyAddChannels");
     // 处理待订阅的频道
     _readyAddChannels.addAll(_subChannels);
     _readyAddChannels.removeWhere((ch) => _readyRemoveChannels.contains(ch));
@@ -59,7 +60,8 @@ class RealtimeChannelHub {
     // 如果新的订阅和旧的不同,则需要刷新
     if (_readyAddChannels.union(_subChannels).length != _subChannels.length) {
       _cachedRealTimeSub?.close;
-      _cachedRealTimeSub = sub(_readyAddChannels.toList());
+      _cachedRealTimeSub = sub(_readyAddChannels.toList())
+        ..stream.listen(_messageStreamController.add);
     }
     // 更新已订阅频道数据
     _subChannels = _readyAddChannels;
