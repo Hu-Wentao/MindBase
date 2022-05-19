@@ -11,7 +11,7 @@ import 'package:mind_base/src/interface/i_dto.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
 /// 统一监听与处理工作空间内的所有数据
-/// todo 当前假定本数据库为一个工作空间
+/// fixme 需要重构
 class WorkspaceProvider extends ProviderSidecar {
   late MetaDtoRepo _metaDtoRepo;
 
@@ -39,8 +39,14 @@ class WorkspaceProvider extends ProviderSidecar {
 
   actSelectWorkspace(WorkspaceManagerProvider pManager, String wsId) async {
     setInitializing("正在打开工作空间[$wsId]");
-    final opendsWs = await pManager.getOpenedWorkspace(wsId);
+    final OpenedWorkspace opendsWs = await pManager.getOpenedWorkspace(wsId);
     openedWorkspace = opendsWs;
+    openedWorkspace!.subs.onData((data) {
+      // fixme 手动刷新
+      opendsWs.onWatchMetaEvt(data);
+      // fixme 可以监听到消息
+      setInitialized("OpenedWorkspace 刷新数据[${data.type}]");
+    });
     setInitialized("已打开工作空间[${opendsWs.workspace.name}],ID[$wsId]");
   }
 

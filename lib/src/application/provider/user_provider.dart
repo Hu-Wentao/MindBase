@@ -29,7 +29,7 @@ class UserProvider extends ProviderSidecar {
   _tryRecoveryUser() async {
     try {
       final u = await _accountService.getUser();
-      _setLogged(u, "已恢复登录状态[$user]");
+      _setLogged(u, "已恢复登录状态[$u]");
     } catch (e, s) {
       // print("debug #尝试恢复用户登录状态时出错,\n[$e],\n[$s]");
       // 如果用户已退出登录, 则抛出下面的错误提示

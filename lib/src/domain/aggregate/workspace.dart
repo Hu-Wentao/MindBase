@@ -63,10 +63,11 @@ class OpenedWorkspace {
     required this.getWatchRecords,
   }) {
     _metasSub = watchMetasEvt.listen((event) {
-      print("#OpenedWorkspace#realtimeStream: ${event}");
+      print("#OpenedWorkspace#realtimeStream: $event");
       onWatchMetaEvt(event);
     });
   }
+  StreamSubscription<AccessorEvt<RecordMetaDto>> get subs => _metasSub;
 
   @protected
   RecordMeta insertMeta(RecordMeta meta) {
@@ -113,6 +114,7 @@ class OpenedWorkspace {
 
   /// 数据同步 ===================================================================
   void onWatchMetaEvt(AccessorEvt<RecordMetaDto> event) {
+    print("debug onWatchMetaEvt: $event");
     switch (event.type) {
       case AccessorEvtTp.insert:
         _onEvtInsertMeta(event.dto!);
@@ -202,7 +204,6 @@ class OpenedMeta {
     records.add(record);
     return record;
   }
-
 
 // 返回被更新的元素index
   void _onEvtUpdateRecord(Record record) {
