@@ -94,8 +94,8 @@ class WorkspaceService {
 
   openWorkspace(Workspace workspace) => OpenedWorkspace.openBy(
       workspace: workspace,
-      getAllMeta: _getMetaAcc(workspace.id).findAll,
-      watchMetasEvt: _getMetaAcc(workspace.id).watchAll(),
+      fetchAllMeta: _getMetaAcc(workspace.id).findAll,
+      watchAllMeta: _getMetaAcc(workspace.id).watchAll(),
       getFetchAllRecords: (String metaId)=> _getRecordAcc(workspace, metaId).findAll(),
       getWatchAllRecords: (String metaId) => _getRecordAcc(workspace, metaId).watchAll(),
     );
