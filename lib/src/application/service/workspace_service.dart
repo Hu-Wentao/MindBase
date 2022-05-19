@@ -7,6 +7,8 @@ import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mind_base/src/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
 
+import '../provider/model/opened_workspace.dart';
+
 @lazySingleton
 class WorkspaceService {
   final Teams _teams;
@@ -94,6 +96,7 @@ class WorkspaceService {
       workspace: workspace,
       getAllMeta: _getMetaAcc(workspace.id).findAll,
       watchMetasEvt: _getMetaAcc(workspace.id).watchAll(),
-      getWatchRecords: (String metaId) => _getRecordAcc(workspace, metaId).watchAll(),
+      getFetchAllRecords: (String metaId)=> _getRecordAcc(workspace, metaId).findAll(),
+      getWatchAllRecords: (String metaId) => _getRecordAcc(workspace, metaId).watchAll(),
     );
 }
