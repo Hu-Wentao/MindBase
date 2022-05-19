@@ -20,6 +20,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   // 状态
   Map<Team, List<Workspace>> workspaces = {};
   List<OpenedWorkspace> openedWorkspaces = [];
+  OpenedWorkspace? selectedWorkspace;
 
   // 用户登录成功后,才能够获取到 工作空间列表
   WorkspaceManagerProvider() : super(onCatch: ExceptionAdapter.of);
@@ -43,14 +44,14 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   _initWorkspaces() async =>
       workspaces = await (_workspaceSrv.queryAllUserWorkspaces());
 
-  actUpdate(User? nUser) {
-    // print("actUpdate user: $nUser, judge: ${nUser != user}; ${nUser == null}");
+  actOnUserUpdate(User? nUser) {
     if (nUser != user) {
       if (nUser == null) {
         setUninitialized("尚未登录");
       } else {
-        user = nUser;
-        actInitializing(m: "更新已登录用户信息");
+        setInitialized("更新已登录用户信息", () {
+          user = nUser;
+        });
       }
     }
   }
@@ -69,17 +70,24 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   /// 打开或返回已存在的OpenedWorkspace
   // actOpenWorkspace(Workspace workspace) => actOpenWorkspaceById(workspace.id);
 
-  actOpenWorkspaceById(String workspaceId) => actWrapper(() {
-        openedWorkspaces.firstWhere(
-          (opened) => opened.workspace.id == workspaceId,
-          orElse: () => _openWorkspaceById(workspaceId),
-        );
-        setInitialized("打开工作空间[$workspaceId]成功");
+  Future<BaseException?> actOpenWorkspaceById(String workspaceId) async =>
+      await actWrapper(() {
+        // 选中工作空间
+        setInitialized("打开工作空间[$workspaceId]成功", () {
+          final ws = openedWorkspaces.firstWhere(
+            (opened) => opened.workspace.id == workspaceId,
+            orElse: () => _openWorkspaceById(workspaceId),
+          );
+          selectedWorkspace = ws;
+        });
       });
 
   /// 关闭工作空间
-  closeWorkspace(Workspace workspace) =>
-      openedWorkspaces.removeWhere((element) => element.workspace == workspace);
+  Future<BaseException?> actCloseWorkspace(Workspace workspace) async =>
+      await actWrapper(() => setInitialized("关闭工作空间[${workspace.id}]成功", () {
+            openedWorkspaces
+                .removeWhere((element) => element.workspace == workspace);
+          }));
 
   _openWorkspaceById(String workspaceId) {
     final ws = _openWorkspace(workspaces.values
@@ -105,7 +113,8 @@ class WorkspaceManagerProvider extends ProviderSidecar {
     (workspaces[team] ??= []).add(workspace);
   }
 
-  getOpenedWorkspace(String workspaceId) async {
+  // todo 考虑换个写法, 或者转移到Service中
+  Future<OpenedWorkspace> getOpenedWorkspace(String workspaceId) async {
     if (_isOpened(workspaceId)) {
       return openedWorkspaces
           .firstWhere((element) => element.workspace.id == workspaceId);
