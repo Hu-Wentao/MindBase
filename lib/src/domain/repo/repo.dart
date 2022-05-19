@@ -143,19 +143,22 @@ class MetaDtoRepo {
 
 class RecordDtoRepo {
   final server.Database _serverDb;
-  final String collectionId; // 也是所在workspaceId
+
+  final RecordMeta meta;
   final RecordEttAccessor _recordAcc;
 
   RecordDtoRepo(
     this._serverDb,
     this._recordAcc,
-    this.collectionId,
+    this.meta,
   );
 
-  static RecordDtoRepo withDI(GetIt get, String metaId) => RecordDtoRepo(
+  String get collectionId => meta.id; // 也是所在metaId
+
+  static RecordDtoRepo withDI(GetIt get, RecordMeta meta) => RecordDtoRepo(
         get<server.Database>(),
-        RecordEttAccessor(get<Database>(), metaId),
-        metaId,
+        RecordEttAccessor(get<Database>(), meta.id),
+        meta,
       );
 
   insert(RecordDto dto) async {
@@ -165,7 +168,7 @@ class RecordDtoRepo {
       if (e.type == 'collection_not_found') {
         // 集合不存在,则创建集合
         // fixme 新建的集合为"所有人可读写"
-        await createMetaCollection(null);
+        await createRecordCollection(meta, null);
         // 再次尝试
         await _recordAcc.insert(dto);
       }
@@ -182,7 +185,7 @@ class RecordDtoRepo {
       if (e.type == 'collection_not_found') {
         // 集合不存在,则创建集合
         // fixme 新建的集合为"所有人可读写"
-        await createMetaCollection(null);
+        await createRecordCollection(meta, null);
         // 再次尝试
         await update(dto);
       } else if (e.type == 'document_not_found') {
@@ -197,39 +200,28 @@ class RecordDtoRepo {
 
   /// [teamId] 为空表示"所有人可读写"
   /// 默认权限为 "团队内可读写"
-  createMetaCollection(String? teamId) async {
+  /// [meta] 应当是固定内存地址的对象,这样可以确保meta本身是实时更新的
+  createRecordCollection(RecordMeta meta, String? teamId) async {
+    // 权限
     final permit = teamId == null ? ['role:all'] : ['team:$teamId'];
     // 创建集合
     await _serverDb.createCollection(
       collectionId: collectionId,
-      name: 'meta_$collectionId',
+      name: 'rcd_$collectionId',
       permission: 'collection',
       read: permit,
       write: permit,
     );
     // 添加属性 <固定属性,无需用户指定>
-    await _serverDb.createStringAttribute(
-        collectionId: collectionId, key: 'name', size: 127, xrequired: true);
-    await _serverDb.createStringAttribute(
+    for (var attr in meta.attrs) {
+      // attr.name
+      await _serverDb.createStringAttribute(
         collectionId: collectionId,
-        key: 'memo',
-        size: 255,
+        key: "${attr.k}",
+        size: 511,
         xrequired: false,
-        xdefault: '');
-    await _serverDb.createIntegerAttribute(
-        collectionId: collectionId, key: 'maxKey', xrequired: true);
-    await _serverDb.createStringAttribute(
-        collectionId: collectionId,
-        key: 'attrs',
-        size: 65535,
-        xrequired: false,
-        xdefault: '');
-    await _serverDb.createStringAttribute(
-        collectionId: collectionId,
-        key: 'methods',
-        size: 65535,
-        xrequired: false,
-        xdefault: '');
+      );
+    }
   }
 
   findById(String metaId) => _recordAcc.findById(metaId);
