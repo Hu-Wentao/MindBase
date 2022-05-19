@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:appwrite/appwrite.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
+import 'package:mind_base/src/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_source.dart';
 import 'package:mind_base/src/interface/i_dao.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
@@ -38,26 +38,27 @@ class OpenedWorkspace extends ChangeNotifier {
 
   OpenedWorkspace.openBy({
     required this.workspace,
-    required Stream<RecordMetaDto> Function() getAllMeta,
-    required Stream<AccessorEvt<RecordMetaDto>> watchMetasEvt,
+    required Stream<RecordMetaDto> Function() fetchAllMeta,
+    required Stream<AccessorEvt<RecordMetaDto>> watchAllMeta,
     required this.getFetchAllRecords,
     required this.getWatchAllRecords,
   }) {
-    try {
-      // 获取全部 fixme (执行成功了,但是没有刷新到UI上)
-      getAllMeta().listen(_onEvtInsertMeta).onData((data) {
-        print("debug getAllMeta: $data");
-        notifyListeners();
-      });
-    } on AppwriteException catch (e) {
+    // 获取全部 fixme (执行成功了,但是没有刷新到UI上)
+    fetchAllMeta().listen((e) {
+      print("debug getAllMetal XXX $e");
+      _onEvtInsertMeta(e);
+      notifyListeners();
+    }, onError: (e, s) {
       if (e.code == 404 && e.type == "collection_not_found") {
         // 不存在则无需抛出异常
+        print("debug OpenedMeta.openBy: [$e], 由推测的`Meta集合`尚未创建导致的,无需抛出异常");
       } else {
-        rethrow;
+        // print("debug OpenedMeta.openBy: 抛出未知异常 [$e]");
+        throw ExceptionAdapter.of(e, s);
       }
-    }
+    });
     // 开始监听
-    _metasSub = watchMetasEvt.listen((event) {
+    _metasSub = watchAllMeta.listen((event) {
       print("#OpenedWorkspace#realtimeStream: $event");
       onWatchMetaEvt(event);
     });
@@ -151,6 +152,7 @@ class OpenedWorkspace extends ChangeNotifier {
       fetchAllRecords: getFetchAllRecords(meta.id),
       watchAllRecords: getWatchAllRecords(meta.id),
     ));
+    print("debug _openCacheMeta: ${meta.id}");
   }
 
   Workspace close() {
@@ -176,18 +178,18 @@ class OpenedMeta extends ChangeNotifier {
     required Stream<RecordDto> fetchAllRecords,
     required Stream<AccessorEvt<RecordDto>> watchAllRecords,
   }) {
-    try {
-      fetchAllRecords.listen((event) {
-        _onEvtInsertRecord(event.toDomain(meta));
-        notifyListeners();
-      });
-    } on AppwriteException catch (e) {
+    fetchAllRecords.listen((event) {
+      _onEvtInsertRecord(event.toDomain(meta));
+      notifyListeners();
+    }, onError: (e, s) {
       if (e.code == 404 && e.type == "collection_not_found") {
         // 不存在则无需抛出异常
+        print("debug OpenedMeta.openBy: [$e], 由推测的`Record集合`尚未创建导致的,无需抛出异常");
       } else {
-        rethrow;
+        // print("debug OpenedMeta.openBy: 抛出未知异常 [$e]");
+        throw ExceptionAdapter.of(e, s);
       }
-    }
+    });
     _cachedRecordSubs = watchAllRecords.listen((event) {
       _onWatchRecord(event);
     });
