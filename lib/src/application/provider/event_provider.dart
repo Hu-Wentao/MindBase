@@ -8,6 +8,7 @@ import 'package:mind_base/src/application/service/realtime_service.dart';
 import 'package:mind_base/src/application/service/workspace_service.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/exceptions/exceptions.dart';
+import 'package:mind_base/src/infra/dto/dto_aw_impl.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
@@ -18,12 +19,20 @@ class WorkspaceOpenedEvt implements Event {
   final Workspace workspace;
 
   WorkspaceOpenedEvt(this.workspace);
+
+  @override
+  String toString() =>
+      'WorkspaceOpenedEvt{id: [${workspace.id}], name: [${workspace.name}]}';
 }
 
 class WorkspaceCloseEvt implements Event {
   final Workspace workspace;
 
   WorkspaceCloseEvt(this.workspace);
+
+  @override
+  String toString() =>
+      'WorkspaceCloseEvt{id: [${workspace.id}], name: [${workspace.name}]}';
 }
 
 enum WatchEventType {
@@ -34,26 +43,75 @@ enum WatchEventType {
   // drop, // 所监听的集合被删除
 }
 
-class WatchEvent<DTO> implements Event {
+class DatabaseEvent implements Event {
   final WatchEventType type;
-  final DTO data;
+  final String ettId;
+  final String collectionId;
 
-  const WatchEvent(this.type, this.data);
+  final Map<String, dynamic> data;
 
-  const WatchEvent.insert(DTO event) : this(WatchEventType.insert, event);
+  const DatabaseEvent(
+    this.type,
+    this.ettId,
+    this.collectionId,
+    this.data,
+  );
 
-  const WatchEvent.delete(DTO event) : this(WatchEventType.delete, event);
+  DatabaseEvent.insert(this.ettId, this.collectionId, this.data)
+      : type = WatchEventType.insert;
 
-  const WatchEvent.replace(DTO event) : this(WatchEventType.replace, event);
+  DatabaseEvent.delete(this.ettId, this.collectionId, this.data)
+      : type = WatchEventType.delete;
 
-  const WatchEvent.update(DTO event) : this(WatchEventType.update, event);
+  DatabaseEvent.replace(this.ettId, this.collectionId, this.data)
+      : type = WatchEventType.replace;
+
+  DatabaseEvent.update(this.ettId, this.collectionId, this.data)
+      : type = WatchEventType.update;
 }
 
 // 临时包装一下
 class RealTimeEvtFactory extends Event {
+  static final eventsMap = {
+    "database": {
+      "create": null,
+      "delete": null,
+      "update": null,
+      "documents": {"create": null, "delete": null, "update": onDocumentUpdate},
+      "attributes": {"create": null, "delete": null},
+      "indexes": {"create": null, "delete": null},
+    },
+  };
+
+  // (event: database.documents.update,
+  // payload:{
+  //  $id: 628504d3560d1ec67330,
+  //  $collection: 6283e2b508850ed24d82968b
+  //  name: XXX, memo: sdf, maxKey: 4, attrs: null, methods: null, $read: [], $write: [],
+  //},
+  //channels: [documents, collections.6283e2b508850ed24d82968b.documents, collections.6283e2b508850ed24d82968b.documents.628504d3560d1ec67330],
+  //timestamp: 1652892787)
+  static Event onDocumentUpdate(RealtimeMessage msg) {
+    // msg.event;
+    return DatabaseEvent(WatchEventType.update, msg.payload['\$id'],
+        msg.payload['\$collection'], msg.payload);
+    // final type = data['type'];
+    // final id = data['document']['id'];
+    // final data = data['document']['data'];
+    // final event = eventsMap['database']['documents']['update'](data);
+    // event.data.id = id;
+    // return event;
+    return RealTimeEvt(msg);
+  }
+
   static Event of(RealtimeMessage msg) {
     print("RealTimeEvtFactory of $msg");
-    return RealTimeEvt(msg);
+    final events = msg.event.split('.');
+    dynamic targetCall;
+    for (var i = 0; i < events.length; i++) {
+      targetCall = eventsMap[events[i]];
+    }
+    return (targetCall == null) ? RealTimeEvt(msg) : targetCall(msg);
   }
 }
 
@@ -89,8 +147,9 @@ class EventProvider extends ProviderSidecar {
       ..on<WorkspaceCloseEvt>().listen(onCloseWorkspaceEvt)
       // 全局日志
       ..on().listen((event) {
+        // fixme 可能存在只有第二次发送数据才有接收的问题, 需要检测
         print(
-            "debug EventProvider._listen#Global#log [${event.runtimeType}], $event");
+            "debug 全局事件日志:EventProvider._listen#log [${event.runtimeType}], $event");
       });
   }
 
@@ -118,7 +177,8 @@ class EventProvider extends ProviderSidecar {
           // <初始化Record记录>
           _fetchRecord(metaDto, workspace);
           // 发送查询到的Meta
-          eventBus.fire(WatchEvent<RecordMetaDto>.insert(metaDto));
+          eventBus.fire(DatabaseEvent.insert(metaDto.id, workspace.id,
+              RecordMetaDtoAppwriteX(metaDto).toJson()));
         },
         onError: _ignoreCollectionNotFoundE,
       );
@@ -127,7 +187,8 @@ class EventProvider extends ProviderSidecar {
   void _fetchRecord(RecordMetaDto metaDto, Workspace workspace) =>
       sl<WorkspaceService>().queryRecordsBy(workspace, metaDto.id).listen(
             // 发送查询到的Record
-            (event) => eventBus.fire(WatchEvent<RecordDto>.insert(event)),
+            (event) => eventBus.fire(DatabaseEvent.insert(
+                event.id, workspace.id, RecordDtoAppwriteX(event).toJson())),
             onError: _ignoreCollectionNotFoundE,
           );
 
