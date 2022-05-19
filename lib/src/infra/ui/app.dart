@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:form_builder_validators/localization/l10n.dart';
-import 'package:mind_base/src/application/provider/event_provider.dart';
 import 'package:mind_base/src/application/provider/user_provider.dart';
 import 'package:mind_base/src/application/provider/workspace_manager_provider.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
@@ -16,9 +15,6 @@ class MindBaseApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MultiProvider(
         providers: [
-          ChangeNotifierProvider<EventProvider>(
-            create: (_) => EventProvider()..actInitializing(),
-          ),
           ChangeNotifierProvider<UserProvider>(
             create: (_) => UserProvider()..actInitializing(),
           ),
@@ -33,28 +29,25 @@ class MindBaseApp extends StatelessWidget {
                 pre!..actInitializing(),
           ),
         ],
-        child: Consumer<EventProvider>(
-          // 必须使用Consumer，否则无法获取到EventProvider
-          builder: (c, p, __) => MaterialApp.router(
-            routerDelegate: _router.delegate(),
-            routeInformationParser: _router.defaultRouteParser(),
-            title: 'Mind Base',
-            localizationsDelegates: const [
-              FormBuilderLocalizations.delegate,
-              ...GlobalMaterialLocalizations.delegates,
-            ],
-            supportedLocales: const [
-              Locale('zh', ''),
-              Locale('en', ''),
-              Locale('es', ''),
-              Locale('fa', ''),
-              Locale('fr', ''),
-              Locale('ja', ''),
-              Locale('pt', ''),
-              Locale('sk', ''),
-              Locale('pl', ''),
-            ],
-          ),
+        child: MaterialApp.router(
+          routerDelegate: _router.delegate(),
+          routeInformationParser: _router.defaultRouteParser(),
+          title: 'Mind Base',
+          localizationsDelegates: const [
+            FormBuilderLocalizations.delegate,
+            ...GlobalMaterialLocalizations.delegates,
+          ],
+          supportedLocales: const [
+            Locale('zh', ''),
+            Locale('en', ''),
+            Locale('es', ''),
+            Locale('fa', ''),
+            Locale('fr', ''),
+            Locale('ja', ''),
+            Locale('pt', ''),
+            Locale('sk', ''),
+            Locale('pl', ''),
+          ],
         ),
       );
 }
