@@ -5,16 +5,54 @@ import 'package:mind_base/src/infra/dto/dto_aw_impl.dart';
 import 'package:mind_base/src/interface/i_dao.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
 
-/// 适配Appwrite读写
+/// 适配Appwrite
+
+abstract class IAppwriteAccessor<T extends IEntityDto> extends IAccessor<T>{
+  String get collectionId;
+
+  @override
+  T jsonToDto(Map<String, dynamic> mgJson);
+
+  @override
+  T? jsonToDtoOr(Map<String, Object?>? mgJson);
+
+  @override
+  Map<String, dynamic> dtoToJson(T dto);
+
+  @override
+  Future<T?> findById(String id);
+
+  @override
+  Stream<T> findAll();
+
+  // Stream<WatchEvent<T>> watchById(String id);
+
+  @override
+  Future<Document> insert(T dto);
+
+  @override
+  Future<Document> update(T dto);
+
+  @override
+  Future<Document> replace(T dto);
+
+  /// 删除记录
+  @override
+  Future deleteBy(String id);
+
+  /// 删除表
+  @override
+  Future<bool> drop();
+}
 
 extension DocumentX on Document {
   toFullJson() => data..['id'] = $id;
 }
 
-abstract class BaseEttAccessor<T extends IEntityDto> implements IAccessor<T> {
+abstract class BaseAppwriteAccessor<T extends IEntityDto> implements IAppwriteAccessor<T> {
   final Database db;
 
-  const BaseEttAccessor(this.db);
+  const BaseAppwriteAccessor(this.db);
 
   @override
   T? jsonToDtoOr(Map<String, dynamic>? mgJson) =>
@@ -114,7 +152,7 @@ abstract class BaseEttAccessor<T extends IEntityDto> implements IAccessor<T> {
 }
 
 /// 根据 Meta-v3.1C 实现
-class WorkspaceEttAccessor extends BaseEttAccessor<WorkspaceDto> {
+class WorkspaceEttAccessor extends BaseAppwriteAccessor<WorkspaceDto> {
   @override
   final String collectionId;
 
@@ -130,7 +168,7 @@ class WorkspaceEttAccessor extends BaseEttAccessor<WorkspaceDto> {
 }
 
 /// 即Meta
-class RecordMetaEttAccessor extends BaseEttAccessor<RecordMetaDto> {
+class RecordMetaEttAccessor extends BaseAppwriteAccessor<RecordMetaDto> {
   @override
   final String collectionId;
 
@@ -151,7 +189,7 @@ class RecordMetaEttAccessor extends BaseEttAccessor<RecordMetaDto> {
       RecordMetaDtoAppwriteX(dto).toJson();
 }
 
-class RecordEttAccessor extends BaseEttAccessor<RecordDto> {
+class RecordEttAccessor extends BaseAppwriteAccessor<RecordDto> {
   @override
   final String collectionId;
 
