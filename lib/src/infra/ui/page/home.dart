@@ -186,7 +186,6 @@ class WorkspaceSelectorTitle extends StatelessWidget {
                 ],
                 onSelected: (value) {
                   // 选中Item后,在这里会被二次调用
-                  print("debug##$value");
                   switch (value) {
                     case 'create_workspace':
                       // showCreateWorkspaceDialog(context: context, actCreate: pManger.actCreateWorkspace);
@@ -198,8 +197,7 @@ class WorkspaceSelectorTitle extends StatelessWidget {
                     default:
                       if (value.startsWith(selectWorkspaceEvt)) {
                         final wsId = value.substring(selectWorkspaceEvt.length);
-                        // pManger.actOpenWorkspaceById(wsId);
-                        pWs.actSelectWorkspace(pManger, wsId);
+                        pManger.actOpenWorkspaceById(wsId);
                         return;
                       }
                       print("debug#未知的value#$value");
@@ -226,17 +224,20 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   final _kMethodBuilder = GlobalKey<FormBuilderState>();
 
   @override
-  Widget build(BuildContext context) =>
-      Consumer<WorkspaceProvider>(builder: (c, pWorkspace, _) {
-        switch (pWorkspace.state) {
-          case SidecarState.uninitialized:
-            return _buildWorkspaceSelector(context, pWorkspace);
-          case SidecarState.initializing:
-            return const Center(child: CircularProgressIndicator());
-          case SidecarState.initialized:
-            return _buildWorkspaceDetail(context, pWorkspace);
-        }
-      });
+  Widget build(BuildContext context) => Consumer<WorkspaceManagerProvider>(
+        builder: (c, pManager, _) {
+          switch (pManager.state) {
+            case SidecarState.uninitialized:
+              return _buildWorkspaceSelector(context, pManager);
+            case SidecarState.initializing:
+              return const Center(child: CircularProgressIndicator());
+            case SidecarState.initialized:
+              return (pManager.selectedWorkspace == null)
+                  ? _buildWorkspaceSelector(context, pManager)
+                  : _buildWorkspaceDetail(context);
+          }
+        },
+      );
 
   /// 选择工作空间
   _buildWorkspaceSelector(context, pWorkspace) {
@@ -245,64 +246,67 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
     //   builder: (c,p,_){
     //   },
     // );
-
     return const Center(child: Text("请在左上角打开一个工作空间"));
   }
 
+  // 已打开工作空间
   /// 工作空间内容
-  _buildWorkspaceDetail(context, WorkspaceProvider pWorkspace) => Row(
-        children: [
-          /// 左侧Meta List
-          SizedBox(
-            width: 200,
-            child: Stack(
-              children: [
-                ListView.builder(
-                  itemCount: pWorkspace.metaList.length,
-                  itemBuilder: (c, i) => ListTile(
-                    title: Text(pWorkspace.metaList[i].name),
-                    onTap: () =>
-                        pWorkspace.actWatchMeta(pWorkspace.metaList[i]),
-                  ),
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ListTile(
-                      title: const Text("新建一个表"),
-                      trailing: const Icon(Icons.add),
-                      onTap: () async {
-                        await pWorkspace
-                            .actSaveMeta(await showRecordMetaEditDialog(
-                          context: context,
-                          kAttrBuilder: _kAttrBuilder,
-                          kMetaBuilder: _kMetaBuilder,
-                          kMethodBuilder: _kMethodBuilder,
-                          queryMetaFn: pWorkspace.workspace.queryMeta,
-                          allMetas: pWorkspace.workspace.allMetas,
-                        ));
-                      },
+  _buildWorkspaceDetail(context) => Consumer<WorkspaceProvider>(
+        builder: (c, pWorkspace, _) => Row(
+          children: [
+            /// 左侧Meta List
+            SizedBox(
+              width: 200,
+              child: Stack(
+                children: [
+                  // MetaList
+                  ListView.builder(
+                    itemCount: pWorkspace.metaList.length,
+                    itemBuilder: (c, i) => ListTile(
+                      title: Text(pWorkspace.metaList[i].name),
+                      onTap: () =>
+                          pWorkspace.actWatchMeta(pWorkspace.metaList[i]),
                     ),
-                  ],
-                )
-              ],
+                  ),
+                  // 新建Meta
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ListTile(
+                        title: const Text("新建一个表"),
+                        trailing: const Icon(Icons.add),
+                        onTap: () async => await pWorkspace
+                            .actSaveMeta(await showRecordMetaEditDialog(
+                              context: context,
+                              kAttrBuilder: _kAttrBuilder,
+                              kMetaBuilder: _kMetaBuilder,
+                              kMethodBuilder: _kMethodBuilder,
+                              queryMetaFn: pWorkspace.workspace.queryMeta,
+                              allMetas: pWorkspace.workspace.allMetas,
+                            ))
+                            .thenDialog(context),
+                      ),
+                    ],
+                  )
+                ],
+              ),
             ),
-          ),
 
-          /// 右侧 table
-          if (pWorkspace.watchedMeta == null)
-            const Expanded(
-              child: Center(child: Text("请选择/创建 一个Meta")),
-            ),
-          if (pWorkspace.watchedMeta != null)
-            RecordDataGrid(
-              key: ValueKey(pWorkspace.watchedMeta),
-              dataGridSource:
-                  pWorkspace.actGetDataSource() as RecordDataGridSourcePluto,
-              onSaveRecord: pWorkspace.actSaveRecord,
-              onSaveMeta: pWorkspace.actSaveMeta,
-            ),
-        ],
+            /// 右侧 table
+            if (pWorkspace.watchedMeta == null)
+              const Expanded(
+                child: Center(child: Text("请选择/创建 一个Meta")),
+              ),
+            if (pWorkspace.watchedMeta != null)
+              RecordDataGrid(
+                key: ValueKey(pWorkspace.watchedMeta),
+                dataGridSource:
+                    pWorkspace.actGetDataSource() as RecordDataGridSourcePluto,
+                onSaveRecord: pWorkspace.actSaveRecord,
+                onSaveMeta: pWorkspace.actSaveMeta,
+              ),
+          ],
+        ),
       );
 }
 
