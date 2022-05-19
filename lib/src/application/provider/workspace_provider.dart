@@ -18,7 +18,7 @@ class WorkspaceProvider extends ProviderSidecar {
   MetaDtoRepo? _metaDtoRepo;
 
   // <MetaId,Accessor>
-  final Map<String, RecordEttAccessor> _recordAccessors = {};
+  final Map<String, RecordDtoRepo> _recordAccessors = {};
 
   // 核心状态
   OpenedWorkspace? openedWorkspace;
@@ -66,8 +66,8 @@ class WorkspaceProvider extends ProviderSidecar {
         _metaDtoRepo = null;
       });
 
-  RecordEttAccessor _recordAccessor(String metaId) =>
-      _recordAccessors[metaId] ??= RecordEttAccessor(sl<Database>(), metaId);
+  RecordDtoRepo _recordAccessor(RecordMeta meta) =>
+      _recordAccessors[meta.id] ??= RecordDtoRepo.withDI(sl, meta);
 
   /// 业务逻辑-Meta ==============================================================
   /// MetaProvider
@@ -115,27 +115,16 @@ class WorkspaceProvider extends ProviderSidecar {
   void actRemoveMeta(String metaId) =>
       actWrapper(() => setInitialized("删除Meta [$metaId]", () async {
             // 取消meta的监听
-            actWatchMeta(null);
+            actSelectMeta(null);
             // 从数据库中删除 Meta记录
             await _metaDtoRepo!.deleteBy(metaId);
             // 从数据库中删除 Meta对应的Record集合
-            await _recordAccessor(metaId).drop();
+            // fixme 删除Record集合
+            // await _recordAccessor(metaId).drop();
           }));
 
   /// 业务逻辑-Record ============================================================
   /// RecordProvider
-
-  @Deprecated("使用 selectedMeta")
-  RecordMeta? watchedMeta;
-
-// 切换监听的Meta
-  @Deprecated("使用 selectedMeta")
-  Future<void> actWatchMeta(RecordMeta? meta) => actWrapper(
-        () => setInitialized(
-          meta == null ? "取消监听Meta" : "开始/切换监听Meta[${meta.name}]",
-          () => watchedMeta = meta,
-        ),
-      );
 
   Future<void> actSelectMeta(RecordMeta? meta) => actWrapper(
         () => setInitialized(
@@ -148,33 +137,33 @@ class WorkspaceProvider extends ProviderSidecar {
   Record actQueryRecordBy(
     String recordId, {
     String? metaId,
-    @Deprecated("使用metaId查询") RecordMeta? meta,
     bool queryGlobal = false, // true表示查询所有类型的MetaId下的记录,只要recordId相符即可
   }) =>
       workspace.queryRecordBy(
         recordId,
-        metaId: queryGlobal ? null : metaId ?? (meta ?? watchedMeta)?.id,
+        metaId: queryGlobal ? null : metaId ?? (selectedMeta)?.id,
       );
 
   Future<void> actSaveRecord(RecordDto? dto) => actWrapper(() async {
         log("actSaveRecord [${dto?.id}]");
         // 无需set,因为插入成功后, watch会监听到新的变更
         if (dto == null) return;
-        // fixme 需要用到recordRepo, 包装save方法
-        await _recordAccessor(dto.metaId).replace(dto);
+        final meta = selectedMeta!;
+        print("debug debug #meta [$meta]");
+        await _recordAccessor(meta.meta).update(dto);
         // await RecordAccessor(sl<Db>(), dto.metaIdHex).save(dto.id, dto);
       });
 
   Future<void> actRemoveRecordBy(int rowIndex) {
-    final meta = watchedMeta;
+    final meta = selectedMeta;
     final rcd = workspace.getRecords(meta!.id)[rowIndex];
-    return actRemoveRecord(meta, rcd.id);
+    return actRemoveRecord(meta.meta, rcd.id);
   }
 
   Future<void> actRemoveRecord(RecordMeta meta, String ettId) =>
       actWrapper(() async {
         log("actRemoveRecord $ettId");
-        await _recordAccessor(meta.id).deleteBy(ettId);
+        await _recordAccessor(meta).deleteBy(ettId);
       });
 
 // <MetaId, 数据源>
@@ -206,7 +195,7 @@ class WorkspaceProvider extends ProviderSidecar {
 
   /// 获取已缓存的数据源
   IRecordDataGridSource actGetDataSource([String? metaId]) =>
-      _getByMetaId(metaId ?? watchedMeta!.id);
+      _getByMetaId(metaId ?? selectedMeta!.id);
 
   IRecordDataGridSource _getByMetaId(String metaId) => _cacheSource[metaId] ??=
       _newDataSource(workspace.workspace.getMetaBy(metaId)!);
