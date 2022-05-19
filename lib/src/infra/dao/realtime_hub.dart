@@ -18,11 +18,11 @@ class RealtimeChannelHub {
 
   RealtimeChannelHub(this._realtime);
 
-  Stream<RealtimeMessage> get stream => _messageStreamController.stream
-    .doOnCancel(() {
-      // 如果Dao中的doOnCancel有效,则这里的doOnCancel可以移除
-      print("debug #RealtimeChannelHub stream cancel! ${DateTime.now()}");
-    });
+  Stream<RealtimeMessage> get stream =>
+      _messageStreamController.stream.doOnCancel(() {
+        // 如果Dao中的doOnCancel有效,则这里的doOnCancel可以移除
+        print("debug #RealtimeChannelHub stream cancel! ${DateTime.now()}");
+      });
 
   // 添加订阅并择时刷新
   actAddChannel(SubChannel channel) {
@@ -132,7 +132,12 @@ class SubChannel {
 
   const SubChannel(this.channel, this.tag);
 
-  // 监听某个集合(表)的增删改事件
+  // 监听某个文档(记录)的删改事件
+  const SubChannel.document(String collectionId, String documentId,
+      {String tag = ''})
+      : this("$_collectionsL1.$collectionId.$_documentsL2.$documentId", tag);
+
+  // 监听某个集合(表)中所有记录的 增删改事件
   const SubChannel.collection(String collectionId, {String tag = ''})
       : this("$_collectionsL1.$collectionId.$_documentsL2", tag);
 
