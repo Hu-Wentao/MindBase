@@ -13,10 +13,10 @@ import 'package:logging/logging.dart' as _i7;
 
 import '../application.dart' as _i8;
 import '../application/service/account_service.dart' as _i5;
-import '../application/service/realtime_service.dart' as _i12;
-import '../application/service/workspace_service.dart' as _i11;
-import '../domain/repo/repo.dart' as _i10;
-import '../infra/dao/dao_aw_impl.dart' as _i9;
+import '../application/service/workspace_service.dart' as _i12;
+import '../domain/repo/repo.dart' as _i11;
+import '../infra/dao/dao_aw_impl.dart' as _i10;
+import '../infra/dao/realtime_hub.dart' as _i9;
 import 'app_client_config.dart' as _i13;
 import 'app_server_config.dart' as _i14;
 import 'common_config.dart' as _i16;
@@ -45,20 +45,20 @@ _i1.GetIt $initGetIt(_i1.GetIt get,
   gh.lazySingleton<_i7.Logger>(
       () => configCommon.logger(get<_i8.MindBaseConfig>()));
   gh.lazySingleton<_i3.Realtime>(() => appClientConfig.realtime);
+  gh.lazySingleton<_i9.RealtimeChannelHub>(
+      () => _i9.RealtimeChannelHub(get<_i3.Realtime>()));
   gh.lazySingleton<_i3.Storage>(() => appClientConfig.storage);
   gh.lazySingleton<_i4.Storage>(() => appServerConfig.storage);
   gh.lazySingleton<_i3.Teams>(() => appClientConfig.teams);
   gh.lazySingleton<_i4.Teams>(() => appServerConfig.teams);
-  gh.lazySingleton<_i9.WorkspaceEttAccessor>(() => appClientConfig.wsEttAcc);
-  gh.lazySingleton<_i10.WorkspaceRepo>(() =>
-      _i10.WorkspaceRepo(get<_i3.Database>(), get<_i9.WorkspaceEttAccessor>()));
-  gh.lazySingleton<_i11.WorkspaceService>(() => _i11.WorkspaceService(
+  gh.lazySingleton<_i10.WorkspaceEttAccessor>(() => appClientConfig.wsEttAcc);
+  gh.lazySingleton<_i11.WorkspaceRepo>(() => _i11.WorkspaceRepo(
+      get<_i3.Database>(), get<_i10.WorkspaceEttAccessor>()));
+  gh.lazySingleton<_i12.WorkspaceService>(() => _i12.WorkspaceService(
       get<_i3.Database>(),
       get<_i3.Teams>(),
-      get<_i10.WorkspaceRepo>(),
-      get<_i9.WorkspaceEttAccessor>()));
-  gh.lazySingleton<_i12.RealTimeService>(
-      () => _i12.RealTimeService(get<_i3.Realtime>()));
+      get<_i11.WorkspaceRepo>(),
+      get<_i10.WorkspaceEttAccessor>()));
   return get;
 }
 
