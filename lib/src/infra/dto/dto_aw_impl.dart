@@ -94,7 +94,7 @@ extension RecordMetaDtoAppwriteX on RecordMetaDto {
     return RecordMetaDto(
       id: (json['id'] as String?) ?? '请注入id或使用toFullJson',
       name: json['name'] as String,
-      memo: json['memo'] as String,
+      memo: json['memo'] as String? ?? '',
       maxKey: json['maxKey'] as int,
       attrs: a.isEmpty
           ? []
