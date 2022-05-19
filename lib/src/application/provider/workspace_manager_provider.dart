@@ -14,7 +14,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   late EventBus _eventBus;
   late WorkspaceService _workspaceSrv;
 
-  // 父级状态
+  // 父级状态 缓存当前已登录的用户, 确保登录用户与缓存的工作空间是一致的;
   User? user;
 
   // 状态
@@ -22,32 +22,26 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   List<OpenedWorkspace> openedWorkspaces = [];
 
   // 用户登录成功后,才能够获取到 工作空间列表
-  WorkspaceManagerProvider(this.user) : super(onCatch: ExceptionAdapter.of);
+  WorkspaceManagerProvider() : super(onCatch: ExceptionAdapter.of);
 
   @override
   onInitializing() async {
-    // user为null,表示尚未登录X
-    if (user == null) {
-      setUninitialized("尚未登录");
-      return;
-    }
-    //
     _workspaceSrv = sl<WorkspaceService>();
     _eventBus = sl<EventBus>();
-    //
-    _initEventBus();
+    // _initEventBus();
     _initWorkspaces();
+    // todo 考虑添加一层OpenTeam,以监听工作空间的创建与关闭
     setInitialized("工作空间同步完成");
   }
 
-  _initEventBus() => _eventBus
-    ..on<WorkspaceOpenedEvt>().listen((event) {
-      // 获取数据
-    });
+  // _initEventBus() => _eventBus
+  //   ..on<WorkspaceOpenedEvt>().listen((event) {
+  //     // 获取数据
+  //   });
 
   // 同步当前用户的工作空间 等
-  _initWorkspaces() async => workspaces =
-      await (_workspaceSrv.queryAllUserWorkspaces());
+  _initWorkspaces() async =>
+      workspaces = await (_workspaceSrv.queryAllUserWorkspaces());
 
   actUpdate(User? nUser) {
     // print("actUpdate user: $nUser, judge: ${nUser != user}; ${nUser == null}");
@@ -98,9 +92,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
 
   // `real` 打开工作空间, 并缓存
   _openWorkspace(Workspace workspace) {
-    final w = workspace.open(
-      sl<EventBus>().on<DatabaseEvent>(),
-    );
+    final w = _workspaceSrv.openWorkspace(workspace);
     openedWorkspaces.add(w);
     return w;
   }

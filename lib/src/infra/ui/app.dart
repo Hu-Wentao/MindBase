@@ -19,7 +19,7 @@ class MindBaseApp extends StatelessWidget {
             create: (_) => UserProvider()..actInitializing(),
           ),
           ChangeNotifierProxyProvider<UserProvider, WorkspaceManagerProvider>(
-              create: (_) => WorkspaceManagerProvider(null),
+              create: (_) => WorkspaceManagerProvider(),
               update: (c, u, pre) => pre!..actUpdate(u.user)),
           ChangeNotifierProxyProvider<WorkspaceManagerProvider,
               WorkspaceProvider>(
