@@ -5,8 +5,9 @@ import 'package:mind_base/src/application/service/workspace_service.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/domain/value/event.dart';
-import 'package:mind_base/src/interface/i_dao.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
+
+import 'model/opened_workspace.dart';
 
 /// 管理用户名下的所有工作空间
 /// 包括对`已打开的的Workspace的数据同步工作`

@@ -10,10 +10,12 @@ import 'package:mind_base/src/infra/ui/widget/data_table_source.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
+import 'model/opened_workspace.dart';
+
 /// 统一监听与处理工作空间内的所有数据
 /// fixme 需要重构
 class WorkspaceProvider extends ProviderSidecar {
-  late MetaDtoRepo _metaDtoRepo;
+  MetaDtoRepo? _metaDtoRepo;
 
   // <MetaId,Accessor>
   final Map<String, RecordEttAccessor> _recordAccessors = {};
@@ -22,7 +24,8 @@ class WorkspaceProvider extends ProviderSidecar {
   OpenedWorkspace? openedWorkspace;
 
   List<OpenedMeta> get openedMetas => openedWorkspace!.openedMetas;
-  OpenedMeta? selectedWorkspace;
+
+  OpenedMeta? selectedMeta;
 
   @Deprecated("使用 openedWorkspace")
   OpenedWorkspace get workspace => openedWorkspace!;
@@ -30,36 +33,38 @@ class WorkspaceProvider extends ProviderSidecar {
   WorkspaceProvider([this.openedWorkspace]);
 
   @override
-  onInitializing() => (openedWorkspace == null)
-      ? setUninitialized("尚未打开工作空间")
-      : setInitialized("工作空间[${openedWorkspace!.workspace.id}]初始化完成", () {
-          _metaDtoRepo = MetaDtoRepo.withDI(sl, workspace.workspace.id);
-        });
+  onInitializing() => actOnSelectedWorkspaceUpdate(null);
 
   actOnSelectedWorkspaceUpdate(OpenedWorkspace? selectedWorkspace) {
     if (selectedWorkspace == null) {
       // 取消选择工作空间
       return (openedWorkspace == null)
           ? setUninitialized("尚未选择工作空间,无需重复取消选择")
-          : setUninitialized("工作空间[${openedWorkspace!.workspace.id}]已取消选中", () {
-              openedWorkspace = null;
-            });
+          : _setNoneWorkspace();
     } else {
       // 选择新的工作空间
       if (openedWorkspace == null) {
-        return setInitialized("选择新的工作空间[${selectedWorkspace.id}]", () {
-          openedWorkspace = selectedWorkspace;
-        });
+        return _setNewWorkspace(selectedWorkspace);
       } else {
         // 替换选择的工作空间
         return (openedWorkspace!.id == selectedWorkspace.id)
             ? setInitialized("工作空间[${openedWorkspace!.id}]已选中,无需重复选中")
-            : setInitialized("选择新的工作空间[${selectedWorkspace.id}]", () {
-                openedWorkspace = selectedWorkspace;
-              });
+            : _setNewWorkspace(selectedWorkspace);
       }
     }
   }
+
+  _setNewWorkspace(OpenedWorkspace selectedWorkspace) =>
+      setInitialized("选择新的工作空间[${selectedWorkspace.id}]", () {
+        openedWorkspace = selectedWorkspace;
+        _metaDtoRepo = MetaDtoRepo.withDI(sl, selectedWorkspace.id);
+      });
+
+  _setNoneWorkspace() =>
+      setUninitialized("工作空间[${openedWorkspace!.workspace.id}]已取消选中", () {
+        openedWorkspace = null;
+        _metaDtoRepo = null;
+      });
 
   RecordEttAccessor _recordAccessor(String metaId) =>
       _recordAccessors[metaId] ??= RecordEttAccessor(sl<Database>(), metaId);
@@ -72,17 +77,17 @@ class WorkspaceProvider extends ProviderSidecar {
 // todo 考虑改成 MetaDto
   Future<void> actInsertMeta(RecordMeta meta) =>
       actWrapper(() => setInitialized("新增Meta [$meta]", () async {
-            await _metaDtoRepo.insert(meta.toDto());
+            await _metaDtoRepo!.insert(meta.toDto());
           }));
 
   Future<BaseException?> actSaveMeta(RecordMetaDto? dto) async =>
       await actWrapper(() => setInitialized("保存元素 [$dto]", () async {
             if (dto == null) return null;
-            await _metaDtoRepo.update(dto);
+            await _metaDtoRepo!.update(dto);
           }));
 
   Future<RecordMetaDto?> actQueryMeta(String metaId) =>
-      _metaDtoRepo.findById(metaId);
+      _metaDtoRepo!.findById(metaId);
 
 // 更新meta的指定Attr
   Future<BaseException?> actEditAttribute(
@@ -105,14 +110,14 @@ class WorkspaceProvider extends ProviderSidecar {
   }
 
   Future<List<RecordMetaDto>> actQueryMetaByName(String metaName) async =>
-      _metaDtoRepo.findAllBy(metaName).toList();
+      _metaDtoRepo!.findAllBy(metaName).toList();
 
   void actRemoveMeta(String metaId) =>
       actWrapper(() => setInitialized("删除Meta [$metaId]", () async {
             // 取消meta的监听
             actWatchMeta(null);
             // 从数据库中删除 Meta记录
-            await _metaDtoRepo.deleteBy(metaId);
+            await _metaDtoRepo!.deleteBy(metaId);
             // 从数据库中删除 Meta对应的Record集合
             await _recordAccessor(metaId).drop();
           }));
@@ -120,13 +125,23 @@ class WorkspaceProvider extends ProviderSidecar {
   /// 业务逻辑-Record ============================================================
   /// RecordProvider
 
+  @Deprecated("使用 selectedMeta")
   RecordMeta? watchedMeta;
 
 // 切换监听的Meta
+  @Deprecated("使用 selectedMeta")
   Future<void> actWatchMeta(RecordMeta? meta) => actWrapper(
         () => setInitialized(
           meta == null ? "取消监听Meta" : "开始/切换监听Meta[${meta.name}]",
           () => watchedMeta = meta,
+        ),
+      );
+
+  Future<void> actSelectMeta(RecordMeta? meta) => actWrapper(
+        () => setInitialized(
+          meta == null ? "取消监听Meta" : "开始/切换监听Meta[${meta.name}]",
+          () => selectedMeta =
+              openedMetas.firstWhere((element) => element.id == meta!.id),
         ),
       );
 

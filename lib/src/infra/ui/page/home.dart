@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:mind_base/src/application/provider/model/opened_workspace.dart';
 import 'package:mind_base/src/application/provider/user_provider.dart';
 import 'package:mind_base/src/application/provider/workspace_manager_provider.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
@@ -252,61 +253,82 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   // 已打开工作空间
   /// 工作空间内容
   _buildWorkspaceDetail(context) => Consumer<WorkspaceProvider>(
-        builder: (c, pWorkspace, _) => Row(
-          children: [
-            /// 左侧Meta List
-            SizedBox(
-              width: 200,
-              child: Stack(
-                children: [
-                  // MetaList
-                  ListView.builder(
-                    itemCount: pWorkspace.metaList.length,
-                    itemBuilder: (c, i) => ListTile(
-                      title: Text(pWorkspace.metaList[i].name),
-                      onTap: () =>
-                          pWorkspace.actWatchMeta(pWorkspace.metaList[i]),
-                    ),
-                  ),
-                  // 新建Meta
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
+        builder: (c, pWorkspace, _) {
+          print(
+              'debug#_buildWorkspaceDetail 重建# ${pWorkspace.openedWorkspace?.openedMetas}');
+          return ChangeNotifierProvider<OpenedMeta?>.value(
+            value: pWorkspace.selectedMeta,
+            child: Row(
+              children: [
+                /// 左侧Meta List
+                SizedBox(
+                  width: 200,
+                  child: Stack(
                     children: [
-                      ListTile(
-                        title: const Text("新建一个表"),
-                        trailing: const Icon(Icons.add),
-                        onTap: () async => await pWorkspace
-                            .actSaveMeta(await showRecordMetaEditDialog(
-                              context: context,
-                              kAttrBuilder: _kAttrBuilder,
-                              kMetaBuilder: _kMetaBuilder,
-                              kMethodBuilder: _kMethodBuilder,
-                              queryMetaFn: pWorkspace.workspace.queryMeta,
-                              allMetas: pWorkspace.workspace.allMetas,
-                            ))
-                            .thenDialog(context),
+                      // MetaList
+                      ChangeNotifierProvider<OpenedWorkspace?>.value(
+                        value: pWorkspace.openedWorkspace,
+                        child: Consumer<OpenedWorkspace?>(
+                          builder: (c, p, _) => (p == null)
+                              ? const Text("Error selectedWorkspace==null")
+                              : ListView.builder(
+                                  itemCount: p.openedMetas.length,
+                                  // itemCount: pWorkspace.metaList.length,
+                                  itemBuilder: (c, i) => ListTile(
+                                    title: Text(p.openedMetas[i].meta.name),
+                                    onTap: () => pWorkspace
+                                        .actSelectMeta(p.openedMetas[i].meta),
+                                  ),
+                                ),
+                        ),
                       ),
+                      // 新建Meta
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ListTile(
+                            title: const Text("新建一个表"),
+                            trailing: const Icon(Icons.add),
+                            onTap: () async => await pWorkspace
+                                .actSaveMeta(await showRecordMetaEditDialog(
+                                  context: context,
+                                  kAttrBuilder: _kAttrBuilder,
+                                  kMetaBuilder: _kMetaBuilder,
+                                  kMethodBuilder: _kMethodBuilder,
+                                  queryMetaFn: pWorkspace.workspace.queryMeta,
+                                  allMetas: pWorkspace.workspace.allMetas,
+                                ))
+                                .thenDialog(context),
+                          ),
+                        ],
+                      )
                     ],
-                  )
-                ],
-              ),
-            ),
+                  ),
+                ),
 
-            /// 右侧 table
-            if (pWorkspace.watchedMeta == null)
-              const Expanded(
-                child: Center(child: Text("请选择/创建 一个Meta")),
-              ),
-            if (pWorkspace.watchedMeta != null)
-              RecordDataGrid(
-                key: ValueKey(pWorkspace.watchedMeta),
-                dataGridSource:
-                    pWorkspace.actGetDataSource() as RecordDataGridSourcePluto,
-                onSaveRecord: pWorkspace.actSaveRecord,
-                onSaveMeta: pWorkspace.actSaveMeta,
-              ),
-          ],
-        ),
+                /// 右侧 table
+                // if (pWorkspace.watchedMeta == null)
+                Consumer<OpenedMeta?>(
+                  builder: (c, p, _) {
+                    return (p == null)
+                        ? const Expanded(
+                            child: Center(child: Text("请选择/创建 一个Meta")),
+                          )
+                        : RecordDataGrid(
+                            key: ValueKey(pWorkspace.selectedMeta),
+                            dataGridSource: p.dataSource,
+                            // dataGridSource: pWorkspace.actGetDataSource()
+                            //     as RecordDataGridSourcePluto,
+                            onSaveRecord: pWorkspace.actSaveRecord,
+                            onSaveMeta: pWorkspace.actSaveMeta,
+                          );
+                  },
+                ),
+                // if (pWorkspace.watchedMeta != null)
+              ],
+            ),
+          );
+        },
       );
 }
 
