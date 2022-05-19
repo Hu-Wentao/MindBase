@@ -17,45 +17,59 @@ class WorkspaceProvider extends ProviderSidecar {
 
   // <MetaId,Accessor>
   final Map<String, RecordEttAccessor> _recordAccessors = {};
+
+  // 核心状态
   OpenedWorkspace? openedWorkspace;
 
+  List<OpenedMeta> get openedMetas => openedWorkspace!.openedMetas;
+  OpenedMeta? selectedWorkspace;
+
+  @Deprecated("使用 openedWorkspace")
   OpenedWorkspace get workspace => openedWorkspace!;
 
-  WorkspaceProvider(this.openedWorkspace);
+  WorkspaceProvider([this.openedWorkspace]);
 
   @override
-  onInitializing() {
-    if (openedWorkspace == null) {
-      setUninitialized("尚未打开工作空间");
-      return;
+  onInitializing() => (openedWorkspace == null)
+      ? setUninitialized("尚未打开工作空间")
+      : setInitialized("工作空间[${openedWorkspace!.workspace.id}]初始化完成", () {
+          _metaDtoRepo = MetaDtoRepo.withDI(sl, workspace.workspace.id);
+        });
+
+  actOnSelectedWorkspaceUpdate(OpenedWorkspace? selectedWorkspace) {
+    if (selectedWorkspace == null) {
+      // 取消选择工作空间
+      return (openedWorkspace == null)
+          ? setUninitialized("尚未选择工作空间,无需重复取消选择")
+          : setUninitialized("工作空间[${openedWorkspace!.workspace.id}]已取消选中", () {
+              openedWorkspace = null;
+            });
+    } else {
+      // 选择新的工作空间
+      if (openedWorkspace == null) {
+        return setInitialized("选择新的工作空间[${selectedWorkspace.id}]", () {
+          openedWorkspace = selectedWorkspace;
+        });
+      } else {
+        // 替换选择的工作空间
+        return (openedWorkspace!.id == selectedWorkspace.id)
+            ? setInitialized("工作空间[${openedWorkspace!.id}]已选中,无需重复选中")
+            : setInitialized("选择新的工作空间[${selectedWorkspace.id}]", () {
+                openedWorkspace = selectedWorkspace;
+              });
+      }
     }
-    _metaDtoRepo = MetaDtoRepo.withDI(sl, workspace.workspace.id);
-    setInitialized("工作空间[${openedWorkspace!.workspace.id}]初始化完成");
   }
 
   RecordEttAccessor _recordAccessor(String metaId) =>
-      _recordAccessors[metaId] ??= RecordEttAccessor(
-          sl<Database>(), metaId);
-
-  actSelectWorkspace(WorkspaceManagerProvider pManager, String wsId) async {
-    setInitializing("正在打开工作空间[$wsId]");
-    final OpenedWorkspace opendsWs = await pManager.getOpenedWorkspace(wsId);
-    openedWorkspace = opendsWs;
-    openedWorkspace!.subs.onData((data) {
-      // fixme 手动刷新
-      opendsWs.onWatchMetaEvt(data);
-      // fixme 可以监听到消息
-      setInitialized("OpenedWorkspace 刷新数据[${data.type}]");
-    });
-    setInitialized("已打开工作空间[${opendsWs.workspace.name}],ID[$wsId]");
-  }
+      _recordAccessors[metaId] ??= RecordEttAccessor(sl<Database>(), metaId);
 
   /// 业务逻辑-Meta ==============================================================
   /// MetaProvider
 
   List<RecordMeta> get metaList => workspace.allMetas().toList();
 
-  // todo 考虑改成 MetaDto
+// todo 考虑改成 MetaDto
   Future<void> actInsertMeta(RecordMeta meta) =>
       actWrapper(() => setInitialized("新增Meta [$meta]", () async {
             await _metaDtoRepo.insert(meta.toDto());
@@ -70,7 +84,7 @@ class WorkspaceProvider extends ProviderSidecar {
   Future<RecordMetaDto?> actQueryMeta(String metaId) =>
       _metaDtoRepo.findById(metaId);
 
-  // 更新meta的指定Attr
+// 更新meta的指定Attr
   Future<BaseException?> actEditAttribute(
     RecordMetaDto metaDto,
     AttributeDto? attr,
@@ -108,7 +122,7 @@ class WorkspaceProvider extends ProviderSidecar {
 
   RecordMeta? watchedMeta;
 
-  // 切换监听的Meta
+// 切换监听的Meta
   Future<void> actWatchMeta(RecordMeta? meta) => actWrapper(
         () => setInitialized(
           meta == null ? "取消监听Meta" : "开始/切换监听Meta[${meta.name}]",
@@ -147,7 +161,7 @@ class WorkspaceProvider extends ProviderSidecar {
         await _recordAccessor(meta.id).deleteBy(ettId);
       });
 
-  // <MetaId, 数据源>
+// <MetaId, 数据源>
   final Map<String, IRecordDataGridSource> _cacheSource = {};
 
   void _findCachedSource(
@@ -165,7 +179,7 @@ class WorkspaceProvider extends ProviderSidecar {
         (source) => source.onInsertEvt(record),
       );
 
-  // index: 更新的Record在cache中的索引
+// index: 更新的Record在cache中的索引
   void _onEvtUpdateRecordSource(Record record, int index) => _findCachedSource(
         record.meta.id,
         (source) => source.onUpdateEvt(record, index),
