@@ -1,6 +1,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
-import 'package:mind_base/src/domain/entity/entity.dart';
+import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/infra/dao/realtime_hub.dart';
 import 'package:mind_base/src/infra/dto/dto_aw_impl.dart';
 import 'package:mind_base/src/interface/i_dao.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
@@ -24,8 +25,6 @@ abstract class IAppwriteAccessor<T extends IEntityDto> extends IAccessor<T> {
 
   @override
   Stream<T> findAll();
-
-  // Stream<WatchEvent<T>> watchById(String id);
 
   @override
   Future<Document> insert(T dto);
@@ -74,32 +73,6 @@ abstract class BaseAppwriteAccessor<T extends IEntityDto>
       yield jsonToDto(e.toFullJson());
     }
   }
-
-  // @override
-  // Stream<WatchEvent<T>> watchAll() => db
-  //         .collection(collectionId)
-  //         .watch(
-  //           builder?.build() ??
-  //               AggregationPipelineBuilder().addStage(
-  //                 Match(where.exists('_id').toQuery()),
-  //               ),
-  //         )
-  //         .map((e) => WatchEvent.of<T>(e, jsonToDtoOr))
-  //         .map((e) {
-  //       slLogger.info("[$runtimeType::watchAll] $e");
-  //       return e;
-  //     });
-
-  // @override
-  // Stream<WatchEvent<T>> watchById(String id) => db
-  //     .collection(collectionId)
-  //     .watch(
-  //       AggregationPipelineBuilder()
-  //           .addStage(Match(where.id(id).toQuery()))
-  //           .build(),
-  //     )
-  //     .map<mg.ChangeEvent>((e) => e as mg.ChangeEvent)
-  //     .map((v) => WatchEvent.of<T>(v, jsonToDtoOr));
 
   /// 当ObjectId已存在时,更新无效
   @override
@@ -154,9 +127,86 @@ abstract class BaseAppwriteAccessor<T extends IEntityDto>
   Future<bool> drop() => throw "需要Server Client";
 }
 
+mixin AppwriteAccessorWatchableMx<T extends IEntityDto>
+    on BaseAppwriteAccessor<T> {
+  static const collectionEvtTag = "database.documents.";
+
+  RealtimeChannelHub get hub;
+
+  Stream<AccessorEvt<T>> watchById(String id) {
+    final channel = SubChannel.document(collectionId, id);
+    hub.actAddChannel(channel);
+    return hub.stream
+        .where(
+          (event) =>
+              // todo 转换操作需要转移到其他类中, 例如[RealTimeEvtFactory]
+              event.event.startsWith(collectionEvtTag) &&
+              event.payload['\$collection'] == collectionId &&
+              event.payload['\$id'] == id,
+        )
+        .map((event) => AccessorEvt<T>(
+              _collectionEvt2AccessorEvtTp(event.event),
+              id,
+              collectionId,
+              jsonToDtoOr(event.payload),
+            ))
+        .doOnCancel(() {
+      print(
+          "debug #AppwriteAccessorWatchableMx::watchById cancel! 添加移除channel任务 ${DateTime.now()}");
+      hub.actRemoveChannel(channel);
+    });
+  }
+
+  /// 监听整个集合内的记录变更事件
+  Stream<AccessorEvt<T>> watchAll() {
+    final channel = SubChannel.collection(collectionId);
+    hub.actAddChannel(channel);
+    return hub.stream
+        .where(
+          (event) =>
+              // todo 转换操作需要转移到其他类中, 例如[RealTimeEvtFactory]
+              event.event.startsWith(collectionEvtTag) &&
+              event.payload['\$collection'] == collectionId,
+        )
+        .map((event) => AccessorEvt<T>(
+              _collectionEvt2AccessorEvtTp(event.event),
+              event.payload['\$id'],
+              collectionId,
+              jsonToDtoOr(event.payload),
+            ))
+        .doOnCancel(() {
+      print(
+          "debug #AppwriteAccessorWatchableMx::watchAll cancel! 添加移除channel任务 ${DateTime.now()}");
+      hub.actRemoveChannel(channel);
+    });
+    // todo 考虑通过转换为BroadcastStream来实现 onCancel自动取消Channel订阅的功能
+    // 但尚未验证副作用,需要测试
+    // .asBroadcastStream(onCancel: (sub) => hub.actRemoveChannel(channel))
+    // ;
+  }
+
+  // todo 转换操作需要转移到其他类中, 例如[RealTimeEvtFactory]
+  AccessorEvtTp _collectionEvt2AccessorEvtTp(String event) {
+    switch (event) {
+      case "${collectionEvtTag}create":
+        return AccessorEvtTp.insert;
+      case "${collectionEvtTag}update":
+        return AccessorEvtTp.update;
+      case "${collectionEvtTag}delete":
+        return AccessorEvtTp.delete;
+      default:
+        throw ("debug #_collectionEvt2AccessorEvtTp#Error! 未处理的event类型: $event");
+    }
+  }
+}
+
 /// 根据 Meta-v3.1C 实现
-class WorkspaceEttAccessor extends BaseAppwriteAccessor<WorkspaceDto> {
-  const WorkspaceEttAccessor(Database db, String collectionId)
+class WorkspaceEttAccessor extends BaseAppwriteAccessor<WorkspaceDto>
+    with AppwriteAccessorWatchableMx<WorkspaceDto> {
+  @override
+  final RealtimeChannelHub hub;
+
+  const WorkspaceEttAccessor(Database db, String collectionId, this.hub)
       : super(db, collectionId);
 
   @override
@@ -169,9 +219,13 @@ class WorkspaceEttAccessor extends BaseAppwriteAccessor<WorkspaceDto> {
 }
 
 /// 即Meta
-class RecordMetaEttAccessor extends BaseAppwriteAccessor<RecordMetaDto> {
+class RecordMetaEttAccessor extends BaseAppwriteAccessor<RecordMetaDto>
+    with AppwriteAccessorWatchableMx<RecordMetaDto> {
   const RecordMetaEttAccessor(Database db, String workspaceId)
       : super(db, workspaceId);
+
+  @override
+  RealtimeChannelHub get hub => sl<RealtimeChannelHub>();
 
   @override
   RecordMetaDto jsonToDto(Map<String, Object?> mgJson) =>
@@ -186,8 +240,12 @@ class RecordMetaEttAccessor extends BaseAppwriteAccessor<RecordMetaDto> {
       RecordMetaDtoAppwriteX(dto).toJson();
 }
 
-class RecordEttAccessor extends BaseAppwriteAccessor<RecordDto> {
+class RecordEttAccessor extends BaseAppwriteAccessor<RecordDto>
+    with AppwriteAccessorWatchableMx<RecordDto> {
   const RecordEttAccessor(Database db, String metaId) : super(db, metaId);
+
+  @override
+  RealtimeChannelHub get hub => sl<RealtimeChannelHub>();
 
   @override
   RecordDto jsonToDto(Map<String, dynamic> json) =>
