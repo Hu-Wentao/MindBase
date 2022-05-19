@@ -7,7 +7,7 @@ import 'package:mind_base/src/interface/i_dto.dart';
 
 /// 适配Appwrite
 
-abstract class IAppwriteAccessor<T extends IEntityDto> extends IAccessor<T>{
+abstract class IAppwriteAccessor<T extends IEntityDto> extends IAccessor<T> {
   String get collectionId;
 
   @override
@@ -49,10 +49,13 @@ extension DocumentX on Document {
   toFullJson() => data..['id'] = $id;
 }
 
-abstract class BaseAppwriteAccessor<T extends IEntityDto> implements IAppwriteAccessor<T> {
+abstract class BaseAppwriteAccessor<T extends IEntityDto>
+    implements IAppwriteAccessor<T> {
   final Database db;
+  @override
+  final String collectionId;
 
-  const BaseAppwriteAccessor(this.db);
+  const BaseAppwriteAccessor(this.db, this.collectionId);
 
   @override
   T? jsonToDtoOr(Map<String, dynamic>? mgJson) =>
@@ -153,10 +156,8 @@ abstract class BaseAppwriteAccessor<T extends IEntityDto> implements IAppwriteAc
 
 /// 根据 Meta-v3.1C 实现
 class WorkspaceEttAccessor extends BaseAppwriteAccessor<WorkspaceDto> {
-  @override
-  final String collectionId;
-
-  const WorkspaceEttAccessor(Database db, this.collectionId) : super(db);
+  const WorkspaceEttAccessor(Database db, String collectionId)
+      : super(db, collectionId);
 
   @override
   WorkspaceDto jsonToDto(Map<String, Object?> js) =>
@@ -169,12 +170,8 @@ class WorkspaceEttAccessor extends BaseAppwriteAccessor<WorkspaceDto> {
 
 /// 即Meta
 class RecordMetaEttAccessor extends BaseAppwriteAccessor<RecordMetaDto> {
-  @override
-  final String collectionId;
-
   const RecordMetaEttAccessor(Database db, String workspaceId)
-      : collectionId = workspaceId,
-        super(db);
+      : super(db, workspaceId);
 
   @override
   RecordMetaDto jsonToDto(Map<String, Object?> mgJson) =>
@@ -190,20 +187,13 @@ class RecordMetaEttAccessor extends BaseAppwriteAccessor<RecordMetaDto> {
 }
 
 class RecordEttAccessor extends BaseAppwriteAccessor<RecordDto> {
-  @override
-  final String collectionId;
-
   // Record所在Workspace的Meta查询方法.
   // 显然,在查询Record之前,应当先保存Workspace内所有的Meta,以供查询
-  final QueryMetaFn toMeta;
-
-  const RecordEttAccessor(Database db, String metaId, this.toMeta)
-      : collectionId = metaId,
-        super(db);
+  const RecordEttAccessor(Database db, String metaId) : super(db, metaId);
 
   @override
   RecordDto jsonToDto(Map<String, dynamic> json) =>
-      RecordDtoAppwriteX.fromJson(json, toMeta);
+      RecordDtoAppwriteX.fromJson(json);
 
   @override
   Map<String, dynamic> dtoToJson(RecordDto dto) =>
