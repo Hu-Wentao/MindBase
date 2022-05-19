@@ -187,8 +187,6 @@ class RecordMetaEttAccessor extends BaseAppwriteAccessor<RecordMetaDto> {
 }
 
 class RecordEttAccessor extends BaseAppwriteAccessor<RecordDto> {
-  // Record所在Workspace的Meta查询方法.
-  // 显然,在查询Record之前,应当先保存Workspace内所有的Meta,以供查询
   const RecordEttAccessor(Database db, String metaId) : super(db, metaId);
 
   @override

@@ -27,7 +27,7 @@ class WorkspaceService {
       RecordMetaEttAccessor(_db, workspaceId);
 
   RecordEttAccessor _getRecordAcc(Workspace ws, String meatId) =>
-      RecordEttAccessor(_db, meatId, ws.queryMeta);
+      RecordEttAccessor(_db, meatId);
 
   /// 查询一个工作空间内的所有Meta
   Stream<RecordMetaDto> queryMetasBy(String workspaceId) =>

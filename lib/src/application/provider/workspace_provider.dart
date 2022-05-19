@@ -35,7 +35,7 @@ class WorkspaceProvider extends ProviderSidecar {
 
   RecordEttAccessor _recordAccessor(String metaId) =>
       _recordAccessors[metaId] ??= RecordEttAccessor(
-          sl<Database>(), metaId, workspace.workspace.queryMeta);
+          sl<Database>(), metaId);
 
   actSelectWorkspace(WorkspaceManagerProvider pManager, String wsId) async {
     setInitializing("正在打开工作空间[$wsId]");
@@ -57,9 +57,7 @@ class WorkspaceProvider extends ProviderSidecar {
 
   Future<BaseException?> actSaveMeta(RecordMetaDto? dto) async =>
       await actWrapper(() => setInitialized("保存元素 [$dto]", () async {
-            if (dto == null) {
-              return null;
-            }
+            if (dto == null) return null;
             await _metaDtoRepo.update(dto);
           }));
 
