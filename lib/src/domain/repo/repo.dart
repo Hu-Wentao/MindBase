@@ -140,3 +140,101 @@ class MetaDtoRepo {
 
   deleteBy(String metaId) => _metaAcc.deleteBy(metaId);
 }
+
+class RecordDtoRepo {
+  final server.Database _serverDb;
+  final String collectionId; // 也是所在workspaceId
+  final RecordEttAccessor _recordAcc;
+
+  RecordDtoRepo(
+    this._serverDb,
+    this._recordAcc,
+    this.collectionId,
+  );
+
+  static RecordDtoRepo withDI(GetIt get, String metaId) => RecordDtoRepo(
+        get<server.Database>(),
+        RecordEttAccessor(get<Database>(), metaId),
+        metaId,
+      );
+
+  insert(RecordDto dto) async {
+    try {
+      await _recordAcc.insert(dto);
+    } on AppwriteException catch (e) {
+      if (e.type == 'collection_not_found') {
+        // 集合不存在,则创建集合
+        // fixme 新建的集合为"所有人可读写"
+        await createMetaCollection(null);
+        // 再次尝试
+        await _recordAcc.insert(dto);
+      }
+    } catch (e) {
+      print('insert meta error[$e]');
+      rethrow;
+    }
+  }
+
+  update(RecordDto dto) async {
+    try {
+      await _recordAcc.update(dto);
+    } on AppwriteException catch (e) {
+      if (e.type == 'collection_not_found') {
+        // 集合不存在,则创建集合
+        // fixme 新建的集合为"所有人可读写"
+        await createMetaCollection(null);
+        // 再次尝试
+        await update(dto);
+      } else if (e.type == 'document_not_found') {
+        // 文档不存在,新建文档
+        await insert(dto);
+      }
+    } catch (e) {
+      print('insert meta error[$e], type ${e.runtimeType}');
+      rethrow;
+    }
+  }
+
+  /// [teamId] 为空表示"所有人可读写"
+  /// 默认权限为 "团队内可读写"
+  createMetaCollection(String? teamId) async {
+    final permit = teamId == null ? ['role:all'] : ['team:$teamId'];
+    // 创建集合
+    await _serverDb.createCollection(
+      collectionId: collectionId,
+      name: 'meta_$collectionId',
+      permission: 'collection',
+      read: permit,
+      write: permit,
+    );
+    // 添加属性 <固定属性,无需用户指定>
+    await _serverDb.createStringAttribute(
+        collectionId: collectionId, key: 'name', size: 127, xrequired: true);
+    await _serverDb.createStringAttribute(
+        collectionId: collectionId,
+        key: 'memo',
+        size: 255,
+        xrequired: false,
+        xdefault: '');
+    await _serverDb.createIntegerAttribute(
+        collectionId: collectionId, key: 'maxKey', xrequired: true);
+    await _serverDb.createStringAttribute(
+        collectionId: collectionId,
+        key: 'attrs',
+        size: 65535,
+        xrequired: false,
+        xdefault: '');
+    await _serverDb.createStringAttribute(
+        collectionId: collectionId,
+        key: 'methods',
+        size: 65535,
+        xrequired: false,
+        xdefault: '');
+  }
+
+  findById(String metaId) => _recordAcc.findById(metaId);
+
+  findAll() => _recordAcc.findAll();
+
+  deleteBy(String metaId) => _recordAcc.deleteBy(metaId);
+}
