@@ -147,7 +147,7 @@ class WorkspaceProvider extends ProviderSidecar {
         // 无需set,因为插入成功后, watch会监听到新的变更
         if (dto == null) return;
         final meta = selectedMeta!;
-        await _recordDtoRepo(meta.meta).insert(dto);
+        await _recordDtoRepo(meta.meta).update(dto);
       });
 
   Future<void> actRemoveRecordBy(int rowIndex) {

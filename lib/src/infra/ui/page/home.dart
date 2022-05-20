@@ -253,11 +253,11 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   // 已打开工作空间
   /// 工作空间内容
   _buildWorkspaceDetail(context) => Consumer<WorkspaceProvider>(
-        builder: (c, pWorkspace, _) {
-          // print(
-          //     'debug#_buildWorkspaceDetail 重建# ${pWorkspace.openedWorkspace?.openedMetas}');
-          return ChangeNotifierProvider<OpenedMeta?>.value(
-            value: pWorkspace.selectedMeta,
+        builder: (c, pWorkspace, _) =>
+            ChangeNotifierProvider<OpenedMeta?>.value(
+          value: pWorkspace.selectedMeta,
+          child: ChangeNotifierProvider<OpenedWorkspace?>.value(
+            value: pWorkspace.openedWorkspace,
             child: Row(
               children: [
                 /// 左侧Meta List
@@ -266,21 +266,18 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                   child: Stack(
                     children: [
                       // MetaList
-                      ChangeNotifierProvider<OpenedWorkspace?>.value(
-                        value: pWorkspace.openedWorkspace,
-                        child: Consumer<OpenedWorkspace?>(
-                          builder: (c, p, _) => (p == null)
-                              ? const Text("Error selectedWorkspace==null")
-                              : ListView.builder(
-                                  itemCount: p.openedMetas.length,
-                                  // itemCount: pWorkspace.metaList.length,
-                                  itemBuilder: (c, i) => ListTile(
-                                    title: Text(p.openedMetas[i].meta.name),
-                                    onTap: () => pWorkspace
-                                        .actSelectOpenMeta(p.openedMetas[i]),
-                                  ),
+                      Consumer<OpenedWorkspace?>(
+                        builder: (c, p, _) => (p == null)
+                            ? const Text("Error selectedWorkspace==null")
+                            : ListView.builder(
+                                itemCount: p.openedMetas.length,
+                                // itemCount: pWorkspace.metaList.length,
+                                itemBuilder: (c, i) => ListTile(
+                                  title: Text(p.openedMetas[i].meta.name),
+                                  onTap: () => pWorkspace
+                                      .actSelectOpenMeta(p.openedMetas[i]),
                                 ),
-                        ),
+                              ),
                       ),
                       // 新建Meta
                       Column(
@@ -308,25 +305,21 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
 
                 /// 右侧 table
                 // if (pWorkspace.watchedMeta == null)
-                Consumer<OpenedMeta?>(
-                  builder: (c, p, _) {
-                    return (p == null)
-                        ? const Expanded(
-                            child: Center(child: Text("请选择/创建 一个Meta")),
-                          )
-                        : RecordDataGrid(
-                            // key: ValueKey(pWorkspace.selectedMeta),
-                            dataGridSource: p.dataSource,
-                            onSaveRecord: pWorkspace.actSaveRecord,
-                            onSaveMeta: pWorkspace.actSaveMeta,
-                          );
-                  },
-                ),
-                // if (pWorkspace.watchedMeta != null)
+                (pWorkspace.selectedMeta == null)
+                    ? const Expanded(
+                        child: Center(child: Text("请选择/创建 一个Meta")),
+                      )
+                    : RecordDataGrid(
+                        // fixme 数据更新后,本widget没有刷新, 添加key之后,可以在selectedMeta刷新时,被动刷新表格
+                        key: ValueKey(pWorkspace.selectedMeta),
+                        dataGridSource: pWorkspace.selectedMeta!.dataSource,
+                        onSaveRecord: pWorkspace.actSaveRecord,
+                        onSaveMeta: pWorkspace.actSaveMeta,
+                      ),
               ],
             ),
-          );
-        },
+          ),
+        ),
       );
 }
 
