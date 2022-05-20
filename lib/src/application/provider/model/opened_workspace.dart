@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:appwrite/appwrite.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
@@ -49,7 +50,9 @@ class OpenedWorkspace extends ChangeNotifier {
       _onEvtInsertMeta(e);
       notifyListeners();
     }, onError: (e, s) {
-      if (e.code == 404 && e.type == "collection_not_found") {
+      if (e is AppwriteException &&
+          e.code == 404 &&
+          e.type == "collection_not_found") {
         // 不存在则无需抛出异常
         print("debug OpenedMeta.openBy: [$e], 由推测的`Meta集合`尚未创建导致的,无需抛出异常");
       } else {
@@ -85,11 +88,12 @@ class OpenedWorkspace extends ChangeNotifier {
   }
 
   void removeMeta(String metaId) {
-    __indexByMetas(metaId,onFind: (i,m)=> metas.remove(m));
-    __indexByOpenedMetas(metaId,onFind: (i,m)=> openedMetas.remove(m));
+    __indexByMetas(metaId, onFind: (i, m) => metas.remove(m));
+    __indexByOpenedMetas(metaId, onFind: (i, m) => openedMetas.remove(m));
   }
 
-  void closeMeta(String metaId) => __indexByOpenedMetas(metaId,onFind: (i,m)=> m.close());
+  void closeMeta(String metaId) =>
+      __indexByOpenedMetas(metaId, onFind: (i, m) => m.close());
 
   @Deprecated("应当使用 selectedMeta.getRecords()")
   List<Record> getRecords(String metaId) =>
@@ -192,6 +196,7 @@ class OpenedMeta extends ChangeNotifier {
   final RecordMeta meta;
 
   String get id => meta.id;
+
   String get name => meta.name;
 
   OpenedMeta(this.meta);
@@ -205,7 +210,9 @@ class OpenedMeta extends ChangeNotifier {
       _onEvtInsertRecord(event.toDomain(meta));
       notifyListeners();
     }, onError: (e, s) {
-      if (e.code == 404 && e.type == "collection_not_found") {
+      if (e is AppwriteException &&
+          e.code == 404 &&
+          e.type == "collection_not_found") {
         // 不存在则无需抛出异常
         print("debug OpenedMeta.openBy: [$e], 由推测的`Record集合`尚未创建导致的,无需抛出异常");
       } else {
