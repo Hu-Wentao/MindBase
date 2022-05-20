@@ -58,7 +58,8 @@ extension IExprJsonDtoAppwriteX on IExprJsonDto {
 extension RecordDtoAppwriteX on RecordDto {
   Map<String, dynamic> toJson() => fields.map((key, value) => MapEntry(
         jsonEncode(key),
-        ValueJsonDtoAppwriteX(ValueJsonDto.fromDomain(value)).toJson(),
+        jsonEncode(
+            ValueJsonDtoAppwriteX(ValueJsonDto.fromDomain(value)).toJson()),
       ));
 
   static RecordDto fromDocument(Document doc) => fromJson(doc.data);
@@ -66,12 +67,15 @@ extension RecordDtoAppwriteX on RecordDto {
   static RecordDto fromJson(Map<String, dynamic> json) => RecordDto(
           fields: Map.fromEntries(
         json.entries
-            .where((element) => element.value is Map<String, dynamic>)
+            // 过滤掉Appwrite附加的 $id,$collection等字段
+            .where((entry) =>
+                !entry.key.startsWith('\$') && !entry.key.startsWith('id'))
             .map(
               (e) => MapEntry(
-                int.parse(e.key),
+                jsonDecode(e.key) as int,
                 // fixme #324 考虑移除Value包装;
-                ValueJsonDtoAppwriteX.fromJson(e.value).toDomain(null) as Value,
+                ValueJsonDtoAppwriteX.fromJson(jsonDecode(e.value))
+                    .toDomain(null) as Value,
               ),
             ),
       ));
