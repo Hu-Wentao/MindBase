@@ -163,8 +163,7 @@ extension PlutoRecordX on Record {
 
 extension PlutoRecordDtoX on RecordDto {
   // 更新全部,(其实可以只更新一个字段)
-  RecordDto updateBy(RecordMeta meta, PlutoRow row) {
-    assert(meta.id == metaIdHex);
+  RecordDto updateBy(PlutoRow row) {
     row.cells.forEach((propId, value) {
       fields[propId.parsePropK] = Value.of(value.value);
     });
@@ -224,8 +223,7 @@ class RecordDataGridSourcePluto extends IRecordDataGridSource {
   }
 
   @override
-  onRemoveEvt(String recordId, int index) {
-    print("onRemoveEvt $index");
+  onRemoveEvt(String recordId, @Deprecated("本实现类不需要index") int index) {
     // 如果是非活跃状态下... 则只移除Widget, 因为不需要刷新UI
     cachedRows.removeWhere((element) => element.key == ValueKey(recordId));
     // todo 优化:只刷新指定行

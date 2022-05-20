@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:mind_base/src/application/provider/model/opened_workspace.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
@@ -47,12 +48,9 @@ class _RecordDataGridState extends State<RecordDataGrid> {
   }
 
   @override
-  Widget build(BuildContext context) => Consumer<WorkspaceProvider>(
-        builder: (c, pWorkspace, _) {
-          final openedMeta = pWorkspace.selectedMeta!;
-          // final meta = pWorkspace.watchedMeta!;
-          final data = openedMeta.dataSource;
-              // pWorkspace.actGetDataSource() as RecordDataGridSourcePluto;
+  Widget build(BuildContext context) => Consumer<OpenedMeta?>(
+        builder: (c, openedMeta, _) {
+          final data = openedMeta!.dataSource;
           return Expanded(
             child: PlutoGrid(
               rows: data.cachedRows,
@@ -67,11 +65,11 @@ class _RecordDataGridState extends State<RecordDataGrid> {
                 final ettId = row.key as ValueKey<String>;
 
                 // 更新的DTO
-                final dto = pWorkspace
-                    .actQueryRecordBy(ettId.value, metaId: openedMeta.id)
+                final dto = openedMeta.records
+                    .firstWhere((element) => element.id == ettId.value)
                     .toDto()
-                    .updateBy(openedMeta.meta, row);
-                pWorkspace.actSaveRecord(dto); // 同步到服务器
+                    .updateBy(row);
+                widget.onSaveRecord(dto); // 同步到服务器
               },
               onSelected: (_) {
                 print("#debug #onSelected $_");
@@ -89,13 +87,15 @@ class _RecordDataGridState extends State<RecordDataGrid> {
               onRowsMoved: (_) {
                 print("#debug #onRowsMoved $_");
               },
-              createHeader: (manager) => DataFrameTitlePluto(
-                meta: openedMeta.meta,
-                stateManager: manager,
-                onSaveMeta: pWorkspace.actSaveMeta,
-                onSaveRecord: pWorkspace.actSaveRecord,
-                queryMetaFn: pWorkspace.workspace.queryMeta,
-                allMetas: pWorkspace.workspace.allMetas,
+              createHeader: (manager) => Consumer<OpenedWorkspace>(
+                builder: (c, p, _) => DataFrameTitlePluto(
+                  meta: openedMeta.meta,
+                  stateManager: manager,
+                  onSaveMeta: widget.onSaveMeta,
+                  onSaveRecord: widget.onSaveRecord,
+                  queryMetaFn: p.queryMeta,
+                  allMetas: p.allMetas,
+                ),
               ),
               // createFooter: (_) {             },
               // rowColorCallback: (_) {},
