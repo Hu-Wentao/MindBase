@@ -46,7 +46,6 @@ class OpenedWorkspace extends ChangeNotifier {
   }) {
     // 获取全部 fixme (执行成功了,但是没有刷新到UI上)
     fetchAllMeta().listen((e) {
-      print("debug getAllMetal XXX $e");
       _onEvtInsertMeta(e);
       notifyListeners();
     }, onError: (e, s) {
@@ -225,7 +224,12 @@ class OpenedMeta extends ChangeNotifier {
     });
   }
 
-  RecordDataGridSourcePluto get dataSource => RecordDataGridSourcePluto(
+  /// 内部缓存表格数据
+  /// fixme 如果meta更新,
+  RecordDataGridSourcePluto? _cachedDataSource;
+
+  RecordDataGridSourcePluto get dataSource =>
+      _cachedDataSource ??= RecordDataGridSourcePluto(
         meta: meta,
         cachedColumns: meta.toPlutoCols,
         cachedRows: records.map((e) => e.toPlutoRow()).toList(),
@@ -236,16 +240,13 @@ class OpenedMeta extends ChangeNotifier {
     switch (event.type) {
       case AccessorEvtTp.insert:
         _onEvtInsertRecord(event.dto!.toDomain(meta));
-        // _onEvtInsertRecordSource(event.dto!);
         break;
       case AccessorEvtTp.replace:
       case AccessorEvtTp.update:
-        final index = _onEvtUpdateRecord(event.dto!.toDomain(meta));
-        // _onEvtUpdateRecordSource(event.dto!, index);
+        _onEvtUpdateRecord(event.dto!.toDomain(meta));
         break;
       case AccessorEvtTp.delete:
-        final index = _onEvtRemoveRecord(event.ettId);
-        // _onEvtRemoveRecordSource(event.ettId, metaId, index);
+        _onEvtRemoveRecord(event.ettId);
         break;
     }
     notifyListeners();
@@ -253,22 +254,27 @@ class OpenedMeta extends ChangeNotifier {
 
   Record _onEvtInsertRecord(Record record) {
     records.add(record);
+    _cachedDataSource?.onInsertEvt(record);
     return record;
   }
 
 // 返回被更新的元素index
-  void _onEvtUpdateRecord(Record record) {
+  int _onEvtUpdateRecord(Record record) {
     final index = records.indexWhere((element) => element.id == record.id);
-    if (index != -1) {
-      records[index].update(record);
-    } else {
+    if (index == -1) {
       _onEvtInsertRecord(record);
+    } else {
+      records[index].update(record);
+      _cachedDataSource?.onUpdateEvt(record, index);
     }
+    return index;
   }
 
 // 返回被更新的元素index
   void _onEvtRemoveRecord(String ettId) {
     records.removeWhere((element) => element.id == ettId);
+    // RecordDataGridSourcePluto.onRemoveEvt 不需要传入index,这里使用0
+    _cachedDataSource?.onRemoveEvt(ettId, 0);
   }
 
   close() {
