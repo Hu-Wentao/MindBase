@@ -171,6 +171,8 @@ class RecordDtoRepo {
         await createRecordCollection(meta, null);
         // 再次尝试
         await _recordAcc.insert(dto);
+      }else{
+        rethrow;
       }
     } catch (e) {
       print('insert meta error[$e]');
@@ -191,6 +193,8 @@ class RecordDtoRepo {
       } else if (e.type == 'document_not_found') {
         // 文档不存在,新建文档
         await insert(dto);
+      }else{
+        rethrow;
       }
     } catch (e) {
       print('insert meta error[$e], type ${e.runtimeType}');
