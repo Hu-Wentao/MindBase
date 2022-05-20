@@ -192,6 +192,7 @@ class OpenedMeta extends ChangeNotifier {
   final RecordMeta meta;
 
   String get id => meta.id;
+  String get name => meta.name;
 
   OpenedMeta(this.meta);
 
