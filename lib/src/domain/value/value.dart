@@ -106,6 +106,10 @@ enum FuncScope {
 }
 
 extension PropertyX on String {
+  /// 在字符串开头使用 m标识[Methods], 使用 a标识[Attribute]
+  static String getPropId(bool isAttribute, int k) =>
+      isAttribute ? 'a$k' : 'm$k';
+
   String get parsePropType => substring(0, 1);
 
   int get parsePropK => int.parse(substring(1));
@@ -114,6 +118,13 @@ extension PropertyX on String {
         parsePropType,
         parsePropK,
       );
+
+  static isPropId(bool? assignAttribute, String propId) =>
+      assignAttribute == null
+          ? isPropId(true, propId) || isPropId(false, propId)
+          : assignAttribute
+              ? propId.startsWith('a')
+              : propId.startsWith('m');
 }
 
 abstract class ObjectIdX {

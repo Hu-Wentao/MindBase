@@ -8,8 +8,7 @@ abstract class Property extends Equatable {
   AttrType get type; // 最终返回值类型
 
   /// 字段或属性在一个Meta中的唯一标识
-  /// 在字符串开头使用 m标识[Methods], 使用 a标识[Attribute]
-  String get propId => '${(this is Attribute) ? 'a' : 'm'}$k';
+  String get propId => PropertyX.getPropId(this is Attribute, k);
 
   static Tuple2<String, int> parsePropId(String propId) => propId.parsePropId();
 
