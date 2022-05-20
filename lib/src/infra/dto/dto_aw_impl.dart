@@ -57,7 +57,7 @@ extension IExprJsonDtoAppwriteX on IExprJsonDto {
 // todo 重点单元测试
 extension RecordDtoAppwriteX on RecordDto {
   Map<String, dynamic> toJson() => fields.map((key, value) => MapEntry(
-        jsonEncode(key),
+        "$key", // 转换后的k为数字字符串
         jsonEncode(
             ValueJsonDtoAppwriteX(ValueJsonDto.fromDomain(value)).toJson()),
       ));
@@ -72,7 +72,7 @@ extension RecordDtoAppwriteX on RecordDto {
                 !entry.key.startsWith('\$') && !entry.key.startsWith('id'))
             .map(
               (e) => MapEntry(
-                jsonDecode(e.key) as int,
+                int.parse(e.key),
                 // fixme #324 考虑移除Value包装;
                 ValueJsonDtoAppwriteX.fromJson(jsonDecode(e.value))
                     .toDomain(null) as Value,
