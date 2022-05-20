@@ -90,9 +90,6 @@ abstract class BaseAppwriteAccessor<T extends IEntityDto>
         write: write,
       );
 
-  @override
-  Future<Document> update(T dto) => replace(dto);
-
   // /// 如果已存在,
   // Future<Document> save(String id, T dto) async {
   //   final exist = await findById(id);
@@ -110,13 +107,15 @@ abstract class BaseAppwriteAccessor<T extends IEntityDto>
   //     .collection(collectionId)
   //     .updateOne(where.id(id), dto.toMongoJson());
 
-  // Future<WriteResult> replace(T dto);
   @override
-  Future<Document> replace(T dto) async => await db.updateDocument(
+  Future<Document> update(T dto) async => await db.updateDocument(
         collectionId: collectionId,
         documentId: dto.id,
         data: dtoToJson(dto),
       );
+
+  @override
+  Future<Document> replace(T dto) => update(dto);
 
   @override
   Future deleteBy(String id) =>
