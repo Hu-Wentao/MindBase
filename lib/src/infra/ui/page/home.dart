@@ -315,10 +315,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                             child: Center(child: Text("请选择/创建 一个Meta")),
                           )
                         : RecordDataGrid(
-                            key: ValueKey(pWorkspace.selectedMeta),
+                            // key: ValueKey(pWorkspace.selectedMeta),
                             dataGridSource: p.dataSource,
-                            // dataGridSource: pWorkspace.actGetDataSource()
-                            //     as RecordDataGridSourcePluto,
                             onSaveRecord: pWorkspace.actSaveRecord,
                             onSaveMeta: pWorkspace.actSaveMeta,
                           );
