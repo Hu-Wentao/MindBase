@@ -1,11 +1,9 @@
 import 'dart:async';
 
-import 'package:appwrite/appwrite.dart';
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/application/provider/workspace_manager_provider.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
+import 'package:mind_base/src/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/domain/repo/repo.dart';
-import 'package:mind_base/src/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_source.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
@@ -30,7 +28,7 @@ class WorkspaceProvider extends ProviderSidecar {
   @Deprecated("使用 openedWorkspace")
   OpenedWorkspace get workspace => openedWorkspace!;
 
-  WorkspaceProvider([this.openedWorkspace]);
+  WorkspaceProvider([this.openedWorkspace]):super(onCatch: ExceptionAdapter.of);
 
   @override
   onInitializing() => actOnSelectedWorkspaceUpdate(null);
@@ -66,7 +64,7 @@ class WorkspaceProvider extends ProviderSidecar {
         _metaDtoRepo = null;
       });
 
-  RecordDtoRepo _recordAccessor(RecordMeta meta) =>
+  RecordDtoRepo _recordDtoRepo(RecordMeta meta) =>
       _recordAccessors[meta.id] ??= RecordDtoRepo.withDI(sl, meta);
 
   /// 业务逻辑-Meta ==============================================================
@@ -145,13 +143,11 @@ class WorkspaceProvider extends ProviderSidecar {
       );
 
   Future<void> actSaveRecord(RecordDto? dto) => actWrapper(() async {
-        log("actSaveRecord [${dto?.id}]");
+        log("actSaveRecord ID[${dto?.id}]字段[${dto?.fields}]");
         // 无需set,因为插入成功后, watch会监听到新的变更
         if (dto == null) return;
         final meta = selectedMeta!;
-        print("debug debug #meta [$meta]");
-        await _recordAccessor(meta.meta).update(dto);
-        // await RecordAccessor(sl<Db>(), dto.metaIdHex).save(dto.id, dto);
+        await _recordDtoRepo(meta.meta).insert(dto);
       });
 
   Future<void> actRemoveRecordBy(int rowIndex) {
@@ -163,7 +159,7 @@ class WorkspaceProvider extends ProviderSidecar {
   Future<void> actRemoveRecord(RecordMeta meta, String ettId) =>
       actWrapper(() async {
         log("actRemoveRecord $ettId");
-        await _recordAccessor(meta).deleteBy(ettId);
+        await _recordDtoRepo(meta).deleteBy(ettId);
       });
 
 // <MetaId, 数据源>
