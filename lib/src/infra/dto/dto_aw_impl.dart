@@ -57,7 +57,7 @@ extension IExprJsonDtoAppwriteX on IExprJsonDto {
 // todo 重点单元测试
 extension RecordDtoAppwriteX on RecordDto {
   Map<String, dynamic> toJson() => fields.map((key, value) => MapEntry(
-        "$key", // 转换后的k为数字字符串
+        PropertyX.getPropId(true, key), // 使用propId, 因为纯数值的属性名触发Appwrite的bug
         jsonEncode(
             ValueJsonDtoAppwriteX(ValueJsonDto.fromDomain(value)).toJson()),
       ));
@@ -67,12 +67,11 @@ extension RecordDtoAppwriteX on RecordDto {
   static RecordDto fromJson(Map<String, dynamic> json) => RecordDto(
           fields: Map.fromEntries(
         json.entries
-            // 过滤掉Appwrite附加的 $id,$collection等字段
-            .where((entry) =>
-                !entry.key.startsWith('\$') && !entry.key.startsWith('id'))
+            // 过滤掉Appwrite附加的 $id,$collection等字段;
+            .where((entry) => PropertyX.isPropId(true, entry.key))
             .map(
               (e) => MapEntry(
-                int.parse(e.key),
+                e.key.parsePropK,
                 // fixme #324 考虑移除Value包装;
                 ValueJsonDtoAppwriteX.fromJson(jsonDecode(e.value))
                     .toDomain(null) as Value,

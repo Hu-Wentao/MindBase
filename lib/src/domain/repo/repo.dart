@@ -218,10 +218,9 @@ class RecordDtoRepo {
     );
     // 添加属性 <固定属性,无需用户指定>
     for (var attr in meta.attrs) {
-      // attr.name
       await _serverDb.createStringAttribute(
         collectionId: collectionId,
-        key: "${attr.k}",
+        key: attr.propId, // Appwrite BUG,属性名称不能用纯数字
         size: 511,
         xrequired: false,
       );
