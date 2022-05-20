@@ -1,16 +1,12 @@
-import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart' hide test;
 import 'package:mind_base/src/application/expr_evaluator.dart';
 import 'package:mind_base/src/application/expression_parser.dart';
-import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
-import 'package:mind_base/src/domain/value/value.dart';
-import 'package:mind_base/src/interface/dto.dart';
+import 'package:mind_base/src/interface/i_dto.dart';
 import 'package:mind_base/src/interface/expression_dto.dart';
-import 'package:mongo_dart/mongo_dart.dart';
 
 ///
 /// 可读字符串 : 用户直接输入的字符串
