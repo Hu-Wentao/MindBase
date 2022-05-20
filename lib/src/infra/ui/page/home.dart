@@ -254,10 +254,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   /// 工作空间内容
   _buildWorkspaceDetail(context) => Consumer<WorkspaceProvider>(
         builder: (c, pWorkspace, _) =>
-            ChangeNotifierProvider<OpenedMeta?>.value(
-          value: pWorkspace.selectedMeta,
-          child: ChangeNotifierProvider<OpenedWorkspace?>.value(
-            value: pWorkspace.openedWorkspace,
+            ChangeNotifierProvider<OpenedWorkspace?>.value(
+          value: pWorkspace.openedWorkspace,
+          child: ChangeNotifierProvider<OpenedMeta?>.value(
+            value: pWorkspace.selectedMeta,
             child: Row(
               children: [
                 /// 左侧Meta List
@@ -268,6 +268,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                       // MetaList
                       Consumer<OpenedWorkspace?>(
                         builder: (c, p, _) => (p == null)
+                            // 此时本组件不应该存在
                             ? const Text("Error selectedWorkspace==null")
                             : ListView.builder(
                                 itemCount: p.openedMetas.length,
@@ -304,7 +305,6 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                 ),
 
                 /// 右侧 table
-                // if (pWorkspace.watchedMeta == null)
                 (pWorkspace.selectedMeta == null)
                     ? const Expanded(
                         child: Center(child: Text("请选择/创建 一个Meta")),
