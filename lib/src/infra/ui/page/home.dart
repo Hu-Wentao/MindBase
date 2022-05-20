@@ -254,8 +254,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
   /// 工作空间内容
   _buildWorkspaceDetail(context) => Consumer<WorkspaceProvider>(
         builder: (c, pWorkspace, _) {
-          print(
-              'debug#_buildWorkspaceDetail 重建# ${pWorkspace.openedWorkspace?.openedMetas}');
+          // print(
+          //     'debug#_buildWorkspaceDetail 重建# ${pWorkspace.openedWorkspace?.openedMetas}');
           return ChangeNotifierProvider<OpenedMeta?>.value(
             value: pWorkspace.selectedMeta,
             child: Row(
@@ -277,7 +277,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                   itemBuilder: (c, i) => ListTile(
                                     title: Text(p.openedMetas[i].meta.name),
                                     onTap: () => pWorkspace
-                                        .actSelectMeta(p.openedMetas[i].meta),
+                                        .actSelectOpenMeta(p.openedMetas[i]),
                                   ),
                                 ),
                         ),

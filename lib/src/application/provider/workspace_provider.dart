@@ -115,7 +115,7 @@ class WorkspaceProvider extends ProviderSidecar {
   void actRemoveMeta(String metaId) =>
       actWrapper(() => setInitialized("删除Meta [$metaId]", () async {
             // 取消meta的监听
-            actSelectMeta(null);
+            actSelectOpenMeta(null);
             // 从数据库中删除 Meta记录
             await _metaDtoRepo!.deleteBy(metaId);
             // 从数据库中删除 Meta对应的Record集合
@@ -126,12 +126,12 @@ class WorkspaceProvider extends ProviderSidecar {
   /// 业务逻辑-Record ============================================================
   /// RecordProvider
 
-  Future<void> actSelectMeta(RecordMeta? meta) => actWrapper(
+  // 选择一个已经打开的meta
+  Future<void> actSelectOpenMeta(OpenedMeta? meta) => actWrapper(
         () => setInitialized(
-          meta == null ? "取消监听Meta" : "开始/切换监听Meta[${meta.name}]",
-          () => selectedMeta =
-              openedMetas.firstWhere((element) => element.id == meta!.id),
-        ),
+            meta == null ? "取消监听Meta" : "开始/切换监听Meta[${meta.name}]",
+            () => selectedMeta = meta
+            ),
       );
 
   Record actQueryRecordBy(
