@@ -82,7 +82,7 @@ class OpenedWorkspace extends ChangeNotifier {
     return meta;
   }
 
-  RecordMeta updateMeta(RecordMeta meta) {
+  RecordMeta onMetaUpdate(RecordMeta meta) {
     final i = metas.indexWhere((element) => element.id == meta.id);
     if (i != -1) {
       metas[i].update(meta);
@@ -92,13 +92,14 @@ class OpenedWorkspace extends ChangeNotifier {
     return meta;
   }
 
-  void removeMeta(String metaId) {
+  void onMetaDelete(String metaId) {
+    // 先关闭,后移除,否则会找不到Meta
+    final i = __indexByOpenedMetas(metaId, onFind: (i, m) {
+      m.close();
+    });
+    if (i != -1) openedMetas.removeAt(i);
     __indexByMetas(metaId, onFind: (i, m) => metas.remove(m));
-    __indexByOpenedMetas(metaId, onFind: (i, m) => openedMetas.remove(m));
   }
-
-  void closeMeta(String metaId) =>
-      __indexByOpenedMetas(metaId, onFind: (i, m) => m.close());
 
   @Deprecated("应当使用 selectedMeta.getRecords()")
   List<Record> getRecords(String metaId) =>
@@ -151,12 +152,10 @@ class OpenedWorkspace extends ChangeNotifier {
         break;
       case AccessorEvtTp.replace:
       case AccessorEvtTp.update:
-        updateMeta(event.dto!.toDm(queryMeta));
+        onMetaUpdate(event.dto!.toDm(queryMeta));
         break;
       case AccessorEvtTp.delete:
-        final metaId = event.ettId;
-        closeMeta(metaId); // 先关闭,后移除,否则会找不到Meta
-        removeMeta(metaId);
+        onMetaDelete(event.ettId);
         break;
     }
     notifyListeners();
