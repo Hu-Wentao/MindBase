@@ -15,7 +15,8 @@ import 'package:mind_base/src/interface/i_dto.dart';
 class OpenedWorkspace extends ChangeNotifier {
   late final StreamSubscription<AccessorEvt<RecordMetaDto>> _metasSub;
 
-// todo 改为 _workspace;  考虑直接用WorkspaceDto
+// todo 改为 _workspace;
+//  不能使用WorkspaceDto,必须持有RecordMeta,用于处理ref关系
   final Workspace workspace;
 
   // fixme 本类缺少 openMeta的代码,导致选中meta后,openedMetas里面没有被选中的openedMeta
@@ -46,7 +47,7 @@ class OpenedWorkspace extends ChangeNotifier {
   }) {
     // 获取全部 fixme (执行成功了,但是没有刷新到UI上)
     fetchAllMeta().listen((e) {
-      _onEvtInsertMeta(e);
+      onMetaAdd(e.toDm(queryMeta));
       notifyListeners();
     }, onError: (e, s) {
       if (e is AppwriteException &&
@@ -61,7 +62,7 @@ class OpenedWorkspace extends ChangeNotifier {
     });
     // 开始监听
     _metasSub = watchAllMeta.listen((event) {
-      print("#OpenedWorkspace#realtimeStream: $event");
+      print("#OpenedWorkspace[$id]#开始监听Meta变更: $event");
       onWatchMetaEvt(event);
     });
   }
@@ -69,10 +70,15 @@ class OpenedWorkspace extends ChangeNotifier {
   StreamSubscription<AccessorEvt<RecordMetaDto>> get subs => _metasSub;
 
   @protected
-  RecordMeta insertMeta(RecordMeta meta) {
+  RecordMeta onMetaAdd(RecordMeta meta) {
     //todo 可能要考虑meta/record在watchAll时,先收到create事件,然后又在getAll中被二次查询到的情况,这会导出出现两个相同Id的Meta/Record
     metas.add(meta);
-    _openCacheMeta(meta);
+    openedMetas.add(OpenedMeta.openBy(
+      meta: meta,
+      fetchAllRecords: getFetchAllRecords(meta.id),
+      watchAllRecords: getWatchAllRecords(meta.id),
+    ));
+    print("debug _openCacheMeta: ${meta.id}");
     return meta;
   }
 
@@ -96,7 +102,7 @@ class OpenedWorkspace extends ChangeNotifier {
 
   @Deprecated("应当使用 selectedMeta.getRecords()")
   List<Record> getRecords(String metaId) =>
-      openedMetas.firstWhere((element) => element.id == metaId).records;
+      openedMetas[__indexByOpenedMetas(metaId)].records;
 
   Iterable<List<Record>> allRecords() =>
       openedMetas.map((element) => element.records);
@@ -138,46 +144,22 @@ class OpenedWorkspace extends ChangeNotifier {
 
   /// 数据同步 ===================================================================
   void onWatchMetaEvt(AccessorEvt<RecordMetaDto> event) {
-    print("debug onWatchMetaEvt: $event");
+    print("debug 工作空间#onWatchMetaEvt: $event");
     switch (event.type) {
       case AccessorEvtTp.insert:
-        _onEvtInsertMeta(event.dto!);
+        onMetaAdd(event.dto!.toDm(queryMeta));
         break;
       case AccessorEvtTp.replace:
       case AccessorEvtTp.update:
-        _onEvtUpdateMeta(event.dto!);
+        updateMeta(event.dto!.toDm(queryMeta));
         break;
       case AccessorEvtTp.delete:
-        _onEvtRemoveMeta(event.ettId);
+        final metaId = event.ettId;
+        closeMeta(metaId); // 先关闭,后移除,否则会找不到Meta
+        removeMeta(metaId);
         break;
     }
     notifyListeners();
-  }
-
-  void _onEvtInsertMeta(RecordMetaDto metaDto) {
-    final meta = metaDto.toDm(queryMeta);
-    insertMeta(meta);
-  }
-
-  void _onEvtUpdateMeta(RecordMetaDto metaDto) {
-    final meta = metaDto.toDm(queryMeta);
-    updateMeta(meta);
-  }
-
-  void _onEvtRemoveMeta(String metaId) {
-    removeMeta(metaId);
-    // 取消缓存和监听Meta下Record
-    closeMeta(metaId);
-  }
-
-  // 打开并缓存Meta
-  _openCacheMeta(RecordMeta meta) {
-    openedMetas.add(OpenedMeta.openBy(
-      meta: meta,
-      fetchAllRecords: getFetchAllRecords(meta.id),
-      watchAllRecords: getWatchAllRecords(meta.id),
-    ));
-    print("debug _openCacheMeta: ${meta.id}");
   }
 
   Workspace close() {
@@ -258,7 +240,7 @@ class OpenedMeta extends ChangeNotifier {
     return record;
   }
 
-// 返回被更新的元素index
+  // 返回被更新的元素index
   int _onEvtUpdateRecord(Record record) {
     final index = records.indexWhere((element) => element.id == record.id);
     if (index == -1) {
@@ -270,7 +252,7 @@ class OpenedMeta extends ChangeNotifier {
     return index;
   }
 
-// 返回被更新的元素index
+  // 返回被更新的元素index
   void _onEvtRemoveRecord(String ettId) {
     records.removeWhere((element) => element.id == ettId);
     // RecordDataGridSourcePluto.onRemoveEvt 不需要传入index,这里使用0
