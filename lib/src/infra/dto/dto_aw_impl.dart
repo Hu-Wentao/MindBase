@@ -73,8 +73,10 @@ extension RecordDtoAppwriteX on RecordDto {
               (e) => MapEntry(
                 e.key.parsePropK,
                 // fixme #324 考虑移除Value包装;
-                ValueJsonDtoAppwriteX.fromJson(jsonDecode(e.value))
-                    .toDomain(null) as Value,
+                e.value == null
+                    ? Value.of('')
+                    : ValueJsonDtoAppwriteX.fromJson(jsonDecode(e.value))
+                        .toDomain(null) as Value,
               ),
             ),
       ));
