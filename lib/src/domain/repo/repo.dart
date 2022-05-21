@@ -2,7 +2,7 @@
 
 import 'package:appwrite/appwrite.dart';
 import 'package:dart_appwrite/dart_appwrite.dart' as server;
-import 'package:get_arch_core/get_arch_core_interface.dart';
+import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
@@ -60,6 +60,7 @@ class MetaDtoRepo {
         workspaceId,
       );
 
+  @Deprecated("使用insertEntity;不能直接插入MetaDto! 因为MetaDtoRepo需要在新增记录的同时, 参照Meta创建对应的Record集合")
   insert(RecordMetaDto dto) async {
     try {
       await _metaAcc.insert(dto);
@@ -70,6 +71,25 @@ class MetaDtoRepo {
         await createMetaCollection(null);
         // 再次尝试
         await _metaAcc.insert(dto);
+      }
+    } catch (e) {
+      print('insert meta error[$e]');
+      rethrow;
+    }
+  }
+
+  /// 插入Meta记录的同时, 创建对应的Record集合;
+  /// 解决监听不存在Record集合,在集合被创建后无法收到消息的问题
+  insertEntity(RecordMeta meta) async {
+    try {
+      await createMetaWithRecordCollection(meta);
+    } on AppwriteException catch (e) {
+      if (e.type == 'collection_not_found') {
+        // 集合不存在,则创建集合
+        // fixme 新建的集合为"所有人可读写"
+        await createMetaCollection(null);
+        // 再次尝试
+        await createMetaWithRecordCollection(meta);
       }
     } catch (e) {
       print('insert meta error[$e]');
@@ -95,6 +115,15 @@ class MetaDtoRepo {
       print('insert meta error[$e], type ${e.runtimeType}');
       rethrow;
     }
+  }
+
+  /// 新增一条Meta记录,同时创建一个新的Record集合(否则会导致Record监听失效)
+  ///   如果没有对应的Record集合, 即使realtime配置了相关的监听参数,再Record集合创建之后,数据也不会被接收到
+  ///   因此必须要再Meta记录创建的同时,创建对应的Record集合
+  Future createMetaWithRecordCollection(RecordMeta meta) async {
+    await _metaAcc.insert(meta.toDto());
+    // 同时创建一个所有人可读写的Record集合
+    await RecordDtoRepo.withDI(sl, meta).createRecordCollection(meta, null);
   }
 
   /// [teamId] 为空表示"所有人可读写"
@@ -205,7 +234,7 @@ class RecordDtoRepo {
   /// [teamId] 为空表示"所有人可读写"
   /// 默认权限为 "团队内可读写"
   /// [meta] 应当是固定内存地址的对象,这样可以确保meta本身是实时更新的
-  createRecordCollection(RecordMeta meta, String? teamId) async {
+  Future createRecordCollection(@Deprecated("不需要") _m, String? teamId) async {
     // 权限
     final permit = teamId == null ? ['role:all'] : ['team:$teamId'];
     // 创建集合
