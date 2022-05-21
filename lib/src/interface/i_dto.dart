@@ -14,7 +14,8 @@ abstract class IEntityDto extends IDto {
   const IEntityDto();
 
   String get id;
- // 避免IDto的toString调用toDto导致报错
+
+  // 避免IDto的toString调用toDto导致报错
   @override
   String toString() => "IDto[$runtimeType]toString";
 }
@@ -300,6 +301,8 @@ class AttributeDto extends IDto {
     required this.memo,
     required this.type,
   });
+
+  String get propId => PropertyX.getPropId(true, k);
 
   /// 供Form初始化
   AttributeDto.builder({
