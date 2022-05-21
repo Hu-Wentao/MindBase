@@ -29,7 +29,7 @@ class DialogFactory {
   static NDialog _buildUnLogin(BaseException exception, BuildContext context) =>
       NDialog(
         dialogStyle: DialogStyle(titleDivider: true),
-        title: const Text("您尚未登录..."),
+        title: const Text("您尚未登录"),
         content: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(exception.msg),
@@ -37,11 +37,14 @@ class DialogFactory {
         actions: <Widget>[
           TextButton(
             child: const Text("前往登录页"),
-            onPressed: () => showAuthDialog(
-              context: context,
-              actAuthWith:
-                  Provider.of<UserProvider>(context, listen: false).actAuthWith,
-            ),
+            onPressed: () {
+              Navigator.of(context).pop(); //关闭当前Dialog
+              showAuthDialog(
+                context: context,
+                actAuthWith: Provider.of<UserProvider>(context, listen: false)
+                    .actAuthWith,
+              );
+            },
           ),
           TextButton(
               child: const Text("取消"), onPressed: () => context.popRoute()),
