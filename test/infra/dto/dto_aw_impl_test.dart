@@ -82,4 +82,31 @@ main() {
     print("recordXJs2 = $recordXJs2");
     expect(recordXJs2, recordJs);
   });
+
+  test("IExprJsonDtoAppwriteX", () {
+    final value = Value.of("1234");
+    final valueDto = ValueJsonDto.fromDomain(value);
+    // print("valueDto = ${ValueJsonDtoAppwriteX(valueDto).toJson()}");
+    final expr = Expression(
+        fn: IFunc.findBy("add"),
+        ag: [Value.of(1), Value.of(2)],
+        type: AttrType.string);
+    final exprDto = ExprJsonDto.fromDomain(expr);
+    // print("exprDto = $exprDto");
+
+    final valueJson = IExprJsonDtoAppwriteX(valueDto).toJson();
+    print("valueJson = $valueJson");
+    final exprJson = IExprJsonDtoAppwriteX(exprDto).toJson();
+    print("exprJson = $exprJson");
+
+    final value2 = IExprJsonDtoAppwriteX.fromJson(valueJson);
+    final expr2 = IExprJsonDtoAppwriteX.fromJson(exprJson);
+
+    final value2Json = IExprJsonDtoAppwriteX(value2).toJson();
+    print("value2Json = $value2Json");
+    final expr2Json = IExprJsonDtoAppwriteX(expr2).toJson();
+    print("expr2Json = $expr2Json");
+    expect(expr2Json, exprJson);
+    expect(value2Json, valueJson);
+  });
 }
