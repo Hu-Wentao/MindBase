@@ -86,7 +86,7 @@ class MetaDtoRepo {
     // 原始MetaAttrList快照
     final originAttrDtoSnap = originMeta.toDto().attrs;
     // 1. 先更新meta记录
-    await update(metaDto);
+    await _update(metaDto);
     // 对比两个对象的属性, 只更新有新增的属性
     final snapAttrKs = originAttrDtoSnap.map((e) => e.k).toSet();
     final readyCreateKs =
@@ -97,8 +97,7 @@ class MetaDtoRepo {
     await _createAttrs(_serverDb, metaDto.id, readyCreateAttrs);
   }
 
-  @Deprecated("updateWithRecordCollection")
-  update(RecordMetaDto dto) async {
+  _update(RecordMetaDto dto) async {
     try {
       await _metaAcc.update(dto);
     } on AppwriteException catch (e) {
@@ -107,7 +106,7 @@ class MetaDtoRepo {
         // fixme 新建的集合为"所有人可读写"
         await createMetaCollection(null);
         // 再次尝试
-        await update(dto);
+        await _update(dto);
       } else if (e.type == 'document_not_found') {
         // 文档不存在,新建文档
         // await insertEntity(dto);
