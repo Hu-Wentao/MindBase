@@ -106,7 +106,7 @@ class MetaDtoRepo {
   Future createMetaWithRecordCollection(RecordMeta meta) async {
     await _metaAcc.insert(meta.toDto());
     // 同时创建一个所有人可读写的Record集合
-    await RecordDtoRepo.withDI(sl, meta).createRecordCollection(meta, null);
+    await RecordDtoRepo.withDI(sl, meta).createRecordCollection(null);
   }
 
   /// [teamId] 为空表示"所有人可读写"
@@ -117,7 +117,7 @@ class MetaDtoRepo {
     await _serverDb.createCollection(
       collectionId: collectionId,
       name: 'meta_$collectionId',
-      permission: 'collection',
+      permission: 'collection', // 整个集合都用这里配置的权限
       read: permit,
       write: permit,
     );
@@ -180,7 +180,7 @@ class RecordDtoRepo {
       if (e.type == 'collection_not_found') {
         // 集合不存在,则创建集合
         // fixme 新建的集合为"所有人可读写"
-        await createRecordCollection(meta, null);
+        await createRecordCollection(null);
         // 再次尝试
         await _recordAcc.insert(dto);
       } else {
@@ -199,7 +199,7 @@ class RecordDtoRepo {
       if (e.type == 'collection_not_found') {
         // 集合不存在,则创建集合
         // fixme 新建的集合为"所有人可读写"
-        await createRecordCollection(meta, null);
+        await createRecordCollection(null);
         // 再次尝试
         await update(dto);
       } else if (e.type == 'document_not_found') {
@@ -217,7 +217,7 @@ class RecordDtoRepo {
   /// [teamId] 为空表示"所有人可读写"
   /// 默认权限为 "团队内可读写"
   /// [meta] 应当是固定内存地址的对象,这样可以确保meta本身是实时更新的
-  Future createRecordCollection(@Deprecated("不需要") _m, String? teamId) async {
+  Future createRecordCollection(String? teamId) async {
     // 权限
     final permit = teamId == null ? ['role:all'] : ['team:$teamId'];
     // 创建集合
