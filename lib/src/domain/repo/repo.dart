@@ -79,6 +79,25 @@ class MetaDtoRepo {
     }
   }
 
+  /// 更新
+  /// 当前只实现对新增字段的添加功能, 删除考虑后面引入视图(隐藏字段)解决
+  updateWithRecordCollection(
+      RecordMeta originMeta, RecordMetaDto metaDto) async {
+    // 原始MetaAttrList快照
+    final originAttrDtoSnap = originMeta.toDto().attrs;
+    // 1. 先更新meta记录
+    await update(metaDto);
+    // 对比两个对象的属性, 只更新有新增的属性
+    final snapAttrKs = originAttrDtoSnap.map((e) => e.k).toSet();
+    final readyCreateKs =
+        metaDto.attrs.map((e) => e.k).toSet().difference(snapAttrKs);
+    // 2. 更新对应的Record表结构
+    final readyCreateAttrs =
+        metaDto.attrs.where((e) => readyCreateKs.contains(e.k));
+    await _createAttrs(_serverDb, metaDto.id, readyCreateAttrs);
+  }
+
+  @Deprecated("updateWithRecordCollection")
   update(RecordMetaDto dto) async {
     try {
       await _metaAcc.update(dto);
@@ -117,7 +136,8 @@ class MetaDtoRepo {
     await _serverDb.createCollection(
       collectionId: collectionId,
       name: 'meta_$collectionId',
-      permission: 'collection', // 整个集合都用这里配置的权限
+      // 集合级权限
+      permission: 'collection',
       read: permit,
       write: permit,
     );
