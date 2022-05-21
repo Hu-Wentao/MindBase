@@ -276,8 +276,9 @@ class MethodDto extends IDto {
         expr: expr.toDomain(toMeta),
       );
 
+
   @override
-  String toString() => toJson().toString();
+  String toString() => 'MethodDto{k: $k, name: $name, memo: $memo, expr: $expr}';
 
   @override
   Map<String, dynamic> toJson() =>
@@ -412,6 +413,9 @@ abstract class IExprJsonDto extends IDto {
         throw "IExpr::toDomain 未知的类型 [$runtimeType]";
     }
   }
+
+  @override
+  String toString() => 'IExprJsonDto{fn: $fn, ag: $ag}';
 
   @override
   Map<String, dynamic> toJson() =>
