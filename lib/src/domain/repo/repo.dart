@@ -228,15 +228,8 @@ class RecordDtoRepo {
       read: permit,
       write: permit,
     );
-    // 添加属性 <固定属性,无需用户指定>
-    for (var attr in meta.attrs) {
-      await _serverDb.createStringAttribute(
-        collectionId: collectionId,
-        key: attr.propId, // Appwrite BUG,属性名称不能用纯数字
-        size: 511,
-        xrequired: false,
-      );
-    }
+    // 创建属性
+    await createAttrs(meta.attrs.map((e) => e.toDto()));
   }
 
   findById(String metaId) => _recordAcc.findById(metaId);
@@ -244,4 +237,22 @@ class RecordDtoRepo {
   findAll() => _recordAcc.findAll();
 
   deleteBy(String metaId) => _recordAcc.deleteBy(metaId);
+
+  Future createAttrs(Iterable<AttributeDto> attrs) =>
+      _createAttrs(_serverDb, collectionId, attrs);
+}
+
+Future _createAttrs(
+  server.Database _db,
+  String metaId,
+  Iterable<AttributeDto> attrs,
+) async {
+  for (var attr in attrs) {
+    await _db.createStringAttribute(
+      collectionId: metaId, // ==Record集合Id
+      key: attr.propId, // Appwrite BUG,属性名称不能用纯数字
+      size: 511,
+      xrequired: false,
+    );
+  }
 }
