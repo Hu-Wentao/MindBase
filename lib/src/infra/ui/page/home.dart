@@ -288,14 +288,16 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                             title: const Text("新建一个表"),
                             trailing: const Icon(Icons.add),
                             onTap: () async => await pWorkspace
-                                .actSaveMeta(await showRecordMetaEditDialog(
+                                .actInsertMeta((await showRecordMetaEditDialog(
                                   context: context,
                                   kAttrBuilder: _kAttrBuilder,
                                   kMetaBuilder: _kMetaBuilder,
                                   kMethodBuilder: _kMethodBuilder,
                                   queryMetaFn: pWorkspace.workspace.queryMeta,
                                   allMetas: pWorkspace.workspace.allMetas,
-                                ))
+                                ))!
+                                    .toDm(
+                                        pWorkspace.openedWorkspace!.queryMeta))
                                 .thenDialog(context),
                           ),
                         ],
@@ -314,7 +316,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                         key: ValueKey(pWorkspace.selectedMeta),
                         dataGridSource: pWorkspace.selectedMeta!.dataSource,
                         onSaveRecord: pWorkspace.actSaveRecord,
-                        onSaveMeta: pWorkspace.actSaveMeta,
+                        onSaveMeta: pWorkspace.actUpdateMeta,
                       ),
               ],
             ),
