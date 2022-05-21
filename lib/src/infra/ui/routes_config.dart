@@ -1,6 +1,6 @@
 import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:mind_base/src/infra/ui/page/home.dart';
+import 'package:mind_base/src/infra/ui/page/home/home.dart';
 
 @MaterialAutoRouter(
   replaceInRouteName: 'Page,Route',

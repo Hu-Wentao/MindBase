@@ -7,15 +7,17 @@ import 'package:mind_base/src/application/provider/model/opened_workspace.dart';
 import 'package:mind_base/src/application/provider/user_provider.dart';
 import 'package:mind_base/src/application/provider/workspace_manager_provider.dart';
 import 'package:mind_base/src/application/provider/workspace_provider.dart';
+import 'package:mind_base/src/constants/pubspec.yaml.g.dart';
 import 'package:mind_base/src/infra/ui/dialog/auth_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/confirm_dialog.dart';
 import 'package:mind_base/src/infra/ui/dialog/record_meta_edit_dialog.dart';
 import 'package:mind_base/src/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/infra/ui/widget/RadiusInkWell.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_grid.dart';
-import 'package:mind_base/src/infra/ui/widget/data_table_source.dart';
 import 'package:provider/provider.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
+
+part 'settings_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -340,14 +342,5 @@ class FunctionShopScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Text("函数商店");
-  }
-}
-
-class SettingScreen extends StatelessWidget {
-  const SettingScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Text("设置");
   }
 }
