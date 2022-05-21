@@ -60,24 +60,6 @@ class MetaDtoRepo {
         workspaceId,
       );
 
-  @Deprecated("使用insertEntity;不能直接插入MetaDto! 因为MetaDtoRepo需要在新增记录的同时, 参照Meta创建对应的Record集合")
-  insert(RecordMetaDto dto) async {
-    try {
-      await _metaAcc.insert(dto);
-    } on AppwriteException catch (e) {
-      if (e.type == 'collection_not_found') {
-        // 集合不存在,则创建集合
-        // fixme 新建的集合为"所有人可读写"
-        await createMetaCollection(null);
-        // 再次尝试
-        await _metaAcc.insert(dto);
-      }
-    } catch (e) {
-      print('insert meta error[$e]');
-      rethrow;
-    }
-  }
-
   /// 插入Meta记录的同时, 创建对应的Record集合;
   /// 解决监听不存在Record集合,在集合被创建后无法收到消息的问题
   insertEntity(RecordMeta meta) async {
@@ -109,7 +91,8 @@ class MetaDtoRepo {
         await update(dto);
       } else if (e.type == 'document_not_found') {
         // 文档不存在,新建文档
-        await insert(dto);
+        // await insertEntity(dto);
+        throw "Meta记录尚未创建,必须创建后才能更新Meta!";
       }
     } catch (e) {
       print('insert meta error[$e], type ${e.runtimeType}');
