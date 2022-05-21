@@ -38,31 +38,32 @@ class WorkspaceProvider extends ProviderSidecar {
       // 取消选择工作空间
       return (openedWorkspace == null)
           ? setUninitialized("尚未选择工作空间,无需重复取消选择")
-          : _setNoneWorkspace();
+          : _unSelectWorkspace();
     } else {
       // 选择新的工作空间
       if (openedWorkspace == null) {
-        return _setNewWorkspace(selectedWorkspace);
+        return _selectWorkspace(selectedWorkspace);
       } else {
         // 替换选择的工作空间
         return (openedWorkspace!.id == selectedWorkspace.id)
             ? setInitialized("工作空间[${openedWorkspace!.id}]已选中,无需重复选中")
-            : _setNewWorkspace(selectedWorkspace);
+            : _selectWorkspace(selectedWorkspace);
       }
     }
   }
 
-  _setNewWorkspace(OpenedWorkspace selectedWorkspace) =>
+  _selectWorkspace(OpenedWorkspace selectedWorkspace) =>
       setInitialized("选择新的工作空间[${selectedWorkspace.id}]", () {
         openedWorkspace = selectedWorkspace;
         _metaDtoRepo = MetaDtoRepo.withDI(sl, selectedWorkspace.id);
       });
 
-  _setNoneWorkspace() =>
-      setUninitialized("工作空间[${openedWorkspace!.workspace.id}]已取消选中", () {
-        openedWorkspace = null;
-        _metaDtoRepo = null;
-      });
+  _unSelectWorkspace() => openedWorkspace == null
+      ? log("_unSelectWorkspace#当前未选中工作空间")
+      : setUninitialized("工作空间[${openedWorkspace!.workspace.id}]已取消选中", () {
+          openedWorkspace = null;
+          _metaDtoRepo = null;
+        });
 
   RecordDtoRepo _recordDtoRepo(RecordMeta meta) =>
       _recordAccessors[meta.id] ??= RecordDtoRepo.withDI(sl, meta);
