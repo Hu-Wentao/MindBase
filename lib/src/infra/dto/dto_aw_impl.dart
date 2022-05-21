@@ -21,7 +21,7 @@ extension ValueJsonDtoAppwriteX on ValueJsonDto {
 extension ExprJsonDtoAppwriteX on ExprJsonDto {
   Map<String, dynamic> toJson() => {
         'fn': fn,
-        'ag': jsonEncode(ag.map((e) => e.toJson())),
+        'ag': jsonEncode(ag.map((e) => IExprJsonDtoAppwriteX(e).toJson()).toList()),
         'type': '${type?.name}',
       };
 
@@ -52,6 +52,13 @@ extension IExprJsonDtoAppwriteX on IExprJsonDto {
       return ExprJsonDtoAppwriteX.fromJson(json);
     }
   }
+
+  Map<String, dynamic> toJson() => (this is ValueJsonDto)
+      ? (ValueJsonDtoAppwriteX((this as ValueJsonDto)).toJson())
+      : (this is ExprJsonDto)
+          ? ExprJsonDtoAppwriteX(this as ExprJsonDto).toJson()
+          : throw Exception(
+              'IExprJsonDtoAppwriteX::toJson#未处理的类型[$runtimeType]');
 }
 
 // todo 重点单元测试
@@ -127,7 +134,7 @@ extension MethodDtoAppwriteX on MethodDto {
         'k': jsonEncode(k),
         'name': name,
         'memo': memo,
-        'expr': jsonEncode(expr.toJson()),
+        'expr': jsonEncode(IExprJsonDtoAppwriteX(expr).toJson()),
       };
 
   static MethodDto fromJson(Map<String, dynamic> json) => MethodDto(
