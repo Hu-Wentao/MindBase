@@ -11,7 +11,6 @@ import 'package:provider_sidecar/provider_sidecar.dart';
 import 'model/opened_workspace.dart';
 
 /// 统一监听与处理工作空间内的所有数据
-/// fixme 需要重构
 class WorkspaceProvider extends ProviderSidecar {
   MetaDtoRepo? _metaDtoRepo;
 
@@ -71,7 +70,7 @@ class WorkspaceProvider extends ProviderSidecar {
   /// 业务逻辑-Meta ==============================================================
   /// MetaProvider
 
-  List<RecordMeta> get metaList => workspace.allMetas().toList();
+  List<RecordMeta> get metaList => openedWorkspace!.allMetas().toList();
 
   /// 注意,[actInsertMeta]与[actUpdateMeta]不能混用, Insert必须使用Meta,而不是Dto
   Future<BaseException?> actInsertMeta(RecordMeta meta) async =>
@@ -138,7 +137,7 @@ class WorkspaceProvider extends ProviderSidecar {
     String? metaId,
     bool queryGlobal = false, // true表示查询所有类型的MetaId下的记录,只要recordId相符即可
   }) =>
-      workspace.queryRecordBy(
+      openedWorkspace!.queryRecordBy(
         recordId,
         metaId: queryGlobal ? null : metaId ?? (selectedMeta)?.id,
       );
@@ -151,10 +150,10 @@ class WorkspaceProvider extends ProviderSidecar {
         await _recordDtoRepo(meta.meta).update(dto);
       });
 
+  @Deprecated("使用actRemoveRecord,避免使用rowIndex")
   Future<void> actRemoveRecordBy(int rowIndex) {
-    final meta = selectedMeta;
-    final rcd = workspace.getRecords(meta!.id)[rowIndex];
-    return actRemoveRecord(meta.meta, rcd.id);
+    final rcd = selectedMeta!.records[rowIndex];
+    return actRemoveRecord(selectedMeta!.meta, rcd.id);
   }
 
   Future<void> actRemoveRecord(RecordMeta meta, String ettId) =>
@@ -163,52 +162,13 @@ class WorkspaceProvider extends ProviderSidecar {
         await _recordDtoRepo(meta).deleteBy(ettId);
       });
 
-// <MetaId, 数据源>
-  final Map<String, IRecordDataGridSource> _cacheSource = {};
-
-  void _findCachedSource(
-    String metaId,
-    Function(IRecordDataGridSource source) onFind,
-  ) {
-    final source = _cacheSource[metaId];
-    if (source != null) {
-      onFind(source);
-    }
-  }
-
-  void _onEvtInsertRecordSource(Record record) => _findCachedSource(
-        record.meta.id,
-        (source) => source.onInsertEvt(record),
-      );
-
-// index: 更新的Record在cache中的索引
-  void _onEvtUpdateRecordSource(Record record, int index) => _findCachedSource(
-        record.meta.id,
-        (source) => source.onUpdateEvt(record, index),
-      );
-
-  void _onEvtRemoveRecordSource(String ettId, String metaId, int index) =>
-      _findCachedSource(metaId, (source) => source.onRemoveEvt(ettId, index));
-
   /// 获取已缓存的数据源
   IRecordDataGridSource actGetDataSource([String? metaId]) =>
       _getByMetaId(metaId ?? selectedMeta!.id);
 
-  IRecordDataGridSource _getByMetaId(String metaId) => _cacheSource[metaId] ??=
-      _newDataSource(workspace.workspace.getMetaBy(metaId)!);
-
-  /// 创建数据源, 以及数据源对应的[DataGridController]
-  RecordDataGridSourcePluto _newDataSource(RecordMeta meta) =>
-      RecordDataGridSourcePluto(
-        meta: meta,
-        cachedColumns: meta.toPlutoCols,
-        cachedRows:
-            getCachedRecordsByMeta(meta.id).map((e) => e.toPlutoRow()).toList(),
-      );
+  IRecordDataGridSource _getByMetaId(String metaId) =>
+      openedMetas.firstWhere((element) => element.id == metaId).dataSource;
 
   List<Record> getCachedRecordsByMeta(String metaId) =>
-      workspace.getRecords(metaId);
-//
-// Record getCachedRecordByIndex(String metaId, int index) =>
-//     getCachedRecordsByMeta(metaId)[index];
+      openedMetas.firstWhere((element) => element.id == metaId).records;
 }
