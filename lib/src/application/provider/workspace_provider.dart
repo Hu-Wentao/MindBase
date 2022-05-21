@@ -28,7 +28,8 @@ class WorkspaceProvider extends ProviderSidecar {
   @Deprecated("使用 openedWorkspace")
   OpenedWorkspace get workspace => openedWorkspace!;
 
-  WorkspaceProvider([this.openedWorkspace]):super(onCatch: ExceptionAdapter.of);
+  WorkspaceProvider([this.openedWorkspace])
+      : super(onCatch: ExceptionAdapter.of);
 
   @override
   onInitializing() => actOnSelectedWorkspaceUpdate(null);
@@ -72,13 +73,14 @@ class WorkspaceProvider extends ProviderSidecar {
 
   List<RecordMeta> get metaList => workspace.allMetas().toList();
 
-// todo 考虑改成 MetaDto
-  Future<void> actInsertMeta(RecordMeta meta) =>
-      actWrapper(() => setInitialized("新增Meta [$meta]", () async {
-            await _metaDtoRepo!.insert(meta.toDto());
+  /// 注意,[actInsertMeta]与[actUpdateMeta]不能混用, Insert必须使用Meta,而不是Dto
+  Future<BaseException?> actInsertMeta(RecordMeta meta) async =>
+      await actWrapper(() => setInitialized("新增Meta [$meta]", () async {
+            await _metaDtoRepo!.insertEntity(meta);
           }));
 
-  Future<BaseException?> actSaveMeta(RecordMetaDto? dto) async =>
+  /// 必须时Meta已存在, 否则请使用[actInsertMeta]创建后再更新
+  Future<BaseException?> actUpdateMeta(RecordMetaDto? dto) async =>
       await actWrapper(() => setInitialized("保存元素 [$dto]", () async {
             if (dto == null) return null;
             await _metaDtoRepo!.update(dto);
@@ -104,7 +106,7 @@ class WorkspaceProvider extends ProviderSidecar {
       metaDto.attrs.add(attr);
     }
     // 持久化
-    return actSaveMeta(metaDto);
+    return actUpdateMeta(metaDto);
   }
 
   Future<List<RecordMetaDto>> actQueryMetaByName(String metaName) async =>
@@ -128,8 +130,7 @@ class WorkspaceProvider extends ProviderSidecar {
   Future<void> actSelectOpenMeta(OpenedMeta? meta) => actWrapper(
         () => setInitialized(
             meta == null ? "取消监听Meta" : "开始/切换监听Meta[${meta.name}]",
-            () => selectedMeta = meta
-            ),
+            () => selectedMeta = meta),
       );
 
   Record actQueryRecordBy(
