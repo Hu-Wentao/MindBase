@@ -79,35 +79,38 @@ class WorkspaceProvider extends ProviderSidecar {
             await _metaDtoRepo!.insertEntity(meta);
           }));
 
-  /// 必须时Meta已存在, 否则请使用[actInsertMeta]创建后再更新
-  Future<BaseException?> actUpdateMeta(RecordMetaDto? dto) async =>
+  Future<BaseException?> actUpdateMeta(
+    RecordMeta origin,
+    RecordMetaDto? dto,
+  ) async =>
       await actWrapper(() => setInitialized("保存元素 [$dto]", () async {
             if (dto == null) return null;
-            await _metaDtoRepo!.update(dto);
+            await _metaDtoRepo!.updateWithRecordCollection(origin, dto);
           }));
 
   Future<RecordMetaDto?> actQueryMeta(String metaId) =>
       _metaDtoRepo!.findById(metaId);
 
+// // 尚未用到,暂时关闭
 // 更新meta的指定Attr
-  Future<BaseException?> actEditAttribute(
-    RecordMetaDto metaDto,
-    AttributeDto? attr,
-  ) async {
-    if (attr == null) {
-      return null;
-    }
-    print("debug 更新meta的指定Attr [$metaDto] [$attr]");
-    // todo 后期改为update
-    final index = metaDto.attrs.indexWhere((element) => element.k == attr.k);
-    if (index != -1) {
-      metaDto.attrs[index] = (attr);
-    } else {
-      metaDto.attrs.add(attr);
-    }
-    // 持久化
-    return actUpdateMeta(metaDto);
-  }
+//   Future<BaseException?> actEditAttribute(
+//     RecordMetaDto metaDto,
+//     AttributeDto? attr,
+//   ) async {
+//     if (attr == null) {
+//       return null;
+//     }
+//     print("debug 更新meta的指定Attr [$metaDto] [$attr]");
+//     // todo 后期改为update
+//     final index = metaDto.attrs.indexWhere((element) => element.k == attr.k);
+//     if (index != -1) {
+//       metaDto.attrs[index] = (attr);
+//     } else {
+//       metaDto.attrs.add(attr);
+//     }
+//     // 持久化
+//     return actUpdateMeta(metaDto);
+//   }
 
   Future<List<RecordMetaDto>> actQueryMetaByName(String metaName) async =>
       _metaDtoRepo!.findAllBy(metaName).toList();

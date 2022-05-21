@@ -318,7 +318,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                         key: ValueKey(pWorkspace.selectedMeta),
                         dataGridSource: pWorkspace.selectedMeta!.dataSource,
                         onSaveRecord: pWorkspace.actSaveRecord,
-                        onSaveMeta: pWorkspace.actUpdateMeta,
+                        onSaveMeta: (dto) => pWorkspace.actUpdateMeta(
+                          pWorkspace.selectedMeta!.meta,
+                          dto,
+                        ),
                       ),
               ],
             ),
