@@ -1,10 +1,10 @@
 import 'package:get_arch_core/get_arch_core_interface.dart';
 
-class Team {
+class TestTeam {
   final String name;
   final String city;
 
-  Team(this.name, this.city);
+  TestTeam(this.name, this.city);
 
   @override
   String toString() {
@@ -12,11 +12,11 @@ class Team {
   }
 }
 
-class Workspace {
+class TestWorkspace {
   final String name;
   final String path;
 
-  Workspace(this.name, this.path);
+  TestWorkspace(this.name, this.path);
 
   @override
   String toString() {
@@ -26,11 +26,11 @@ class Workspace {
 
 main() {
   final workspaces = {
-    Team("aaa", '132'): [
-      Workspace('name', 'path'),
-      Workspace('name2', 'path2')
+    TestTeam("aaa", '132'): [
+      TestWorkspace('name', 'path'),
+      TestWorkspace('name2', 'path2')
     ],
-    Team("bbb", '133'): [],
+    TestTeam("bbb", '133'): [],
   };
 
   final itemsData = workspaces.entries.expand((entry) {
