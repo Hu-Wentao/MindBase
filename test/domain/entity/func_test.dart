@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mind_base/src/domain/entity/entity.dart';
-import 'package:mind_base/src/domain/value/value.dart';
+import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 
 main() {
   test("Expression2", () {

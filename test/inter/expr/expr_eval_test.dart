@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mind_base/src/application/expr_evaluator.dart';
-import 'package:mind_base/src/domain/entity/entity.dart';
-import 'package:mind_base/src/domain/value/value.dart';
+import 'package:mind_base/src/workspace/application/service/expr_evaluator.dart';
+import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 
 main() {
   /// 求值器
