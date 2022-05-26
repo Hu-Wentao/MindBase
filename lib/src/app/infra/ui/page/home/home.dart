@@ -295,8 +295,10 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                   kAttrBuilder: _kAttrBuilder,
                                   kMetaBuilder: _kMetaBuilder,
                                   kMethodBuilder: _kMethodBuilder,
-                                  queryMetaFn: pWorkspace.workspace.queryMeta,
-                                  allMetas: pWorkspace.workspace.allMetas,
+                                  queryMetaFn:
+                                      pWorkspace.openedWorkspace!.queryMeta,
+                                  allMetas:
+                                      pWorkspace.openedWorkspace!.allMetas,
                                 ))!
                                     .toDm(
                                         pWorkspace.openedWorkspace!.queryMeta))

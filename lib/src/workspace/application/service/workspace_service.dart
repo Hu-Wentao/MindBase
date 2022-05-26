@@ -92,7 +92,7 @@ class WorkspaceService {
     return Tuple2(team, ws);
   }
 
-  openWorkspace(Workspace workspace) => OpenedWorkspace.openBy(
+  OpenedWorkspace openWorkspace(Workspace workspace) => OpenedWorkspace.openBy(
       workspace: workspace,
       fetchAllMeta: _getMetaAcc(workspace.id).findAll,
       watchAllMeta: _getMetaAcc(workspace.id).watchAll(),

@@ -91,7 +91,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
                 .removeWhere((element) => element.workspace == workspace);
           }));
 
-  _openWorkspaceById(String workspaceId) {
+  OpenedWorkspace _openWorkspaceById(String workspaceId) {
     final ws = _openWorkspace(workspaces.values
         .expand((element) => element)
         .firstWhere((element) => element.id == workspaceId));
@@ -101,7 +101,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   }
 
   // `real` 打开工作空间, 并缓存
-  _openWorkspace(Workspace workspace) {
+  OpenedWorkspace _openWorkspace(Workspace workspace) {
     final w = _workspaceSrv.openWorkspace(workspace);
     openedWorkspaces.add(w);
     return w;

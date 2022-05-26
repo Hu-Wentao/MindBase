@@ -24,9 +24,6 @@ class WorkspaceProvider extends ProviderSidecar {
 
   OpenedMeta? selectedMeta;
 
-  @Deprecated("使用 openedWorkspace")
-  OpenedWorkspace get workspace => openedWorkspace!;
-
   WorkspaceProvider([this.openedWorkspace])
       : super(onCatch: ExceptionAdapter.of);
 
