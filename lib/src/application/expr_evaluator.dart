@@ -34,7 +34,7 @@ class ExprEvaluator {
 
   // As都是Value类型
   evalAsFunc(IExpr expr, ctx) {
-    print("evalAsFunc# ${expr.fn}#${expr.ag}");
+    // print("evalAsFunc# ${expr.fn}#${expr.ag}");
     assert(expr is Value);
     // todo 考虑检查一下 [expr.e]是否为null,这样可以提前检查异常
     if (expr.fn is AsFuncThis) {
@@ -60,7 +60,7 @@ class ExprEvaluator {
     }
 
     final member = eval(expr.ag[1], ctx);
-    print("evalMemberFunc# 表达式的ag列表${expr.ag}");
+    // print("evalMemberFunc# 表达式的ag列表${expr.ag}");
     // 选择相关的Accessor
     for (var a in memberAccessors) {
       if (a.canHandle(obj, member)) {
