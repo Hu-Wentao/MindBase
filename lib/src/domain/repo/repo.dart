@@ -192,7 +192,15 @@ class RecordDtoRepo {
         meta,
       );
 
+  /// #332 如果确认, 则本方法可以被简化
+  RecordDto removeMethodEntry(RecordDto dto) {
+    final methodKeySet = meta.methods.map((e) => e.k);
+    return dto..fields.removeWhere((key, value) => methodKeySet.contains(key));
+  }
+
   insert(RecordDto dto) async {
+    // #332相关, 数据库不会持久化method的返回值, 只会持久化methods方法体(在Meta中)
+    dto = removeMethodEntry(dto);
     try {
       await _recordAcc.insert(dto);
     } on AppwriteException catch (e) {
@@ -212,6 +220,8 @@ class RecordDtoRepo {
   }
 
   update(RecordDto dto) async {
+    // #332相关, 数据库不会持久化method的返回值, 只会持久化methods方法体(在Meta中)
+    dto = removeMethodEntry(dto);
     try {
       await _recordAcc.update(dto);
     } on AppwriteException catch (e) {
