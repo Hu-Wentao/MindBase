@@ -1,5 +1,6 @@
 part of 'entity.dart';
 
+typedef FindRecordFn = Record Function(ExprValue value);
 
 abstract class IExpr with IFunctor {
   const IExpr();
@@ -11,11 +12,11 @@ abstract class IExpr with IFunctor {
     } else if (ag is List<IExpr>) {
       return Expression(fn: fn, ag: ag, type: type);
     } else {
-      throw "IExpr.of构造失败#fn名称与类型: [${fn.name}][${fn.runtimeType}] #ag参数# ${ag
-          .join(", ")}";
+      throw "IExpr.of构造失败#fn名称与类型: [${fn.name}][${fn.runtimeType}] #ag参数# ${ag.join(", ")}";
     }
   }
 
+  @Deprecated("IExpr_v20B fn只作为Expression独有属性")
   Func get fn;
 
   /// 调用后即为 [value]
@@ -128,7 +129,7 @@ class Value extends IExpr with IFunctor, EquatableMixin {
         return v;
       default:
         fn = const AsFuncDynamic();
-    // throw "暂不支持的包装类型[${v.runtimeType}]";
+      // throw "暂不支持的包装类型[${v.runtimeType}]";
     }
     return Value(
       fn: fn,
@@ -140,4 +141,66 @@ class Value extends IExpr with IFunctor, EquatableMixin {
 
   @override
   String toString() => '${fn.name}($ag)';
+}
+
+/// IExpr_v20B
+/// 取代原有的Value类
+/// 仅用于表达式中的Value, 对于Record中的Value,其类型已经再Meta中指定了, 只需要[ag]即可
+class ExprValue extends IExpr with IFunctor, EquatableMixin {
+  @override
+  final AttrType type;
+  @override
+  final List ag;
+
+  const ExprValue.build({
+    required this.type,
+    required this.ag,
+  });
+
+  @override
+  callee() => v;
+
+  @override
+  dynamic get value => callee();
+
+  dynamic get v => ag[0];
+
+  String get e => ag[1];
+
+  @override
+  List<Object?> get props => ag;
+
+  @Deprecated("适配原有的Value.of构造; 改用Value.build")
+  factory ExprValue.of(dynamic v, [dynamic e]) {
+    dynamic value = v ?? "";
+    switch (v.runtimeType) {
+      case String:
+        return ExprValue.build(type: AttrType.string, ag: [value, e]);
+      case int:
+      case double:
+      case num:
+        return ExprValue.build(type: AttrType.num, ag: [value, e]);
+      case bool:
+        return ExprValue.build(type: AttrType.boolean, ag: [value, e]);
+      case IExpr:
+        return v;
+      case ExprValue: // 无法被IExpr取代, dart限制
+        return v;
+      case Expression: // 无法被IExpr取代, dart限制
+        return v;
+      default:
+        print("debug #warn#ExprValue.of 尚未配置的类型: ${v.runtimeType}");
+        return ExprValue.build(type: AttrType.any, ag: [value, e]);
+      // fn = const AsFuncDynamic();
+      // throw "暂不支持的包装类型[${v.runtimeType}]";
+    }
+  }
+
+  factory ExprValue.err(String? e) => ExprValue.of("", e);
+
+  @override
+  String toString() => '($ag)';
+
+  @override
+  Func get fn => throw UnimplementedError("ExprValue不需要fn属性");
 }
