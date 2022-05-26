@@ -2,8 +2,11 @@ part of 'aggregate.dart';
 
 class Workspace implements IAgg<String> {
   /// 开头`>>`用于防止用户自己设置同名变量
-  /// 对应Value类型为 [QueryMetaFn] 将`MetaId->Meta查询`注入到ctx中, 以便读取meta,同时解决循环依赖问题
-  static const ctxQueryMetaSign = ">>_workspace_ctx_query_meta_sign";
+  /// 用于DTO->Domain转换: 对应Value类型为 [QueryMetaFn] 将`MetaId->Meta查询`注入到ctx中, 以便读取meta,同时解决循环依赖问题
+  static const ctxQueryMetaSign = ">>_ctxQueryMetaSign";
+
+  /// 用于表达式求值: 在工作空间内查询Record的实例(参见[AttrType.ref], [AsFuncThis])
+  static const ctxFindRecordFnSign = ">>_ctxFindRecordFnSign";
 
   @override
   final String id;
