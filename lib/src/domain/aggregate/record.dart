@@ -34,23 +34,29 @@ class Record implements IEtt<String> {
       );
 
   /// Value不存在时返回一个空Value
+  @Deprecated("使用 getField")
   Value getFieldByColumn(String name) =>
       tryGetFieldByColumn(name, orElse: (_) => Value.of(''))!;
 
+  @Deprecated("使用 getField")
   Value? tryGetFieldByColumn(String name, {Value Function(int k)? orElse}) {
     final propId = Property.parsePropId(name);
     return tryGetFieldBy(propId.value2, orElse: orElse);
   }
 
+  @Deprecated("使用 getField")
   Value getFieldBy(int attrKey, {Value Function(int k)? orElse}) =>
       tryGetFieldBy(attrKey) ??
       orElse?.call(attrKey) ??
       (throw "找不到attrKey: [$attrKey] 对应的Field");
 
+  @Deprecated("使用 getField")
   Value? tryGetFieldBy(int attrKey, {Value Function(int k)? orElse}) =>
       fields[attrKey] ?? orElse?.call(attrKey);
 
-  ExprValue tryGetField(int attrKey) {
+  ExprValue getFieldByAttrName(String name) => getField(name.parsePropK);
+
+  ExprValue getField(int attrKey) {
     final prop = meta.attrs.firstWhere((attr) => attr.k == attrKey);
     final value = tryGetFieldBy(attrKey);
     return ExprValue.build(
@@ -69,7 +75,7 @@ class Record implements IEtt<String> {
   Value getValueBy(Property prop, FindRecordFn find) {
     if (prop is Method) {
       final method = prop;
-      return Value.of(method.eval(this,find));
+      return Value.of(method.eval(this, find));
     } else {
       return getFieldBy(prop.k, orElse: (_) => Value.of(null)); // 填充一个null默认值
     }
