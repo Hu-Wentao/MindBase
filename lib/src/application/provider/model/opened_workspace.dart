@@ -32,6 +32,13 @@ class OpenedWorkspace extends ChangeNotifier {
 
   RecordMeta? Function(String metaId) get getMetaBy => workspace.getMetaBy;
 
+
+  Record findRecord(ExprValue value){
+    assert(value.type.isRef,"findRecord: value.type.isRef 必须是Ref类型才能作为查询参数");
+    // value.type.meta
+    return getRecords(value.type.meta!.id).firstWhere((record) => record.id == value.value);
+  }
+
   Iterable<RecordMeta> allMetas() => metas;
 
   final Stream<RecordDto> Function(String metaId) getFetchAllRecords;
@@ -108,6 +115,7 @@ class OpenedWorkspace extends ChangeNotifier {
   Iterable<List<Record>> allRecords() =>
       openedMetas.map((element) => element.records);
 
+  @Deprecated("改用 findRecord")
   Record queryRecordBy(String recordId, {String? metaId}) {
     if (metaId != null) {
       return getRecords(metaId).firstWhere((record) => record.id == recordId);
