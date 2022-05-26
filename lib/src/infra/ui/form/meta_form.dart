@@ -30,26 +30,28 @@ class MetaForm extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          MetaMainForm(
-            kMetaBuilder: kMetaBuilder,
-            origin: origin,
-          ),
-          AttributeListForm.build(
-            isCreate: isCreate,
-            allMetas: allMetas,
-            kAttrBuilder: kAttrBuilder,
-            origin: origin,
-          ),
-          MethodListForm.build(
-            isCreate: isCreate,
-            kMethodBuilder: kMethodBuilder,
-            origin: origin,
-          ),
-        ],
-      );
+  Widget build(BuildContext context) => SingleChildScrollView(
+    child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            MetaMainForm(
+              kMetaBuilder: kMetaBuilder,
+              origin: origin,
+            ),
+            AttributeListForm.build(
+              isCreate: isCreate,
+              allMetas: allMetas,
+              kAttrBuilder: kAttrBuilder,
+              origin: origin,
+            ),
+            MethodListForm.build(
+              isCreate: isCreate,
+              kMethodBuilder: kMethodBuilder,
+              origin: origin,
+            ),
+          ],
+        ),
+  );
 
   static checkBy(
     GlobalKey<FormBuilderState> kMetaBuilder,
