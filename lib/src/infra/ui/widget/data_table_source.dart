@@ -152,11 +152,11 @@ class _GridRefCellWidgetState extends State<GridRefCellWidget> {
 }
 
 extension PlutoRecordX on Record {
-  PlutoRow toPlutoRow() => PlutoRow(
+  PlutoRow toPlutoRow(FindRecordFn find) => PlutoRow(
         key: ValueKey<String>(id), // 将id作为key,以便接收更新事件时,查询是哪一个record
         cells: Map.fromEntries(meta.properties.map((prop) => MapEntry(
               prop.propId,
-              PlutoCell(value: getValueBy(prop).v),
+              PlutoCell(value: getValueBy(prop, find).v),
             ))),
       );
 }
@@ -189,6 +189,7 @@ extension PlutoRecordDtoX on RecordDto {
 class RecordDataGridSourcePluto extends IRecordDataGridSource {
   RecordDataGridSourcePluto({
     required this.meta,
+    required this.findRecord,
     required this.cachedRows,
     required this.cachedColumns,
     this.stateManager,
@@ -196,7 +197,7 @@ class RecordDataGridSourcePluto extends IRecordDataGridSource {
 
   @override
   final RecordMeta meta; // 地址不变,但属性值会变
-
+  final FindRecordFn findRecord;
   final List<PlutoRow> cachedRows;
 
   final List<PlutoColumn> cachedColumns;
@@ -208,7 +209,7 @@ class RecordDataGridSourcePluto extends IRecordDataGridSource {
   onInsertEvt(Record record) {
     print("onInsertEvt $record");
     // 如果是非活跃状态下... 则只添加Widget, 因为不需要刷新UI
-    cachedRows.add(record.toPlutoRow());
+    cachedRows.add(record.toPlutoRow(findRecord));
     // 活跃状态下, 提醒刷新UI, 由于List<Row>地址值是一致的, manager内部的List也会被更新
     // todo 优化:只刷新指定行
     stateManager?.notifyListeners();
@@ -217,7 +218,7 @@ class RecordDataGridSourcePluto extends IRecordDataGridSource {
   @override
   onUpdateEvt(Record record, int index) {
     print("onUpdateEvt $record $index");
-    cachedRows[index] = record.toPlutoRow();
+    cachedRows[index] = record.toPlutoRow(findRecord);
     // todo 优化:只刷新指定行
     stateManager?.notifyListeners();
   }
