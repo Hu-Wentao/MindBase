@@ -43,11 +43,7 @@ class _RecordFormState extends State<RecordForm> {
   Widget build(BuildContext context) => FormBuilder(
         key: _kRecordBuilder,
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: SizedBox(
-          // height: 800,
-          // width: 800,
-          // todo 调整高度
-          // height: MediaQuery.of(context).size.height * 0.6,
+        child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: widget.meta.attrs.map(_buildFormField).toList(),
