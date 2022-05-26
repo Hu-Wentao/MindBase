@@ -43,36 +43,20 @@ class _RecordFormState extends State<RecordForm> {
           // height: MediaQuery.of(context).size.height * 0.6,
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [
-              ...widget.meta.attrs.map((attr) {
-                final field = _origin.fields[attr.k];
-                return FormBuilderTextField(
-                  name: attr.propId, // Attribute::k作为Map的key
-                  initialValue: field?.value,
-                  decoration: InputDecoration(
-                    labelText: attr.name,
-                    hintText: attr.type.name,
-                  ),
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(context),
-                  ]),
-                );
-              }).toList(),
-              ...widget.meta.methods.map((methods) {
-                final field = _origin.fields[methods.k];
-                return FormBuilderTextField(
-                  name: methods.propId, // Attribute::k作为Map的key
-                  initialValue: field?.value,
-                  decoration: InputDecoration(
-                    labelText: methods.name,
-                    hintText: methods.expr.toString(),
-                  ),
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(context),
-                  ]),
-                );
-              }).toList()
-            ],
+            children: widget.meta.attrs.map((attr) {
+              final field = _origin.fields[attr.k];
+              return FormBuilderTextField(
+                name: attr.propId, // Attribute::k作为Map的key
+                initialValue: field?.value,
+                decoration: InputDecoration(
+                  labelText: attr.name,
+                  hintText: attr.type.name,
+                ),
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(context),
+                ]),
+              );
+            }).toList(),
           ),
         ),
       );
