@@ -3,8 +3,8 @@ import 'package:appwrite/models.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/infra/dao/realtime_hub.dart';
 import 'package:mind_base/src/infra/dto/dto_aw_impl.dart';
-import 'package:mind_base/src/interface/i_dao.dart';
-import 'package:mind_base/src/interface/i_dto.dart';
+import 'package:mind_base/src/inter/i_dao.dart';
+import 'package:mind_base/src/inter/i_dto.dart';
 
 /// 适配Appwrite
 

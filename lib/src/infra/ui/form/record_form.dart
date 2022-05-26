@@ -5,7 +5,7 @@ import 'package:mind_base/src/application/provider/model/opened_workspace.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/domain/value/value.dart';
-import 'package:mind_base/src/interface/i_dto.dart';
+import 'package:mind_base/src/inter/i_dto.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 
 /// 创建指定[RecordMeta]对应的Record

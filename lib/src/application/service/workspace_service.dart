@@ -5,7 +5,7 @@ import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/repo/repo.dart';
 import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mind_base/src/infra/dao/dao_aw_impl.dart';
-import 'package:mind_base/src/interface/i_dto.dart';
+import 'package:mind_base/src/inter/i_dto.dart';
 
 import '../provider/model/opened_workspace.dart';
 

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:mind_base/src/domain/entity/entity.dart';
-import 'package:mind_base/src/interface/i_dto.dart';
+import 'package:mind_base/src/inter/i_dto.dart';
 
 /// Json实现
 

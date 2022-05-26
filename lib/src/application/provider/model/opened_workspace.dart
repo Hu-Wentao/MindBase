@@ -6,8 +6,8 @@ import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_source.dart';
-import 'package:mind_base/src/interface/i_dao.dart';
-import 'package:mind_base/src/interface/i_dto.dart';
+import 'package:mind_base/src/inter/i_dao.dart';
+import 'package:mind_base/src/inter/i_dto.dart';
 
 /// 管理已打开的工作空间
 /// 在这里, 将DTO组装为 Domain对象, 也是业务逻辑的一部分

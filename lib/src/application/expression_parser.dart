@@ -1,8 +1,8 @@
 import 'package:mind_base/src/application/parser_char.dart';
+import 'package:mind_base/src/inter/expression_dto.dart';
 import 'package:petitparser/core.dart';
 import 'package:petitparser/parser.dart';
 
-import '../interface/expression_dto.dart';
 
 final exprParser = ExpressionParser();
 /// 用户输入表达式解析器

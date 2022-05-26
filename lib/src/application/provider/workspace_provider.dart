@@ -5,7 +5,7 @@ import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/domain/repo/repo.dart';
 import 'package:mind_base/src/infra/ui/widget/data_table_source.dart';
-import 'package:mind_base/src/interface/i_dto.dart';
+import 'package:mind_base/src/inter/i_dto.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
 import 'model/opened_workspace.dart';

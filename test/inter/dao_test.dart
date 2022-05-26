@@ -1,7 +1,7 @@
 // import 'package:flutter_test/flutter_test.dart';
 // import 'package:mind_base/src/domain/entity/entity.dart';
-// import 'package:mind_base/src/interface/i_dao.dart';
-// import 'package:mind_base/src/interface/i_dto.dart';
+// import 'package:mind_base/src/inter/i_dao.dart';
+// import 'package:mind_base/src/inter/i_dto.dart';
 //
 // main() async {
 //   var flowSign = 1;

@@ -4,7 +4,7 @@ import 'package:mind_base/src/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/domain/value/value.dart';
-import 'package:mind_base/src/interface/expression_dto.dart';
+import 'package:mind_base/src/inter/expression_dto.dart';
 
 const exprToDomain = ExprDtoToDomain(
   memberAccessors: [MetaMemberAccessor()],

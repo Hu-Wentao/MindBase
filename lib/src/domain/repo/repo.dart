@@ -5,7 +5,7 @@ import 'package:dart_appwrite/dart_appwrite.dart' as server;
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/infra/dao/dao_aw_impl.dart';
-import 'package:mind_base/src/interface/i_dto.dart';
+import 'package:mind_base/src/inter/i_dto.dart';
 
 @lazySingleton
 class WorkspaceRepo {

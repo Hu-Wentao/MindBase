@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/infra/dto/dto_aw_impl.dart';
-import 'package:mind_base/src/interface/i_dto.dart';
+import 'package:mind_base/src/inter/i_dto.dart';
 
 main() {
   test('test RecordMetaDto', () {

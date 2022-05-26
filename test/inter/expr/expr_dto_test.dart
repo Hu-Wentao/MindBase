@@ -6,8 +6,8 @@
 // import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 // import 'package:mind_base/src/domain/entity/entity.dart';
 // import 'package:mind_base/src/infra/dto/dto_aw_impl.dart';
-// import 'package:mind_base/src/interface/i_dto.dart';
-// import 'package:mind_base/src/interface/expression_dto.dart';
+// import 'package:mind_base/src/inter/i_dto.dart';
+// import 'package:mind_base/src/inter/expression_dto.dart';
 //
 // ///
 // /// 可读字符串 : 用户直接输入的字符串

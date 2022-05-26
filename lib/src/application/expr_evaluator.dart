@@ -1,7 +1,7 @@
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
-import 'package:mind_base/src/interface/expression_dto.dart';
+import 'package:mind_base/src/inter/expression_dto.dart';
 
 const exprEvaluator = ExprEvaluator(memberAccessors: [RecordMemberAccessor()]);
 

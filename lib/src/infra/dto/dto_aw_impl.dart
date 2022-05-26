@@ -6,7 +6,7 @@ import 'package:appwrite/models.dart';
 import 'package:mind_base/src/domain/entity/entity.dart';
 import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mind_base/src/infra/dao/dao_aw_impl.dart';
-import 'package:mind_base/src/interface/i_dto.dart';
+import 'package:mind_base/src/inter/i_dto.dart';
 
 /// todo IExpr-v20B; 目前该方案仅用于修复表达式fn丢失导致的问题
 extension ValueJsonDtoAppwriteX on ValueJsonDto {
