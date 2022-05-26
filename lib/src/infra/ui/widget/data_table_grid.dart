@@ -93,6 +93,7 @@ class _RecordDataGridState extends State<RecordDataGrid> {
                   stateManager: manager,
                   onSaveMeta: widget.onSaveMeta,
                   onSaveRecord: widget.onSaveRecord,
+                  openedWorkspace: p,
                   queryMetaFn: p.queryMeta,
                   allMetas: p.allMetas,
                 ),
@@ -155,6 +156,7 @@ class _RecordDataGridState extends State<RecordDataGrid> {
 /// 表格标题栏
 class DataFrameTitlePluto extends StatelessWidget {
   final RecordMeta meta;
+  final OpenedWorkspace openedWorkspace;
   final PlutoGridStateManager stateManager;
   final Future<void> Function(RecordDto? dto) onSaveRecord;
   final Future<void> Function(RecordMetaDto? dto) onSaveMeta;
@@ -168,6 +170,7 @@ class DataFrameTitlePluto extends StatelessWidget {
   DataFrameTitlePluto({
     Key? key,
     required this.meta,
+    required this.openedWorkspace,
     required this.stateManager,
     required this.onSaveMeta,
     required this.onSaveRecord,
@@ -198,6 +201,7 @@ class DataFrameTitlePluto extends StatelessWidget {
               await showRecordEditDialog(
                 context: context,
                 meta: meta,
+                openedWorkspace: openedWorkspace,
                 kRecordBuilder: _kRecordBuilder,
               ),
             ),
