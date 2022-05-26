@@ -66,10 +66,10 @@ class Record implements IEtt<String> {
   static ExpressionParser parser = ExpressionParser();
 
   /// 根据属性名称获取属性值(同时调用表达式进行计算)
-  Value getValueBy(Property prop) {
+  Value getValueBy(Property prop, FindRecordFn find) {
     if (prop is Method) {
       final method = prop;
-      return Value.of(method.eval(this));
+      return Value.of(method.eval(this,find));
     } else {
       return getFieldBy(prop.k, orElse: (_) => Value.of(null)); // 填充一个null默认值
     }

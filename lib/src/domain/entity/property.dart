@@ -50,9 +50,16 @@ class Method extends Property {
   @override
   List<Object> get props => super.props..addAll([expr]);
 
-  // 求值, 传入所在record为上下文'this'
-  dynamic eval(Record record) =>
-      exprEvaluator.eval(expr, {AsFuncThis.ctxSign: record});
+  /// 表达式求值
+  /// [record] 对象实例, 必填
+  /// [find] record所在的OpenedWorkspace中调用, 可空(如果Record内的方法没有引用其他类型(Meta)的话)
+  ///
+  /// 上下文 [AsFuncThis.ctxSign]  : 当前record(`this`)
+  /// 上下文 [Workspace.ctxFindRecordFnSign] :用于查询 [AttrType.ref] 所对应的记录值
+  dynamic eval(Record record, FindRecordFn? find) => exprEvaluator.eval(expr, {
+        AsFuncThis.ctxSign: record,
+        Workspace.ctxFindRecordFnSign: find,
+      });
 }
 
 class Attribute extends Property {
