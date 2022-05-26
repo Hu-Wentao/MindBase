@@ -136,6 +136,7 @@ class WorkspaceProvider extends ProviderSidecar {
             () => selectedMeta = meta),
       );
 
+  @Deprecated("尝试使用 FindRecordFn")
   Record actQueryRecordBy(
     String recordId, {
     String? metaId,

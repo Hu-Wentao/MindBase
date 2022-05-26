@@ -44,6 +44,7 @@ abstract class ExpressionDto {
   /// 转换后将会被替换为持久化上下文，即 `<bob对象对应的Record::id>.<bob对应Meta::propId>`
   ExpressionDto toPersistence(Map<String, dynamic> currentContext);
 
+  /// Expr(表达式ExpressionDto)->Domain(IExpr)
   /// 允许meta为null, 用于解析没有使用`this`或者其他`全局函数`的表达式
   IExpr toDomain([String? metaId, QueryMetaFn? queryMetaFn]) => exprToDomain.convert(
         this,
