@@ -11,6 +11,7 @@ class ExprEvaluator {
 
   const ExprEvaluator({this.memberAccessors = const []});
 
+  /// todo IExpr_v20B 返回值应当为 [IExpr], 最终返回值类型应当为 [ExprValue]
   dynamic eval(IExpr expr, Map<String, dynamic> ctx) {
     print("eval: $expr");
     final fn = expr.fn;
@@ -52,12 +53,14 @@ class ExprEvaluator {
     var obj = eval(expr.ag[0], ctx);
     assert(obj != null, "找不到Member主对象,参数列表[${expr.ag}]");
     // 如果obj不是Record,而是RecordId(是一个引用对象),则需要从工作空间中查询,
-    if (obj is String && obj.length == 24) {
-      final queryMetaFn = ctx[Workspace.ctxQueryMetaSign];
-      obj = queryMetaFn(obj); // MetaId(HexString) -> Meta
+    if (obj is ExprValue) {
+      assert(obj.type.isRef, "只有RefExprValue才能作为FindRecordFn的参数");
+      final findRecordFn = ctx[Workspace.ctxFindRecordFnSign] as FindRecordFn;
+      obj = findRecordFn(obj); // MetaId(HexString) -> Meta
     }
 
     final member = eval(expr.ag[1], ctx);
+    print("evalMemberFunc# 表达式的ag列表${expr.ag}");
     // 选择相关的Accessor
     for (var a in memberAccessors) {
       if (a.canHandle(obj, member)) {
@@ -282,15 +285,16 @@ class RecordMemberAccessor implements MemberAccessor<Record> {
   /// 成员可以是值, 也可是函数[Function]
   /// todo 在新增/修改变量/方法名称时,没有检查名称唯一性
   /// 考虑允许方法与变量重名,用于表达"get"方法
+  /// todo IExpr_v20B 返回值改造为 IExpr, 或者(ExprValue)
   @override
   getMember(Record record, String member) {
     final method = record.meta.tryGetMethodBy(member);
     if (method != null) {
       return method.expr.callee; // 可以被调用
     }
-    final field = record.tryGetFieldByColumn(member);
-    if (field != null) {
-      return field.value; // 值
+    final field = record.getFieldByAttrName(member);
+    if (field.value != null) {
+      return field; // 值
     }
     throw "在Record[${record.id}]找不到名称为[$member]的成员方法或变量";
   }
