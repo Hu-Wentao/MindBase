@@ -32,11 +32,11 @@ class OpenedWorkspace extends ChangeNotifier {
 
   RecordMeta? Function(String metaId) get getMetaBy => workspace.getMetaBy;
 
-
-  Record findRecord(ExprValue value){
-    assert(value.type.isRef,"findRecord: value.type.isRef 必须是Ref类型才能作为查询参数");
+  Record findRecord(ExprValue value) {
+    assert(value.type.isRef, "findRecord: value.type.isRef 必须是Ref类型才能作为查询参数");
     // value.type.meta
-    return getRecords(value.type.meta!.id).firstWhere((record) => record.id == value.value);
+    return getRecords(value.type.meta!.id)
+        .firstWhere((record) => record.id == value.value);
   }
 
   Iterable<RecordMeta> allMetas() => metas;
@@ -81,6 +81,7 @@ class OpenedWorkspace extends ChangeNotifier {
     //todo 可能要考虑meta/record在watchAll时,先收到create事件,然后又在getAll中被二次查询到的情况,这会导出出现两个相同Id的Meta/Record
     metas.add(meta);
     openedMetas.add(OpenedMeta.openBy(
+      at: this,
       meta: meta,
       fetchAllRecords: getFetchAllRecords(meta.id),
       watchAllRecords: getWatchAllRecords(meta.id),
@@ -180,6 +181,7 @@ class OpenedMeta extends ChangeNotifier {
   late final StreamSubscription<AccessorEvt<RecordDto>> _cachedRecordSubs;
 
   // 附加状态
+  final OpenedWorkspace at;
   final List<Record> records = [];
   final RecordMeta meta;
 
@@ -187,9 +189,10 @@ class OpenedMeta extends ChangeNotifier {
 
   String get name => meta.name;
 
-  OpenedMeta(this.meta);
+  OpenedMeta(this.meta, this.at);
 
   OpenedMeta.openBy({
+    required this.at,
     required this.meta,
     required Stream<RecordDto> fetchAllRecords,
     required Stream<AccessorEvt<RecordDto>> watchAllRecords,
@@ -220,8 +223,9 @@ class OpenedMeta extends ChangeNotifier {
   RecordDataGridSourcePluto get dataSource =>
       _cachedDataSource ??= RecordDataGridSourcePluto(
         meta: meta,
+        findRecord: at.findRecord,
         cachedColumns: meta.toPlutoCols,
-        cachedRows: records.map((e) => e.toPlutoRow()).toList(),
+        cachedRows: records.map((e) => e.toPlutoRow(at.findRecord)).toList(),
       );
 
   void _onWatchRecord(AccessorEvt<RecordDto> event) {
