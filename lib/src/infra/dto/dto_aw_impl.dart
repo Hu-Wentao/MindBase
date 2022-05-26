@@ -8,20 +8,38 @@ import 'package:mind_base/src/domain/value/value.dart';
 import 'package:mind_base/src/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/interface/i_dto.dart';
 
+/// todo IExpr-v20B; 目前该方案仅用于修复表达式fn丢失导致的问题
 extension ValueJsonDtoAppwriteX on ValueJsonDto {
-  // 需要将 ag:List 转换为 ag:String
-  Map<String, dynamic> toJson() => {'ag': jsonEncode(ag)};
+  // 修复 ::fn 字段丢失导致表达式无法正常解析的bug
+  Map<String, dynamic> toJson() => {
+        'ag': jsonEncode({
+          'fn': fn,
+          'ag': jsonEncode(ag),
+        }),
+      };
 
-  static ValueJsonDto fromJson(dynamic json) => ValueJsonDto(
-        fn: json['fn'] as String? ?? 'asString', // 存储时已擦除`fn`,该值应当为空
-        ag: jsonDecode(json['ag'] as String),
+  static ValueJsonDto fromJson(Map<String, dynamic> js) {
+    final jsMap = jsonDecode(js['ag'] as String);
+    if (jsMap is List) {
+      // 仅用于适配 0.12.0 之前的版本, 之前版本所录入的asThis表达式都无法正常执行
+      return ValueJsonDto(
+        fn: js['fn'] as String? ?? 'asString', // 存储时已擦除`fn`,该值应当为空
+        ag: jsonDecode(js['ag'] as String),
       );
+    } else {
+      return ValueJsonDto(
+        fn: jsMap['fn'] as String? ?? 'asString',
+        ag: jsonDecode(jsMap['ag'] as String),
+      );
+    }
+  }
 }
 
 extension ExprJsonDtoAppwriteX on ExprJsonDto {
   Map<String, dynamic> toJson() => {
         'fn': fn,
-        'ag': jsonEncode(ag.map((e) => IExprJsonDtoAppwriteX(e).toJson()).toList()),
+        'ag': jsonEncode(
+            ag.map((e) => IExprJsonDtoAppwriteX(e).toJson()).toList()),
         'type': '${type?.name}',
       };
 
