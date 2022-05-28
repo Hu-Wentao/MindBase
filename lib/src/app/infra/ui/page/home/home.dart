@@ -162,7 +162,7 @@ class WorkspaceSelectorTitle extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(pWs.openedWorkspace?.workspace.name ?? "请选择工作空间"),
+              Text(pWs.openedWorkspace?.name ?? "请选择工作空间"),
               const SizedBox(width: 8),
               PopupMenuButton<String>(
                 itemBuilder: (ctx) => [

@@ -57,7 +57,7 @@ class WorkspaceProvider extends ProviderSidecar {
 
   _unSelectWorkspace() => openedWorkspace == null
       ? log("_unSelectWorkspace#当前未选中工作空间")
-      : setUninitialized("工作空间[${openedWorkspace!.workspace.id}]已取消选中", () {
+      : setUninitialized("工作空间[${openedWorkspace!.id}]已取消选中", () {
           openedWorkspace = null;
           _metaDtoRepo = null;
         });

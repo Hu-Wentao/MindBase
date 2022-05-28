@@ -15,22 +15,21 @@ import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 class OpenedWorkspace extends ChangeNotifier {
   late final StreamSubscription<AccessorEvt<RecordMetaDto>> _metasSub;
 
-// todo 改为 _workspace;
 //  不能使用WorkspaceDto,必须持有RecordMeta,用于处理ref关系
-  final Workspace workspace;
+  final Workspace _workspace;
 
   // fixme 本类缺少 openMeta的代码,导致选中meta后,openedMetas里面没有被选中的openedMeta
   final List<OpenedMeta> openedMetas = [];
 
-  String get id => workspace.id;
+  String get id => _workspace.id;
 
-  String get name => workspace.name;
+  String get name => _workspace.name;
 
-  List<RecordMeta> get metas => workspace.metas;
+  List<RecordMeta> get metas => _workspace.metas;
 
-  QueryMetaFn get queryMeta => workspace.queryMeta;
+  QueryMetaFn get queryMeta => _workspace.queryMeta;
 
-  RecordMeta? Function(String metaId) get getMetaBy => workspace.getMetaBy;
+  RecordMeta? Function(String metaId) get getMetaBy => _workspace.getMetaBy;
 
   Record findRecord(ExprValue value) {
     assert(value.type.isRef, "findRecord: value.type.isRef 必须是Ref类型才能作为查询参数");
@@ -46,12 +45,12 @@ class OpenedWorkspace extends ChangeNotifier {
       getWatchAllRecords;
 
   OpenedWorkspace.openBy({
-    required this.workspace,
+    required Workspace workspace,
     required Stream<RecordMetaDto> Function() fetchAllMeta,
     required Stream<AccessorEvt<RecordMetaDto>> watchAllMeta,
     required this.getFetchAllRecords,
     required this.getWatchAllRecords,
-  }) {
+  }) : _workspace = workspace {
     // 获取全部 fixme (执行成功了,但是没有刷新到UI上)
     fetchAllMeta().listen((e) {
       onMetaAdd(e.toDm(queryMeta));
@@ -173,7 +172,7 @@ class OpenedWorkspace extends ChangeNotifier {
   Workspace close() {
     openedMetas.map((openedMeta) => openedMeta.close());
     _metasSub.cancel();
-    return workspace;
+    return _workspace;
   }
 }
 

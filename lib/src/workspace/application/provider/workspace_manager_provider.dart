@@ -12,7 +12,7 @@ import 'opened_workspace.dart';
 /// 管理用户名下的所有工作空间
 /// 包括对`已打开的的Workspace的数据同步工作`
 class WorkspaceManagerProvider extends ProviderSidecar {
-  final EventBus _eventBus = sl<EventBus>();
+  // final EventBus _eventBus = sl<EventBus>();
   final WorkspaceService _workspaceSrv = sl<WorkspaceService>();
 
   // 父级状态 缓存当前已登录的用户, 确保登录用户与缓存的工作空间是一致的;
@@ -77,7 +77,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
         // 选中工作空间
         setInitialized("打开工作空间[$workspaceId]成功", () {
           final ws = openedWorkspaces.firstWhere(
-            (opened) => opened.workspace.id == workspaceId,
+            (opened) => opened.id == workspaceId,
             orElse: () => _openWorkspaceById(workspaceId),
           );
           if (andSelect) selectedWorkspace = ws;
@@ -88,7 +88,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   Future<BaseException?> actCloseWorkspace(Workspace workspace) async =>
       await actWrapper(() => setInitialized("关闭工作空间[${workspace.id}]成功", () {
             openedWorkspaces
-                .removeWhere((element) => element.workspace == workspace);
+                .removeWhere((element) => element.id == workspace.id);
           }));
 
   OpenedWorkspace _openWorkspaceById(String workspaceId) {
@@ -96,7 +96,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
         .expand((element) => element)
         .firstWhere((element) => element.id == workspaceId));
     // 首次打开,发送事件
-    _eventBus.fire(WorkspaceOpenedEvt(ws.workspace));
+    // _eventBus.fire(WorkspaceOpenedEvt(ws.workspace));
     return ws;
   }
 
@@ -108,7 +108,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   }
 
   _isOpened(String workspaceId) =>
-      openedWorkspaces.any((element) => element.workspace.id == workspaceId);
+      openedWorkspaces.any((element) => element.id == workspaceId);
 
   // 缓存工作空间
   _addWorkspace(Team team, Workspace workspace) {
@@ -119,7 +119,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   Future<OpenedWorkspace> getOpenedWorkspace(String workspaceId) async {
     if (_isOpened(workspaceId)) {
       return openedWorkspaces
-          .firstWhere((element) => element.workspace.id == workspaceId);
+          .firstWhere((element) => element.id == workspaceId);
     } else {
       final err = await actOpenWorkspaceById(workspaceId);
       if (err != null) {
