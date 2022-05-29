@@ -40,34 +40,34 @@ class ExprDtoToDomain {
   }
 
   @protected
-  Value convertValue(ValueDto valueDto, Map<String, dynamic> ctx) {
+  ExprValue convertValue(ValueDto valueDto, Map<String, dynamic> ctx) {
     var value = valueDto.value;
     if (value is List) {
-      return Value.of(value.map((e) => convert(e, ctx)).toList());
+      return ExprValue.of(value.map((e) => convert(e, ctx)).toList());
     }
     if (value is Map) {
-      return Value.of(value.map(
+      return ExprValue.of(value.map(
           (key, value) => MapEntry(convert(key, ctx), convert(value, ctx))));
     }
-    return Value.of(value);
+    return ExprValue.of(value);
   }
 
   @protected
-  Value convertVariable(VariableDto variable, Map<String, dynamic> ctx) =>
-      Value.of(
+  ExprValue convertVariable(VariableDto variable, Map<String, dynamic> ctx) =>
+      ExprValue.of(
         ctx[variable.identifier.name] ??
             (throw "在ctx中找不到变量[${variable.identifier.name}]"),
       );
 
   // 这里是DTO转换, 传入ctx['this']作为ag,仅仅是为了下一步求值中,可以访问其member,以便保存propId
   @protected
-  Value convertThis(ThisExpressionDto expr, Map<String, dynamic> ctx) => Value(
-      // fn: AsFuncThis(AttrType.ref((ctx[AsFuncThis.ctxTypeSign] as RecordMeta))),
-      fn: AsFuncThis(AttrType.ref(
-        ctx[AsFuncThis.ctxMetaIdSign],
-        ctx[Workspace.ctxQueryMetaSign],
-      )),
-      ag: const []);
+  ExprValue convertThis(ThisExpressionDto expr, Map<String, dynamic> ctx) =>
+      ExprValue.build(
+          type: AttrType.ref(
+            ctx[AsFuncThis.ctxMetaIdSign],
+            ctx[Workspace.ctxQueryMetaSign],
+          ),
+          ag: const []);
 
   /// 转换Member表达式:
   ///   1. 通过 expr.object, 从ctx中查询到`对象`,
@@ -91,12 +91,14 @@ class ExprDtoToDomain {
     if (objectType.tp != AttrTp.ref) {
       throw "MemberExpressionDto.object# Member表达式的类型为[$objectType],其tp只能是[${AttrTp.ref}]";
     }
-    final prop = getMember(objectType.meta, expr.property.name) as Property;
-    final propValue = Value.of(prop.propId);
+
+    // type: 字段的类型, value: 字段的名称(而不是字段的值,如果时值,则应当时访问Record的结果)
+    final ExprValue prop = getMember(objectType.meta, expr.property.name);
+    // final propValue = Value.of(prop.propId);
 
     return Expression(
       fn: IFunc.memberFunc,
-      ag: [objectV, propValue],
+      ag: [objectV, prop],
       type: prop.type, // 表达式的返回值类型即对应prop的类型
     );
   }
@@ -129,8 +131,9 @@ class ExprDtoToDomain {
     final callee = convert(expr.callee, ctx).value; // .value才是Ctx中存储的Func实例
     // AsFunc表示该IExpr是Value
     if (callee is AsFunc) {
-      return Value(
-          fn: callee,
+      return ExprValue.build(
+          type: callee.rType,
+          // fn: callee,
           ag: expr.arguments.map((e) => (e as ValueDto).value).toList());
     }
     // 对于非 AsFunc, type类型的获取逻辑暂时先放在 DTO->Domain中(此处)进行处理
@@ -187,7 +190,7 @@ class ExprDtoToDomain {
   /// DTO>Domain的 getMember应该返回什么?
   /// 应该返回Meta中的prop,而不是propId,因为还涉及到类型推断逻辑
   @protected
-  dynamic getMember(dynamic obj, String member) {
+  ExprValue getMember(dynamic obj, String member) {
     // dynamic getMember(IExpr value, String member) {
     //   final obj = value.value;
     for (var a in memberAccessors) {
@@ -224,12 +227,13 @@ class MetaMemberAccessor implements MemberAccessor<RecordMeta> {
 
   /// 将成员名称-> 成员prop
   @override
-  getMember(RecordMeta meta, String member) {
+  ExprValue getMember(RecordMeta meta, String member) {
     final prop = meta.properties.firstWhere(
       (element) => element.name == member,
       orElse: () => throw "在Record[${meta.id}]找不到名称为[$member]的成员方法或变量",
     );
-    return prop;
+    return ExprValue.build(type: prop.type, ag: [prop.propId]);
+    // return prop;
     // if (prop.type.tp == AttrTp.ref) {
     //   // 引用类型, 同时返回类型信息, 以便推断表达式返回值类型
     //   return Value(
