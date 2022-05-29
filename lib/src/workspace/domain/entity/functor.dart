@@ -8,7 +8,7 @@ abstract class IExpr with IFunctor {
   /// 不常用, 如果是 [ExpressionDto]转换成 [IExpr], 则需要使用 [ExprDtoToDomain],结合ctx上下文做转换
   factory IExpr.of(Func fn, List<dynamic> ag, AttrType type) {
     if (fn is AsFunc) {
-      return Value(fn: fn, ag: ag);
+      return ExprValue.build(type: fn.rType, ag: ag);
     } else if (ag is List<IExpr>) {
       return Expression(fn: fn, ag: ag, type: type);
     } else {
@@ -71,9 +71,7 @@ mixin IFunctor {
 // IFunctor fMap(Func fn);
 }
 
-/// Expr-v11.2 方案 直接存储dynamic类型,通过 fn映射为具体的类型
-/// 一般来说 List [ag], ag[0]用于存储 v, 表示当前的值;考虑用ag[1]存储 e
-/// 需要注意的是, ag[0]可以是dynamic类型,在计算时,会自动as为String类型
+@Deprecated("将在IExpr_v20B2C移除")
 class Value extends IExpr with IFunctor, EquatableMixin {
   @override
   final AsFunc fn; // 对于Value, fn对象始终是 [AsFunc]类及其子类
@@ -143,6 +141,27 @@ class Value extends IExpr with IFunctor, EquatableMixin {
   String toString() => '${fn.name}($ag)';
 }
 
+/// 用于返回某个Meta的Prop时的包装
+/// type: 字段的类型,
+/// value: 字段的名称(而不是字段的值,如果时值,则应当时访问Record的结果)
+extension PropExprValueX on ExprValue {
+  static of(Property prop) {
+    return ExprValue.build(type: prop.type, ag: [prop.propId]);
+  }
+
+  bool get isRefValue => type.isRef;
+}
+
+/// 对于RefValue, 表示一个对象的引用,类型为[type],对象Id(RecordId)为
+extension RefExprValueX on ExprValue {
+  static of(AttrType type, String recordId) {
+    assert(type.isRef, "RefExprValueX::of#type[${type.name}]不是Ref类型");
+    return ExprValue.build(type: type, ag: [recordId]);
+  }
+
+  bool get isRefValue => type.isRef;
+}
+
 /// IExpr_v20B
 /// 取代原有的Value类
 /// 仅用于表达式中的Value, 对于Record中的Value,其类型已经再Meta中指定了, 只需要[ag]即可
@@ -163,7 +182,8 @@ class ExprValue extends IExpr with IFunctor, EquatableMixin {
   @override
   dynamic get value => callee();
 
-  dynamic get v => ag[0];
+  // 避免没有valued导致抛出RangeError
+  dynamic get v => ag.isEmpty ? null : ag[0];
 
   String get e => ag[1];
 
@@ -199,7 +219,7 @@ class ExprValue extends IExpr with IFunctor, EquatableMixin {
   factory ExprValue.err(String? e) => ExprValue.of("", e);
 
   @override
-  String toString() => '($ag)';
+  String toString() => '($ag:${type.name})';
 
   @override
   Func get fn => throw UnimplementedError("ExprValue不需要fn属性");
