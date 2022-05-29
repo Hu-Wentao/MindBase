@@ -456,6 +456,7 @@ class ExprJsonDto extends IExprJsonDto {
 }
 
 /// 不同点在于, ValueDto 的ag是 List<dynamic>
+@Deprecated("使用[ExprValueJsonDto]或[]")
 class ValueJsonDto extends IExprJsonDto {
   //内嵌函数的名
   @override
@@ -499,6 +500,53 @@ class ValueJsonDto extends IExprJsonDto {
         }
     }
   }
+}
+/// 对应[ExprValue]
+class ExprValueJsonDto extends IExprJsonDto {
+  //内嵌函数的名
+  AttrTypeDto type;
+  @override
+  List<dynamic> ag;
+
+  ExprValueJsonDto({
+    required this.type,
+    this.ag = const [],
+  });
+
+  ExprValueJsonDto.builder({
+    this.type = AttrTypeDto.any,
+    this.ag = const [],
+  });
+
+  factory ExprValueJsonDto.fromDomain(IExpr expr) => ExprValueJsonDto(
+        type: expr.type.toDto(),
+        ag: expr.ag,
+      );
+
+  /// 可视化的函数表达式字符串
+  @override
+  String toReadableString() => "$fn(${ag.map(_resolveTypeToJson).join(', ')})";
+
+  _resolveTypeToJson(dynamic e) {
+    switch (e.runtimeType) {
+      case IExprJsonDto:
+        return e.toJson();
+      case Record:
+        return jsonEncode((e as Record).id);
+      case RecordMeta:
+        return jsonEncode((e as RecordMeta).id);
+      default:
+        try {
+          return jsonEncode(e);
+        } catch (e) {
+          print("_resolveTypeToJson#error#e = $e");
+          return "error";
+        }
+    }
+  }
+
+  @override
+  String? get fn => throw UnimplementedError("ExprValueJsonDto不需要::fn");
 }
 
 class WorkspaceDto extends IEntityDto {
