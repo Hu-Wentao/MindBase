@@ -9,7 +9,7 @@ import 'package:mind_base/src/workspace/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 
 /// 对应[Value]
-@Deprecated('Use ExprValue')
+@Deprecated('Use ExprValueJsonDtoAppwriteX')
 extension ValueJsonDtoAppwriteX on ValueJsonDto {
 // 修复 ::fn 字段丢失导致表达式无法正常解析的bug
   Map<String, dynamic> toJson() => {
@@ -81,17 +81,17 @@ extension IExprJsonDtoAppwriteX on IExprJsonDto {
   static IExprJsonDto fromDocument(Document doc) => fromJson(doc.data);
 
   static IExprJsonDto fromJson(Map<String, dynamic> json) {
-    // 只有表达式才有::type属性
-    final type = json['type'] as String?;
-    if (type == null || type.isEmpty) {
-      return ValueJsonDtoAppwriteX.fromJson(json);
+    // 只有表达式才有::fn属性
+    final fn = json['fn'] as String?;
+    if (fn == null || fn.isEmpty) {
+      return ExprValueJsonDtoAppwriteX.fromJson(json);
     } else {
       return ExprJsonDtoAppwriteX.fromJson(json);
     }
   }
 
-  Map<String, dynamic> toJson() => (this is ValueJsonDto)
-      ? (ValueJsonDtoAppwriteX((this as ValueJsonDto)).toJson())
+  Map<String, dynamic> toJson() => (this is ExprValueJsonDto)
+      ? (ExprValueJsonDtoAppwriteX((this as ExprValueJsonDto)).toJson())
       : (this is ExprJsonDto)
           ? ExprJsonDtoAppwriteX(this as ExprJsonDto).toJson()
           : throw Exception(
