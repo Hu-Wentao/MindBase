@@ -30,12 +30,13 @@ class MetaForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
-    child: Column(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             MetaMainForm(
-              kMetaBuilder: kMetaBuilder,
+              isCreate: isCreate,
               origin: origin,
+              kMetaBuilder: kMetaBuilder,
             ),
             AttributeListForm.build(
               isCreate: isCreate,
@@ -43,14 +44,15 @@ class MetaForm extends StatelessWidget {
               kAttrBuilder: kAttrBuilder,
               origin: origin,
             ),
-            MethodListForm.build(
-              isCreate: isCreate,
-              kMethodBuilder: kMethodBuilder,
-              origin: origin,
-            ),
+            if (!isCreate) // 如果是新建Meta, 则暂不提供"创建方法"按钮
+              MethodListForm.build(
+                isCreate: isCreate,
+                kMethodBuilder: kMethodBuilder,
+                origin: origin,
+              ),
           ],
         ),
-  );
+      );
 
   static checkBy(
     GlobalKey<FormBuilderState> kMetaBuilder,
@@ -140,13 +142,15 @@ class MetaForm extends StatelessWidget {
 }
 
 class MetaMainForm extends StatefulWidget {
-  final RecordMetaDto? origin;
+  final bool isCreate;
+  final RecordMetaDto origin;
 
   final GlobalKey<FormBuilderState>? kMetaBuilder;
 
   const MetaMainForm({
     Key? key,
-    this.origin,
+    required this.isCreate,
+    required this.origin,
     this.kMetaBuilder,
   }) : super(key: key);
 
@@ -160,7 +164,7 @@ class _MetaMainFormState extends State<MetaMainForm> {
 
   @override
   initState() {
-    _origin = widget.origin ?? RecordMetaDto.builder();
+    _origin = widget.origin;
     _kMetaBuilder = widget.kMetaBuilder ?? GlobalKey<FormBuilderState>();
     super.initState();
   }
