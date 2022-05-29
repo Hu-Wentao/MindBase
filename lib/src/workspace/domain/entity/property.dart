@@ -56,10 +56,13 @@ class Method extends Property {
   ///
   /// 上下文 [AsFuncThis.ctxSign]  : 当前record(`this`)
   /// 上下文 [Workspace.ctxFindRecordFnSign] :用于查询 [AttrType.ref] 所对应的记录值
-  dynamic eval(Record record, FindRecordFn? find) => exprEvaluator.eval(expr, {
-        AsFuncThis.ctxSign: record,
-        Workspace.ctxFindRecordFnSign: find,
-      });
+  dynamic eval(Record record, FindRecordFn? find) {
+    final r = exprEvaluator.eval(expr, {
+      AsFuncThis.ctxSign: record,
+      Workspace.ctxFindRecordFnSign: find,
+    });
+    return r.value;
+  }
 }
 
 class Attribute extends Property {
