@@ -16,6 +16,7 @@ import 'package:mind_base/src/core/infra/ui/widget/RadiusInkWell.dart';
 import 'package:mind_base/src/workspace/infra/ui/widget/data_table_grid.dart';
 import 'package:provider/provider.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
+import 'package:adaptive_breakpoints/adaptive_breakpoints.dart';
 
 part 'settings_screen.dart';
 
@@ -127,7 +128,9 @@ class _HomePageState extends State<HomePage> {
                 // todo 展示用户头像
                 const Icon(Icons.person),
                 const SizedBox(width: 4),
-                Text(p.user?.name ?? "未登录"),
+                // 手机竖屏模式不展示用户名
+                if (getWindowType(c) != AdaptiveWindowType.xsmall)
+                  Text(p.user?.name ?? "未登录"),
               ],
             ),
             onTap: () async {

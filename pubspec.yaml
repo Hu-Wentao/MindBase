@@ -74,6 +74,7 @@ dependencies:
   easy_debounce:
   dart_appwrite:
   event_bus:
+  adaptive_breakpoints:
 dev_dependencies:
   flutter_test:
     sdk: flutter
