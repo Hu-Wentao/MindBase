@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/workspace/application/service/meta_service.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/workspace/domain/repo/repo.dart';
@@ -12,7 +13,7 @@ import 'opened_workspace.dart';
 
 /// 统一监听与处理工作空间内的所有数据
 class WorkspaceProvider extends ProviderSidecar {
-  MetaDtoRepo? _metaDtoRepo;
+  MetaService? _metaService;
 
   // <MetaId,Accessor>
   final Map<String, RecordDtoRepo> _recordAccessors = {};
@@ -52,14 +53,14 @@ class WorkspaceProvider extends ProviderSidecar {
   _selectWorkspace(OpenedWorkspace selectedWorkspace) =>
       setInitialized("选择新的工作空间[${selectedWorkspace.id}]", () {
         openedWorkspace = selectedWorkspace;
-        _metaDtoRepo = MetaDtoRepo.withDI(sl, selectedWorkspace.id);
+        _metaService = MetaService.withDI(sl, selectedWorkspace.id);
       });
 
   _unSelectWorkspace() => openedWorkspace == null
       ? log("_unSelectWorkspace#当前未选中工作空间")
       : setUninitialized("工作空间[${openedWorkspace!.id}]已取消选中", () {
           openedWorkspace = null;
-          _metaDtoRepo = null;
+          _metaService = null;
         });
 
   RecordDtoRepo _recordDtoRepo(RecordMeta meta) =>
@@ -73,7 +74,7 @@ class WorkspaceProvider extends ProviderSidecar {
   /// 注意,[actInsertMeta]与[actUpdateMeta]不能混用, Insert必须使用Meta,而不是Dto
   Future<BaseException?> actInsertMeta(RecordMeta meta) async =>
       await actWrapper(() => setInitialized("新增Meta [$meta]", () async {
-            await _metaDtoRepo!.insertEntity(meta);
+            await _metaService!.insertMetaDto(meta);
           }));
 
   Future<BaseException?> actUpdateMeta(
@@ -82,11 +83,11 @@ class WorkspaceProvider extends ProviderSidecar {
   ) async =>
       await actWrapper(() => setInitialized("保存元素 [$dto]", () async {
             if (dto == null) return null;
-            await _metaDtoRepo!.updateWithRecordCollection(origin, dto);
+            await _metaService!.updateWithRecordCollection(origin, dto);
           }));
 
   Future<RecordMetaDto?> actQueryMeta(String metaId) =>
-      _metaDtoRepo!.findById(metaId);
+      _metaService!.findById(metaId);
 
 // // 尚未用到,暂时关闭
 // 更新meta的指定Attr
@@ -110,17 +111,14 @@ class WorkspaceProvider extends ProviderSidecar {
 //   }
 
   Future<List<RecordMetaDto>> actQueryMetaByName(String metaName) async =>
-      _metaDtoRepo!.findAllBy(metaName).toList();
+      _metaService!.findAllBy(metaName).toList();
 
   void actRemoveMeta(String metaId) =>
       actWrapper(() => setInitialized("删除Meta [$metaId]", () async {
             // 取消meta的监听
             actSelectOpenMeta(null);
-            // 从数据库中删除 Meta记录
-            await _metaDtoRepo!.deleteBy(metaId);
-            // 从数据库中删除 Meta对应的Record集合
-            // fixme 删除Record集合
-            // await _recordAccessor(metaId).drop();
+            // 从数据库中删除 Meta记录和Record集合
+            await _metaService!.deleteBy(metaId);
           }));
 
   /// 业务逻辑-Record ============================================================
