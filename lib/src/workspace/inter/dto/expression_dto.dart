@@ -5,8 +5,8 @@ import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:petitparser/petitparser.dart';
 
-import '../application/service/expression_parser.dart';
-import 'expr_dto_to_domain.dart';
+import '../../application/service/expression_parser.dart';
+import '../../application/service/expr_dto_to_domain.dart';
 
 /// 标识符 仅用于对用户输入的表达式解析
 /// 变量/方法的名称, 与上下文对应

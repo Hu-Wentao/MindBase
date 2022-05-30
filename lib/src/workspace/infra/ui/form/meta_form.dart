@@ -7,7 +7,7 @@ import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
-import 'package:mind_base/src/workspace/inter/expression_dto.dart';
+import 'package:mind_base/src/workspace/inter/dto/expression_dto.dart';
 import 'package:ndialog/ndialog.dart';
 
 class MetaForm extends StatelessWidget {

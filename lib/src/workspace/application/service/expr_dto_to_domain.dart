@@ -3,7 +3,7 @@ import 'package:mind_base/src/workspace/application/service/expr_evaluator.dart'
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
-import 'package:mind_base/src/workspace/inter/expression_dto.dart';
+import 'package:mind_base/src/workspace/inter/dto/expression_dto.dart';
 
 const exprToDomain = ExprDtoToDomain(
   memberAccessors: [MetaMemberAccessor()],

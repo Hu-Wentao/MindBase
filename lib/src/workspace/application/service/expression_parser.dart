@@ -1,5 +1,5 @@
 import 'package:mind_base/src/workspace/application/service/parser_char.dart';
-import 'package:mind_base/src/workspace/inter/expression_dto.dart';
+import 'package:mind_base/src/workspace/inter/dto/expression_dto.dart';
 import 'package:petitparser/core.dart';
 import 'package:petitparser/parser.dart';
 
