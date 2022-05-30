@@ -1,4 +1,4 @@
-import 'package:mind_base/src/workspace/application/service/parser_char.dart';
+import 'package:mind_base/src/workspace/application/service/expr/parser_char.dart';
 import 'package:mind_base/src/workspace/inter/dto/expr_token_dto.dart';
 import 'package:petitparser/core.dart';
 import 'package:petitparser/parser.dart';

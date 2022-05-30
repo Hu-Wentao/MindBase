@@ -4,7 +4,7 @@ import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'dart:math' as math;
 
 
-import '../../application/service/expr_evaluator.dart';
+import '../../application/service/expr/expr_evaluator.dart';
 
 part 'func.dart';
 part 'functor.dart';
