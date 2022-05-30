@@ -190,7 +190,6 @@ class ExprValue extends IExpr with IFunctor, EquatableMixin {
   @override
   List<Object?> get props => ag;
 
-  @Deprecated("适配原有的Value.of构造; 改用Value.build")
   factory ExprValue.of(dynamic v, [dynamic e]) {
     dynamic value = v ?? "";
     switch (v.runtimeType) {
@@ -203,9 +202,7 @@ class ExprValue extends IExpr with IFunctor, EquatableMixin {
       case bool:
         return ExprValue.build(type: AttrType.boolean, ag: [value, e]);
       case IExpr:
-        return v;
       case ExprValue: // 无法被IExpr取代, dart限制
-        return v;
       case Expression: // 无法被IExpr取代, dart限制
         return v;
       default:
