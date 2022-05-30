@@ -220,17 +220,23 @@ class DataFrameTitlePluto extends StatelessWidget {
             TextButton.icon(
               onPressed: () {
                 final checked = stateManager.checkedRows;
-                showConfirmDialog(
-                  context: context,
-                  title: "确认删除选中的 ${checked.length} 条记录吗",
-                  onConfirm: () async {
-                    final recordIds =
-                        checked.map((e) => (e.key as ValueKey<String>).value);
-                    for (final recordId in recordIds) {
-                      await pWorkspace.actRemoveRecord(meta, recordId);
-                    }
-                  },
-                );
+                if (checked.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("您尚未选中记录"),
+                  ));
+                } else {
+                  showConfirmDialog(
+                    context: context,
+                    title: "确认删除选中的 ${checked.length} 条记录吗",
+                    onConfirm: () async {
+                      final recordIds =
+                          checked.map((e) => (e.key as ValueKey<String>).value);
+                      for (final recordId in recordIds) {
+                        await pWorkspace.actRemoveRecord(meta, recordId);
+                      }
+                    },
+                  );
+                }
               },
               icon: const Icon(Icons.delete_outline_rounded),
               label: const Text("删除记录"),
