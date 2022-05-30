@@ -43,18 +43,18 @@ class ExprEvaluator {
   ExprValue evalMemberFunc(IExpr expr, ctx) {
     assert(expr is Expression);
     // 读取参数
-    var obj = eval(expr.ag[0], ctx);
+    ExprValue exprV = eval(expr.ag[0], ctx);
     // 如果obj不是Record,而是RecordId(是一个引用对象),则需要从工作空间中查询,
-    assert(obj.type.isRef, "只有RefExprValue才能作为FindRecordFn的参数");
+    assert(exprV.type.isRef, "只有RefExprValue才能作为FindRecordFn的参数");
 
     late Record rcd;
-    if (obj.value == null || (obj.value as String).isEmpty) {
-      // 识别为 `this`表达式
+    if (exprV.value == null || (exprV.value as String).isEmpty) {
+      // 识别为 `this`表达式, this是一种特殊(不指定RecordId)的RefExprValue
       rcd = ctx[AsFuncThis.ctxSign] as Record;
     } else {
       // 识别为 Ref表达式
       final findRecordFn = ctx[Workspace.ctxFindRecordFnSign] as FindRecordFn;
-      rcd = findRecordFn(obj.value); // RecordId(HexString) -> Record
+      rcd = findRecordFn(exprV); // ExprValue(RefExprValue) -> Record
     }
 
     final member = eval(expr.ag[1], ctx);
@@ -68,7 +68,7 @@ class ExprEvaluator {
       }
     }
     throw ExpressionEvaluatorException.memberAccessNotSupported(
-      obj.runtimeType,
+      exprV.runtimeType,
       field,
     );
   }
