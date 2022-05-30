@@ -289,20 +289,22 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                           ListTile(
                             title: const Text("新建一个表"),
                             trailing: const Icon(Icons.add),
-                            onTap: () async => await pWorkspace
-                                .actInsertMeta((await showRecordMetaEditDialog(
-                                  context: context,
-                                  kAttrBuilder: _kAttrBuilder,
-                                  kMetaBuilder: _kMetaBuilder,
-                                  kMethodBuilder: _kMethodBuilder,
-                                  queryMetaFn:
-                                      pWorkspace.openedWorkspace!.queryMeta,
-                                  allMetas:
-                                      pWorkspace.openedWorkspace!.allMetas,
-                                ))!
-                                    .toDm(
-                                        pWorkspace.openedWorkspace!.queryMeta))
-                                .thenDialog(context),
+                            onTap: () async {
+                              final nMeta = (await showRecordMetaEditDialog(
+                                context: context,
+                                kAttrBuilder: _kAttrBuilder,
+                                kMetaBuilder: _kMetaBuilder,
+                                kMethodBuilder: _kMethodBuilder,
+                                queryMetaFn:
+                                    pWorkspace.openedWorkspace!.queryMeta,
+                                allMetas: pWorkspace.openedWorkspace!.allMetas,
+                              ));
+                              if (nMeta == null) return;
+                              return await pWorkspace
+                                  .actInsertMeta(nMeta.toDm(
+                                      pWorkspace.openedWorkspace!.queryMeta))
+                                  .thenDialog(context);
+                            },
                           ),
                         ],
                       )
