@@ -76,8 +76,8 @@ extension AttributeDtoJsonX on AttributeDto {
       };
 }
 
-extension IExprJsonDtoJsonX on IExprJsonDto {
-  static IExprJsonDto fromJson(Map<String, dynamic> json) {
+extension IExprJsonDtoJsonX on IExprNodeDto {
+  static IExprNodeDto fromJson(Map<String, dynamic> json) {
     final fnName = json['fn'] as String;
     if (IFunc.isAsFunc(fnName)) {
       return ValueJsonDtoJsonX.fromJson(json);
@@ -87,8 +87,8 @@ extension IExprJsonDtoJsonX on IExprJsonDto {
   }
 }
 
-extension ExprJsonDtoJsonX on ExprJsonDto {
-  static fromJson(Map<String, dynamic> json) => ExprJsonDto(
+extension ExprJsonDtoJsonX on ExprNodeDto {
+  static fromJson(Map<String, dynamic> json) => ExprNodeDto(
         fn: json['fn'] as String,
         ag: (json['ag'] as List<dynamic>)
             .map((e) => IExprJsonDtoJsonX.fromJson(e as Map<String, dynamic>))

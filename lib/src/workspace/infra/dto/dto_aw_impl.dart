@@ -40,21 +40,21 @@ extension ValueJsonDtoAppwriteX on ValueJsonDto {
 /// [ExprValue]
 /// @since >0.14.0
 /// 取代IExpr中的[Value], 属于不兼容变更
-extension ExprValueJsonDtoAppwriteX on ExprValueJsonDto {
+extension ExprValueJsonDtoAppwriteX on ExprValueNodeDto {
   // 修复 ::fn 字段丢失导致表达式无法正常解析的bug
   Map<String, dynamic> toJson() => {
         'type': type.name,
         'ag': jsonEncode(ag),
       };
 
-  static ExprValueJsonDto fromJson(Map<String, dynamic> js) => ExprValueJsonDto(
+  static ExprValueNodeDto fromJson(Map<String, dynamic> js) => ExprValueNodeDto(
         type: AttrTypeDto.by(js['type'] as String),
         ag: jsonDecode(js['ag'] as String),
       );
 }
 
 /// 对应 [Expression]
-extension ExprJsonDtoAppwriteX on ExprJsonDto {
+extension ExprJsonDtoAppwriteX on ExprNodeDto {
   Map<String, dynamic> toJson() => {
         'fn': fn,
         'ag': jsonEncode(
@@ -64,7 +64,7 @@ extension ExprJsonDtoAppwriteX on ExprJsonDto {
 
   static fromJson(Map<String, dynamic> json) {
     final ag = json['ag'] as String? ?? '';
-    return ExprJsonDto(
+    return ExprNodeDto(
       fn: json['fn'] as String,
       ag: ag.isEmpty
           ? []
@@ -77,10 +77,10 @@ extension ExprJsonDtoAppwriteX on ExprJsonDto {
   }
 }
 
-extension IExprJsonDtoAppwriteX on IExprJsonDto {
-  static IExprJsonDto fromDocument(Document doc) => fromJson(doc.data);
+extension IExprJsonDtoAppwriteX on IExprNodeDto {
+  static IExprNodeDto fromDocument(Document doc) => fromJson(doc.data);
 
-  static IExprJsonDto fromJson(Map<String, dynamic> json) {
+  static IExprNodeDto fromJson(Map<String, dynamic> json) {
     // 只有表达式才有::fn属性
     final fn = json['fn'] as String?;
     if (fn == null || fn.isEmpty) {
@@ -90,10 +90,10 @@ extension IExprJsonDtoAppwriteX on IExprJsonDto {
     }
   }
 
-  Map<String, dynamic> toJson() => (this is ExprValueJsonDto)
-      ? (ExprValueJsonDtoAppwriteX((this as ExprValueJsonDto)).toJson())
-      : (this is ExprJsonDto)
-          ? ExprJsonDtoAppwriteX(this as ExprJsonDto).toJson()
+  Map<String, dynamic> toJson() => (this is ExprValueNodeDto)
+      ? (ExprValueJsonDtoAppwriteX((this as ExprValueNodeDto)).toJson())
+      : (this is ExprNodeDto)
+          ? ExprJsonDtoAppwriteX(this as ExprNodeDto).toJson()
           : throw Exception(
               'IExprJsonDtoAppwriteX::toJson#未处理的类型[$runtimeType]');
 }

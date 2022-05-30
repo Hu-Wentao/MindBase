@@ -3,7 +3,7 @@ import 'package:mind_base/src/workspace/application/service/expr_evaluator.dart'
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
-import 'package:mind_base/src/workspace/inter/dto/expression_dto.dart';
+import 'package:mind_base/src/workspace/inter/dto/expr_token_dto.dart';
 
 const exprToDomain = ExprDtoToDomain(
   memberAccessors: [MetaMemberAccessor()],
@@ -16,31 +16,31 @@ class ExprDtoToDomain {
 
   const ExprDtoToDomain({this.memberAccessors = const []});
 
-  IExpr convert(ExpressionDto expr, Map<String, dynamic> ctx) {
+  IExpr convert(ExprTokenDto expr, Map<String, dynamic> ctx) {
     switch (expr.runtimeType) {
-      case ValueDto:
-        return convertValue(expr as ValueDto, ctx);
+      case LiteralDto:
+        return convertValue(expr as LiteralDto, ctx);
       case VariableDto:
         return convertVariable(expr as VariableDto, ctx);
-      case ThisExpressionDto:
-        return convertThis(expr as ThisExpressionDto, ctx);
-      case MemberExpressionDto:
-        return convertMemberExpression(expr as MemberExpressionDto, ctx);
-      case IndexExpressionDto:
-        return convertIndexExpression(expr as IndexExpressionDto, ctx);
-      case CallExpressionDto:
-        return convertCallExpression(expr as CallExpressionDto, ctx);
-      case UnaryExpressionDto:
-        return convertUnaryExpression(expr as UnaryExpressionDto, ctx);
-      case BinaryExpressionDto:
-        return convertBinaryExpression(expr as BinaryExpressionDto, ctx);
+      case ThisExprTokenDto:
+        return convertThis(expr as ThisExprTokenDto, ctx);
+      case MemberExprTokenDto:
+        return convertMemberExpression(expr as MemberExprTokenDto, ctx);
+      case IndexExprTokenDto:
+        return convertIndexExpression(expr as IndexExprTokenDto, ctx);
+      case CallExprTokenDto:
+        return convertCallExpression(expr as CallExprTokenDto, ctx);
+      case UnaryExprTokenDto:
+        return convertUnaryExpression(expr as UnaryExprTokenDto, ctx);
+      case BinaryExprTokenDto:
+        return convertBinaryExpression(expr as BinaryExprTokenDto, ctx);
       default:
         throw ArgumentError("未知的表达式类型 '${expr.runtimeType}'");
     }
   }
 
   @protected
-  ExprValue convertValue(ValueDto valueDto, Map<String, dynamic> ctx) {
+  ExprValue convertValue(LiteralDto valueDto, Map<String, dynamic> ctx) {
     var value = valueDto.value;
     if (value is List) {
       return ExprValue.of(value.map((e) => convert(e, ctx)).toList());
@@ -61,7 +61,7 @@ class ExprDtoToDomain {
 
   // 这里是DTO转换, 传入ctx['this']作为ag,仅仅是为了下一步求值中,可以访问其member,以便保存propId
   @protected
-  ExprValue convertThis(ThisExpressionDto expr, Map<String, dynamic> ctx) =>
+  ExprValue convertThis(ThisExprTokenDto expr, Map<String, dynamic> ctx) =>
       ExprValue.build(
           type: AttrType.ref(
             ctx[AsFuncThis.ctxMetaIdSign],
@@ -80,7 +80,7 @@ class ExprDtoToDomain {
   ///   2. 通过object(即MetaId),
   @protected
   IExpr convertMemberExpression(
-    MemberExpressionDto expr,
+    MemberExprTokenDto expr,
     Map<String, dynamic> ctx,
   ) {
     // `expr.object`将被识别为`VariableDto`, `this`从ctx中获取到 MetaId, 而Value本身可以从 Workspace中得到Meta
@@ -105,7 +105,7 @@ class ExprDtoToDomain {
 
   @protected
   IExpr convertIndexExpression(
-    IndexExpressionDto expr,
+    IndexExprTokenDto expr,
     Map<String, dynamic> ctx,
   ) {
     final obj = convert(expr.object, ctx);
@@ -125,7 +125,7 @@ class ExprDtoToDomain {
   /// 3. 将 callee与 arguments 组装成 Expression,并返回
   @protected
   IExpr convertCallExpression(
-    CallExpressionDto expr,
+    CallExprTokenDto expr,
     Map<String, dynamic> ctx,
   ) {
     final callee = convert(expr.callee, ctx).value; // .value才是Ctx中存储的Func实例
@@ -134,7 +134,7 @@ class ExprDtoToDomain {
       return ExprValue.build(
           type: callee.rType,
           // fn: callee,
-          ag: expr.arguments.map((e) => (e as ValueDto).value).toList());
+          ag: expr.arguments.map((e) => (e as LiteralDto).value).toList());
     }
     // 对于非 AsFunc, type类型的获取逻辑暂时先放在 DTO->Domain中(此处)进行处理
     // todo 某些func可能需要特殊处理
@@ -150,7 +150,7 @@ class ExprDtoToDomain {
   /// [-], [~], [!], [+]
   @protected
   IExpr convertUnaryExpression(
-    UnaryExpressionDto expr,
+    UnaryExprTokenDto expr,
     Map<String, dynamic> ctx,
   ) {
     var argument = convert(expr.argument, ctx);
@@ -165,7 +165,7 @@ class ExprDtoToDomain {
 
   @protected
   IExpr convertBinaryExpression(
-    BinaryExpressionDto expr,
+    BinaryExprTokenDto expr,
     Map<String, dynamic> ctx,
   ) {
     var left = convert(expr.left, ctx);

@@ -1,23 +1,22 @@
 part of 'i_dto.dart';
 
 /// 将表达式转换为json保存
-/// todo 重命名为IExprNodeDto,避免Json歧义
-abstract class IExprJsonDto extends IDto {
+abstract class IExprNodeDto extends IDto {
   String? get fn;
 
   List<dynamic> get ag;
 
-  static IExprJsonDto fromDomain(dynamic expr) {
+  static IExprNodeDto fromDomain(dynamic expr) {
     if (expr is ExprValue) {
-      return ExprValueJsonDto(
+      return ExprValueNodeDto(
         type: expr.type.toDto(),
         ag: expr.ag,
       );
     }
     if (expr is Expression) {
-      return ExprJsonDto(
+      return ExprNodeDto(
         fn: expr.fn.name,
-        ag: expr.ag.map(IExprJsonDto.fromDomain).toList(),
+        ag: expr.ag.map(IExprNodeDto.fromDomain).toList(),
         type: expr.type.toDto(),
       );
     }
@@ -39,11 +38,11 @@ abstract class IExprJsonDto extends IDto {
         //   ag[0] = String.fromHexString(ag[0] as String);
         // }
         return Value(fn: fn, ag: dto.ag);
-      case ExprValueJsonDto:
-        final dto = this as ExprValueJsonDto;
+      case ExprValueNodeDto:
+        final dto = this as ExprValueNodeDto;
         return ExprValue.build(type: dto.type.toDomain(toMeta!), ag: dto.ag);
-      case ExprJsonDto:
-        final dto = (this as ExprJsonDto);
+      case ExprNodeDto:
+        final dto = (this as ExprNodeDto);
         return Expression(
           fn: IFunc.findBy(dto.fn!),
           ag: dto.ag.map((e) => e.toDomain(toMeta)).toList(),
@@ -56,7 +55,7 @@ abstract class IExprJsonDto extends IDto {
 
   @override
   String toString() =>
-      'IExprJsonDto{fn: ${this is ExprValueJsonDto ? (this as ExprValueJsonDto).type : fn}, ag: $ag}';
+      'IExprJsonDto{fn: ${this is ExprValueNodeDto ? (this as ExprValueNodeDto).type : fn}, ag: $ag}';
 
   @override
   Map<String, dynamic> toJson() =>
@@ -65,7 +64,7 @@ abstract class IExprJsonDto extends IDto {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ExprJsonDto &&
+      other is ExprNodeDto &&
           runtimeType == other.runtimeType &&
           fn == other.fn &&
           // fixme 低性能
@@ -75,30 +74,30 @@ abstract class IExprJsonDto extends IDto {
   int get hashCode => fn.hashCode ^ hashObjects(ag);
 }
 
-class ExprJsonDto extends IExprJsonDto {
+class ExprNodeDto extends IExprNodeDto {
   //内嵌函数的名
   @override
   String? fn;
   @override
-  List<IExprJsonDto> ag;
+  List<IExprNodeDto> ag;
 
   AttrTypeDto? type;
 
-  ExprJsonDto({
+  ExprNodeDto({
     required this.fn,
     this.ag = const [],
     required this.type,
   });
 
-  ExprJsonDto.builder({
+  ExprNodeDto.builder({
     this.fn,
     this.ag = const [],
     this.type,
   });
 
-  factory ExprJsonDto.fromDomain(IExpr expr) => ExprJsonDto(
+  factory ExprNodeDto.fromDomain(IExpr expr) => ExprNodeDto(
         fn: expr.fn.name,
-        ag: expr.ag.map(IExprJsonDto.fromDomain).toList(),
+        ag: expr.ag.map(IExprNodeDto.fromDomain).toList(),
         type: expr.type.toDto(),
       );
 
@@ -110,7 +109,7 @@ class ExprJsonDto extends IExprJsonDto {
 
 /// 不同点在于, ValueDto 的ag是 List<dynamic>
 @Deprecated("将在IExpr_20B2C移除")
-class ValueJsonDto extends IExprJsonDto {
+class ValueJsonDto extends IExprNodeDto {
   //内嵌函数的名
   @override
   String? fn;
@@ -138,7 +137,7 @@ class ValueJsonDto extends IExprJsonDto {
 
   _resolveTypeToJson(dynamic e) {
     switch (e.runtimeType) {
-      case IExprJsonDto:
+      case IExprNodeDto:
         return e.toJson();
       case Record:
         return jsonEncode((e as Record).id);
@@ -156,23 +155,23 @@ class ValueJsonDto extends IExprJsonDto {
 }
 
 /// 对应[ExprValue]
-class ExprValueJsonDto extends IExprJsonDto {
+class ExprValueNodeDto extends IExprNodeDto {
   //内嵌函数的名
   AttrTypeDto type;
   @override
   List<dynamic> ag;
 
-  ExprValueJsonDto({
+  ExprValueNodeDto({
     required this.type,
     this.ag = const [],
   });
 
-  ExprValueJsonDto.builder({
+  ExprValueNodeDto.builder({
     this.type = AttrTypeDto.any,
     this.ag = const [],
   });
 
-  factory ExprValueJsonDto.fromDomain(IExpr expr) => ExprValueJsonDto(
+  factory ExprValueNodeDto.fromDomain(IExpr expr) => ExprValueNodeDto(
         type: expr.type.toDto(),
         ag: expr.ag,
       );
@@ -184,7 +183,7 @@ class ExprValueJsonDto extends IExprJsonDto {
 
   _resolveTypeToJson(dynamic e) {
     switch (e.runtimeType) {
-      case IExprJsonDto:
+      case IExprNodeDto:
         return e.toJson();
       case Record:
         return jsonEncode((e as Record).id);

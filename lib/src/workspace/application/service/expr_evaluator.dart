@@ -1,7 +1,7 @@
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
-import 'package:mind_base/src/workspace/inter/dto/expression_dto.dart';
+import 'package:mind_base/src/workspace/inter/dto/expr_token_dto.dart';
 
 const exprEvaluator = ExprEvaluator(memberAccessors: [RecordMemberAccessor()]);
 
@@ -74,7 +74,7 @@ class ExprEvaluator {
   }
 
   @protected
-  dynamic evalValue(ValueDto valueDto, Map<String, dynamic> ctx) {
+  dynamic evalValue(LiteralDto valueDto, Map<String, dynamic> ctx) {
     var value = valueDto.value;
     if (value is List) return value.map((e) => eval(e, ctx)).toList();
     if (value is Map) {
@@ -90,7 +90,7 @@ class ExprEvaluator {
   }
 
   @protected
-  dynamic evalThis(ThisExpressionDto expr, Map<String, dynamic> ctx) {
+  dynamic evalThis(ThisExprTokenDto expr, Map<String, dynamic> ctx) {
     return ctx['this'];
   }
 

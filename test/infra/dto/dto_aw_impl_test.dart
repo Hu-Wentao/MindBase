@@ -91,7 +91,7 @@ main() {
         fn: IFunc.findBy("add"),
         ag: [Value.of(1), Value.of(2)],
         type: AttrType.string);
-    final exprDto = ExprJsonDto.fromDomain(expr);
+    final exprDto = ExprNodeDto.fromDomain(expr);
     // print("exprDto = $exprDto");
 
     final valueJson = IExprJsonDtoAppwriteX(valueDto).toJson();

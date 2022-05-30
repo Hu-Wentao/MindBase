@@ -8,7 +8,7 @@ import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:quiver/core.dart';
 
-part 'expr_dto.dart';
+part 'expr_node_dto.dart';
 
 extension RecordX on Record {
   RecordDto toDto() => RecordDto.fromDomain(this);
@@ -207,7 +207,7 @@ class MethodDto extends IDto {
   int k;
   String name;
   String memo;
-  IExprJsonDto expr;
+  IExprNodeDto expr;
 
   MethodDto({
     required this.k,
@@ -222,12 +222,12 @@ class MethodDto extends IDto {
     int k = 0,
     String name = "",
     String memo = "",
-    IExprJsonDto? expr,
+    IExprNodeDto? expr,
   }) : this(
           k: k,
           name: name,
           memo: memo,
-          expr: expr ?? ExprJsonDto.builder(),
+          expr: expr ?? ExprNodeDto.builder(),
         );
 
   factory MethodDto.fromFrom(Map<String, dynamic> attrMap) => MethodDto(
@@ -243,7 +243,7 @@ class MethodDto extends IDto {
           k: method.k,
           name: method.name,
           memo: method.memo,
-          expr: IExprJsonDto.fromDomain(method.expr),
+          expr: IExprNodeDto.fromDomain(method.expr),
         );
 
   MethodDto copyWith({

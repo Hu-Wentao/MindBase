@@ -27,9 +27,9 @@ class Identifier {
 /// Expr v11
 /// 解析用户输入的表达式
 /// `可读字符串` -> `可执行表达式`
-abstract class ExpressionDto {
+abstract class ExprTokenDto {
   /// 表达式不合法会抛出异常
-  static ExpressionDto of(
+  static ExprTokenDto of(
     ExpressionParser parser,
     String humanReadableString,
   ) {
@@ -42,33 +42,33 @@ abstract class ExpressionDto {
   /// 转换为持久化字段，避免上下文变化导致无法解析的问题
   /// [currentContext] 在用户输入字符串时的上下文，会随时变更，例如 `bob.name`
   /// 转换后将会被替换为持久化上下文，即 `<bob对象对应的Record::id>.<bob对应Meta::propId>`
-  ExpressionDto toPersistence(Map<String, dynamic> currentContext);
+  ExprTokenDto toPersistence(Map<String, dynamic> currentContext);
 
   /// Expr(表达式ExpressionDto)->Domain(IExpr)
   /// 允许meta为null, 用于解析没有使用`this`或者其他`全局函数`的表达式
-  IExpr toDomain([String? metaId, QueryMetaFn? queryMetaFn]) => exprToDomain.convert(
+  IExpr toDomain([String? metaId, QueryMetaFn? queryMetaFn]) =>
+      exprToDomain.convert(
         this,
         {
           // 由于没有`this`,只有`this`的类型(Meta)所以这里使用[ctxTypeSign]
           AsFuncThis.ctxMetaIdSign: metaId,
           // 注入当前工作空间, 用于通过metaId查询Meta
           Workspace.ctxQueryMetaSign: queryMetaFn,
-        }..addEntries(
-            IFunc.allFuncMapEntry), // 注意,在Dto->Domain时,似乎仍然需要全局Func
+        }..addEntries(IFunc.allFuncMapEntry), // 注意,在Dto->Domain时,似乎仍然需要全局Func
       );
 }
 
-abstract class BaseExpressionDto extends ExpressionDto with EquatableMixin {
+abstract class BaseExprTokenDto extends ExprTokenDto with EquatableMixin {
   @override
   String toString() => toReadableString();
 }
 
 /// 字面值 例如用户输入的 ”My name is", 或者是 123
-class ValueDto extends BaseExpressionDto {
+class LiteralDto extends BaseExprTokenDto {
   final dynamic value; // json解码后的字面量
   final String raw; // json编码后的字符串
 
-  ValueDto(this.value, [String? raw]) : raw = raw ?? (json.encode(value));
+  LiteralDto(this.value, [String? raw]) : raw = raw ?? (json.encode(value));
 
   @override
   List<Object?> get props => [value, raw];
@@ -77,14 +77,14 @@ class ValueDto extends BaseExpressionDto {
   String toReadableString() => raw;
 
   @override
-  ExpressionDto toPersistence(Map<String, dynamic> currentContext) {
+  ExprTokenDto toPersistence(Map<String, dynamic> currentContext) {
     return this;
   }
 }
 
 /// Variable 变量/字段/记录的属性值，例如用户输入的 `this.name`, `bob.name`等， 将会解析出`name`对应当前Meta的name字段值
 /// [identifier] 指的是变量、方法的名称
-class VariableDto extends BaseExpressionDto {
+class VariableDto extends BaseExprTokenDto {
   final Identifier identifier;
 
   VariableDto(this.identifier);
@@ -96,13 +96,13 @@ class VariableDto extends BaseExpressionDto {
   String toReadableString() => '$identifier';
 
   @override
-  ExpressionDto toPersistence(Map<String, dynamic> currentContext) {
+  ExprTokenDto toPersistence(Map<String, dynamic> currentContext) {
     return currentContext[identifier.name];
   }
 }
 
 /// 即`this`
-class ThisExpressionDto extends BaseExpressionDto {
+class ThisExprTokenDto extends BaseExprTokenDto {
   static const sign = 'this';
 
   @override
@@ -113,32 +113,16 @@ class ThisExpressionDto extends BaseExpressionDto {
 
   /// 似乎不需要
   @override
-  ExpressionDto toPersistence(Map<String, dynamic> currentContext) => this;
+  ExprTokenDto toPersistence(Map<String, dynamic> currentContext) => this;
 }
-// class ThisExpressionDto extends BaseExpressionDto {
-//   final String ref; // 输入上下文中，值为 this，持久化上下文中，为对应
-//
-//   ThisExpressionDto([this.ref = 'this']);
-//
-//   @override
-//   List<Object?> get props => const [];
-//
-//   @override
-//   String toReadableString() => toString();
-//
-//   @override
-//   ExpressionDto toPersistence(Map<String, dynamic> currentContext) =>
-//       ThisExpressionDto(
-//           (currentContext['this'] as Record).id.toHexString());
-// }
 
 /// 成员变量/方法
-class MemberExpressionDto extends BaseExpressionDto {
-  final ExpressionDto object;
+class MemberExprTokenDto extends BaseExprTokenDto {
+  final ExprTokenDto object;
 
   final Identifier property;
 
-  MemberExpressionDto(this.object, this.property);
+  MemberExprTokenDto(this.object, this.property);
 
   @override
   List<Object?> get props => [object, property];
@@ -147,18 +131,18 @@ class MemberExpressionDto extends BaseExpressionDto {
   String toReadableString() => '${object.toReadableString()}.$property';
 
   @override
-  ExpressionDto toPersistence(Map<String, dynamic> currentContext) {
+  ExprTokenDto toPersistence(Map<String, dynamic> currentContext) {
     return currentContext[object][property.name];
   }
 }
 
 /// 索引表达式 ， 表示某个数组的某个元素 `bag[1]`
-class IndexExpressionDto extends BaseExpressionDto {
-  final ExpressionDto object;
+class IndexExprTokenDto extends BaseExprTokenDto {
+  final ExprTokenDto object;
 
-  final ExpressionDto index;
+  final ExprTokenDto index;
 
-  IndexExpressionDto(this.object, this.index);
+  IndexExprTokenDto(this.object, this.index);
 
   @override
   List<Object?> get props => [object, index];
@@ -167,18 +151,18 @@ class IndexExpressionDto extends BaseExpressionDto {
   String toReadableString() => '${object.toReadableString()}[$index]';
 
   @override
-  ExpressionDto toPersistence(Map<String, dynamic> currentContext) {
+  ExprTokenDto toPersistence(Map<String, dynamic> currentContext) {
     return this; // todo
     // return toReadableString();
   }
 }
 
 /// 调用表达式，调用某个方法， `read()`
-class CallExpressionDto extends BaseExpressionDto {
-  final ExpressionDto callee;
-  final List<ExpressionDto> arguments;
+class CallExprTokenDto extends BaseExprTokenDto {
+  final ExprTokenDto callee;
+  final List<ExprTokenDto> arguments;
 
-  CallExpressionDto(this.callee, this.arguments);
+  CallExprTokenDto(this.callee, this.arguments);
 
   @override
   List<Object?> get props => [callee, arguments];
@@ -188,27 +172,27 @@ class CallExpressionDto extends BaseExpressionDto {
       '${callee.toReadableString()}(${arguments.join(', ')})';
 
   @override
-  ExpressionDto toPersistence(Map<String, dynamic> currentContext) {
+  ExprTokenDto toPersistence(Map<String, dynamic> currentContext) {
     return this; // todo
     // return toReadableString();
   }
 }
 
 /// 复合表达式
-abstract class CompoundExpressionDto extends BaseExpressionDto {
+abstract class CompoundExprTokenDto extends BaseExprTokenDto {
   @override
   String toReadableString() => '($this)';
 }
 
 /// 一元表达式
-class UnaryExpressionDto extends BaseExpressionDto {
+class UnaryExprTokenDto extends BaseExprTokenDto {
   final String operator;
 
-  final ExpressionDto argument;
+  final ExprTokenDto argument;
 
   final bool prefix;
 
-  UnaryExpressionDto(this.operator, this.argument, {this.prefix = true});
+  UnaryExprTokenDto(this.operator, this.argument, {this.prefix = true});
 
   @override
   List<Object?> get props => [operator, argument, prefix];
@@ -217,19 +201,19 @@ class UnaryExpressionDto extends BaseExpressionDto {
   String toReadableString() => '$operator$argument';
 
   @override
-  ExpressionDto toPersistence(Map<String, dynamic> currentContext) {
+  ExprTokenDto toPersistence(Map<String, dynamic> currentContext) {
     return this; // todo
     // return toReadableString();
   }
 }
 
 /// 二元运算符
-class BinaryExpressionDto extends CompoundExpressionDto {
+class BinaryExprTokenDto extends CompoundExprTokenDto {
   final String operator;
-  final ExpressionDto left;
-  final ExpressionDto right;
+  final ExprTokenDto left;
+  final ExprTokenDto right;
 
-  BinaryExpressionDto(this.operator, this.left, this.right);
+  BinaryExprTokenDto(this.operator, this.left, this.right);
 
   @override
   List<Object?> get props => [operator, left, right];
@@ -241,19 +225,19 @@ class BinaryExpressionDto extends CompoundExpressionDto {
 
   @override
   String toString() {
-    var l = (left is BinaryExpressionDto &&
-            (left as BinaryExpressionDto).precedence < precedence)
+    var l = (left is BinaryExprTokenDto &&
+            (left as BinaryExprTokenDto).precedence < precedence)
         ? '($left)'
         : '$left';
-    var r = (right is BinaryExpressionDto &&
-            (right as BinaryExpressionDto).precedence < precedence)
+    var r = (right is BinaryExprTokenDto &&
+            (right as BinaryExprTokenDto).precedence < precedence)
         ? '($right)'
         : '$right';
     return '$l$operator$r';
   }
 
   @override
-  ExpressionDto toPersistence(Map<String, dynamic> currentContext) {
+  ExprTokenDto toPersistence(Map<String, dynamic> currentContext) {
     return this; // todo
     // return toReadableString();
   }

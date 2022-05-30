@@ -61,7 +61,7 @@ main() {
     print("#r = $r");
   });
   test("简单表达式序列化", () {
-    final dto = IExprJsonDto.fromDomain(expr);
+    final dto = IExprNodeDto.fromDomain(expr);
     print("dto = $dto");
     final js = IExprJsonDtoAppwriteX(dto).toJson();
     print("js = $js");

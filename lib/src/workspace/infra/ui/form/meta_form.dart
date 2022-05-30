@@ -7,7 +7,7 @@ import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
-import 'package:mind_base/src/workspace/inter/dto/expression_dto.dart';
+import 'package:mind_base/src/workspace/inter/dto/expr_token_dto.dart';
 import 'package:ndialog/ndialog.dart';
 
 class MetaForm extends StatelessWidget {
@@ -136,8 +136,8 @@ class MetaForm extends StatelessWidget {
                 name: json['name'] as String,
                 memo: json['memo'] as String,
                 // 可读Token->Domain(包含上下文)->IExprJson(持久化)
-                expr: IExprJsonDto.fromDomain(
-                  ExpressionDto.of(exprParser, json['expr'] as String).toDomain(
+                expr: IExprNodeDto.fromDomain(
+                  ExprTokenDto.of(exprParser, json['expr'] as String).toDomain(
                     metaId,
                     queryMetaFn,
                   ),
