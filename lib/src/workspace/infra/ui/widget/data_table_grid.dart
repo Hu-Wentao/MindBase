@@ -180,68 +180,71 @@ class DataFrameTitlePluto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Consumer<WorkspaceProvider>(
-        builder: (c, pWorkspace, _) => Row(
-          children: [
-            TextButton.icon(
-              onPressed: () async => await onSaveMeta(
-                await showRecordMetaEditDialog(
-                  context: context,
-                  originMeta: meta.toDto(),
-                  kMetaBuilder: kMetaBuilder,
-                  kAttrBuilder: kAttrBuilder,
-                  kMethodBuilder: kMethodBuilder,
-                  queryMetaFn: queryMetaFn,
-                  allMetas: allMetas,
-                ),
-              ),
-              icon: const Icon(Icons.edit),
-              label: const Text("修改结构"),
-            ),
-            TextButton.icon(
-              onPressed: () async => await onSaveRecord(
-                await showRecordEditDialog(
-                  context: context,
-                  meta: meta,
-                  openedWorkspace: openedWorkspace,
-                  kRecordBuilder: _kRecordBuilder,
-                ),
-              ),
-              icon: const Icon(Icons.add),
-              label: const Text("新增记录"),
-            ),
-            TextButton.icon(
-              onPressed: () => showConfirmDialog(
-                  context: context,
-                  title: "确认删除[${meta.name}]表吗",
-                  onConfirm: () => pWorkspace.actRemoveMeta(meta.id)),
-              icon: const Icon(Icons.delete),
-              label: const Text("删除表"),
-            ),
-            TextButton.icon(
-              onPressed: () {
-                final checked = stateManager.checkedRows;
-                if (checked.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text("您尚未选中记录"),
-                  ));
-                } else {
-                  showConfirmDialog(
+        builder: (c, pWorkspace, _) => SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              TextButton.icon(
+                onPressed: () async => await onSaveMeta(
+                  await showRecordMetaEditDialog(
                     context: context,
-                    title: "确认删除选中的 ${checked.length} 条记录吗",
-                    onConfirm: () async {
-                      final recordIds =
-                          checked.map((e) => (e.key as ValueKey<String>).value);
-                      for (final recordId in recordIds) {
-                        await pWorkspace.actRemoveRecord(meta, recordId);
-                      }
-                    },
-                  );
-                }
-              },
-              icon: const Icon(Icons.delete_outline_rounded),
-              label: const Text("删除记录"),
-            )
-          ],
+                    originMeta: meta.toDto(),
+                    kMetaBuilder: kMetaBuilder,
+                    kAttrBuilder: kAttrBuilder,
+                    kMethodBuilder: kMethodBuilder,
+                    queryMetaFn: queryMetaFn,
+                    allMetas: allMetas,
+                  ),
+                ),
+                icon: const Icon(Icons.edit),
+                label: const Text("修改结构"),
+              ),
+              TextButton.icon(
+                onPressed: () async => await onSaveRecord(
+                  await showRecordEditDialog(
+                    context: context,
+                    meta: meta,
+                    openedWorkspace: openedWorkspace,
+                    kRecordBuilder: _kRecordBuilder,
+                  ),
+                ),
+                icon: const Icon(Icons.add),
+                label: const Text("新增记录"),
+              ),
+              TextButton.icon(
+                onPressed: () => showConfirmDialog(
+                    context: context,
+                    title: "确认删除[${meta.name}]表吗",
+                    onConfirm: () => pWorkspace.actRemoveMeta(meta.id)),
+                icon: const Icon(Icons.delete),
+                label: const Text("删除表"),
+              ),
+              TextButton.icon(
+                onPressed: () {
+                  final checked = stateManager.checkedRows;
+                  if (checked.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("您尚未选中记录"),
+                    ));
+                  } else {
+                    showConfirmDialog(
+                      context: context,
+                      title: "确认删除选中的 ${checked.length} 条记录吗",
+                      onConfirm: () async {
+                        final recordIds = checked
+                            .map((e) => (e.key as ValueKey<String>).value);
+                        for (final recordId in recordIds) {
+                          await pWorkspace.actRemoveRecord(meta, recordId);
+                        }
+                      },
+                    );
+                  }
+                },
+                icon: const Icon(Icons.delete_outline_rounded),
+                label: const Text("删除记录"),
+              )
+            ],
+          ),
         ),
       );
 }
