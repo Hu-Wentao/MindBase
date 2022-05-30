@@ -54,30 +54,35 @@ class MetaForm extends StatelessWidget {
         ),
       );
 
+  /// 允许 [kMethodBuilder]为空, 因为创建时可能会不展示MethodBuilder,如果此时传入,会导致MethodBuilder始终报错
   static checkBy(
     GlobalKey<FormBuilderState> kMetaBuilder,
     GlobalKey<FormBuilderState> kAttrBuilder,
-    GlobalKey<FormBuilderState> kMethodBuilder,
+    GlobalKey<FormBuilderState>? kMethodBuilder,
   ) {
     final metaState = kMetaBuilder.currentState?.saveAndValidate() ?? false;
     final attrState = kAttrBuilder.currentState?.saveAndValidate() ?? false;
-    final methodState = kMethodBuilder.currentState?.saveAndValidate() ?? false;
-    return metaState && attrState && methodState;
+    if (kMethodBuilder != null) {
+      final methodState =
+          kMethodBuilder.currentState?.saveAndValidate() ?? false;
+      return metaState && attrState && methodState;
+    } else {
+      return metaState && attrState;
+    }
   }
 
   /// 通过 k获取 MetaForm和AttrForm 中的数据, 最后转换成DTO
   static RecordMetaDto? fetchDtoBy({
     required GlobalKey<FormBuilderState> kMetaBuilder,
     required GlobalKey<FormBuilderState> kAttrBuilder,
-    required GlobalKey<FormBuilderState> kMethodBuilder,
+    required GlobalKey<FormBuilderState>? kMethodBuilder,
     required QueryMetaFn? queryMetaFn,
   }) {
-    if (!checkBy(kMetaBuilder, kAttrBuilder, kMethodBuilder)) {
-      return null;
-    }
+    assert(checkBy(kMetaBuilder, kAttrBuilder, kMethodBuilder),
+        "校验Meta,Attr和MethodBuilder失败");
     final metaMap = kMetaBuilder.currentState!.value;
     final attrMap = kAttrBuilder.currentState!.value;
-    final methodMap = kMethodBuilder.currentState!.value;
+    final methodMap = kMethodBuilder?.currentState!.value;
     slLogger.info(
         "fetchDtoBy # metaMap: $metaMap, attrMap: $attrMap, methodMap: $methodMap");
     // <key,<field,value>>
@@ -102,42 +107,47 @@ class MetaForm extends StatelessWidget {
       );
     }).toList();
 
-    final methodFormatMap = <int, Map<String, String>>{};
-    for (final e in methodMap.entries) {
-      final k = e.key.split("@");
-      final ik = int.parse(k[0]);
-      final fk = k[1];
-      final v = e.value;
-      methodFormatMap[ik] ??= {};
-      methodFormatMap[ik]![fk] = v;
-    }
-    // expr12 由于持久化为Json,需要 Readable->Domain(Meta)->Json, 显然此时Meta尚未持久化(尚未被创建)
-    // 所以在expr12中, 无法在创建Meta之前,创建方法
-    final metaId = metaMap['id'] as String?;
-    // 尝试查询Meta,如果查不到就取消添加方法(因为Meta还没被创建)
-    // final meta = sl<WorkspaceDataHolder>().getMetaBy(ObjectId.fromHexString(metaId));
-    // 注意, 由于 attr-v7.2 新增QueryMetaFn, 所以只要MetaId!=null,就可以新建方法
-    final methods = (metaId == null)
-        ? const <MethodDto>[]
-        : methodFormatMap.entries.map((e) {
-            final json = e.value;
-            final key = int.parse(json['k'] as String);
-            return MethodDto(
-              k: key,
-              name: json['name'] as String,
-              memo: json['memo'] as String,
-              // 可读Token->Domain(包含上下文)->IExprJson(持久化)
-              expr: IExprJsonDto.fromDomain(
-                ExpressionDto.of(exprParser, json['expr'] as String).toDomain(
-                  metaId,
-                  queryMetaFn,
+    // 为空表示当前From没有构造Method输入框
+    if (methodMap == null) {
+      return RecordMetaDto.fromForm(metaMap, attrs, []);
+    } else {
+      final methodFormatMap = <int, Map<String, String>>{};
+      for (final e in methodMap.entries) {
+        final k = e.key.split("@");
+        final ik = int.parse(k[0]);
+        final fk = k[1];
+        final v = e.value;
+        methodFormatMap[ik] ??= {};
+        methodFormatMap[ik]![fk] = v;
+      }
+      // expr12 由于持久化为Json,需要 Readable->Domain(Meta)->Json, 显然此时Meta尚未持久化(尚未被创建)
+      // 所以在expr12中, 无法在创建Meta之前,创建方法
+      final metaId = metaMap['id'] as String?;
+      // 尝试查询Meta,如果查不到就取消添加方法(因为Meta还没被创建)
+      // final meta = sl<WorkspaceDataHolder>().getMetaBy(ObjectId.fromHexString(metaId));
+      // 注意, 由于 attr-v7.2 新增QueryMetaFn, 所以只要MetaId!=null,就可以新建方法
+      final methods = (metaId == null)
+          ? const <MethodDto>[]
+          : methodFormatMap.entries.map((e) {
+              final json = e.value;
+              final key = int.parse(json['k'] as String);
+              return MethodDto(
+                k: key,
+                name: json['name'] as String,
+                memo: json['memo'] as String,
+                // 可读Token->Domain(包含上下文)->IExprJson(持久化)
+                expr: IExprJsonDto.fromDomain(
+                  ExpressionDto.of(exprParser, json['expr'] as String).toDomain(
+                    metaId,
+                    queryMetaFn,
+                  ),
                 ),
-              ),
-            );
-          }).toList();
+              );
+            }).toList();
 
-    // print("debug # attrs: $attrs");
-    return RecordMetaDto.fromForm(metaMap, attrs, methods);
+      // print("debug # attrs: $attrs");
+      return RecordMetaDto.fromForm(metaMap, attrs, methods);
+    }
   }
 }
 

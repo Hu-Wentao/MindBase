@@ -36,12 +36,15 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
               if (MetaForm.checkBy(
                 kMetaBuilder,
                 kAttrBuilder,
-                kMethodBuilder,
+                originMeta == null
+                    ? null
+                    : kMethodBuilder, // 新建Meta时不需要检查方法,否则会导致新建失败(method check始终为false)
               )) {
                 final dto = MetaForm.fetchDtoBy(
                   kMetaBuilder: kMetaBuilder,
                   kAttrBuilder: kAttrBuilder,
-                  kMethodBuilder: kMethodBuilder,
+                  // 新建Meta时不需要检查...
+                  kMethodBuilder: originMeta == null ? null : kMethodBuilder,
                   queryMetaFn: queryMetaFn,
                 );
                 Navigator.pop<RecordMetaDto>(context, dto);
