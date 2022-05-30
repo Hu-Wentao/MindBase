@@ -185,21 +185,6 @@ class DataFrameTitlePluto extends StatelessWidget {
           child: Row(
             children: [
               TextButton.icon(
-                onPressed: () async => await onSaveMeta(
-                  await showRecordMetaEditDialog(
-                    context: context,
-                    originMeta: meta.toDto(),
-                    kMetaBuilder: kMetaBuilder,
-                    kAttrBuilder: kAttrBuilder,
-                    kMethodBuilder: kMethodBuilder,
-                    queryMetaFn: queryMetaFn,
-                    allMetas: allMetas,
-                  ),
-                ),
-                icon: const Icon(Icons.edit),
-                label: const Text("修改结构"),
-              ),
-              TextButton.icon(
                 onPressed: () async => await onSaveRecord(
                   await showRecordEditDialog(
                     context: context,
@@ -209,15 +194,7 @@ class DataFrameTitlePluto extends StatelessWidget {
                   ),
                 ),
                 icon: const Icon(Icons.add),
-                label: const Text("新增记录"),
-              ),
-              TextButton.icon(
-                onPressed: () => showConfirmDialog(
-                    context: context,
-                    title: "确认删除[${meta.name}]表吗",
-                    onConfirm: () => pWorkspace.actRemoveMeta(meta.id)),
-                icon: const Icon(Icons.delete),
-                label: const Text("删除表"),
+                label: const Text("新增一行"),
               ),
               TextButton.icon(
                 onPressed: () {
@@ -241,8 +218,31 @@ class DataFrameTitlePluto extends StatelessWidget {
                   }
                 },
                 icon: const Icon(Icons.delete_outline_rounded),
-                label: const Text("删除记录"),
-              )
+                label: const Text("删除选中"),
+              ),
+              TextButton.icon(
+                onPressed: () async => await onSaveMeta(
+                  await showRecordMetaEditDialog(
+                    context: context,
+                    originMeta: meta.toDto(),
+                    kMetaBuilder: kMetaBuilder,
+                    kAttrBuilder: kAttrBuilder,
+                    kMethodBuilder: kMethodBuilder,
+                    queryMetaFn: queryMetaFn,
+                    allMetas: allMetas,
+                  ),
+                ),
+                icon: const Icon(Icons.edit),
+                label: const Text("修改结构"),
+              ),
+              TextButton.icon(
+                onPressed: () => showConfirmDialog(
+                    context: context,
+                    title: "确认删除[${meta.name}]表吗",
+                    onConfirm: () => pWorkspace.actRemoveMeta(meta.id)),
+                icon: const Icon(Icons.delete),
+                label: const Text("删除表"),
+              ),
             ],
           ),
         ),
