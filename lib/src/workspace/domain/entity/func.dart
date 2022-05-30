@@ -512,66 +512,68 @@ final anyFunList = <Func>[
 ];
 
 /// 基础表达式
+/// todo 尚未修改返回值类型为[ExprValue]
 final numFunList = [
   BaseFunc(
     name: "add",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
-    logic: ((p) => (p[0]) + (p[1])),
+    logic: ((p) => (p[0] as ExprValue).value + (p[1] as ExprValue).value),
   ),
   BaseFunc(
     name: "sub",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
-    logic: ((p) => (p[0]) - (p[1])),
+    logic: ((p) => (p[0] as ExprValue).value - (p[1] as ExprValue).value),
   ),
   BaseFunc(
     name: "mul",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
-    logic: ((p) => (p[0]) * (p[1])),
+    logic: ((p) => (p[0] as ExprValue).value * (p[1] as ExprValue).value),
   ),
   BaseFunc(
     name: "div",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
-    logic: ((p) => (p[0]) / (p[1])),
+    logic: ((p) => (p[0] as ExprValue).value / (p[1] as ExprValue).value),
   ),
   BaseFunc(
     name: "mod",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
-    logic: ((p) => (p[0]) % (p[1])),
+    logic: ((p) => (p[0] as ExprValue).value % (p[1] as ExprValue).value),
   ),
   BaseFunc(
     name: "pow",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.num,
-    logic: ((p) => math.pow((p[0]), (p[1]))),
+    logic: ((p) =>
+        math.pow((p[0] as ExprValue).value, (p[1] as ExprValue).value)),
   ),
   BaseFunc(
     name: "greater",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.boolean,
-    logic: ((p) => (p[0]) > (p[1])),
+    logic: ((p) => (p[0] as ExprValue).value > (p[1] as ExprValue).value),
   ),
   BaseFunc(
     name: "greaterEqual",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.boolean,
-    logic: ((p) => (p[0]) > (p[1])),
+    logic: ((p) => (p[0] as ExprValue).value > (p[1] as ExprValue).value),
   ),
   BaseFunc(
     name: "little",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.boolean,
-    logic: ((p) => (p[0]) < (p[1])),
+    logic: ((p) => (p[0] as ExprValue).value < (p[1] as ExprValue).value),
   ),
   BaseFunc(
     name: "littleEqual",
     pTypes: const [AttrType.num, AttrType.num],
     rType: AttrType.boolean,
-    logic: ((p) => (p[0]) <= (p[1])),
+    logic: ((p) => (p[0] as ExprValue).value <= (p[1] as ExprValue).value),
   ),
 ];
 
@@ -582,19 +584,23 @@ final boolFunList = [
     name: "and",
     pTypes: const [AttrType.boolean, AttrType.boolean],
     rType: AttrType.boolean,
-    logic: ((p) => (p[0]) && (p[1] is Function) ? p[1].call() : p[1]),
+    logic: ((p) => (p[0] as ExprValue).value && (p[1] is Function)
+        ? p[1].call()
+        : (p[1] as ExprValue).value),
   ),
   BaseFunc(
     name: "or",
     pTypes: const [AttrType.boolean, AttrType.boolean],
     rType: AttrType.boolean,
-    logic: ((p) => (p[0]) || (p[1] is Function) ? p[1].call() : p[1]),
+    logic: ((p) => (p[0] as ExprValue).value || (p[1] is Function)
+        ? p[1].call()
+        : (p[1] as ExprValue).value),
   ),
   BaseFunc(
     name: "not",
     pTypes: const [AttrType.boolean],
     rType: AttrType.boolean,
-    logic: ((p) => !(p[0])),
+    logic: ((p) => !(p[0] as ExprValue).value),
   ),
 ];
 final strFunList = [
@@ -602,6 +608,6 @@ final strFunList = [
     name: "len",
     pTypes: const [AttrType.string],
     rType: AttrType.num,
-    logic: ((p) => (p[0]).value.length),
+    logic: ((p) => (p[0] as ExprValue).value.value.length),
   )
 ];

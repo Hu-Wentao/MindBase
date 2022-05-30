@@ -8,6 +8,7 @@ class AttrType {
   // 从所在Workspace中获取Meta的函数
   final QueryMetaFn? _getMeta;
 
+  @Deprecated("考虑移除any类型, 默认用string")
   static const AttrType any = AttrType(AttrTp.any, null, null);
   static const AttrType num = AttrType(AttrTp.num, null, null);
   static const AttrType string = AttrType(AttrTp.string, null, null);

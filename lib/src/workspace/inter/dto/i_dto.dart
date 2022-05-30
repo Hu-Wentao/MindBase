@@ -360,9 +360,9 @@ abstract class IExprJsonDto extends IDto {
   List<dynamic> get ag;
 
   static IExprJsonDto fromDomain(dynamic expr) {
-    if (expr is Value) {
-      return ValueJsonDto(
-        fn: expr.fn.name,
+    if (expr is ExprValue) {
+      return ExprValueJsonDto(
+        type: expr.type.toDto(),
         ag: expr.ag,
       );
     }
@@ -390,6 +390,9 @@ abstract class IExprJsonDto extends IDto {
         //   ag[0] = String.fromHexString(ag[0] as String);
         // }
         return Value(fn: fn, ag: dto.ag);
+      case ExprValueJsonDto:
+        final dto = this as ExprValueJsonDto;
+        return ExprValue.build(type: dto.type.toDomain(toMeta!), ag: dto.ag);
       case ExprJsonDto:
         final dto = (this as ExprJsonDto);
         return Expression(
@@ -403,7 +406,8 @@ abstract class IExprJsonDto extends IDto {
   }
 
   @override
-  String toString() => 'IExprJsonDto{fn: $fn, ag: $ag}';
+  String toString() =>
+      'IExprJsonDto{fn: ${this is ExprValueJsonDto ? (this as ExprValueJsonDto).type : fn}, ag: $ag}';
 
   @override
   Map<String, dynamic> toJson() =>
@@ -456,6 +460,7 @@ class ExprJsonDto extends IExprJsonDto {
 }
 
 /// 不同点在于, ValueDto 的ag是 List<dynamic>
+@Deprecated("将在IExpr_20B2C移除")
 class ValueJsonDto extends IExprJsonDto {
   //内嵌函数的名
   @override
@@ -499,6 +504,54 @@ class ValueJsonDto extends IExprJsonDto {
         }
     }
   }
+}
+
+/// 对应[ExprValue]
+class ExprValueJsonDto extends IExprJsonDto {
+  //内嵌函数的名
+  AttrTypeDto type;
+  @override
+  List<dynamic> ag;
+
+  ExprValueJsonDto({
+    required this.type,
+    this.ag = const [],
+  });
+
+  ExprValueJsonDto.builder({
+    this.type = AttrTypeDto.any,
+    this.ag = const [],
+  });
+
+  factory ExprValueJsonDto.fromDomain(IExpr expr) => ExprValueJsonDto(
+        type: expr.type.toDto(),
+        ag: expr.ag,
+      );
+
+  /// 可视化的函数表达式字符串
+  @override
+  String toReadableString() => "(${ag.map(_resolveTypeToJson).join(', ')}:${type.name})";
+
+  _resolveTypeToJson(dynamic e) {
+    switch (e.runtimeType) {
+      case IExprJsonDto:
+        return e.toJson();
+      case Record:
+        return jsonEncode((e as Record).id);
+      case RecordMeta:
+        return jsonEncode((e as RecordMeta).id);
+      default:
+        try {
+          return jsonEncode(e);
+        } catch (e) {
+          print("_resolveTypeToJson#error#e = $e");
+          return "error";
+        }
+    }
+  }
+
+  @override
+  String? get fn => throw UnimplementedError("ExprValueJsonDto不需要::fn");
 }
 
 class WorkspaceDto extends IEntityDto {

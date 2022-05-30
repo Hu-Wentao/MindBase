@@ -12,64 +12,64 @@ class ExprEvaluator {
   const ExprEvaluator({this.memberAccessors = const []});
 
   /// todo IExpr_v20B 返回值应当为 [IExpr], 最终返回值类型应当为 [ExprValue]
-  dynamic eval(IExpr expr, Map<String, dynamic> ctx) {
-    print("eval: $expr");
-    final fn = expr.fn;
-    // print("fn runtimeType = ${fn.runtimeType}");
-
-    if (fn is AsFunc) {
-      // 由于 AsFunc带有<>泛型,无法case匹配,因此在这里提前处理
-      return evalAsFunc(expr, ctx);
+  /// 1. 存在问题: 如果返回值为 [ExprValue],那么计算结果为Record,也需要包装成 [ExprValue],但目前没有对应的type来表示record
+  /// 2. 确实要统一返回ExprValue, 以member访问为例, 如果不用ExprValue,则Record对象将只有一个RecordId, 无法作为member函数的首个入参;
+  /// 3. 问题解决: 对于 已有的 add(),等入参为原始类型的函数, 需要进行简单改造,适配为ExprValue,这样可以同时检查入参的类型;
+  ExprValue eval(IExpr expr, Map<String, dynamic> ctx) {
+    // print("eval: $expr");
+    late dynamic r;
+    if (expr is ExprValue) {
+      return expr; // ExprValue就不用求值了,直接返回
+    } else {
+      switch (expr.fn.runtimeType) {
+        // case AsFunc:
+        case MemberFunc:
+          r = evalMemberFunc(expr, ctx);
+          break;
+        case IndexFunc:
+          r = evalIndexFunc(expr, ctx);
+          break;
+        case BaseFunc: // 普通函数,无需上下文
+          final rr = evalBaseFunc(expr, ctx);
+          // fixme 由于基础函数返回值都是原始类型, 在这里对原始类型进行简单包装,防止出错
+          r = ExprValue.of(rr);
+          break;
+      }
     }
-    switch (fn.runtimeType) {
-      // case AsFunc:
-      case MemberFunc:
-        return evalMemberFunc(expr, ctx);
-      case IndexFunc:
-        return evalIndexFunc(expr, ctx);
-      case BaseFunc: // 普通函数,无需上下文
-        return evalBaseFunc(expr, ctx);
-    }
+    print("eval#rst: $expr #r: $r");
+    return r;
   }
 
-  // As都是Value类型
-  evalAsFunc(IExpr expr, ctx) {
-    // print("evalAsFunc# ${expr.fn}#${expr.ag}");
-    assert(expr is Value);
-    // todo 考虑检查一下 [expr.e]是否为null,这样可以提前检查异常
-    if (expr.fn is AsFuncThis) {
-      // this 应当是一个[Record]实例, 表示当前被调用方法所在的Record
-      return ctx[AsFuncThis.ctxSign];
-    } else if (expr.fn is AsFuncRef) {
-      return expr.value;
-    }
-    // 直接返回v,而不是value, 后期考虑移除value等自带求值功能|或者将这里的功能移动到Func中
-    return (expr as Value).v;
-  }
-
-  evalMemberFunc(IExpr expr, ctx) {
+  ExprValue evalMemberFunc(IExpr expr, ctx) {
     assert(expr is Expression);
     // 读取参数
-    var obj = eval(expr.ag[0], ctx);
-    assert(obj != null, "找不到Member主对象,参数列表[${expr.ag}]");
+    ExprValue exprV = eval(expr.ag[0], ctx);
     // 如果obj不是Record,而是RecordId(是一个引用对象),则需要从工作空间中查询,
-    if (obj is ExprValue) {
-      assert(obj.type.isRef, "只有RefExprValue才能作为FindRecordFn的参数");
+    assert(exprV.type.isRef, "只有RefExprValue才能作为FindRecordFn的参数");
+
+    late Record rcd;
+    if (exprV.value == null || (exprV.value as String).isEmpty) {
+      // 识别为 `this`表达式, this是一种特殊(不指定RecordId)的RefExprValue
+      rcd = ctx[AsFuncThis.ctxSign] as Record;
+    } else {
+      // 识别为 Ref表达式
       final findRecordFn = ctx[Workspace.ctxFindRecordFnSign] as FindRecordFn;
-      obj = findRecordFn(obj); // MetaId(HexString) -> Meta
+      rcd = findRecordFn(exprV); // ExprValue(RefExprValue) -> Record
     }
 
     final member = eval(expr.ag[1], ctx);
+
+    late String field = member.value;
     // print("evalMemberFunc# 表达式的ag列表${expr.ag}");
     // 选择相关的Accessor
     for (var a in memberAccessors) {
-      if (a.canHandle(obj, member)) {
-        return a.getMember(obj, member);
+      if (a.canHandle(rcd, field)) {
+        return a.getMember(rcd, field);
       }
     }
     throw ExpressionEvaluatorException.memberAccessNotSupported(
-      obj.runtimeType,
-      member,
+      exprV.runtimeType,
+      field,
     );
   }
 
@@ -184,7 +184,7 @@ class ExprEvaluator {
     assert(expr is Expression);
     final obj = (expr as Expression).ag[0];
     final index = (expr).ag[1];
-    return eval(obj, ctx)[eval(index, ctx)];
+    return eval(obj, ctx).value[eval(index, ctx)];
   }
 
   evalBaseFunc(IExpr expr, Map<String, dynamic> ctx) {
@@ -294,7 +294,7 @@ class RecordMemberAccessor implements MemberAccessor<Record> {
     }
     final field = record.getFieldByAttrName(member);
     if (field.value != null) {
-      return field; // 值
+      return field; // Expr值, 如果是ref,则直接返回,如果是原始类型, 则要返回value
     }
     throw "在Record[${record.id}]找不到名称为[$member]的成员方法或变量";
   }

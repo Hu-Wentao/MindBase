@@ -103,6 +103,7 @@ extension ExprJsonDtoJsonX on ExprJsonDto {
       };
 }
 
+@Deprecated("将在IExpr_20B2C移除")
 extension ValueJsonDtoJsonX on ValueJsonDto {
   static ValueJsonDto fromJson(Map<String, dynamic> json) => ValueJsonDto(
       fn: json['fn'] as String,

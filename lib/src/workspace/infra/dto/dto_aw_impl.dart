@@ -8,9 +8,10 @@ import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 
-/// todo IExpr-v20B; 目前该方案仅用于修复表达式fn丢失导致的问题
+/// 对应[Value]
+@Deprecated('Use ExprValueJsonDtoAppwriteX')
 extension ValueJsonDtoAppwriteX on ValueJsonDto {
-  // 修复 ::fn 字段丢失导致表达式无法正常解析的bug
+// 修复 ::fn 字段丢失导致表达式无法正常解析的bug
   Map<String, dynamic> toJson() => {
         'ag': jsonEncode({
           'fn': fn,
@@ -21,7 +22,7 @@ extension ValueJsonDtoAppwriteX on ValueJsonDto {
   static ValueJsonDto fromJson(Map<String, dynamic> js) {
     final jsMap = jsonDecode(js['ag'] as String);
     if (jsMap is List) {
-      // 仅用于适配 0.12.0 之前的版本, 之前版本所录入的asThis表达式都无法正常执行
+// 仅用于适配 0.12.0 之前的版本, 之前版本所录入的asThis表达式都无法正常执行
       return ValueJsonDto(
         fn: js['fn'] as String? ?? 'asString', // 存储时已擦除`fn`,该值应当为空
         ag: jsonDecode(js['ag'] as String),
@@ -35,6 +36,24 @@ extension ValueJsonDtoAppwriteX on ValueJsonDto {
   }
 }
 
+///
+/// [ExprValue]
+/// @since >0.14.0
+/// 取代IExpr中的[Value], 属于不兼容变更
+extension ExprValueJsonDtoAppwriteX on ExprValueJsonDto {
+  // 修复 ::fn 字段丢失导致表达式无法正常解析的bug
+  Map<String, dynamic> toJson() => {
+        'type': type.name,
+        'ag': jsonEncode(ag),
+      };
+
+  static ExprValueJsonDto fromJson(Map<String, dynamic> js) => ExprValueJsonDto(
+        type: AttrTypeDto.by(js['type'] as String),
+        ag: jsonDecode(js['ag'] as String),
+      );
+}
+
+/// 对应 [Expression]
 extension ExprJsonDtoAppwriteX on ExprJsonDto {
   Map<String, dynamic> toJson() => {
         'fn': fn,
@@ -62,17 +81,17 @@ extension IExprJsonDtoAppwriteX on IExprJsonDto {
   static IExprJsonDto fromDocument(Document doc) => fromJson(doc.data);
 
   static IExprJsonDto fromJson(Map<String, dynamic> json) {
-    // 只有表达式才有::type属性
-    final type = json['type'] as String?;
-    if (type == null || type.isEmpty) {
-      return ValueJsonDtoAppwriteX.fromJson(json);
+    // 只有表达式才有::fn属性
+    final fn = json['fn'] as String?;
+    if (fn == null || fn.isEmpty) {
+      return ExprValueJsonDtoAppwriteX.fromJson(json);
     } else {
       return ExprJsonDtoAppwriteX.fromJson(json);
     }
   }
 
-  Map<String, dynamic> toJson() => (this is ValueJsonDto)
-      ? (ValueJsonDtoAppwriteX((this as ValueJsonDto)).toJson())
+  Map<String, dynamic> toJson() => (this is ExprValueJsonDto)
+      ? (ExprValueJsonDtoAppwriteX((this as ExprValueJsonDto)).toJson())
       : (this is ExprJsonDto)
           ? ExprJsonDtoAppwriteX(this as ExprJsonDto).toJson()
           : throw Exception(
