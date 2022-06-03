@@ -2,9 +2,12 @@ part of 'i_dto.dart';
 
 /// 将表达式转换为json保存
 abstract class IExprNodeDto extends IDto {
-  String? get fn;
+  AttrTypeDto? get type;
 
   List<dynamic> get ag;
+
+  @Deprecated("ExprValue没有fn")
+  String? get fn;
 
   static IExprNodeDto fromDomain(dynamic expr) {
     if (expr is ExprValue) {
@@ -152,6 +155,10 @@ class ValueJsonDto extends IExprNodeDto {
         }
     }
   }
+
+  @override
+  // TODO: implement type
+  AttrTypeDto? get type => throw UnimplementedError();
 }
 
 /// 对应[ExprValue]
