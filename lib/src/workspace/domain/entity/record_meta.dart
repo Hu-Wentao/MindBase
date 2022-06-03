@@ -67,6 +67,10 @@ class RecordMeta implements IEtt<String> {
   }
 
   @override
+  String toString() =>
+      'RecordMeta{id: $id, name: $name, attrs: $attrs, methods: $methods}';
+
+  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is RecordMeta &&
