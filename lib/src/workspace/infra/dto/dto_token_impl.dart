@@ -1,8 +1,8 @@
 import 'package:mind_base/src/workspace/application/service/expr/domain_to_token.dart';
-import 'package:mind_base/src/workspace/application/service/expr/expression_parser.dart';
+import 'package:mind_base/src/workspace/application/service/expr/node_to_token.dart';
+import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
-import 'package:petitparser/parser.dart';
 
 /// 针对表达式TokenDTO的转换
 /// TokenString + ctx => TokenDTO
@@ -41,9 +41,15 @@ import 'package:petitparser/parser.dart';
 /// 4. JsonDTO [IExprJsonDto] -> Json [Map]
 ///   [IExprJsonDto].toJson
 
-
 /// 这里是直接从Domain转换到 TokenString
-extension IExprJsonDtoTokenX on IExpr {
+extension IExprTokenX on IExpr {
   // 由于Domain本身已经携带了ctx, 所以这里不许需要额外传入ctx
   String toTokenString() => domainToToken.convert(this, const {});
+}
+
+extension IExprNodeDtoTokenX on IExprNodeDto {
+  // 由于Domain本身已经携带了ctx, 所以这里不许需要额外传入ctx
+  String toTokenString(QueryMetaFn queryMetaFn) => nodeToToken.convert(this, {
+        Workspace.ctxQueryMetaSign: queryMetaFn,
+      });
 }
