@@ -6,6 +6,7 @@ import 'package:mind_base/src/app/config/common_config.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
+import 'package:mind_base/src/workspace/infra/dto/dto_token_impl.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 import 'package:mind_base/src/workspace/inter/dto/expr_token_dto.dart';
 import 'package:ndialog/ndialog.dart';
@@ -14,6 +15,7 @@ class MetaForm extends StatelessWidget {
   final bool isCreate;
   final RecordMetaDto origin;
   final Iterable<RecordMeta> Function() allMetas;
+  final QueryMetaFn queryMetaFn;
   final GlobalKey<FormBuilderState> kMetaBuilder;
   final GlobalKey<FormBuilderState> kAttrBuilder;
   final GlobalKey<FormBuilderState> kMethodBuilder;
@@ -25,6 +27,7 @@ class MetaForm extends StatelessWidget {
     required this.kMetaBuilder,
     required this.kAttrBuilder,
     required this.kMethodBuilder,
+    required this.queryMetaFn,
     required this.origin,
   }) : super(key: key);
 
@@ -49,6 +52,7 @@ class MetaForm extends StatelessWidget {
                 isCreate: isCreate,
                 kMethodBuilder: kMethodBuilder,
                 origin: origin,
+                queryMetaFn: queryMetaFn,
               ),
           ],
         ),
@@ -433,13 +437,14 @@ class MethodListForm extends StatefulWidget {
   final bool isCreate; // true:表单将会新增一个待编辑的属性
   final int nextKey; // ::nextKey()
   final List<MethodDto> originList;
-
+  final QueryMetaFn queryMetaFn;
   final GlobalKey<FormBuilderState>? kMethodBuilder;
 
   factory MethodListForm.build({
     Key? key,
     required isCreate,
     required RecordMetaDto origin,
+    required QueryMetaFn queryMetaFn,
     GlobalKey<FormBuilderState>? kMethodBuilder,
   }) =>
       MethodListForm(
@@ -447,6 +452,7 @@ class MethodListForm extends StatefulWidget {
         nextKey: origin.nextKey(),
         originList: origin.methods,
         kMethodBuilder: kMethodBuilder,
+        queryMetaFn: queryMetaFn,
       );
 
   const MethodListForm({
@@ -455,6 +461,7 @@ class MethodListForm extends StatefulWidget {
     required this.originList,
     required this.nextKey,
     this.kMethodBuilder,
+    required this.queryMetaFn,
   }) : super(key: key);
 
   @override
@@ -496,13 +503,21 @@ class _MethodListFormState extends State<MethodListForm> {
         key: _kMethodBuilder,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          ..._origin.map((a) => _buildMethodForm(context, a)).toList(),
+          ..._origin
+              .map((a) => _buildMethodForm(
+                    context,
+                    a,
+                    widget.queryMetaFn,
+                  ))
+              .toList(),
           ElevatedButton(onPressed: _addNewMethod, child: const Text('添加方法')),
         ]),
       );
 
   /// 特殊处理： 对所有的键添加 ”${a.k}@“开头，以区别不同的Attribute
-  Widget _buildMethodForm(BuildContext context, MethodDto m) => Padding(
+  Widget _buildMethodForm(
+          BuildContext context, MethodDto m, QueryMetaFn queryMetaFn) =>
+      Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: ListTile(
             leading: SizedBox(
@@ -543,7 +558,7 @@ class _MethodListFormState extends State<MethodListForm> {
                     width: 200,
                     child: FormBuilderTextField(
                       name: '${m.k}@expr',
-                      initialValue: m.expr.toReadableString(),
+                      initialValue: m.expr.toTokenString(queryMetaFn),
                       decoration: const InputDecoration(
                         labelText: '方法体',
                         border: OutlineInputBorder(),

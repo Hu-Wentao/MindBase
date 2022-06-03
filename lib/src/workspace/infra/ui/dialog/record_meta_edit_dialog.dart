@@ -12,7 +12,7 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
   required GlobalKey<FormBuilderState> kMetaBuilder,
   required GlobalKey<FormBuilderState> kAttrBuilder,
   required GlobalKey<FormBuilderState> kMethodBuilder,
-  required QueryMetaFn? queryMetaFn,
+  required QueryMetaFn queryMetaFn,
   required Iterable<RecordMeta> Function() allMetas,
 }) async =>
     await NAlertDialog(
@@ -24,6 +24,7 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
       content: MetaForm(
         isCreate: originMeta == null,
         allMetas: allMetas,
+        queryMetaFn: queryMetaFn,
         kMetaBuilder: kMetaBuilder,
         kAttrBuilder: kAttrBuilder,
         kMethodBuilder: kMethodBuilder,

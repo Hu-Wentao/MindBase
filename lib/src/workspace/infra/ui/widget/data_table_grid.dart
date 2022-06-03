@@ -164,7 +164,7 @@ class DataFrameTitlePluto extends StatelessWidget {
   final kMetaBuilder = GlobalKey<FormBuilderState>();
   final kAttrBuilder = GlobalKey<FormBuilderState>();
   final kMethodBuilder = GlobalKey<FormBuilderState>();
-  final QueryMetaFn? queryMetaFn;
+  final QueryMetaFn queryMetaFn;
   final Iterable<RecordMeta> Function() allMetas;
 
   DataFrameTitlePluto({
