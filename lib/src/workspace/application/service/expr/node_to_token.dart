@@ -40,8 +40,9 @@ class NodeToToken {
     if (fnName == IFunc.memberFunc.name) {
       final mainAg = expr.ag[0]; // 调用方,可以是Expr或ExprValue
       final attrAg = expr.ag[1]; // 属性
+      print("debug mainAg: $mainAg, attrAg: $attrAg");
       // 对member表达式进行特殊处理:
-      r = convertMemberExprNode(mainAg as ExprNodeDto, attrAg, ctx);
+      r = convertMemberExprNode(mainAg, attrAg, ctx);
     } else {
       r = expr.ag.map((e) => convert(e, ctx)).join("");
     }
@@ -50,10 +51,11 @@ class NodeToToken {
   }
 
   String convertMemberExprNode(
-      ExprNodeDto mainAg, IExprNodeDto attrAg, Map<String, dynamic> ctx) {
+      IExprNodeDto mainAg, IExprNodeDto attrAg, Map<String, dynamic> ctx) {
     final main = convert(mainAg, ctx);
     // final mainMeta = mainAg.type.meta!;
-    final mainMeta = (ctx[Workspace.ctxQueryMetaSign] as QueryMetaFn).call(mainAg.type!.r!);
+    final mainMeta =
+        (ctx[Workspace.ctxQueryMetaSign] as QueryMetaFn).call(mainAg.type!.r!);
 
     final propId = attrAg.ag[0]; // attr必定是 propId, 不过type可能是ref,或者是String
     final attrName = mainMeta.getPropBy(propId).name;
@@ -61,7 +63,8 @@ class NodeToToken {
   }
 
   @protected
-  String convertValueNode(ExprValueNodeDto exprValue, Map<String, dynamic> ctx) {
+  String convertValueNode(
+      ExprValueNodeDto exprValue, Map<String, dynamic> ctx) {
     // print("debug convertValue: $exprValue");
     late String r;
     // fixme 对`this`进行特殊处理, 将在 IExpr_21 中修复
@@ -72,7 +75,6 @@ class NodeToToken {
     }
     return r;
   }
-
 
   // 这里是DTO转换, 传入ctx['this']作为ag,仅仅是为了下一步求值中,可以访问其member,以便保存propId
   @protected
