@@ -40,4 +40,7 @@ class AttrType {
   bool get isRef => tp == AttrTp.ref;
 
   RecordMeta? get meta => r == null ? null : _getMeta?.call(r!);
+
+  @override
+  String toString() => name;
 }
