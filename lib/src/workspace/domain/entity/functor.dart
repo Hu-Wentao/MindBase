@@ -39,6 +39,7 @@ class Expression extends IExpr with IFunctor, EquatableMixin {
   final List<IExpr> ag;
 
   // expr-v12.1 表达式需要显式确定返回值类型
+  // todo 表达式的返回值类型应该是可以推算出来的, 因此不应该需要指定, 而应该是一个get方法
   @override
   final AttrType type;
 
@@ -55,7 +56,7 @@ class Expression extends IExpr with IFunctor, EquatableMixin {
   get value => callee();
 
   @override
-  List<Object?> get props => [fn, ag];
+  List<Object?> get props => [fn, ag, type];
 
 // @override
 // IFunctor fMap(Func fn) {
