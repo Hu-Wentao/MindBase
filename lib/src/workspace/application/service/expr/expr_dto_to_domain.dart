@@ -210,6 +210,9 @@ class ExpressionConvertException implements Exception {
 
   ExpressionConvertException.memberAccessNotSupported(Type type, String member)
       : this('`$type`类型的对象不支持成员`$member`访问,检查Evaluator中是否定义了成员访问器');
+
+  @override
+  String toString() => 'ExpressionConvertException{message: $message}';
 }
 
 /// 传入 (Meta, propName), 返回 Prop
