@@ -90,12 +90,15 @@ class OpenedWorkspace extends ChangeNotifier {
   }
 
   RecordMeta onMetaUpdate(RecordMeta meta) {
-    final i = metas.indexWhere((element) => element.id == meta.id);
-    if (i != -1) {
-      metas[i].update(meta);
-    } else {
-      metas.add(meta);
-    }
+    __indexByMetas(
+      meta.id,
+      onFind: (i, m) => m.update(meta),
+      onNotFind: () => onMetaAdd(meta),
+    );
+    __indexByOpenedMetas(
+      meta.id,
+      onFind: (i, om) => om.cleanDataSourceCache(),
+    );
     return meta;
   }
 
@@ -143,10 +146,13 @@ class OpenedWorkspace extends ChangeNotifier {
   int __indexByMetas(
     String metaId, {
     Function(int index, RecordMeta meta)? onFind,
+    Function()? onNotFind,
   }) {
     final i = metas.indexWhere((element) => element.id == metaId);
     if (i != -1) {
       onFind?.call(i, metas[i]);
+    } else {
+      onNotFind?.call();
     }
     return i;
   }
@@ -219,13 +225,26 @@ class OpenedMeta extends ChangeNotifier {
   /// fixme 如果meta更新,
   RecordDataGridSourcePluto? _cachedDataSource;
 
-  RecordDataGridSourcePluto get dataSource =>
-      _cachedDataSource ??= RecordDataGridSourcePluto(
-        meta: meta,
-        findRecord: at.findRecord,
-        cachedColumns: meta.toPlutoCols,
-        cachedRows: records.map((e) => e.toPlutoRow(at.findRecord)).toList(),
-      );
+  RecordDataGridSourcePluto get dataSource {
+    print("当前是否为缓存DataSource# ${_cachedDataSource == null}");
+    return _cachedDataSource ??= RecordDataGridSourcePluto(
+      meta: meta,
+      findRecord: at.findRecord,
+      cachedColumns: meta.toPlutoCols,
+      cachedRows: records.map((e) => e.toPlutoRow(at.findRecord)).toList(),
+    );
+  }
+
+  // 变更workspace的版本号，以实现“在不修改实例地址的情况下，让ValueKey能够刷新UI”
+  _refreshDataVer() {
+    _ver++;
+    _ver %= 3;
+    notifyListeners();
+  }
+
+  int _ver = 0;
+
+  get ver => _ver;
 
   void _onWatchRecord(AccessorEvt<RecordDto> event) {
     print("debug #监听WatchRecord # $event");
@@ -272,5 +291,13 @@ class OpenedMeta extends ChangeNotifier {
   close() {
     _cachedRecordSubs.cancel();
     records.clear();
+  }
+
+  /// 用于Meta属性被更新时
+  /// 删除缓存后会自动根据最新的Meta重建UI
+  void cleanDataSourceCache() {
+    _cachedDataSource = null;
+    _refreshDataVer();
+    print("debug 已清除DataSource缓存");
   }
 }
