@@ -244,7 +244,7 @@ class OpenedMeta extends ChangeNotifier {
 
   int _ver = 0;
 
-  get ver => _ver;
+  get ver => _ver + hashCode;
 
   void _onWatchRecord(AccessorEvt<RecordDto> event) {
     print("debug #监听WatchRecord # $event");
