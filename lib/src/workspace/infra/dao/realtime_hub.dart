@@ -11,7 +11,9 @@ class RealtimeChannelHub {
   final Realtime _realtime;
   final Set<SubChannel> _readyAddChannels = {};
   final Set<SubChannel> _readyRemoveChannels = {};
-  Set<SubChannel> _subChannels = {}; // 存储当前的订阅状态
+
+  // 存储当前的已订阅的频道
+  final Set<SubChannel> _subChannels = {};
   RealtimeSubscription? _cachedRealTimeSub;
 
   final StreamController<RealtimeMessage> _messageStreamController =
@@ -64,7 +66,10 @@ class RealtimeChannelHub {
         ..stream.listen(_messageStreamController.add);
     }
     // 更新已订阅频道数据
-    _subChannels = _readyAddChannels;
+    _subChannels.clear();
+    _subChannels.addAll(_readyAddChannels);
+    // 刷新状态后就清空ready
+    _readyAddChannels.clear();
   }
 
   sub(List<SubChannel> channels) =>
