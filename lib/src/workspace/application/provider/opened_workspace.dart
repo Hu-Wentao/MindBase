@@ -79,13 +79,14 @@ class OpenedWorkspace extends ChangeNotifier {
   RecordMeta onMetaAdd(RecordMeta meta) {
     //todo 可能要考虑meta/record在watchAll时,先收到create事件,然后又在getAll中被二次查询到的情况,这会导出出现两个相同Id的Meta/Record
     metas.add(meta);
-    openedMetas.add(OpenedMeta.openBy(
+    final openedMeta = OpenedMeta.open(
       at: this,
       meta: meta,
-      fetchAllRecords: getFetchAllRecords(meta.id),
+      fetchAllRecordsFn: () => getFetchAllRecords(meta.id),
       watchAllRecords: getWatchAllRecords(meta.id),
-    ));
-    print("debug _openCacheMeta: ${meta.id}");
+    );
+    openedMetas.add(openedMeta);
+    // print("debug _openCacheMeta: ${meta.id}");
     return meta;
   }
 
@@ -158,7 +159,7 @@ class OpenedWorkspace extends ChangeNotifier {
   }
 
   /// 数据同步 ===================================================================
-  void onWatchMetaEvt(AccessorEvt<RecordMetaDto> event) {
+  Future<void> onWatchMetaEvt(AccessorEvt<RecordMetaDto> event) async {
     print("debug 工作空间#onWatchMetaEvt: $event");
     switch (event.type) {
       case AccessorEvtTp.insert:
@@ -196,15 +197,60 @@ class OpenedMeta extends ChangeNotifier {
 
   OpenedMeta(this.meta, this.at);
 
-  OpenedMeta.openBy({
+  _safeFetchAllRecord(
+    Stream<RecordDto> Function() fetchAllRecordsFn, {
+    required Function(RecordDto dto) onDto,
+    int reRryCount = 0,
+  }) async {
+    try {
+      // 出现异常,steam会自动关闭
+      await for (final dto in fetchAllRecordsFn()) {
+        _onEvtInsertRecord(dto.toDomain(meta));
+      }
+    } catch (e, s) {
+      if (e is AppwriteException) {
+        if (e.code == 404 && e.type == "collection_not_found") {
+          // 不存在则无需抛出异常
+          print("debug OpenedMeta.openBy: [$e], 由推测的`Record集合`尚未创建导致的,无需抛出异常");
+          return;
+          // 在新建表的时候,首次执行findAll被抛出, 可能是操作太频繁导致, 可以wait一会再重试
+          // AppwriteException: null, {"message":"Error: Server Error","code":500,"version":"0.13.4"} (0)
+        } else if ((e.type == null &&
+                e.code == null &&
+                e.message != null &&
+                e.message!.startsWith(
+                    '{"message":"Error: Server Error","code":500,')) &&
+            // 重试次数<5 则继续重试
+            (reRryCount < 5)) {
+          print("debug 500异常, 重试#[$reRryCount]");
+          return _safeFetchAllRecord(
+            fetchAllRecordsFn,
+            onDto: onDto,
+            reRryCount: reRryCount + 1,
+          );
+        } else {
+          print(
+              "未处理的Appwrite异常 type# ${e.type}, code# ${e.code}, message# ${e.message}, rsp# ${e.response}");
+        }
+      }
+      print("debug OpenedMeta.open: retry#[$reRryCount] 抛出未知异常 [$e], ");
+      throw ExceptionAdapter.of(e, s);
+    }
+  }
+
+  OpenedMeta.open({
     required this.at,
     required this.meta,
-    required Stream<RecordDto> fetchAllRecords,
+    required Stream<RecordDto> Function() fetchAllRecordsFn,
     required Stream<AccessorEvt<RecordDto>> watchAllRecords,
   }) {
-    fetchAllRecords.listen((event) {
-      _onEvtInsertRecord(event.toDomain(meta));
-      notifyListeners();
+    _safeFetchAllRecord(
+      fetchAllRecordsFn,
+      onDto: (dto) => _onEvtInsertRecord(dto.toDomain(meta)),
+    );
+
+    _cachedRecordSubs = watchAllRecords.listen((event) {
+      _onWatchRecord(event);
     }, onError: (e, s) {
       if (e is AppwriteException &&
           e.code == 404 &&
@@ -215,9 +261,6 @@ class OpenedMeta extends ChangeNotifier {
         // print("debug OpenedMeta.openBy: 抛出未知异常 [$e]");
         throw ExceptionAdapter.of(e, s);
       }
-    });
-    _cachedRecordSubs = watchAllRecords.listen((event) {
-      _onWatchRecord(event);
     });
   }
 
