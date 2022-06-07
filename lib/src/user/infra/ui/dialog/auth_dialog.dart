@@ -21,10 +21,14 @@ Future<bool?> showAuthDialog({
   )
       actAuthWith,
 }) =>
-    NAlertDialog(
-      dialogStyle: DialogStyle(titleDivider: true),
-      content: Body(actAuthWith: actAuthWith),
-    ).show(context);
+    showDialog(
+        context: context,
+        builder: (c) => Dialog(
+              child: Body(actAuthWith: actAuthWith),
+              clipBehavior: Clip.hardEdge, // 确保内容不超出Dialog之外(特指圆角部分)
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(28)),
+            ));
 
 class Body extends StatefulWidget {
   // 登录按钮及其排序(首个元素即为首选登录项)
