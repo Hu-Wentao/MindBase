@@ -86,6 +86,8 @@ class _BodyState extends State<Body> {
         return "QQ登录";
       case AuthVerify.qqNumber:
         return "QQ号";
+      case AuthVerify.github:
+        return 'GitHub';
     }
   }
 
@@ -101,6 +103,8 @@ class _BodyState extends State<Body> {
         return LineIcons.qq;
       case AuthVerify.wechatOfficial:
         return LineIcons.weixinWechat;
+      case AuthVerify.github:
+        return LineIcons.github;
     }
   }
 
@@ -114,6 +118,7 @@ class _BodyState extends State<Body> {
         return QQNumber.validator(v);
       case AuthVerify.qqConnect:
       case AuthVerify.wechatOfficial:
+      case AuthVerify.github:
         throw BaseException('[$authVerify]无需校验', debugInfo: '逻辑错误');
     }
   }
@@ -230,6 +235,8 @@ class _BodyState extends State<Body> {
         return [const Text("尚未支持公众号 注册/登录")];
       case AuthVerify.qqConnect:
         return [const Text("尚未支持QQ 注册/登录")];
+      case AuthVerify.github:
+        return [const Text("尚未支持GitHub 注册/登录")];
     }
   }
 

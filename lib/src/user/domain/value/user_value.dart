@@ -6,6 +6,7 @@ enum AuthVerify {
   wechatOfficial, // 关注公众号
   qqConnect, // QQ互联
   qqNumber, // QQ号, 用于QQ机器人
+  github,
 }
 
 @JsonSerializable()

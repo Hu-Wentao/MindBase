@@ -89,6 +89,7 @@ class UserProvider extends ProviderSidecar {
       case AuthVerify.wechatOfficial:
       case AuthVerify.qqConnect:
       case AuthVerify.qqNumber:
+      case AuthVerify.github:
         throw BaseException('功能尚未实现', debugInfo: '逻辑错误');
     }
   }
@@ -115,6 +116,7 @@ class UserProvider extends ProviderSidecar {
       case AuthVerify.wechatOfficial:
       case AuthVerify.qqConnect:
       case AuthVerify.qqNumber:
+      case AuthVerify.github:
         throw BaseException('尚未支持的登录方式[$authVerify]');
     }
     cachedSession = nSession;
