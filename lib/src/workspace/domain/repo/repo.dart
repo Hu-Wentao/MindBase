@@ -3,6 +3,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:dart_appwrite/dart_appwrite.dart' as server;
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
@@ -63,20 +64,20 @@ class MetaDtoRepo {
   /// 插入Meta记录的同时, 创建对应的Record集合;
   /// 解决监听不存在Record集合,在集合被创建后无法收到消息的问题
   insertEntity(RecordMeta meta) async {
-    try {
-      await createMetaWithRecordCollection(meta);
-    } on AppwriteException catch (e) {
-      if (e.type == 'collection_not_found') {
+    final r =
+        await insertMetaWithCreateRecordCollection(meta).catchError((e, s) {
+      print("debug #插入异常 理论步骤2, 插入meta记录,并创建对应的Record集合");
+      if (e is AppwriteException && e.type == 'collection_not_found') {
         // 集合不存在,则创建集合
         // fixme 新建的集合为"所有人可读写"
-        await createMetaCollection(null);
-        // 再次尝试
-        await createMetaWithRecordCollection(meta);
+        return createMetaCollection(null)
+            // 再次尝试
+            .then((_) => insertMetaWithCreateRecordCollection(meta));
+      } else {
+        return ExceptionAdapter.of(e, s);
       }
-    } catch (e) {
-      print('insert meta error[$e]');
-      rethrow;
-    }
+    });
+    if (r is BaseException) throw r;
   }
 
   /// 更新
@@ -121,12 +122,14 @@ class MetaDtoRepo {
   /// 新增一条Meta记录,同时创建一个新的Record集合(否则会导致Record监听失效)
   ///   如果没有对应的Record集合, 即使realtime配置了相关的监听参数,再Record集合创建之后,数据也不会被接收到
   ///   因此必须要再Meta记录创建的同时,创建对应的Record集合
-  Future createMetaWithRecordCollection(RecordMeta meta) async {
-    await _metaAcc.insert(meta.toDto());
-    // 同时创建一个所有人可读写的Record集合
-    await RecordDtoRepo.withDI(sl, meta).createRecordCollection(null);
+  Future insertMetaWithCreateRecordCollection(RecordMeta meta) async {
+    print("debug #插入异常 理论步骤1, 插入meta记录,到Meta表中, 并创建对应的Record集合");
+    await _metaAcc.insert(meta.toDto()).then((value) =>
+        // 同时创建一个所有人可读写的Record集合
+        RecordDtoRepo.withDI(sl, meta).createRecordCollection(null));
   }
 
+  /// 创建Meta集合(存储某个工作空间内的所有Meta记录)
   /// [teamId] 为空表示"所有人可读写"
   /// 默认权限为 "团队内可读写"
   createMetaCollection(String? teamId) async {
@@ -277,6 +280,7 @@ Future _createAttrs(
   Iterable<AttributeDto> attrs,
 ) async {
   for (var attr in attrs) {
+    print('debug 为Record集合[$metaId]创建属性# create attr[$attr]');
     await _db.createStringAttribute(
       collectionId: metaId, // ==Record集合Id
       key: attr.propId, // Appwrite BUG,属性名称不能用纯数字
