@@ -52,7 +52,7 @@ dependencies:
   flutter_form_builder: "7.1.1"
   form_builder_extra_fields:
   form_builder_validators: "7.9.0"
-  auto_route: "3.2.4"
+  auto_route: "4.0.1"
   adaptive_navigation:
   line_icons:
   ndialog:
@@ -63,7 +63,7 @@ dependencies:
   petitparser:
   quiver:
   json_annotation: ">=4.4.0" # json_serializable 要求
-  pluto_grid:
+  pluto_grid: "4.0.0"
   #    git:
   #      url: https://github.com/Hu-Wentao/pluto_grid.git
   #      ref: refactor_move_manager_to_constructor
