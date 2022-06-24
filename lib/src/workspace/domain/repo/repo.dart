@@ -95,9 +95,31 @@ class MetaDtoRepo {
     // 2. 更新对应的Record表结构
     final readyCreateAttrs =
         metaDto.attrs.where((e) => readyCreateKs.contains(e.k));
-    await _createAttrs(_serverDb, metaDto.id, readyCreateAttrs);
+    for (final attr in readyCreateAttrs) {
+      await updateAttribute(null, attr);
+    }
   }
 
+  /// 更新表属性
+  /// [originMeta]传null表示直接创建新列(请确保该列尚不存在)
+  Future updateAttribute(RecordMeta? originMeta, AttributeDto attr) async {
+    final index = originMeta?.attrs.indexWhere((at) => at.k == attr.k) ?? -1;
+    if ((index != -1)) {
+      // k已存在, 更新attr(只涉及Meta)
+      final dto = originMeta!.toDto();
+      dto.attrs.replaceRange(index, index + 1, [attr]);
+      await _update(dto);
+      return;
+    } else {
+      // k不存在, 新增attr(更新Meta, 并操作对应的Record表)
+      final dto = originMeta!.toDto();
+      dto.attrs.add(attr);
+      await _update(dto);
+      return await _createAttr(_serverDb, collectionId, attr);
+    }
+  }
+
+  // 更新Meta记录
   _update(RecordMetaDto dto) async {
     try {
       await _metaAcc.update(dto);
@@ -270,22 +292,24 @@ class RecordDtoRepo {
 
   deleteBy(String metaId) => _recordAcc.deleteBy(metaId);
 
-  Future createAttrs(Iterable<AttributeDto> attrs) =>
-      _createAttrs(_serverDb, collectionId, attrs);
+  Future createAttrs(Iterable<AttributeDto> attrs) async {
+    for (final attr in attrs) {
+      await _createAttr(_serverDb, collectionId, attr);
+    }
+  }
 }
 
-Future _createAttrs(
+/// 为Record集合新增属性
+Future _createAttr(
   server.Database _db,
   String metaId,
-  Iterable<AttributeDto> attrs,
+  AttributeDto attr,
 ) async {
-  for (var attr in attrs) {
-    print('debug 为Record集合[$metaId]创建属性# create attr[$attr]');
-    await _db.createStringAttribute(
-      collectionId: metaId, // ==Record集合Id
-      key: attr.propId, // Appwrite BUG,属性名称不能用纯数字
-      size: 511,
-      xrequired: false,
-    );
-  }
+  print('debug 为Record集合[$metaId]创建属性# create attr[$attr]');
+  await _db.createStringAttribute(
+    collectionId: metaId, // ==Record集合Id
+    key: attr.propId, // Appwrite BUG,属性名称不能用纯数字
+    size: 511,
+    xrequired: false,
+  );
 }
