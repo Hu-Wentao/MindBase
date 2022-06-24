@@ -286,6 +286,29 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                   title: Text(p.openedMetas[i].meta.name),
                                   onTap: () => pWorkspace
                                       .actSelectOpenMeta(p.openedMetas[i]),
+                                  trailing: PopupMenuButton<String>(
+
+                                    itemBuilder: (ctx) => [
+                                      const PopupMenuItem(
+                                        value: 'deleteViewEvt',
+                                        child: ListTile(
+                                          leading: Icon(Icons.delete),
+                                          title: Text("删除视图"),
+                                        ),
+                                      ),
+                                    ],
+                                    onSelected: (value) {
+                                      // 选中Item后,在这里会被二次调用
+                                      switch (value) {
+                                        case 'deleteViewEvt':
+                                          pWorkspace.actRemoveMeta(p.openedMetas[i].meta.id);
+                                          break;
+                                        default:
+                                          print("debug#未知的value#$value");
+                                          break;
+                                      }
+                                    },
+                                  ),
                                 ),
                               ),
                       ),
