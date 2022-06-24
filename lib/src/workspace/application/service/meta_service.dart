@@ -37,4 +37,8 @@ class MetaService {
   updateWithRecordCollection(RecordMeta origin, RecordMetaDto dto) {
     return _metaDtoRepo.updateWithRecordCollection(origin, dto);
   }
+
+  updateAttribute(RecordMeta origin, AttributeDto dto) {
+    return _metaDtoRepo.updateAttribute(origin, dto);
+  }
 }
