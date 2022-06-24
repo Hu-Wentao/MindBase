@@ -11,6 +11,7 @@ import 'package:mind_base/src/workspace/application/provider/workspace_provider.
 import 'package:mind_base/src/constants/pubspec.yaml.g.dart';
 import 'package:mind_base/src/user/infra/ui/dialog/auth_dialog.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/confirm_dialog.dart';
+import 'package:mind_base/src/workspace/infra/ui/dialog/attribute_edit_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/record_meta_edit_dialog.dart';
 import 'package:mind_base/src/core/infra/ui/widget/RadiusInkWell.dart';
 import 'package:mind_base/src/workspace/infra/ui/widget/data_table_grid.dart';
@@ -326,7 +327,6 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                         child: Center(child: Text("请选择/创建 一个Meta")),
                       );
                     }
-
                     final data = openedMeta.dataSource;
                     print(
                         "debug Meta重建,cache Columns#${data.cachedColumns.map((e) => "title ${e.title}")}");
@@ -336,9 +336,31 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                         key: ValueKey(openedMeta.ver),
                         rows: data.cachedRows,
                         columns: data.cachedColumns,
-                        onLoaded: (_) {
+                        onLoaded: (loadedEvt) {
                           // 为数据源绑定新的stateManager, 以便在数据源更新的时候,能够同时刷新UI
-                          data.stateManager = _.stateManager;
+                          data.stateManager = loadedEvt.stateManager;
+                          loadedEvt.stateManager.eventManager!
+                              .listener((PlutoGridEvent plutoEvent) {
+                            switch (plutoEvent.runtimeType) {
+                              case PlutoGridInsertColumnEvent:
+                                // final evt =
+                                //     plutoEvent as PlutoGridInsertColumnEvent;
+                                // final columnIdx = evt.index;
+                                final origin = openedMeta.meta;
+                                showAttributeEditDialog(
+                                  context: context,
+                                  initKey: origin.nextKey(),
+                                  kAttrBuilder: GlobalKey<FormBuilderState>(),
+                                  queryMetaFn: pWorkspace.openedWorkspace!.queryMeta,
+                                  allMetas: ()=>pWorkspace.metaList,
+                                ).then((value) {
+                                  return pWorkspace.actMetaUpdateAttr(origin,value);
+                                });
+                                break;
+                              default:
+                                break;
+                            }
+                          });
                         },
                         onChanged: (_) {
                           print("#debug #onChanged $_");

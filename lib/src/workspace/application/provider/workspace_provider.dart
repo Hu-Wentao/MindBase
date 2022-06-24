@@ -86,6 +86,15 @@ class WorkspaceProvider extends ProviderSidecar {
             await _metaService!.updateWithRecordCollection(origin, dto);
           }));
 
+  Future<BaseException?> actMetaUpdateAttr(
+    RecordMeta origin,
+    AttributeDto? dto,
+  ) async =>
+      await actWrapper(() => setInitialized("更新属性 [$dto]", () async {
+            if (dto == null) return null;
+            await _metaService!.updateAttribute(origin, dto);
+          }));
+
   Future<RecordMetaDto?> actQueryMeta(String metaId) =>
       _metaService!.findById(metaId);
 

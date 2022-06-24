@@ -40,6 +40,8 @@ extension PlutoRecordMetaX on RecordMeta {
             enableAutoEditing: true,
             // 自动切换编辑
             enableEditingMode: true,
+            // 允许向左/右插入列
+            enableInsertColumn: true,
             // 允许编辑
             // this.hide = false,// 隐藏列
             renderer: prop.type.isRef

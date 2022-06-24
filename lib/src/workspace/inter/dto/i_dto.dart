@@ -313,7 +313,7 @@ class AttributeDto extends IDto {
         k: int.parse(attrMap['k'] as String),
         name: attrMap['name'] as String,
         memo: attrMap['memo'] as String,
-        type: AttrTypeDto.by(attrMap['type'] as String),
+        type: AttrTypeDto.by(attrMap['type'] as String, attrMap['ref']),
       );
 
   AttributeDto.ofDomain(Attribute attr)
