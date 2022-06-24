@@ -810,9 +810,11 @@ packages:
   pluto_grid:
     dependency: "direct main"
     description:
-      name: pluto_grid
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: feat_insert_column_menu_item
+      resolved-ref: e7b1a3dc7b77149b87a95a34b3aefa143b120f65
+      url: "https://github.com/Hu-Wentao/pluto_grid.git"
+    source: git
     version: "4.0.0"
   pool:
     dependency: transitive
