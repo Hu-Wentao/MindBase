@@ -209,12 +209,9 @@ class RecordDataGridSourcePluto extends IRecordDataGridSource {
 
   @override
   onInsertEvt(Record record) {
-    print("onInsertEvt $record");
-    // 如果是非活跃状态下... 则只添加Widget, 因为不需要刷新UI
-    cachedRows.add(record.toPlutoRow(findRecord));
-    // 活跃状态下, 提醒刷新UI, 由于List<Row>地址值是一致的, manager内部的List也会被更新
-    // todo 优化:只刷新指定行
-    stateManager?.notifyListeners();
+    // 新的insert方案[cachedRows]和[cachedColumns]交给stateManager管理
+    print("onInsertEvt ${record.fields.values}");
+    stateManager!.appendRows([record.toPlutoRow(findRecord)]);
   }
 
   @override
