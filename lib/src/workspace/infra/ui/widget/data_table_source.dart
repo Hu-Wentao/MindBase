@@ -207,19 +207,29 @@ class RecordDataGridSourcePluto extends IRecordDataGridSource {
   // 在活跃时,通过[stateManager]更新UI
   PlutoGridStateManager? stateManager;
 
+  // 新的insert方案[cachedRows]和[cachedColumns]交给stateManager管理
   @override
   onInsertEvt(Record record) {
-    // 新的insert方案[cachedRows]和[cachedColumns]交给stateManager管理
     print("onInsertEvt ${record.fields.values}");
     stateManager!.appendRows([record.toPlutoRow(findRecord)]);
   }
 
   @override
-  onUpdateEvt(Record record, int index) {
+  onUpdateEvt(
+    Record record,
+    @Deprecated("已更新为通过record::id查询对应row,不再需要index") int index,
+  ) {
     print("onUpdateEvt $record $index");
-    cachedRows[index] = record.toPlutoRow(findRecord);
-    // todo 优化:只刷新指定行
-    stateManager?.notifyListeners();
+
+    final rowKey = ValueKey<String>(record.id);
+    // 通过key找到指定的row
+    final originRow = stateManager!.refRows.originalList
+        .firstWhere((element) => element.key == rowKey);
+
+    originRow.cells.forEach((propId, cell) {
+      final v = record.getField(propId.parsePropK).value;
+      stateManager!.changeCellValue(cell, v);
+    });
   }
 
   @override
