@@ -40,13 +40,13 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'0.19.0';
+const String version = r'0.20.0';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 0;
 
 /// The minor version number: "2" in "1.2.3".
-const int minor = 19;
+const int minor = 20;
 
 /// The patch version number: "3" in "1.2.3".
 const int patch = 0;
@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1655731055;
+const int timestamp = 1656143147;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -109,7 +109,9 @@ const Map<String, Object> dependencies = <String, Object>{
   },
   'flutter_form_builder': r'7.1.1',
   'form_builder_validators': r'7.9.0',
+  'auto_route': r'4.0.1',
   'json_annotation': r'>=4.4.0',
+  'pluto_grid': r'4.0.0',
   'appwrite': r'4.0.2',
 };
 
@@ -122,7 +124,14 @@ const Map<String, Object> devDependencies = <String, Object>{
 };
 
 /// Dependency overrides
-const Map<String, Object> dependencyOverrides = <String, Object>{};
+const Map<String, Object> dependencyOverrides = <String, Object>{
+  'pluto_grid': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/Hu-Wentao/pluto_grid.git',
+      'ref': r'feat_insert_column_menu_item',
+    },
+  },
+};
 
 /// Executables
 const Map<String, Object> executables = <String, Object>{};
