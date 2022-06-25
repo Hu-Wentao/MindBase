@@ -41,7 +41,6 @@ dependencies:
       ref: v3.0
 #  mongo_dart:
   logging:
-  # provider
   provider:
   provider_sidecar:
     git:
@@ -56,8 +55,6 @@ dependencies:
   adaptive_navigation:
   line_icons:
   ndialog:
-  #  data_table2:
-  #  responsive_table:
   #  syncfusion_flutter_datagrid: "20.1.47"
   freezed_annotation:
   petitparser:
@@ -72,6 +69,8 @@ dependencies:
   dart_appwrite:
   event_bus:
   adaptive_breakpoints:
+  feedback:
+  url_launcher:
 dev_dependencies:
   flutter_test:
     sdk: flutter

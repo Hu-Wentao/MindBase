@@ -10,6 +10,7 @@ import 'package:device_info_plus_web/device_info_plus_web.dart';
 import 'package:flutter_keyboard_visibility_web/flutter_keyboard_visibility_web.dart';
 import 'package:flutter_web_auth/src/flutter_web_auth_web.dart';
 import 'package:package_info_plus_web/package_info_plus_web.dart';
+import 'package:url_launcher_web/url_launcher_web.dart';
 
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
@@ -19,5 +20,6 @@ void registerPlugins(final Registrar registrar) {
   FlutterKeyboardVisibilityPlugin.registerWith(registrar);
   FlutterWebAuthPlugin.registerWith(registrar);
   PackageInfoPlugin.registerWith(registrar);
+  UrlLauncherPlugin.registerWith(registrar);
   registrar.registerMessageHandler();
 }

@@ -4,6 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
+import 'package:mind_base/src/feedback/infra/ui/widget/feedback_btn.dart';
 import 'package:mind_base/src/workspace/application/provider/opened_workspace.dart';
 import 'package:mind_base/src/user/application/provider/user_provider.dart';
 import 'package:mind_base/src/workspace/application/provider/workspace_manager_provider.dart';
@@ -77,6 +78,7 @@ class _HomePageState extends State<HomePage> {
         title: _buildAppbarTitle(context, selectedIndex, selectedDest),
         actions: [
           _buildUserInfoTile(context),
+          const FeedbackBtn(),
         ],
       );
 
