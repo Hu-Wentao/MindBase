@@ -210,7 +210,7 @@ class RecordDataGridSourcePluto extends IRecordDataGridSource {
   // 新的insert方案[cachedRows]和[cachedColumns]交给stateManager管理
   @override
   onInsertEvt(Record record) {
-    print("onInsertEvt ${record.fields.values}");
+    // print("onInsertEvt ${record.fields.values}");
     stateManager!.appendRows([record.toPlutoRow(findRecord)]);
   }
 
@@ -219,7 +219,7 @@ class RecordDataGridSourcePluto extends IRecordDataGridSource {
     Record record,
     @Deprecated("已更新为通过record::id查询对应row,不再需要index") int index,
   ) {
-    print("onUpdateEvt $record $index");
+    // print("onUpdateEvt $record $index");
 
     final rowKey = ValueKey<String>(record.id);
     // 通过key找到指定的row
@@ -234,9 +234,9 @@ class RecordDataGridSourcePluto extends IRecordDataGridSource {
 
   @override
   onRemoveEvt(String recordId, @Deprecated("本实现类不需要index") int index) {
-    // 如果是非活跃状态下... 则只移除Widget, 因为不需要刷新UI
-    cachedRows.removeWhere((element) => element.key == ValueKey(recordId));
-    // todo 优化:只刷新指定行
-    stateManager?.notifyListeners();
+    final rowKey = ValueKey<String>(recordId);
+    final originRow = stateManager!.refRows.originalList
+        .firstWhere((element) => element.key == rowKey);
+    stateManager!.removeRows([originRow]);
   }
 }
