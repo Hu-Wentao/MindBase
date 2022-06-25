@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_arch_core/get_arch_core.dart';
@@ -9,7 +8,6 @@ import 'package:mind_base/src/user/infra/ui/widget/rounded_button.dart';
 import 'package:mind_base/src/user/infra/ui/widget/rounded_input_field.dart';
 import 'package:mind_base/src/user/infra/ui/widget/rounded_password_field.dart';
 import 'package:mind_base/src/user/domain/value/value.dart';
-import 'package:ndialog/ndialog.dart';
 
 Future<bool?> showAuthDialog({
   required BuildContext context,
@@ -142,7 +140,7 @@ class _BodyState extends State<Body> {
             padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 16),
             child: TextButton(
               child: const Icon(Icons.close),
-              onPressed: context.popRoute,
+              onPressed: Navigator.of(context).pop,
             ),
           )),
       child: SingleChildScrollView(
@@ -222,7 +220,7 @@ class _BodyState extends State<Body> {
                     )
                     .thenSnackBar(
                       context,
-                      onNull: context.popRoute,
+                      onNull: Navigator.of(context).pop,
                     );
               }
             },
