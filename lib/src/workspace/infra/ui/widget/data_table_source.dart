@@ -219,16 +219,21 @@ class RecordDataGridSourcePluto extends IRecordDataGridSource {
     Record record,
     @Deprecated("已更新为通过record::id查询对应row,不再需要index") int index,
   ) {
-    // print("onUpdateEvt $record $index");
-
     final rowKey = ValueKey<String>(record.id);
     // 通过key找到指定的row
     final originRow = stateManager!.refRows.originalList
         .firstWhere((element) => element.key == rowKey);
 
+    // 更新该行的所有cell (字段与方法)
     originRow.cells.forEach((propId, cell) {
-      final v = record.getField(propId.parsePropK).value;
-      stateManager!.changeCellValue(cell, v);
+      final pId = propId.parsePropId();
+      if (pId.isField) {
+        final v = record.getField(propId.parsePropK).value;
+        stateManager!.changeCellValue(cell, v);
+      } else if (pId.isMethod) {
+        final v = record.getValueBy(meta.getPropBy(propId), findRecord).v;
+        stateManager!.changeCellValue(cell, v);
+      }
     });
   }
 
