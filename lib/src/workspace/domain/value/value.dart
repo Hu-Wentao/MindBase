@@ -4,7 +4,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'value.g.dart';
 
-
 // 异常
 class TypeCastException extends BaseException {
   TypeCastException(String msg) : super(msg);
@@ -104,6 +103,14 @@ enum FuncScope {
   output, // 输出处理, 将`存储值`转换为需要数据.如 func为 "数值*2", 则存储"A1",输出为 A1*2的值
 }
 
+typedef PropId = Tuple2<String, int>;
+
+extension PropIdX on PropId {
+  bool get isField => head == 'a';
+
+  bool get isMethod => head == 'm';
+}
+
 extension PropertyX on String {
   /// 在字符串开头使用 m标识[Methods], 使用 a标识[Attribute]
   static String getPropId(bool isAttribute, int k) =>
@@ -113,7 +120,7 @@ extension PropertyX on String {
 
   int get parsePropK => int.parse(substring(1));
 
-  Tuple2<String, int> parsePropId() => Tuple2(
+  PropId parsePropId() => Tuple2(
         parsePropType,
         parsePropK,
       );
