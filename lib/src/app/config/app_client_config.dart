@@ -7,7 +7,7 @@ import 'package:mind_base/src/workspace/infra/dao/realtime_hub.dart';
 abstract class AppClientConfig {
   @lazySingleton
   Client get client => Client()
-    ..setEndpoint("https://app.shuttlecloud.cn/v1")
+    ..setEndpoint("http://app.shuttlecloud.cn/v1")
     ..setProject("627f35455d30081f4a5c")
     ..setSelfSigned(status: true); // 可能只适用于dev环境
   @lazySingleton
