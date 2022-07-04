@@ -66,7 +66,7 @@ dependencies:
   flutter_svg:
   bson:
   easy_debounce:
-  dart_appwrite:
+  dart_appwrite: "5.0.1"
   event_bus:
   adaptive_breakpoints:
   feedback:
