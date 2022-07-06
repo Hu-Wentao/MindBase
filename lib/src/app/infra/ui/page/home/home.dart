@@ -124,8 +124,6 @@ class _HomePageState extends State<HomePage> {
 
   _buildUserInfoTile(BuildContext context) => Consumer<UserProvider>(
         builder: (c, p, _) {
-          // fixme thenDialog 未生效
-          // await p.actCheckLoggedUser().thenDialog(context);
           return RadiusInkWell(
             margin: const EdgeInsets.all(8.0),
             child: Row(
@@ -283,13 +281,13 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                             ? const Text("Error selectedWorkspace==null")
                             : ListView.builder(
                                 itemCount: p.openedMetas.length,
-                                // itemCount: pWorkspace.metaList.length,
                                 itemBuilder: (c, i) => ListTile(
+                                  selected: p.openedMetas[i].meta.id ==
+                                      pWorkspace.selectedMeta?.id,
                                   title: Text(p.openedMetas[i].meta.name),
                                   onTap: () => pWorkspace
                                       .actSelectOpenMeta(p.openedMetas[i]),
                                   trailing: PopupMenuButton<String>(
-
                                     itemBuilder: (ctx) => [
                                       const PopupMenuItem(
                                         value: 'deleteViewEvt',
@@ -303,7 +301,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                       // 选中Item后,在这里会被二次调用
                                       switch (value) {
                                         case 'deleteViewEvt':
-                                          pWorkspace.actRemoveMeta(p.openedMetas[i].meta.id);
+                                          pWorkspace.actRemoveMeta(
+                                              p.openedMetas[i].meta.id);
                                           break;
                                         default:
                                           print("debug#未知的value#$value");
