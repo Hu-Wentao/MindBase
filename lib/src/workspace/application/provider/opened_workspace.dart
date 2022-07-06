@@ -51,7 +51,7 @@ class OpenedWorkspace extends ChangeNotifier {
     required this.getFetchAllRecords,
     required this.getWatchAllRecords,
   }) : _workspace = workspace {
-    // 获取全部 fixme (执行成功了,但是没有刷新到UI上)
+    // 获取全部
     fetchAllMeta().listen((e) {
       onMetaAdd(e.toDm(queryMeta));
       notifyListeners();
@@ -110,6 +110,8 @@ class OpenedWorkspace extends ChangeNotifier {
     });
     if (i != -1) openedMetas.removeAt(i);
     __indexByMetas(metaId, onFind: (i, m) => metas.remove(m));
+    // 通知UI刷新
+    notifyListeners();
   }
 
   @Deprecated("应当使用 selectedMeta.getRecords()")
