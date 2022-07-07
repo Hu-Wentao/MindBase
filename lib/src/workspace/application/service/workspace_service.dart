@@ -111,7 +111,7 @@ class WorkspaceService {
   Future insertTable(MetaService _metaSrv, TableDto table) async {
     // 更新Meta
     if (table.isCreate) {
-      _metaSrv.insertMetaDto(table.meta);
+      await _metaSrv.insertMetaDto(table.meta);
     } else {
       final origin = _metaSrv.findById(table.meta.id);
       await _metaSrv.updateWithRecordCollection(origin, table.meta);
