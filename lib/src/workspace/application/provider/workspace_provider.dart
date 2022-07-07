@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/workspace/application/service/meta_service.dart';
+import 'package:mind_base/src/workspace/application/service/workspace_service.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/workspace/domain/repo/repo.dart';
+import 'package:mind_base/src/workspace/infra/ui/dialog/import_data_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/widget/data_table_source.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
@@ -14,6 +16,7 @@ import 'opened_workspace.dart';
 /// 统一监听与处理工作空间内的所有数据
 class WorkspaceProvider extends ProviderSidecar {
   MetaService? _metaService;
+  final WorkspaceService _workspaceSrv = sl<WorkspaceService>();
 
   // <MetaId,Accessor>
   final Map<String, RecordDtoRepo> _recordAccessors = {};
@@ -71,10 +74,16 @@ class WorkspaceProvider extends ProviderSidecar {
 
   List<RecordMeta> get metaList => openedWorkspace!.allMetas().toList();
 
-  /// 注意,[actInsertMeta]与[actUpdateMeta]不能混用, Insert必须使用Meta,而不是Dto
-  Future<BaseException?> actInsertMeta(RecordMeta meta) async =>
+  /// 注意,[actInsertMetaDto]与[actUpdateMeta]不能混用, Insert必须使用Meta,而不是Dto
+  Future<BaseException?> actInsertMetaDto(RecordMetaDto meta) async =>
       await actWrapper(() => setInitialized("新增Meta [$meta]", () async {
             await _metaService!.insertMetaDto(meta);
+          }));
+
+  /// 同时更新Meta与数据
+  Future<BaseException?> actUpdateByTable(TableDto dto) async =>
+      await actWrapper(() => setInitialized("通过Table更新Meta/record [$dto]", () async {
+            await _workspaceSrv.insertTable(_metaService!, dto);
           }));
 
   Future<BaseException?> actUpdateMeta(
@@ -83,7 +92,7 @@ class WorkspaceProvider extends ProviderSidecar {
   ) async =>
       await actWrapper(() => setInitialized("保存元素 [$dto]", () async {
             if (dto == null) return null;
-            await _metaService!.updateWithRecordCollection(origin, dto);
+            await _metaService!.updateWithRecordCollection(origin.toDto(), dto);
           }));
 
   Future<BaseException?> actMetaUpdateAttr(
