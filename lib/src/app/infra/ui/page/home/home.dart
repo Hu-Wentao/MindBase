@@ -13,14 +13,10 @@ import 'package:mind_base/src/workspace/application/provider/workspace_provider.
 import 'package:mind_base/src/constants/pubspec.yaml.g.dart';
 import 'package:mind_base/src/user/infra/ui/dialog/auth_dialog.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/confirm_dialog.dart';
-import 'package:mind_base/src/workspace/infra/ui/dialog/attribute_edit_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/import_data_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/record_meta_edit_dialog.dart';
 import 'package:mind_base/src/core/infra/ui/widget/RadiusInkWell.dart';
 import 'package:mind_base/src/workspace/infra/ui/widget/data_table_grid.dart';
-import 'package:mind_base/src/workspace/infra/ui/widget/data_table_source.dart';
-import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
-import 'package:pluto_grid/pluto_grid.dart';
 import 'package:provider/provider.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 import 'package:adaptive_breakpoints/adaptive_breakpoints.dart';
@@ -379,143 +375,14 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
 
                 /// 右侧 table
                 Consumer<OpenedMeta?>(
-                  builder: (c, openedMeta, _) {
-                    if (openedMeta == null) {
-                      return const Expanded(
-                        child: Center(child: Text("请选择/创建 一个Meta")),
-                      );
-                    }
-                    final data = openedMeta.dataSource;
-                    // print(
-                    //     "debug Meta重建,cache Columns#${data.cachedColumns.map((e) => "title ${e.title}")}");
-                    return Expanded(
-                      child: PlutoGrid(
-                        // key不一致的时候才会刷新UI
-                        key: ValueKey(openedMeta.ver),
-                        rows: data.cachedRows,
-                        columns: data.cachedColumns,
-                        onLoaded: (loadedEvt) {
-                          // 为数据源绑定新的stateManager, 以便在数据源更新的时候,能够同时刷新UI
-                          data.stateManager = loadedEvt.stateManager;
-                          loadedEvt.stateManager.eventManager!
-                              .listener((PlutoGridEvent plutoEvent) {
-                            switch (plutoEvent.runtimeType) {
-                              case PlutoGridInsertColumnEvent:
-                                // final evt =
-                                //     plutoEvent as PlutoGridInsertColumnEvent;
-                                // final columnIdx = evt.index;
-                                final origin = openedMeta.meta;
-                                showAttributeEditDialog(
-                                  context: context,
-                                  initKey: origin.nextKey(),
-                                  kAttrBuilder: GlobalKey<FormBuilderState>(),
-                                  queryMetaFn:
-                                      pWorkspace.openedWorkspace!.queryMeta,
-                                  allMetas: () => pWorkspace.metaList,
-                                ).then((value) {
-                                  return pWorkspace.actMetaUpdateAttr(
-                                      origin, value);
-                                });
-                                break;
-                              default:
-                                break;
-                            }
-                          });
-                        },
-                        onChanged: (_) {
-                          print("#debug #onChanged $_");
-                          final row = _.row!;
-                          final ettId = row.key as ValueKey<String>;
-
-                          // 更新的DTO
-                          final dto = openedMeta.records
-                              .firstWhere(
-                                  (element) => element.id == ettId.value)
-                              .toDto()
-                              .updateBy(row);
-                          pWorkspace.actSaveRecord(dto);
-                          // widget.onSaveRecord(dto); // 同步到服务器
-                        },
-                        onSelected: (_) {
-                          print("#debug #onSelected $_");
-                        },
-                        onRowChecked: (_) {
-                          print("#debug #onRowChecked $_");
-                        },
-                        // 开启双击会导致单击事件延迟, 在视觉上造成卡顿的效果
-                        // onRowDoubleTap: (_) {
-                        //   print("#debug #onRowDoubleTap $_");
-                        // },
-                        onRowSecondaryTap: (_) {
-                          print("#debug #onRowSecondaryTap $_");
-                        },
-                        onRowsMoved: (_) {
-                          print("#debug #onRowsMoved $_");
-                        },
-                        createHeader: (manager) => Consumer<OpenedWorkspace>(
-                          builder: (c, p, _) => DataFrameTitlePluto(
-                            meta: openedMeta.meta,
-                            stateManager: manager,
-                            // onSaveMeta: widget.onSaveMeta,
-                            onSaveMeta: (dto) => pWorkspace.actUpdateMeta(
-                              pWorkspace.selectedMeta!.meta,
-                              dto,
-                            ),
-                            // onSaveRecord: widget.onSaveRecord,
-                            onSaveRecord: pWorkspace.actSaveRecord,
-                            openedWorkspace: p,
-                            queryMetaFn: p.queryMeta,
-                            allMetas: p.allMetas,
-                          ),
+                  builder: (c, openedMeta, _) => (openedMeta == null)
+                      ? const Expanded(
+                          child: Center(child: Text("请选择/创建 一个Meta")),
+                        )
+                      : RecordDataGrid(
+                          pWorkspace: pWorkspace,
+                          openedMeta: openedMeta,
                         ),
-                        // createFooter: (_) {             },
-                        // rowColorCallback: (_) {},
-                        configuration: const PlutoGridConfiguration(
-                          // columnHeight: 30.0,
-                          // columnFilterHeight: 30.0,
-                          // rowHeight: 30.0,
-                          // defaultCellPadding: 15,
-                          // defaultColumnTitlePadding: 15,
-                          // iconSize: 15,
-                          enableColumnBorder: true,
-                          // enableGridBorderShadow: true,
-                          enableMoveHorizontalInEditing: true,
-                          // enableRowColorAnimation: false,
-                          // checkedColor: const Color(0x876FB0FF),
-                          /// 以下两项配置列移动,
-                          enableMoveDownAfterSelecting: true,
-                          enterKeyAction:
-                              PlutoGridEnterKeyAction.editingAndMoveDown,
-                          gridBorderRadius:
-                              BorderRadius.all(Radius.circular(10)),
-                          gridPopupBorderRadius:
-                              BorderRadius.all(Radius.circular(7)),
-                          scrollbarConfig: PlutoGridScrollbarConfig(
-                            isAlwaysShown: false,
-                            scrollbarThickness: 8,
-                            scrollbarThicknessWhileDragging: 10,
-                          ),
-                          // localeText: const PlutoGridLocaleText.korean(),
-                          //   columnFilterConfig: PlutoGridColumnFilterConfig(
-                          //     filters: const [
-                          //       ...FilterHelper.defaultFilters,
-                          //       // ClassYouImplemented(),
-                          //     ],
-                          //     resolveDefaultColumnFilter: (column, resolver) {
-                          //       if (column.field == 'column3') {
-                          //         return resolver<PlutoFilterTypeGreaterThan>()
-                          //             as PlutoFilterType;
-                          //       }
-                          //
-                          //       return resolver<PlutoFilterTypeContains>() as PlutoFilterType;
-                          //     },
-                          //   ),
-                        ),
-                        mode: PlutoGridMode
-                            .normal, // 可以通过manager动态切换,以实现对不同类型列的处理
-                      ),
-                    );
-                  },
                 ),
               ],
             ),
