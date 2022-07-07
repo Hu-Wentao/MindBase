@@ -1,4 +1,5 @@
 import 'package:adaptive_navigation/adaptive_navigation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart';
@@ -13,6 +14,7 @@ import 'package:mind_base/src/constants/pubspec.yaml.g.dart';
 import 'package:mind_base/src/user/infra/ui/dialog/auth_dialog.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/confirm_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/attribute_edit_dialog.dart';
+import 'package:mind_base/src/workspace/infra/ui/dialog/import_data_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/record_meta_edit_dialog.dart';
 import 'package:mind_base/src/core/infra/ui/widget/RadiusInkWell.dart';
 import 'package:mind_base/src/workspace/infra/ui/widget/data_table_grid.dart';
@@ -318,24 +320,56 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           ListTile(
-                            title: const Text("新建一个表"),
-                            trailing: const Icon(Icons.add),
-                            onTap: () async {
-                              final nMeta = (await showRecordMetaEditDialog(
-                                context: context,
-                                kAttrBuilder: _kAttrBuilder,
-                                kMetaBuilder: _kMetaBuilder,
-                                kMethodBuilder: _kMethodBuilder,
-                                queryMetaFn:
-                                    pWorkspace.openedWorkspace!.queryMeta,
-                                allMetas: pWorkspace.openedWorkspace!.allMetas,
-                              ));
-                              if (nMeta == null) return;
-                              return await pWorkspace
-                                  .actInsertMeta(nMeta.toDm(
-                                      pWorkspace.openedWorkspace!.queryMeta))
-                                  .thenDialog(context);
-                            },
+                            title: const Text("新建表"),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.add),
+                                  onPressed: () async {
+                                    final nMeta =
+                                        (await showRecordMetaEditDialog(
+                                      context: context,
+                                      kAttrBuilder: _kAttrBuilder,
+                                      kMetaBuilder: _kMetaBuilder,
+                                      kMethodBuilder: _kMethodBuilder,
+                                      queryMetaFn:
+                                          pWorkspace.openedWorkspace!.queryMeta,
+                                      allMetas:
+                                          pWorkspace.openedWorkspace!.allMetas,
+                                    ));
+                                    if (nMeta == null) return;
+                                    return await pWorkspace
+                                        .actInsertMetaDto(nMeta)
+                                        .thenDialog(context);
+                                  },
+                                ),
+                                PopupMenuButton<String>(
+                                  itemBuilder: (ctx) => [
+                                    const PopupMenuItem(
+                                        value: "importByJson",
+                                        child: ListTile(
+                                          title: Text("通过Json导入"),
+                                          trailing: Icon(Icons.input_rounded),
+                                        ))
+                                  ],
+                                  onSelected: (key) async {
+                                    switch (key) {
+                                      case "importByJson":
+                                        final dto = await showImportDataDialog(
+                                            context: context);
+                                        if (dto == null) return;
+                                        // print("debug import data # $dto");
+                                        return await pWorkspace
+                                            .actUpdateByTable(dto)
+                                            .thenDialog(context);
+                                        // todo
+                                        break;
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       )
@@ -352,8 +386,8 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                       );
                     }
                     final data = openedMeta.dataSource;
-                    print(
-                        "debug Meta重建,cache Columns#${data.cachedColumns.map((e) => "title ${e.title}")}");
+                    // print(
+                    //     "debug Meta重建,cache Columns#${data.cachedColumns.map((e) => "title ${e.title}")}");
                     return Expanded(
                       child: PlutoGrid(
                         // key不一致的时候才会刷新UI
@@ -375,10 +409,12 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
                                   context: context,
                                   initKey: origin.nextKey(),
                                   kAttrBuilder: GlobalKey<FormBuilderState>(),
-                                  queryMetaFn: pWorkspace.openedWorkspace!.queryMeta,
-                                  allMetas: ()=>pWorkspace.metaList,
+                                  queryMetaFn:
+                                      pWorkspace.openedWorkspace!.queryMeta,
+                                  allMetas: () => pWorkspace.metaList,
                                 ).then((value) {
-                                  return pWorkspace.actMetaUpdateAttr(origin,value);
+                                  return pWorkspace.actMetaUpdateAttr(
+                                      origin, value);
                                 });
                                 break;
                               default:
