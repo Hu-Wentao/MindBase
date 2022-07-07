@@ -63,29 +63,29 @@ class MetaDtoRepo {
 
   /// 插入Meta记录的同时, 创建对应的Record集合;
   /// 解决监听不存在Record集合,在集合被创建后无法收到消息的问题
-  insertEntity(RecordMeta meta) async {
+  insertDto(RecordMetaDto meta) async {
     final r =
-        await insertMetaWithCreateRecordCollection(meta).catchError((e, s) {
-      print("debug #插入异常 理论步骤2, 插入meta记录,并创建对应的Record集合");
+        await insertMetaDtoWithCreateRecordCollection(meta).catchError((e, s) {
       if (e is AppwriteException && e.type == 'collection_not_found') {
         // 集合不存在,则创建集合
         // fixme 新建的集合为"所有人可读写"
         return createMetaCollection(null)
             // 再次尝试
-            .then((_) => insertMetaWithCreateRecordCollection(meta));
+            .then((_) => insertMetaDtoWithCreateRecordCollection(meta));
       } else {
         return ExceptionAdapter.of(e, s);
       }
     });
     if (r is BaseException) throw r;
+    return r;
   }
 
   /// 更新
   /// 当前只实现对新增字段的添加功能, 删除考虑后面引入视图(隐藏字段)解决
   updateWithRecordCollection(
-      RecordMeta originMeta, RecordMetaDto metaDto) async {
+      RecordMetaDto originMeta, RecordMetaDto metaDto) async {
     // 原始MetaAttrList快照
-    final originAttrDtoSnap = originMeta.toDto().attrs;
+    final originAttrDtoSnap = originMeta.attrs;
     // 1. 先更新meta记录
     await _update(metaDto);
     // 对比两个对象的属性, 只更新有新增的属性
@@ -144,11 +144,10 @@ class MetaDtoRepo {
   /// 新增一条Meta记录,同时创建一个新的Record集合(否则会导致Record监听失效)
   ///   如果没有对应的Record集合, 即使realtime配置了相关的监听参数,再Record集合创建之后,数据也不会被接收到
   ///   因此必须要再Meta记录创建的同时,创建对应的Record集合
-  Future insertMetaWithCreateRecordCollection(RecordMeta meta) async {
-    print("debug #插入异常 理论步骤1, 插入meta记录,到Meta表中, 并创建对应的Record集合");
-    await _metaAcc.insert(meta.toDto()).then((value) =>
+  Future insertMetaDtoWithCreateRecordCollection(RecordMetaDto meta) async {
+    return await _metaAcc.insert(meta).then((value) =>
         // 同时创建一个所有人可读写的Record集合
-        RecordDtoRepo.withDI(sl, meta).createRecordCollection(null));
+        RecordDtoRepo.withDtoDI(sl, meta).createRecordCollection(null));
   }
 
   /// 创建Meta集合(存储某个工作空间内的所有Meta记录)
@@ -200,7 +199,7 @@ class MetaDtoRepo {
 class RecordDtoRepo {
   final server.Database _serverDb;
 
-  final RecordMeta meta;
+  final RecordMetaDto meta;
   final RecordEttAccessor _recordAcc;
 
   RecordDtoRepo(
@@ -211,7 +210,11 @@ class RecordDtoRepo {
 
   String get collectionId => meta.id; // 也是所在metaId
 
-  static RecordDtoRepo withDI(GetIt get, RecordMeta meta) => RecordDtoRepo(
+  static RecordDtoRepo withDI(GetIt get, RecordMeta meta) =>
+      withDtoDI(get, meta.toDto());
+
+  static RecordDtoRepo withDtoDI(GetIt get, RecordMetaDto meta) =>
+      RecordDtoRepo(
         get<server.Database>(),
         RecordEttAccessor(get<Database>(), meta.id),
         meta,
@@ -283,7 +286,9 @@ class RecordDtoRepo {
       write: permit,
     );
     // 创建属性
-    await createAttrs(meta.attrs.map((e) => e.toDto()));
+    for (final attr in meta.attrs) {
+      await _createAttr(_serverDb, collectionId, attr);
+    }
   }
 
   findById(String metaId) => _recordAcc.findById(metaId);
@@ -291,12 +296,6 @@ class RecordDtoRepo {
   findAll() => _recordAcc.findAll();
 
   deleteBy(String metaId) => _recordAcc.deleteBy(metaId);
-
-  Future createAttrs(Iterable<AttributeDto> attrs) async {
-    for (final attr in attrs) {
-      await _createAttr(_serverDb, collectionId, attr);
-    }
-  }
 }
 
 /// 为Record集合新增属性
