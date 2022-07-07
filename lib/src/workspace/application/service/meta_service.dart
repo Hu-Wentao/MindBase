@@ -5,6 +5,7 @@ import 'package:mind_base/src/workspace/domain/repo/repo.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 
 /// 有状态服务, 不能依赖注入
+@Deprecated("合并到WorkspaceService中")
 class MetaService {
   final Database _db;
   final MetaDtoRepo _metaDtoRepo;
@@ -15,8 +16,8 @@ class MetaService {
     return MetaService(MetaDtoRepo.withDI(sl, workspaceId), sl<Database>());
   }
 
-  Future insertMetaDto(RecordMeta meta) {
-    return _metaDtoRepo.insertEntity(meta);
+  Future insertMetaDto(RecordMetaDto metaDto) {
+    return _metaDtoRepo.insertDto(metaDto);
   }
 
   findAllBy(String metaName) {
@@ -34,7 +35,7 @@ class MetaService {
     return _metaDtoRepo.findById(metaId);
   }
 
-  updateWithRecordCollection(RecordMeta origin, RecordMetaDto dto) {
+  updateWithRecordCollection(RecordMetaDto origin, RecordMetaDto dto) {
     return _metaDtoRepo.updateWithRecordCollection(origin, dto);
   }
 
