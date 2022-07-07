@@ -5,9 +5,11 @@ import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/repo/repo.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/infra/dao/dao_aw_impl.dart';
+import 'package:mind_base/src/workspace/infra/ui/dialog/import_data_dialog.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 
 import '../provider/opened_workspace.dart';
+import 'meta_service.dart';
 
 @lazySingleton
 class WorkspaceService {
@@ -28,7 +30,10 @@ class WorkspaceService {
   RecordMetaEttAccessor _getMetaAcc(String workspaceId) =>
       RecordMetaEttAccessor(_db, workspaceId);
 
-  RecordEttAccessor _getRecordAcc(Workspace ws, String meatId) =>
+  RecordEttAccessor _getRecordAcc(
+    @Deprecated("已弃用") Workspace? ws,
+    String meatId,
+  ) =>
       RecordEttAccessor(_db, meatId);
 
   /// 查询一个工作空间内的所有Meta
@@ -93,10 +98,27 @@ class WorkspaceService {
   }
 
   OpenedWorkspace openWorkspace(Workspace workspace) => OpenedWorkspace.openBy(
-      workspace: workspace,
-      fetchAllMeta: _getMetaAcc(workspace.id).findAll,
-      watchAllMeta: _getMetaAcc(workspace.id).watchAll(),
-      getFetchAllRecords: (String metaId)=> _getRecordAcc(workspace, metaId).findAll(),
-      getWatchAllRecords: (String metaId) => _getRecordAcc(workspace, metaId).watchAll(),
-    );
+        workspace: workspace,
+        fetchAllMeta: _getMetaAcc(workspace.id).findAll,
+        watchAllMeta: _getMetaAcc(workspace.id).watchAll(),
+        getFetchAllRecords: (String metaId) =>
+            _getRecordAcc(workspace, metaId).findAll(),
+        getWatchAllRecords: (String metaId) =>
+            _getRecordAcc(workspace, metaId).watchAll(),
+      );
+
+  /// 同时创建Meta与数据
+  Future insertTable(MetaService _metaSrv, TableDto table) async {
+    // 更新Meta
+    if (table.isCreate) {
+      _metaSrv.insertMetaDto(table.meta);
+    } else {
+      final origin = _metaSrv.findById(table.meta.id);
+      await _metaSrv.updateWithRecordCollection(origin, table.meta);
+    }
+    // 插入数据
+    for (final rcd in table.data) {
+      await _getRecordAcc(null, table.meta.id).insert(rcd);
+    }
+  }
 }
