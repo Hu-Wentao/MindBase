@@ -8,15 +8,18 @@ import 'package:ndialog/ndialog.dart';
 /// json,csv等等
 
 /// 用于表示一个[RecordMeta] + [Record]
+/// [isCreate] 为true表示更新结构与插入数据
 class TableDto {
+  final bool isCreate;
   final RecordMetaDto meta;
   final List<RecordDto> data;
 
-  TableDto(this.meta, this.data);
+  TableDto(this.isCreate, this.meta, this.data);
 
-  static TableDto? of(List<dynamic> rawJsList) {
+  /// [metaId] 为null表示新建一个meta,并导入数据
+  static TableDto? of(List<dynamic> rawJsList, {String? metaId}) {
     if (rawJsList.isEmpty) return null;
-    final dto = TableDto(RecordMetaDto.builder(), []);
+    final dto = TableDto(metaId == null, RecordMetaDto.builder(id: metaId), []);
     final meta = dto.meta;
     final typedNoneNameAttrs = <AttrTypeDto, AttributeDto>{};
     for (final js in rawJsList) {
