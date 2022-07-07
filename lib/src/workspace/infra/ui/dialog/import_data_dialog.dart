@@ -134,8 +134,8 @@ class ImportDataByJsonPanel extends StatelessWidget {
     required this.onChanged,
     // todo 考虑换成JsonElement， 以添加comment示例
     this.origin = const [
-      {"姓名": "张三", "年龄": 123, "备注": "456"},
-      {"姓名": "李四", "年龄": 789, "备注": "bu la bu la"}
+      {"姓名": "张三", "年龄": 123, "性别": true},
+      {"姓名": "李四", "年龄": 789, "性别": false}
     ],
   }) : super(key: key);
 
