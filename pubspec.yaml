@@ -71,6 +71,7 @@ dependencies:
   adaptive_breakpoints:
   feedback:
   url_launcher:
+  json_editor:
 dev_dependencies:
   flutter_test:
     sdk: flutter
