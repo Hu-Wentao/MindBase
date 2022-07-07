@@ -71,6 +71,9 @@ class RecordDto extends IEntityDto {
   @override
   Map<String, dynamic> toJson() =>
       throw UnimplementedError("使用[$runtimeType]相关Extension的方法");
+
+  @override
+  String toString() => 'RecordDto{fields: $fields}';
 }
 
 extension RecordMetaX on RecordMeta {
@@ -97,6 +100,15 @@ class RecordMetaDto extends IEntityDto {
   });
 
   AttributeDto findAttr(int k) => attrs.firstWhere((element) => element.k == k);
+
+  AttributeDto? findAttrByName(String name) {
+    for (final a in attrs) {
+      if (a.name == name) {
+        return a;
+      }
+    }
+    return null;
+  }
 
   // 方法和属性公用 k值，在创建表单时，会对同一个实例多次调用，因此这里用`+=`
   int nextKey() => maxKey += 1;
@@ -297,7 +309,7 @@ class AttributeDto extends IDto {
 
   /// 供Form初始化
   AttributeDto.builder({
-    String? metaId,
+    @Deprecated("无意义参数") String? metaId,
     int k = 0,
     String name = "",
     String memo = "",
@@ -439,4 +451,19 @@ class AttrTypeDto {
 
   @override
   String toString() => 'AttrType{tp: $tp, ref: $r}';
+
+  /// 通过value的类型创建对应的[AttrTypeDto]
+  static AttrTypeDto of(dynamic value) {
+    switch (value.runtimeType) {
+      case int:
+      case double:
+        return AttrTypeDto.num;
+      case bool:
+        return AttrTypeDto.boolean;
+      case String:
+        return AttrTypeDto.string;
+      default:
+        return AttrTypeDto.string;
+    }
+  }
 }
