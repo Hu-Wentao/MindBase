@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math' as math;
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:json_editor/json_editor.dart';
 import 'package:mind_base/src/core/infra/dto/dto_json_impl.dart';
 import 'package:mind_base/src/core/inter/i_dto.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
@@ -31,6 +32,10 @@ class RecordDto extends IEntityDto {
 
   const RecordDto({this.fields = const {}});
 
+  factory RecordDto.fromDomain(Record record) => RecordDto(
+        fields: record.fields,
+      );
+
   factory RecordDto.builder({
     String? id,
     String? metaId,
@@ -42,10 +47,6 @@ class RecordDto extends IEntityDto {
         0: Value.of(id ??= ObjectIdX.createHex),
         1: Value.of(metaId),
       }..addAll(fields));
-
-  factory RecordDto.fromDomain(Record record) => RecordDto(
-        fields: record.fields,
-      );
 
   /// 从表单输入
   factory RecordDto.fromForm(RecordMeta meta, Map<String, dynamic> formMap) {
@@ -453,16 +454,18 @@ class AttrTypeDto {
   String toString() => 'AttrType{tp: $tp, ref: $r}';
 
   /// 通过value的类型创建对应的[AttrTypeDto]
-  static AttrTypeDto of(dynamic value) {
-    switch (value.runtimeType) {
-      case int:
-      case double:
+  static AttrTypeDto ofJsonType(JsonElementValueType? value) {
+    if (value == null) return AttrTypeDto.string;
+
+    switch (value) {
+      case JsonElementValueType.numeric:
         return AttrTypeDto.num;
-      case bool:
+      case JsonElementValueType.bool:
         return AttrTypeDto.boolean;
-      case String:
-        return AttrTypeDto.string;
-      default:
+      case JsonElementValueType.string:
+      // 其他类型直接按照String处理
+      case JsonElementValueType.array:
+      case JsonElementValueType.map:
         return AttrTypeDto.string;
     }
   }
