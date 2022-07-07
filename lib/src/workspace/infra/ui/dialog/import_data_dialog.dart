@@ -16,40 +16,73 @@ class TableDto {
 
   TableDto(this.isCreate, this.meta, this.data);
 
-  /// [metaId] 为null表示新建一个meta,并导入数据
-  static TableDto? of(List<dynamic> rawJsList, {String? metaId}) {
-    if (rawJsList.isEmpty) return null;
-    final dto = TableDto(metaId == null, RecordMetaDto.builder(id: metaId), []);
-    final meta = dto.meta;
-    final typedNoneNameAttrs = <AttrTypeDto, AttributeDto>{};
-    for (final js in rawJsList) {
-      print("debug ## e = $js");
-
+  // List, 多条记录的信息
+  static _parseEleArray(JsonElement element, TableDto dto,
+      Map<AttrTypeDto, AttributeDto> typedNoneNameAttrs) {
+    assert(element.valueType == JsonElementValueType.array);
+    final metaMemo = element.comment ?? '';
+    final meta = dto.meta..memo += metaMemo;
+    for (final ele in element.value as List) {
       final rcd = RecordDto.builder();
-      if (js is Map) {
+      assert(ele is JsonElement);
+      if (ele.valueType == JsonElementValueType.map) {
         // Map，单条record的内容
-        for (final kv in js.entries) {
-          final attrName = kv.key.toString();
-          final valueType = AttrTypeDto.of(kv.value);
-          //
-          var at = meta.findAttrByName(attrName);
-          if (at == null) {
-            at = AttributeDto.builder(
-                k: meta.nextKey(), name: attrName, type: valueType);
-            meta.attrs.add(at);
-          }
-          rcd.fields[at.k] = Value.of(kv.value);
-        }
+        // print("deebug ## ele.value = ${ele.value}");
+        _parseEleMap(ele, meta, rcd);
       } else {
         // 只有值，全部归类为无名属性的value
-        final valueType = AttrTypeDto.of(js.value);
+        final valueType = AttrTypeDto.ofJsonType(ele.value);
         typedNoneNameAttrs[valueType] ??= AttributeDto.builder(
             k: meta.nextKey(), name: '${valueType.name} Attr', type: valueType);
-        rcd.fields[typedNoneNameAttrs[valueType]!.k] = Value.of(js.value);
+        rcd.fields[typedNoneNameAttrs[valueType]!.k] =
+            // 无论什么类型，都以AsString存储，参见 IExpr_v20B2C
+            Value(fn: const AsFunc<String>(), ag: [ele.value]);
       }
       dto.data.add(rcd);
     }
     meta.attrs.addAll(typedNoneNameAttrs.values);
+  }
+
+  // Map，单条record的信息
+  static _parseEleMap(JsonElement element, RecordMetaDto meta, RecordDto rcd) {
+    assert(element.valueType == JsonElementValueType.map);
+    for (final JsonElement kv in (element.value as List)) {
+      // print(
+      //     "debug kv = ${kv.key}, type ${kv.valueType}, value=${kv.value}, comment ${kv.comment}");
+      final valueType = AttrTypeDto.ofJsonType(kv.valueType);
+      final attrName = kv.key ?? '${valueType.name} Attr';
+      //
+      var at = meta.findAttrByName(attrName);
+      if (at == null) {
+        at = AttributeDto.builder(
+          k: meta.nextKey(),
+          name: attrName,
+          memo: kv.comment ?? '',
+          type: valueType,
+        );
+        meta.attrs.add(at);
+      }
+      rcd.fields[at.k] = Value(fn: const AsFunc<String>(), ag: [kv.value]);
+    }
+    print("debug meta = $meta, rcd = $rcd");
+  }
+
+  /// [metaId] 为null表示新建一个meta,并导入数据
+  static TableDto? of(JsonElement? element, {String? metaId}) {
+    if (element == null) return null;
+    final dto = TableDto(
+        metaId == null, RecordMetaDto.builder(id: metaId, name: "未命名表"), []);
+    final typedNoneNameAttrs = <AttrTypeDto, AttributeDto>{};
+    if (element.valueType == JsonElementValueType.array) {
+      // 解析List， 即多条记录
+      _parseEleArray(element, dto, typedNoneNameAttrs);
+    } else {
+      // 否则是map，即只有单条记录的信息
+      final meta = dto.meta;
+      final rcd = RecordDto.builder();
+      _parseEleMap(element, meta, rcd);
+      dto.data.add(rcd);
+    }
     return dto;
   }
 
@@ -61,9 +94,8 @@ class TableDto {
 
 Future<TableDto?> showImportDataDialog({
   required BuildContext context,
-  // required ValueChanged<Map> onChanged,
 }) {
-  List list = const [];
+  JsonElement? ele;
   return NAlertDialog(
     dialogStyle: DialogStyle(titleDivider: false),
     title: const Padding(
@@ -71,16 +103,14 @@ Future<TableDto?> showImportDataDialog({
       child: Text("导入数据"),
     ),
     content: ImportDataByJsonPanel(
-      onChanged: (ls) {
-        list = ls;
-      },
+      onChanged: (e) => ele = e,
     ),
     actions: [
       TextButton(
           child: const Text("确认"),
           onPressed: () {
-            if (list.isNotEmpty) {
-              Navigator.pop<TableDto>(context, TableDto.of(list));
+            if (ele != null) {
+              Navigator.pop<TableDto>(context, TableDto.of(ele));
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("不能导入空Json")),
@@ -96,31 +126,41 @@ Future<TableDto?> showImportDataDialog({
 }
 
 class ImportDataByJsonPanel extends StatelessWidget {
-  final ValueChanged<List> onChanged;
-  final Map<String, dynamic>? origin;
+  final ValueChanged<JsonElement> onChanged;
+  final List origin;
 
   const ImportDataByJsonPanel({
     Key? key,
     required this.onChanged,
-    this.origin,
+    // todo 考虑换成JsonElement， 以添加comment示例
+    this.origin = const [
+      {"姓名": "张三", "年龄": 123, "备注": "456"},
+      {"姓名": "李四", "年龄": 789, "备注": "bu la bu la"}
+    ],
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            OutlinedButton(
+              onPressed: () {},
+              child: const Text("Json"),
+            ),
             SizedBox(
               width: 500,
-              height: 500,
+              height: 450,
               child: JsonEditor.object(
                 object: origin,
-                onValueChanged: (e) {
-                  // print(
-                  //     "debug json ele# ${e.comment} # ${e.key} # ${e.valueType} #${e.value}");
-                  onChanged(e.value);
-                },
+                onValueChanged: onChanged,
               ),
-            )
+            ),
+            Text(
+              "注意：请勿将Int类型数据作为Key使用，否则会产生不符合预期的结果",
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
           ],
         ),
       );
