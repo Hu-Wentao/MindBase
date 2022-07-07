@@ -116,9 +116,13 @@ class WorkspaceService {
       final origin = _metaSrv.findById(table.meta.id);
       await _metaSrv.updateWithRecordCollection(origin, table.meta);
     }
+    await Future.delayed(Duration.zero);
+    final RecordDtoRepo rcdRepo = RecordDtoRepo.withDtoDI(sl, table.meta);
     // 插入数据
     for (final rcd in table.data) {
-      await _getRecordAcc(null, table.meta.id).insert(rcd);
+      // print("debug 插入记录 #$rcd");
+      await rcdRepo.insert(rcd);
+      await Future.delayed(Duration.zero);
     }
   }
 }
