@@ -41,12 +41,20 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   //     // 获取数据
   //   });
 
-  actOnUserUpdate(User? nUser) {
+  onUserUpdate(User? nUser) {
     if (nUser != user) {
       return (nUser == null)
-          ? setUninitialized("尚未登录")
+          ? actCleanCache("尚未登录")
           : actSyncUserInfo(nUser);
     }
+  }
+
+  actCleanCache(String msg){
+    user =null;
+    workspaces.clear();
+    openedWorkspaces.clear();
+    selectedWorkspace = null;
+    setUninitialized(msg);
   }
 
   actSyncUserInfo(User nUser) async => await actWrapper(() async {
