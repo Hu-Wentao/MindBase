@@ -234,14 +234,6 @@ class DataFrameTitlePluto extends StatelessWidget {
                 icon: const Icon(Icons.edit),
                 label: const Text("修改结构"),
               ),
-              TextButton.icon(
-                onPressed: () => showConfirmDialog(
-                    context: context,
-                    title: "确认删除[${meta.name}]表吗",
-                    onConfirm: () => pWorkspace.actRemoveMeta(meta.id)),
-                icon: const Icon(Icons.delete),
-                label: const Text("删除表"),
-              ),
             ],
           ),
         ),
