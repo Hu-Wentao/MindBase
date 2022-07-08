@@ -71,7 +71,7 @@ final pMetaStudent = RecordMeta(
           expr: Expression(
             fn: IFunc.findBy("member"),
             ag: [
-              Value.of("a2"), // 表示attribute 0
+              ExprValue.of("a2"), // 表示attribute 0
             ],
             type: AttrType.string,
           )),
@@ -83,12 +83,14 @@ final pMetaStudent = RecordMeta(
           expr: Expression(
             fn: IFunc.findBy("add"),
             ag: [
-              Value.of("Hello everyone! My name is "),
+              ExprValue.of("Hello everyone! My name is "),
               Expression(
                 fn: IFunc.findBy("member"),
                 ag: [
-                  const Value(fn: AsFuncThis(), ag: []),
-                  Value.of("a2"), // 填入 propId
+                  // fixme  `const Value(fn: AsFuncThis(), ag: [])`表达this
+                  ExprValue.of(''),
+                  ExprValue.of("a2"),
+                  // 填入 propId
                 ],
                 type: AttrType.string,
               )

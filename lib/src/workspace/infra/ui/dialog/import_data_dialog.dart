@@ -34,9 +34,7 @@ class TableDto {
         final valueType = AttrTypeDto.ofJsonType(ele.value);
         typedNoneNameAttrs[valueType] ??= AttributeDto.builder(
             k: meta.nextKey(), name: '${valueType.name} Attr', type: valueType);
-        rcd.fields[typedNoneNameAttrs[valueType]!.k] =
-            // 无论什么类型，都以AsString存储，参见 IExpr_v20B2C
-            Value(fn: const AsFunc<String>(), ag: [ele.value]);
+        rcd.fields[typedNoneNameAttrs[valueType]!.k] = Value.of(ele.value);
       }
       dto.data.add(rcd);
     }
@@ -62,7 +60,7 @@ class TableDto {
         );
         meta.attrs.add(at);
       }
-      rcd.fields[at.k] = Value(fn: const AsFunc<String>(), ag: [kv.value]);
+      rcd.fields[at.k] = Value.of(kv.value);
     }
     print("debug meta = $meta, rcd = $rcd");
   }

@@ -60,7 +60,8 @@ class Record implements IEtt<String> {
     final prop = meta.attrs.firstWhere((attr) => attr.k == attrKey);
     final value = tryGetFieldBy(attrKey);
     return ExprValue.build(
-        type: prop.type, ag: value?.ag ?? ['', "Error#找不到Value值"]);
+        type: prop.type,
+        ag: [value?.value, value == null ? "Error#找不到Value值" : null]);
   }
 
   Method? tryGetMethodBy(int methodKey, {Method Function(int k)? orElse}) =>

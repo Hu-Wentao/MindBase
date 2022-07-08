@@ -11,6 +11,19 @@ import 'package:quiver/core.dart';
 
 part 'expr_node_dto.dart';
 
+class ValueDto {
+  dynamic v;
+
+  ValueDto.builder({this.v = ''});
+
+  static fromDomain(Value value) => ValueDto.builder(v: value.value);
+
+  Value toDomain() {
+    // print("RcdValueDto.toDomain: $v, type: ${v.runtimeType}");
+    return Value.of(v);
+  }
+}
+
 extension RecordX on Record {
   RecordDto toDto() => RecordDto.fromDomain(this);
 }

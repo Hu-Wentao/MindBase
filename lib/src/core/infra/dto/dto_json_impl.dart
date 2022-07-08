@@ -12,12 +12,11 @@ extension RecordDtoJsonX on RecordDto {
               .where((element) => element.value is Map<String, dynamic>)
               .map((e) => MapEntry(
                     int.parse(e.key),
-                    ValueJsonDtoJsonX.fromJson(e.value).toDomain(toMeta)
-                        as Value,
+                    RcdValueDtoJsonX.fromJson(e.value).toDomain(),
                   ))));
 
-  Map<String, dynamic> toJson() => fields.map((key, value) =>
-      MapEntry("$key", ValueJsonDto.fromDomain(value).toJson()));
+  Map<String, dynamic> toJson() => fields.map(
+      (key, value) => MapEntry("$key", ValueDto.fromDomain(value).toJson()));
 }
 
 extension RecordMetaDtoJsonX on RecordMetaDto {
@@ -103,11 +102,38 @@ extension ExprJsonDtoJsonX on ExprNodeDto {
       };
 }
 
+extension RcdValueDtoJsonX on ValueDto {
+  static ValueDto fromJson(Map<String, dynamic> json) {
+    if (json['v'] != null) {
+      // IExpr_20B2C 不使用其他包装，只存储`v`
+      return ValueDto.builder(v: json['v']);
+    } else {
+      return _adapt_0_21_0(json);
+    }
+  }
+
+  // 适配早期版本
+  static _adapt_0_21_0(Map<String, dynamic> json) {
+    print("debug adapt 0.21.0 # json = $json");
+    return ValueDto.builder(
+        v: (json['ag'] as List<dynamic>)
+            .map((e) => jsonDecode(e))
+            .toList()
+            .first);
+  }
+
+  Map<String, dynamic> toJson() => {
+        'v': v,
+      };
+}
+
 @Deprecated("将在IExpr_20B2C移除")
 extension ValueJsonDtoJsonX on ValueJsonDto {
-  static ValueJsonDto fromJson(Map<String, dynamic> json) => ValueJsonDto(
-      fn: json['fn'] as String,
-      ag: (json['ag'] as List<dynamic>).map((e) => jsonDecode(e)).toList());
+  static ValueJsonDto fromJson(Map<String, dynamic> json) {
+    return ValueJsonDto.builder(
+        fn: json['fn'] as String,
+        ag: (json['ag'] as List<dynamic>).map((e) => jsonDecode(e)).toList());
+  }
 
   Map<String, dynamic> toJson() => {
         'fn': fn,

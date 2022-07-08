@@ -72,74 +72,20 @@ mixin IFunctor {
 // IFunctor fMap(Func fn);
 }
 
-@Deprecated("将在IExpr_v20B2C移除")
-class Value extends IExpr with IFunctor, EquatableMixin {
+/// Record中的字段值，IExpr_v20B2C
+/// 可能更像是[ExprValue]的Dto
+class Value<T> extends Equatable implements IFunctor {
   @override
-  final AsFunc fn; // 对于Value, fn对象始终是 [AsFunc]类及其子类
-  @override
-  final List<dynamic> ag; // ag[0]为实际值, ag[1]为错误值
-  @override
-  callee() => fn.logic.call(ag);
+  final T value;
 
-  // expr-v12.1
-  @override
-  AttrType get type => fn.rType;
+  const Value.build(this.value);
 
   @override
-  dynamic get value => callee();
+  List<Object?> get props => [value];
 
-  dynamic get v => ag[0];
+  get v => value;
 
-  String get e => ag[1];
-
-  @override
-  List<Object?> get props => [fn, ...ag];
-
-  @protected
-  const Value({
-    required this.fn,
-    required this.ag,
-  });
-
-  factory Value.of(dynamic v, [dynamic e]) {
-    AsFunc fn;
-    dynamic value = v ?? "";
-    switch (v.runtimeType) {
-      case String:
-        fn = const AsFunc<String>();
-        break;
-      case double:
-        fn = const AsFunc<double>();
-        break;
-      case int:
-        fn = const AsFunc<int>();
-        break;
-      case num:
-        fn = const AsFunc<num>();
-        break;
-      case bool:
-        fn = const AsFunc<bool>();
-        break;
-      case IExpr:
-        return v;
-      case Value: // 无法被IExpr取代, 原因未知
-        return v;
-      case Expression: // 无法被IExpr取代, 原因未知
-        return v;
-      default:
-        fn = const AsFuncDynamic();
-      // throw "暂不支持的包装类型[${v.runtimeType}]";
-    }
-    return Value(
-      fn: fn,
-      ag: [value, if (e != null) e],
-    );
-  }
-
-  factory Value.err(String? e) => Value.of("", e);
-
-  @override
-  String toString() => '${fn.name}($ag)';
+  static of(dynamic value) => Value.build(value);
 }
 
 /// 用于返回某个Meta的Prop时的包装

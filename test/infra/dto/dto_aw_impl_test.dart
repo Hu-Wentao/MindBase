@@ -61,13 +61,13 @@ main() {
     // Appwrite传入的Json
     final recordXJs = {
       "1": jsonEncode(ValueJsonDtoAppwriteX(
-              ValueJsonDto.fromDomain(Value.of("62870ebf5e26daf928223242")))
+              ValueDto.fromDomain(Value.of("62870ebf5e26daf928223242")))
           .toJson()),
       "2": jsonEncode(ValueJsonDtoAppwriteX(
-              ValueJsonDto.fromDomain(Value.of("628711ae99b45bcef595dc5d")))
+              ValueDto.fromDomain(Value.of("628711ae99b45bcef595dc5d")))
           .toJson()),
       "3": jsonEncode(
-          ValueJsonDtoAppwriteX(ValueJsonDto.fromDomain(Value.of("fff")))
+          ValueJsonDtoAppwriteX(ValueDto.fromDomain(Value.of("fff")))
               .toJson()),
       r"$id": "62870ebf5e26daf928223242",
       r"$read": "[user: 6283942f3119ac1f8c94]",
@@ -85,7 +85,7 @@ main() {
 
   test("IExprJsonDtoAppwriteX", () {
     final value = Value.of("1234");
-    final valueDto = ValueJsonDto.fromDomain(value);
+    final valueDto = ValueDto.fromDomain(value);
     // print("valueDto = ${ValueJsonDtoAppwriteX(valueDto).toJson()}");
     final expr = Expression(
         fn: IFunc.findBy("add"),

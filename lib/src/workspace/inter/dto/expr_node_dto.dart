@@ -32,15 +32,6 @@ abstract class IExprNodeDto extends IDto {
 
   IExpr toDomain(QueryMetaFn? toMeta) {
     switch (runtimeType) {
-      case ValueJsonDto:
-        final dto = this as ValueJsonDto;
-        final fn = IFunc.findAsFunc(dto.fn!);
-        // var ag = dto.ag;
-        // if ((fn is AsFuncRecord || fn is AsFuncRecordMeta) &&
-        //     ag[0] is! String) {
-        //   ag[0] = String.fromHexString(ag[0] as String);
-        // }
-        return Value(fn: fn, ag: dto.ag);
       case ExprValueNodeDto:
         final dto = this as ExprValueNodeDto;
         return ExprValue.build(type: dto.type.toDomain(toMeta!), ag: dto.ag);
@@ -84,6 +75,7 @@ class ExprNodeDto extends IExprNodeDto {
   @override
   List<IExprNodeDto> ag;
 
+  @override
   AttrTypeDto? type;
 
   ExprNodeDto({

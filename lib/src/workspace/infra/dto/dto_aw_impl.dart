@@ -9,6 +9,33 @@ import 'package:mind_base/src/workspace/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 
 /// 对应[Value]
+extension RcdValueDtoAppwriteX on ValueDto {
+// 修复 ::fn 字段丢失导致表达式无法正常解析的bug
+  Map<String, dynamic> toJson() => {'v': jsonEncode(v)};
+
+  static ValueDto fromJson(Map<String, dynamic> js) {
+    if (js['v'] != null) {
+      return ValueDto.builder(v: jsonDecode(js['v']));
+    } else {
+      return _adapt_0_21_0(js);
+    }
+  }
+
+  static _adapt_0_21_0(Map<String, dynamic> js) {
+    final jsMap = jsonDecode(js['ag'] as String);
+    if (jsMap is List) {
+// 仅用于适配 0.12.0 之前的版本, 之前版本所录入的asThis表达式都无法正常执行
+      return ValueDto.builder(
+        v: jsonDecode(js['ag'] as String)[0],
+      );
+    } else {
+      return ValueDto.builder(
+        v: jsonDecode(jsMap['ag'] as String)[0],
+      );
+    }
+  }
+}
+
 @Deprecated('Use ExprValueJsonDtoAppwriteX')
 extension ValueJsonDtoAppwriteX on ValueJsonDto {
 // 修复 ::fn 字段丢失导致表达式无法正常解析的bug
@@ -103,7 +130,7 @@ extension RecordDtoAppwriteX on RecordDto {
   Map<String, dynamic> toJson() => fields.map((key, value) => MapEntry(
         PropertyX.getPropId(true, key), // 使用propId, 因为纯数值的属性名触发Appwrite的bug
         jsonEncode(
-            ValueJsonDtoAppwriteX(ValueJsonDto.fromDomain(value)).toJson()),
+            RcdValueDtoAppwriteX(ValueDto.fromDomain(value)).toJson()),
       ));
 
   static RecordDto fromDocument(Document doc) => fromJson(doc.data);
@@ -115,13 +142,14 @@ extension RecordDtoAppwriteX on RecordDto {
             .where((entry) => PropertyX.isPropId(true, entry.key))
             .map(
               (e) => MapEntry(
-                  e.key.parsePropK,
-                  // fixme #324 考虑移除Value包装;
-                  e.value == null
-                      ? Value.of('')
-                      : ((ValueJsonDtoAppwriteX.fromJson(jsonDecode(e.value))
-                            ..fn = "asString")
-                          .toDomain(null) as Value)),
+                e.key.parsePropK,
+                e.value == null
+                    ? Value.of('')
+                    : RcdValueDtoAppwriteX.fromJson(jsonDecode(e.value))
+                        .toDomain(),
+                //       ..fn = "asString")
+                //     .toDomain(null) as RcdValue)
+              ),
             ),
       ));
 }
