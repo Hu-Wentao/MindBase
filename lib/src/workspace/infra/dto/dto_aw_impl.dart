@@ -115,13 +115,13 @@ extension RecordDtoAppwriteX on RecordDto {
             .where((entry) => PropertyX.isPropId(true, entry.key))
             .map(
               (e) => MapEntry(
-                e.key.parsePropK,
-                // fixme #324 考虑移除Value包装;
-                e.value == null
-                    ? Value.of('')
-                    : ValueJsonDtoAppwriteX.fromJson(jsonDecode(e.value))
-                        .toDomain(null) as Value,
-              ),
+                  e.key.parsePropK,
+                  // fixme #324 考虑移除Value包装;
+                  e.value == null
+                      ? Value.of('')
+                      : ((ValueJsonDtoAppwriteX.fromJson(jsonDecode(e.value))
+                            ..fn = "asString")
+                          .toDomain(null) as Value)),
             ),
       ));
 }
