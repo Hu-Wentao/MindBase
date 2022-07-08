@@ -20,10 +20,10 @@ class WorkspaceRepo {
     final dto = (await _workspaceAcc.findById(id));
     if (dto == null) return null;
     dto.id = id; // 直接Find返回的Dto没有注入 ::id 属性, 必须手动填充
-    return await _dtoToDomain(dto);
+    return await dtoToDomain(dto);
   }
 
-  Future<Workspace> _dtoToDomain(WorkspaceDto dto) async {
+  Future<Workspace> dtoToDomain(WorkspaceDto dto) async {
     final _metaAccessor = RecordMetaEttAccessor(_db, dto.id);
     final metaList = <RecordMeta>[];
     final workspace = Workspace(id: dto.id, name: dto.name, metas: metaList);
@@ -38,9 +38,7 @@ class WorkspaceRepo {
   // @override
   Future<void> deleteById(String id) async => _workspaceAcc.deleteBy(id);
 
-  Stream<Workspace> findAllByTeam(String teamId) => _workspaceAcc.findAll([
-        "teamId.equal('$teamId')",
-      ]).asyncMap(_dtoToDomain);
+  Stream<Workspace> findAllByTeam(String teamId) => _workspaceAcc.findAllByTeam(teamId).asyncMap(dtoToDomain);
 }
 
 // 需要传入指定集合ID, 因此无法注入
