@@ -214,6 +214,10 @@ class WorkspaceEttAccessor extends BaseAppwriteAccessor<WorkspaceDto>
   @override
   Map<String, dynamic> dtoToJson(WorkspaceDto dto) =>
       WorkspaceDtoAppwriteX(dto).toJson();
+
+  Stream<WorkspaceDto> findAllByTeam(String teamId) => findAll([
+        "teamId.equal('$teamId')",
+      ]);
 }
 
 /// 即Meta
