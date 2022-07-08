@@ -82,9 +82,10 @@ class WorkspaceProvider extends ProviderSidecar {
 
   /// 同时更新Meta与数据
   Future<BaseException?> actUpdateByTable(TableDto dto) async =>
-      await actWrapper(() => setInitialized("通过Table更新Meta/record [$dto]", () async {
-            await _workspaceSrv.insertTable(_metaService!, dto);
-          }));
+      await actWrapper(
+          () => setInitialized("通过Table更新Meta/record [$dto]", () async {
+                await _workspaceSrv.insertTable(_metaService!, dto);
+              }));
 
   Future<BaseException?> actUpdateMeta(
     RecordMeta origin,
@@ -131,8 +132,8 @@ class WorkspaceProvider extends ProviderSidecar {
   Future<List<RecordMetaDto>> actQueryMetaByName(String metaName) async =>
       _metaService!.findAllBy(metaName).toList();
 
-  void actRemoveMeta(String metaId) =>
-      actWrapper(() => setInitialized("删除Meta [$metaId]", () async {
+  Future<BaseException?> actRemoveMeta(String metaId) async =>
+      await actWrapper(() => setInitialized("删除Meta [$metaId]", () async {
             // 取消meta的监听
             actSelectOpenMeta(null);
             // 从数据库中删除 Meta记录和Record集合
