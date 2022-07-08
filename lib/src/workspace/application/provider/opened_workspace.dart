@@ -267,11 +267,10 @@ class OpenedMeta extends ChangeNotifier {
   }
 
   /// 内部缓存表格数据
-  /// fixme 如果meta更新,
   RecordDataGridSourcePluto? _cachedDataSource;
 
   RecordDataGridSourcePluto get dataSource {
-    print("当前是否为缓存DataSource# ${_cachedDataSource == null}");
+    // print("当前是否为缓存DataSource# ${_cachedDataSource == null}");
     return _cachedDataSource ??= RecordDataGridSourcePluto(
       meta: meta,
       findRecord: at.findRecord,

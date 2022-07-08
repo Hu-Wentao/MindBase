@@ -19,30 +19,6 @@ class SnackFactory {
     }
   }
 
-  // .then(context.popRoute);
-  //   } on DioError catch (dioErr) {
-  //     var showMsg;
-  //     var msgInfo; // todo 展示在详情中
-  //     if (dioErr.type == DioErrorType.other &&
-  //         dioErr.error is AppBaseException) {
-  //       final e = (dioErr.error as AppBaseException);
-  //       showMsg = e.msg;
-  //       msgInfo = e.debugInfo;
-  //     } else {
-  //       showMsg = dioErr.message;
-  //     }
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text(showMsg)),
-  //     );
-  //   } on AppBaseException catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text(e.msg),
-  //         // action: SnackBarAction(label: "",), // todo 发送错误报告 $msgInfo
-  //       ),
-  //     );
-  //   }
-
   static ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? _buildBase(
           BaseException exception, BuildContext context) =>
       ScaffoldMessenger.of(context)

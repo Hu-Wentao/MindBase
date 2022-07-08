@@ -36,7 +36,7 @@ class ExprEvaluator {
           break;
       }
     }
-    print("eval#rst: $expr #r: $r");
+    // print("eval#rst: $expr #r: $r");
     return r;
   }
 

@@ -43,10 +43,7 @@ class Expression extends IExpr with IFunctor, EquatableMixin {
   @override
   final AttrType type;
 
-  // const Expression(this.fn, this.type, [this.ag = const []]);
   const Expression({required this.fn, this.ag = const [], required this.type});
-
-  // const Expression(this.fn, [this.ag = const [], this.type = AttrType.any]);
 
   @override
   callee() => fn.invoke(ag.map((a) => a.callee()).toList());

@@ -108,27 +108,6 @@ class WorkspaceProvider extends ProviderSidecar {
   Future<RecordMetaDto?> actQueryMeta(String metaId) =>
       _metaService!.findById(metaId);
 
-// // 尚未用到,暂时关闭
-// 更新meta的指定Attr
-//   Future<BaseException?> actEditAttribute(
-//     RecordMetaDto metaDto,
-//     AttributeDto? attr,
-//   ) async {
-//     if (attr == null) {
-//       return null;
-//     }
-//     print("debug 更新meta的指定Attr [$metaDto] [$attr]");
-//     // todo 后期改为update
-//     final index = metaDto.attrs.indexWhere((element) => element.k == attr.k);
-//     if (index != -1) {
-//       metaDto.attrs[index] = (attr);
-//     } else {
-//       metaDto.attrs.add(attr);
-//     }
-//     // 持久化
-//     return actUpdateMeta(metaDto);
-//   }
-
   Future<List<RecordMetaDto>> actQueryMetaByName(String metaName) async =>
       _metaService!.findAllBy(metaName).toList();
 

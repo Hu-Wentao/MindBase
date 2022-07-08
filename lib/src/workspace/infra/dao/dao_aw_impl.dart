@@ -181,10 +181,6 @@ mixin AppwriteAccessorWatchableMx<T extends IEntityDto>
           "debug #AppwriteAccessorWatchableMx::watchAll cancel! 添加移除channel任务 ${DateTime.now()}");
       hub.actRemoveChannel(channel);
     });
-    // todo 考虑通过转换为BroadcastStream来实现 onCancel自动取消Channel订阅的功能
-    // 但尚未验证副作用,需要测试
-    // .asBroadcastStream(onCancel: (sub) => hub.actRemoveChannel(channel))
-    // ;
   }
 
   // todo 转换操作需要转移到其他类中, 例如[RealTimeEvtFactory]
