@@ -1,10 +1,9 @@
 import 'package:appwrite/models.dart';
-import 'package:event_bus/event_bus.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/workspace/application/service/workspace_service.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
-import 'package:mind_base/src/workspace/domain/value/event.dart';
+import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
 import 'opened_workspace.dart';
@@ -19,7 +18,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   User? user;
 
   // 状态
-  Map<Team, List<Workspace>> workspaces = {};
+  Map<Team, List<WorkspaceDto>> workspaces = {};
   List<OpenedWorkspace> openedWorkspaces = [];
   OpenedWorkspace? selectedWorkspace;
 
@@ -43,14 +42,12 @@ class WorkspaceManagerProvider extends ProviderSidecar {
 
   onUserUpdate(User? nUser) {
     if (nUser != user) {
-      return (nUser == null)
-          ? actCleanCache("尚未登录")
-          : actSyncUserInfo(nUser);
+      return (nUser == null) ? actCleanCache("尚未登录") : actSyncUserInfo(nUser);
     }
   }
 
-  actCleanCache(String msg){
-    user =null;
+  actCleanCache(String msg) {
+    user = null;
     workspaces.clear();
     openedWorkspaces.clear();
     selectedWorkspace = null;
@@ -61,7 +58,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
         setInitialized("刷新已登录用户", () {
           user = nUser;
         });
-        workspaces = await (_workspaceSrv.queryAllUserWorkspaces());
+        workspaces = await (_workspaceSrv.queryAllUserWorkspaceDtoList());
         setInitialized("已同步用户数据");
       });
 
@@ -71,23 +68,21 @@ class WorkspaceManagerProvider extends ProviderSidecar {
     String spaceName,
   ) async =>
       await actWrapper(() async {
-        final r = await _workspaceSrv.createWorkspace(team, spaceName);
+        final r = await _workspaceSrv.createWorkspaceDto(team, spaceName);
         _addWorkspace(r.value1, r.value2);
         setInitialized("创建工作空间成功");
       });
 
   /// 打开或返回已存在的OpenedWorkspace
-  // actOpenWorkspace(Workspace workspace) => actOpenWorkspaceById(workspace.id);
-
   Future<BaseException?> actOpenWorkspaceById(String workspaceId,
           {bool andSelect = true}) async =>
       await actWrapper(() {
         // 选中工作空间
-        setInitialized("打开工作空间[$workspaceId]成功", () {
-          final ws = openedWorkspaces.firstWhere(
-            (opened) => opened.id == workspaceId,
-            orElse: () => _openWorkspaceById(workspaceId),
-          );
+        setInitialized("打开工作空间[$workspaceId]成功", () async {
+          final idx = openedWorkspaces.indexWhere((w) => w.id == workspaceId);
+          final ws = (idx == -1)
+              ? await _openCacheWorkspaceById(workspaceId)
+              : openedWorkspaces[idx];
           if (andSelect) selectedWorkspace = ws;
         });
       });
@@ -99,18 +94,20 @@ class WorkspaceManagerProvider extends ProviderSidecar {
                 .removeWhere((element) => element.id == workspace.id);
           }));
 
-  OpenedWorkspace _openWorkspaceById(String workspaceId) {
-    final ws = _openWorkspace(workspaces.values
+  /// 打开并缓存
+  Future<OpenedWorkspace> _openCacheWorkspaceById(String workspaceId) async {
+    final ws = await _openWorkspace(workspaces.values
         .expand((element) => element)
         .firstWhere((element) => element.id == workspaceId));
     // 首次打开,发送事件
     // _eventBus.fire(WorkspaceOpenedEvt(ws.workspace));
+    openedWorkspaces.add(ws);
     return ws;
   }
 
   // `real` 打开工作空间, 并缓存
-  OpenedWorkspace _openWorkspace(Workspace workspace) {
-    final w = _workspaceSrv.openWorkspace(workspace);
+  Future<OpenedWorkspace> _openWorkspace(WorkspaceDto workspace) async {
+    final w = await _workspaceSrv.openWorkspace(workspace);
     openedWorkspaces.add(w);
     return w;
   }
@@ -119,7 +116,7 @@ class WorkspaceManagerProvider extends ProviderSidecar {
       openedWorkspaces.any((element) => element.id == workspaceId);
 
   // 缓存工作空间
-  _addWorkspace(Team team, Workspace workspace) {
+  _addWorkspace(Team team, WorkspaceDto workspace) {
     (workspaces[team] ??= []).add(workspace);
   }
 

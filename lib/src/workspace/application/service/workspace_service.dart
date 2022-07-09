@@ -60,14 +60,34 @@ class WorkspaceService {
     return r;
   }
 
+  Future<Map<Team, List<WorkspaceDto>>> queryWorkspaceDtoBy(
+      List<Team> teams) async {
+    final r = Map.fromIterables(
+      teams,
+      List.generate(teams.length, (index) => <WorkspaceDto>[]),
+    );
+    for (final t in teams) {
+      final w = await _workspaceEttAcc.findAllByTeam(t.$id).toList();
+      // print("debug workspaceList $w");
+      if (w.isNotEmpty) {
+        r[t] ??= <WorkspaceDto>[];
+        r[t]!.addAll(w);
+      }
+    }
+    return r;
+  }
+
   /// 获取用户的所有Team
   Future<List<Team>> queryAllUserTeams() async => (await _teams.list()).teams;
 
   Future<Map<Team, List<Workspace>>> queryAllUserWorkspaces() async =>
       queryWorkspacesBy(await queryAllUserTeams());
 
+  Future<Map<Team, List<WorkspaceDto>>> queryAllUserWorkspaceDtoList() async =>
+      queryWorkspaceDtoBy(await queryAllUserTeams());
+
   /// 创建团队工作空间(没有团队的话将会自动创建团队)
-  Future<Tuple2<Team, Workspace>> createWorkspace(
+  Future<Tuple2<Team, WorkspaceDto>> createWorkspaceDto(
     Team? team,
     String spaceName,
   ) async {
@@ -93,19 +113,23 @@ class WorkspaceService {
       write: writePermit,
     );
     // print("debug #新建 Workspace成功$r");
-    final ws = (await _workspaceRepo.findById(r.$id))!;
-    return Tuple2(team, ws);
+    // final ws = (await _workspaceRepo.findById(r.$id))!;
+    return Tuple2(team, dto);
   }
 
-  OpenedWorkspace openWorkspace(Workspace workspace) => OpenedWorkspace.openBy(
-        workspace: workspace,
-        fetchAllMeta: _getMetaAcc(workspace.id).findAll,
-        watchAllMeta: _getMetaAcc(workspace.id).watchAll(),
-        getFetchAllRecords: (String metaId) =>
-            _getRecordAcc(workspace, metaId).findAll(),
-        getWatchAllRecords: (String metaId) =>
-            _getRecordAcc(workspace, metaId).watchAll(),
-      );
+
+  Future<OpenedWorkspace> openWorkspace(WorkspaceDto dto) async {
+    final workspace = await _workspaceRepo.dtoToDomain(dto);
+    return OpenedWorkspace.openBy(
+      workspace: workspace,
+      fetchAllMeta: _getMetaAcc(workspace.id).findAll,
+      watchAllMeta: _getMetaAcc(workspace.id).watchAll(),
+      getFetchAllRecords: (String metaId) =>
+          _getRecordAcc(workspace, metaId).findAll(),
+      getWatchAllRecords: (String metaId) =>
+          _getRecordAcc(workspace, metaId).watchAll(),
+    );
+  }
 
   /// 同时创建Meta与数据
   Future insertTable(MetaService _metaSrv, TableDto table) async {
