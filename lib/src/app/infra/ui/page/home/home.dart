@@ -27,6 +27,8 @@ part 'workspace_screen.dart';
 
 part 'team_screen.dart';
 
+part 'discover_screen.dart';
+
 part 'settings_screen.dart';
 
 class HomePage extends StatefulWidget {
@@ -69,8 +71,8 @@ class _HomePageState extends State<HomePage> {
       icon: Icons.people_alt_outlined,
     ),
     AdaptiveScaffoldDestination(
-      title: '模板商店',
-      icon: LineIcons.shoppingBag,
+      title: '发现',
+      icon: Icons.search_outlined,
     ),
     AdaptiveScaffoldDestination(
       title: '设置',
@@ -118,7 +120,7 @@ class _HomePageState extends State<HomePage> {
       case 1:
         return const TeamScreen();
       case 2:
-        return const FunctionShopScreen();
+        return const DiscoverScreen();
       case 3:
         return const SettingScreen();
       default:
@@ -159,11 +161,3 @@ class _HomePageState extends State<HomePage> {
       );
 }
 
-class FunctionShopScreen extends StatelessWidget {
-  const FunctionShopScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Text("函数商店");
-  }
-}
