@@ -124,9 +124,11 @@ class WorkspaceProvider extends ProviderSidecar {
 
   // 选择一个已经打开的meta
   Future<void> actSelectOpenMeta(OpenedMeta? meta) => actWrapper(
-        () => setInitialized(
-            meta == null ? "取消监听Meta" : "开始/切换监听Meta[${meta.name}]",
-            () => selectedMeta = meta),
+        () => selectedMeta != meta
+            ? setInitialized(
+                meta == null ? "取消监听Meta" : "开始/切换监听Meta[${meta.name}]",
+                () => selectedMeta = meta)
+            : null,
       );
 
   @Deprecated("尝试使用 FindRecordFn")

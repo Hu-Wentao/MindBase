@@ -76,15 +76,20 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   /// 打开或返回已存在的OpenedWorkspace
   Future<BaseException?> actOpenWorkspaceById(String workspaceId,
           {bool andSelect = true}) async =>
-      await actWrapper(() {
+      await actWrapper(() async {
         // 选中工作空间
-        setInitialized("打开工作空间[$workspaceId]成功", () async {
-          final idx = openedWorkspaces.indexWhere((w) => w.id == workspaceId);
-          final ws = (idx == -1)
-              ? await _openCacheWorkspaceById(workspaceId)
-              : openedWorkspaces[idx];
-          if (andSelect) selectedWorkspace = ws;
-        });
+        final idx = openedWorkspaces.indexWhere((w) => w.id == workspaceId);
+        final ws = (idx == -1)
+            ? await _openCacheWorkspaceById(workspaceId)
+            : openedWorkspaces[idx];
+        if (andSelect && selectedWorkspace != ws) {
+          selectedWorkspace = ws;
+          // 延迟刷新
+          Future.delayed(Duration.zero, () {
+            setInitialized("切换工作空间[$workspaceId]成功", () async {});
+          });
+        }
+        return ws;
       });
 
   /// 关闭工作空间
@@ -120,25 +125,12 @@ class WorkspaceManagerProvider extends ProviderSidecar {
     (workspaces[team] ??= []).add(workspace);
   }
 
-  // todo 考虑换个写法, 或者转移到Service中
-  Future<OpenedWorkspace> getOpenedWorkspace(String workspaceId) async {
-    if (_isOpened(workspaceId)) {
-      return openedWorkspaces
-          .firstWhere((element) => element.id == workspaceId);
-    } else {
-      final err = await actOpenWorkspaceById(workspaceId);
-      if (err != null) {
-        throw err;
-      }
-      return getOpenedWorkspace(workspaceId);
-    }
-  }
-
   Future<Team?> actRenameTeam(Team team, String? newName) async {
     if (newName == null) return null;
     final tm = await _workspaceSrv.updateName(team, newName);
     print("已更新团队名称#${tm.$id}, ${tm.name}");
     actSyncUserInfo(user!);
+    return null;
   }
 
   Future<void> actDeleteTeam(String teamId) async {

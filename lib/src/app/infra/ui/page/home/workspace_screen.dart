@@ -10,9 +10,8 @@ class WorkspaceSelectorTitle extends StatelessWidget {
   static const createWorkspaceEvt = 'create_workspace';
 
   @override
-  Widget build(BuildContext context) {
-    print("debug path $path");
-    return Consumer2<WorkspaceManagerProvider, WorkspaceProvider>(
+  Widget build(BuildContext context) =>
+      Consumer2<WorkspaceManagerProvider, WorkspaceProvider>(
         builder: (c, pManger, pWs, _) => RadiusInkWell(
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -57,7 +56,6 @@ class WorkspaceSelectorTitle extends StatelessWidget {
                     default:
                       if (value.startsWith(selectWorkspaceEvt)) {
                         final wsId = value.substring(selectWorkspaceEvt.length);
-                        pManger.actOpenWorkspaceById(wsId);
                         context.replaceRoute(
                             WorkspaceScreenRoute(workspaceId: wsId));
                         return;
@@ -71,7 +69,6 @@ class WorkspaceSelectorTitle extends StatelessWidget {
           ),
         ),
       );
-  }
 }
 
 class EmptyWorkspaceScreen extends StatelessWidget {
@@ -109,9 +106,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
             case SidecarState.initializing:
               return const Center(child: CircularProgressIndicator());
             case SidecarState.initialized:
-              return (pManager.selectedWorkspace == null)
-                  ? _buildWorkspaceSelector(context, pManager)
-                  : _buildWorkspaceDetail(context);
+              return _buildWorkspaceDetail(context, pManager);
           }
         },
       );
@@ -128,131 +123,147 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
 
   // 已打开工作空间
   /// 工作空间内容
-  _buildWorkspaceDetail(context) => Consumer<WorkspaceProvider>(
-        builder: (c, pWorkspace, _) =>
-            ChangeNotifierProvider<OpenedWorkspace?>.value(
-          value: pWorkspace.openedWorkspace,
-          child: ChangeNotifierProvider<OpenedMeta?>.value(
-            value: pWorkspace.selectedMeta,
-            child: Row(
-              children: [
-                /// 左侧Meta List
-                SizedBox(
-                  width: 200,
-                  child: Stack(
-                    children: [
-                      // MetaList
-                      Consumer<OpenedWorkspace?>(
-                        builder: (c, p, _) => (p == null)
-                            // 此时本组件不应该存在
-                            ? const Text("Error selectedWorkspace==null")
-                            : ListView.builder(
-                                itemCount: p.openedMetas.length,
-                                itemBuilder: (c, i) => ListTile(
-                                  selected: p.openedMetas[i].meta.id ==
-                                      pWorkspace.selectedMeta?.id,
-                                  title: Text(p.openedMetas[i].meta.name),
-                                  onTap: () => pWorkspace
-                                      .actSelectOpenMeta(p.openedMetas[i]),
-                                  trailing: PopupMenuButton<String>(
-                                    itemBuilder: (ctx) => [
-                                      const PopupMenuItem(
-                                        value: 'deleteViewEvt',
-                                        child: ListTile(
-                                          leading: Icon(Icons.delete),
-                                          title: Text("删除视图"),
-                                        ),
-                                      ),
-                                    ],
-                                    onSelected: (value) {
-                                      // 选中Item后,在这里会被二次调用
-                                      switch (value) {
-                                        case 'deleteViewEvt':
-                                          pWorkspace.actRemoveMeta(
-                                              p.openedMetas[i].meta.id);
-                                          break;
-                                        default:
-                                          print("debug#未知的value#$value");
-                                          break;
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ),
-                      ),
-                      // 新建Meta
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
+  _buildWorkspaceDetail(context, WorkspaceManagerProvider pManager) => Consumer<
+          WorkspaceProvider>(
+      builder: (c, pWorkspace, _) => FutureBuilder(
+          future: pManager.actOpenWorkspaceById(widget.workspaceId),
+          builder: (c, snap) {
+            // print("debug#_buildWorkspaceDetail#snap.connectionState: ${}");
+            return (pWorkspace.openedWorkspace?.id != widget.workspaceId &&
+                    snap.connectionState != ConnectionState.done)
+                ? _buildWorkspaceSelector(context, pManager)
+                : ChangeNotifierProvider<OpenedWorkspace?>.value(
+                    value: pWorkspace.openedWorkspace,
+                    child: ChangeNotifierProvider<OpenedMeta?>.value(
+                      value: pWorkspace.selectedMeta,
+                      child: Row(
                         children: [
-                          ListTile(
-                            title: const Text("新建表"),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
+                          /// 左侧Meta List
+                          SizedBox(
+                            width: 200,
+                            child: Stack(
                               children: [
-                                IconButton(
-                                  icon: const Icon(Icons.add),
-                                  onPressed: () async {
-                                    final nMeta =
-                                        (await showRecordMetaEditDialog(
-                                      context: context,
-                                      kAttrBuilder: _kAttrBuilder,
-                                      kMetaBuilder: _kMetaBuilder,
-                                      kMethodBuilder: _kMethodBuilder,
-                                      queryMetaFn:
-                                          pWorkspace.openedWorkspace!.queryMeta,
-                                      allMetas:
-                                          pWorkspace.openedWorkspace!.allMetas,
-                                    ));
-                                    if (nMeta == null) return;
-                                    return await pWorkspace
-                                        .actInsertMetaDto(nMeta)
-                                        .thenDialog(context);
-                                  },
+                                // MetaList
+                                Consumer<OpenedWorkspace?>(
+                                  builder: (c, p, _) => (p == null)
+                                      // 此时本组件不应该存在
+                                      ? const Text(
+                                          "Error selectedWorkspace==null")
+                                      : ListView.builder(
+                                          itemCount: p.openedMetas.length,
+                                          itemBuilder: (c, i) => ListTile(
+                                            selected:
+                                                p.openedMetas[i].meta.id ==
+                                                    pWorkspace.selectedMeta?.id,
+                                            title: Text(
+                                                p.openedMetas[i].meta.name),
+                                            onTap: () =>
+                                                pWorkspace.actSelectOpenMeta(
+                                                    p.openedMetas[i]),
+                                            trailing: PopupMenuButton<String>(
+                                              itemBuilder: (ctx) => [
+                                                const PopupMenuItem(
+                                                  value: 'deleteViewEvt',
+                                                  child: ListTile(
+                                                    leading: Icon(Icons.delete),
+                                                    title: Text("删除视图"),
+                                                  ),
+                                                ),
+                                              ],
+                                              onSelected: (value) {
+                                                // 选中Item后,在这里会被二次调用
+                                                switch (value) {
+                                                  case 'deleteViewEvt':
+                                                    pWorkspace.actRemoveMeta(p
+                                                        .openedMetas[i]
+                                                        .meta
+                                                        .id);
+                                                    break;
+                                                  default:
+                                                    print(
+                                                        "debug#未知的value#$value");
+                                                    break;
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                        ),
                                 ),
-                                PopupMenuButton<String>(
-                                  itemBuilder: (ctx) => [
-                                    const PopupMenuItem(
-                                        value: "importByJson",
-                                        child: ListTile(
-                                          title: Text("通过Json导入"),
-                                          trailing: Icon(Icons.input_rounded),
-                                        ))
+                                // 新建Meta
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    ListTile(
+                                      title: const Text("新建表"),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          IconButton(
+                                            icon: const Icon(Icons.add),
+                                            onPressed: () async {
+                                              final nMeta =
+                                                  (await showRecordMetaEditDialog(
+                                                context: context,
+                                                kAttrBuilder: _kAttrBuilder,
+                                                kMetaBuilder: _kMetaBuilder,
+                                                kMethodBuilder: _kMethodBuilder,
+                                                queryMetaFn: pWorkspace
+                                                    .openedWorkspace!.queryMeta,
+                                                allMetas: pWorkspace
+                                                    .openedWorkspace!.allMetas,
+                                              ));
+                                              if (nMeta == null) return;
+                                              return await pWorkspace
+                                                  .actInsertMetaDto(nMeta)
+                                                  .thenDialog(context);
+                                            },
+                                          ),
+                                          PopupMenuButton<String>(
+                                            itemBuilder: (ctx) => [
+                                              const PopupMenuItem(
+                                                  value: "importByJson",
+                                                  child: ListTile(
+                                                    title: Text("通过Json导入"),
+                                                    trailing: Icon(
+                                                        Icons.input_rounded),
+                                                  ))
+                                            ],
+                                            onSelected: (key) async {
+                                              switch (key) {
+                                                case "importByJson":
+                                                  final dto =
+                                                      await showImportDataDialog(
+                                                          context: context);
+                                                  if (dto == null) return;
+                                                  return await pWorkspace
+                                                      .actUpdateByTable(dto)
+                                                      .thenDialog(context);
+                                              }
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ],
-                                  onSelected: (key) async {
-                                    switch (key) {
-                                      case "importByJson":
-                                        final dto = await showImportDataDialog(
-                                            context: context);
-                                        if (dto == null) return;
-                                        return await pWorkspace
-                                            .actUpdateByTable(dto)
-                                            .thenDialog(context);
-                                    }
-                                  },
-                                ),
+                                )
                               ],
                             ),
                           ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
 
-                /// 右侧 table
-                Consumer<OpenedMeta?>(
-                  builder: (c, openedMeta, _) => (openedMeta == null)
-                      ? const Expanded(
-                          child: Center(child: Text("请选择/创建 一个Meta")),
-                        )
-                      : RecordDataGrid(
-                          pWorkspace: pWorkspace,
-                          openedMeta: openedMeta,
-                        ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
+                          /// 右侧 table
+                          Consumer<OpenedMeta?>(
+                            builder: (c, openedMeta, _) => (openedMeta == null)
+                                ? const Expanded(
+                                    child: Center(child: Text("请选择/创建 一个Meta")),
+                                  )
+                                : RecordDataGrid(
+                                    pWorkspace: pWorkspace,
+                                    openedMeta: openedMeta,
+                                  ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+          }));
 }
