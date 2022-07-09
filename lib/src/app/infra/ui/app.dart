@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:form_builder_validators/localization/l10n.dart';
-import 'package:mind_base/src/workspace/application/provider/team_provider.dart';
 import 'package:mind_base/src/user/application/provider/user_provider.dart';
 import 'package:mind_base/src/workspace/application/provider/workspace_manager_provider.dart';
 import 'package:mind_base/src/workspace/application/provider/workspace_provider.dart';

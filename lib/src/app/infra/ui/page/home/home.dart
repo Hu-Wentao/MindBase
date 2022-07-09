@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:mind_base/src/core/infra/ui/dialog/text_input_dialog.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/feedback/infra/ui/widget/feedback_btn.dart';
+import 'package:mind_base/src/user/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/workspace/application/provider/opened_workspace.dart';
 import 'package:mind_base/src/user/application/provider/user_provider.dart';
 import 'package:mind_base/src/workspace/application/provider/workspace_manager_provider.dart';
@@ -22,6 +24,8 @@ import 'package:provider_sidecar/provider_sidecar.dart';
 import 'package:adaptive_breakpoints/adaptive_breakpoints.dart';
 
 part 'workspace_screen.dart';
+
+part 'team_screen.dart';
 
 part 'settings_screen.dart';
 
@@ -61,8 +65,8 @@ class _HomePageState extends State<HomePage> {
       icon: Icons.list_alt_outlined,
     ),
     AdaptiveScaffoldDestination(
-      title: '联系人',
-      icon: Icons.person_search_outlined,
+      title: '团队',
+      icon: Icons.people_alt_outlined,
     ),
     AdaptiveScaffoldDestination(
       title: '模板商店',
@@ -112,7 +116,7 @@ class _HomePageState extends State<HomePage> {
       case 0:
         return const WorkspaceScreen();
       case 1:
-        return const ContactScreen();
+        return const TeamScreen();
       case 2:
         return const FunctionShopScreen();
       case 3:
@@ -139,9 +143,9 @@ class _HomePageState extends State<HomePage> {
             ),
             onTap: () async {
               if (p.isLogged) {
-                //  注销
-                showConfirmDialog(
-                    context: context, title: "确认注销吗", onConfirm: p.actLogout);
+                //  退出登录
+                await showConfirmDialog(
+                    context: context, title: "确认退出登录吗", onConfirm: p.actLogout);
               } else {
                 // 登录/注册
                 await showAuthDialog(
@@ -153,15 +157,6 @@ class _HomePageState extends State<HomePage> {
           );
         },
       );
-}
-
-class ContactScreen extends StatelessWidget {
-  const ContactScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Text("联系人");
-  }
 }
 
 class FunctionShopScreen extends StatelessWidget {

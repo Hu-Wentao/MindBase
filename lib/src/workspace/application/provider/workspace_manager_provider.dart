@@ -133,4 +133,16 @@ class WorkspaceManagerProvider extends ProviderSidecar {
       return getOpenedWorkspace(workspaceId);
     }
   }
+
+  Future<Team?> actRenameTeam(Team team, String? newName) async {
+    if (newName == null) return null;
+    final tm = await _workspaceSrv.updateName(team, newName);
+    print("已更新团队名称#${tm.$id}, ${tm.name}");
+    actSyncUserInfo(user!);
+  }
+
+  Future<void> actDeleteTeam(String teamId) async {
+    await _workspaceSrv.deleteTeam(teamId);
+    await actSyncUserInfo(user!);
+  }
 }

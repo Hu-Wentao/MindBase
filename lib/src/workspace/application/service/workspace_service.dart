@@ -117,7 +117,6 @@ class WorkspaceService {
     return Tuple2(team, dto);
   }
 
-
   Future<OpenedWorkspace> openWorkspace(WorkspaceDto dto) async {
     final workspace = await _workspaceRepo.dtoToDomain(dto);
     return OpenedWorkspace.openBy(
@@ -149,4 +148,11 @@ class WorkspaceService {
       await Future.delayed(const Duration(milliseconds: 50));
     }
   }
+
+  Future<Team> updateName(Team team, String newName) async {
+    return await _teams.update(teamId: team.$id, name: newName);
+  }
+
+  Future<void> deleteTeam(String teamId) async =>
+      await _teams.delete(teamId: teamId);
 }
