@@ -58,7 +58,8 @@ _i1.GetIt $initGetIt(_i1.GetIt get,
       get<_i3.Database>(),
       get<_i3.Teams>(),
       get<_i11.WorkspaceRepo>(),
-      get<_i10.WorkspaceEttAccessor>()));
+      get<_i10.WorkspaceEttAccessor>(),
+      get<_i4.Teams>()));
   return get;
 }
 

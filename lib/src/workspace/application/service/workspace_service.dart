@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:dart_appwrite/dart_appwrite.dart' as srv;
 import 'package:appwrite/models.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
@@ -14,6 +15,7 @@ import 'meta_service.dart';
 @lazySingleton
 class WorkspaceService {
   final Teams _teams;
+  final srv.Teams _srvTeams;
   final Database _db;
   final WorkspaceRepo _workspaceRepo;
 
@@ -25,6 +27,7 @@ class WorkspaceService {
     this._teams,
     this._workspaceRepo,
     this._workspaceEttAcc,
+    this._srvTeams,
   );
 
   RecordMetaEttAccessor _getMetaAcc(String workspaceId) =>
@@ -155,4 +158,20 @@ class WorkspaceService {
 
   Future<void> deleteTeam(String teamId) async =>
       await _teams.delete(teamId: teamId);
+
+  /// 直接拉取用户到团队,无需同意.
+  inviteMember(
+    Team team,
+    String userEmail, [
+    List<String> roles = const [],
+  ]) async {
+    final r = await _srvTeams.createMembership(
+      teamId: team.$id,
+      email: userEmail,
+      roles: [],
+      // roles: roles ?? ["team:${team.$id}"], // 默认角色为 "团队成员"
+      url: 'http://app.shuttlecloud.cn',
+    );
+    print("debug member ${r.toMap()}");
+  }
 }
