@@ -85,6 +85,11 @@ class _TeamScreenState extends State<TeamScreen> {
                             child: Text("重命名"),
                           ),
                           const PopupMenuItem(
+                            value: "invite",
+                            child: Text("邀请成员"),
+                          ),
+                          const PopupMenuDivider(),
+                          const PopupMenuItem(
                             value: "delete",
                             child: Text("删除"),
                           )
@@ -95,10 +100,23 @@ class _TeamScreenState extends State<TeamScreen> {
                               await pManger.actRenameTeam(
                                 team,
                                 await showTextInputDialog(
-                                    context: context,
-                                    title: "重命名团队",
-                                    origin: team.name),
+                                  context: context,
+                                  title: "重命名团队",
+                                  origin: team.name,
+                                  hint: team.name,
+                                ),
                               );
+                              break;
+                            case "invite":
+                              await pManger.actInviteMember(
+                                team,
+                                await showTextInputDialog(
+                                  context: context,
+                                  title: "${team.name} 团队邀请成员",
+                                  label: "请输入用户邮箱",
+                                  hint: "被邀请人的注册邮箱",
+                                ),
+                              ).thenDialog(c);
                               break;
                             case "delete":
                               await showConfirmDialog(

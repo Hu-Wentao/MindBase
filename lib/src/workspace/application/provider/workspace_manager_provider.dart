@@ -145,4 +145,10 @@ class WorkspaceManagerProvider extends ProviderSidecar {
     await _workspaceSrv.deleteTeam(teamId);
     await actSyncUserInfo(user!);
   }
+
+  Future<BaseException?> actInviteMember(Team team, String? userEmail) async =>
+      await actWrapper(() async {
+        if (userEmail == null) return;
+        await _workspaceSrv.inviteMember(team, userEmail);
+      });
 }
