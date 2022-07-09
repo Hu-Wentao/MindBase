@@ -8,6 +8,8 @@ import 'package:ndialog/ndialog.dart';
 Future<String?> showTextInputDialog({
   required BuildContext context,
   required String title,
+  String label = "请输入",
+  String? hint,
   String? origin,
   Function? onConfirm,
   Function? onCancel,
@@ -15,18 +17,21 @@ Future<String?> showTextInputDialog({
   final ctrl = TextEditingController(text: origin);
   return NAlertDialog(
     dialogStyle: DialogStyle(titleDivider: true),
+    title: Padding(
+      padding: const EdgeInsets.only(top: 8.0, left: 8, right: 8),
+      child: Text(title),
+    ),
     content: Padding(
-      padding: const EdgeInsets.only(top: 32, left: 8.0, right: 8, bottom: 8),
+      padding: const EdgeInsets.only(top: 8, left: 8.0, right: 8,bottom: 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(title),
           TextField(
             controller: ctrl,
             decoration: InputDecoration(
               border: const OutlineInputBorder(),
-              labelText: "请输入",
-              hintText: "$origin",
+              labelText: label,
+              hintText: hint,
             ),
           )
         ],
