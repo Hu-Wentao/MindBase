@@ -35,6 +35,7 @@ class MindBaseApp extends StatelessWidget {
             // 配置 AutoRoute
             MaterialApp.router(
           debugShowCheckedModeBanner: false,
+          // routerDelegate: AutoRouterDelegate(_router),
           routerDelegate: _router.delegate(),
           routeInformationParser: _router.defaultRouteParser(),
           title: 'Mind Base',

@@ -1,9 +1,10 @@
 import 'package:adaptive_navigation/adaptive_navigation.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart';
-import 'package:line_icons/line_icons.dart';
+import 'package:mind_base/src/app/infra/ui/route/routes_config.gr.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/text_input_dialog.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/feedback/infra/ui/widget/feedback_btn.dart';
@@ -23,6 +24,8 @@ import 'package:provider/provider.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 import 'package:adaptive_breakpoints/adaptive_breakpoints.dart';
 
+import 'auto_adaptive_scaffold.dart';
+
 part 'workspace_screen.dart';
 
 part 'team_screen.dart';
@@ -39,17 +42,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int selectedIndex = 0;
-
-  AdaptiveScaffoldDestination get selectedDest => _destinations[selectedIndex];
+  AdaptiveScaffoldDestination selectedDest(activeIndex) =>
+      _destinations[activeIndex];
 
   @override
-  Widget build(BuildContext context) => AdaptiveNavigationScaffold(
-        appBar: _buildAppbar(context),
-        body: _buildBody(context),
-        selectedIndex: selectedIndex,
+  Widget build(BuildContext context) => AutoAdaptiveScaffold(
+        appBarBuilder: _buildAppbar,
+        routes: const [
+          WorkspaceRoute(),
+          TeamScreenRoute(),
+          DiscoverScreenRoute(),
+          SettingScreenRoute(),
+        ],
         destinations: _destinations,
-        onDestinationSelected: (i) => setState(() => selectedIndex = i),
         // drawerHeader: _buildDrawerHeader(context),
         // navigationTypeResolver: (ctx) {
         //   if (MediaQuery.of(context).size.width > 600) {
@@ -80,49 +85,41 @@ class _HomePageState extends State<HomePage> {
     ),
   ];
 
-  _buildAppbar(BuildContext context) => AdaptiveAppBar(
-        title: _buildAppbarTitle(context, selectedIndex, selectedDest),
+  PreferredSizeWidget _buildAppbar(BuildContext c, TabsRouter tabsRouter) =>
+      AdaptiveAppBar(
+        // leading: tabsRouter.urlState.segments.length <= 3
+        //     ? Container()
+        //     : const AutoLeadingButton(),
+        title: _buildAppbarTitle(c, tabsRouter),
         actions: [
-          _buildUserInfoTile(context),
+          _buildUserInfoTile(c),
           const FeedbackBtn(),
         ],
       );
 
-  _buildAppbarTitle(BuildContext context, int selectedIndex,
-      AdaptiveScaffoldDestination selectedDest) {
+  _buildAppbarTitle(BuildContext context, TabsRouter tabsRouter) {
+    final selectedIndex = tabsRouter.activeIndex;
+    // print("debug #${}, #${tabsRouter.urlState.url}, #${tabsRouter.urlState
+    //     .flatten}, #${tabsRouter.urlState.segments}");
+    AdaptiveScaffoldDestination dest = selectedDest(selectedIndex);
     switch (selectedIndex) {
       case 0:
-        return const WorkspaceSelectorTitle();
+        return WorkspaceSelectorTitle(path: tabsRouter.urlState.path);
       case 1:
         return Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(selectedDest.title),
+          child: Text(dest.title),
         );
       case 2:
         return Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(selectedDest.title),
+          child: Text(dest.title),
         );
       case 3:
         return Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(selectedDest.title),
+          child: Text(dest.title),
         );
-      default:
-        throw "error 未知的 selectedIndex[$selectedIndex]";
-    }
-  }
-
-  _buildBody(BuildContext context) {
-    switch (selectedIndex) {
-      case 0:
-        return const WorkspaceScreen();
-      case 1:
-        return const TeamScreen();
-      case 2:
-        return const DiscoverScreen();
-      case 3:
-        return const SettingScreen();
       default:
         throw "error 未知的 selectedIndex[$selectedIndex]";
     }
@@ -160,4 +157,3 @@ class _HomePageState extends State<HomePage> {
         },
       );
 }
-

@@ -1,20 +1,25 @@
 part of 'home.dart';
 
 class WorkspaceSelectorTitle extends StatelessWidget {
-  const WorkspaceSelectorTitle({Key? key}) : super(key: key);
+  final String path;
+
+  const WorkspaceSelectorTitle({Key? key, this.path = ''}) : super(key: key);
 
   //选择工作空间, 如果已打开则选择, 如果未开打,则先打开,然后再选择
   static const selectWorkspaceEvt = 'open_workspace_';
   static const createWorkspaceEvt = 'create_workspace';
 
   @override
-  Widget build(BuildContext context) =>
-      Consumer2<WorkspaceManagerProvider, WorkspaceProvider>(
+  Widget build(BuildContext context) {
+    print("debug path $path");
+    return Consumer2<WorkspaceManagerProvider, WorkspaceProvider>(
         builder: (c, pManger, pWs, _) => RadiusInkWell(
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(pWs.openedWorkspace?.name ?? "请选择工作空间"),
+              Text((path == "/workspace" || pWs.openedWorkspace?.name == null)
+                  ? "请选择工作空间"
+                  : pWs.openedWorkspace!.name),
               const SizedBox(width: 8),
               PopupMenuButton<String>(
                 itemBuilder: (ctx) => [
@@ -53,6 +58,8 @@ class WorkspaceSelectorTitle extends StatelessWidget {
                       if (value.startsWith(selectWorkspaceEvt)) {
                         final wsId = value.substring(selectWorkspaceEvt.length);
                         pManger.actOpenWorkspaceById(wsId);
+                        context.replaceRoute(
+                            WorkspaceScreenRoute(workspaceId: wsId));
                         return;
                       }
                       print("debug#未知的value#$value");
@@ -64,10 +71,25 @@ class WorkspaceSelectorTitle extends StatelessWidget {
           ),
         ),
       );
+  }
+}
+
+class EmptyWorkspaceScreen extends StatelessWidget {
+  const EmptyWorkspaceScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: Text("尚未打开工作空间"));
+  }
 }
 
 class WorkspaceScreen extends StatefulWidget {
-  const WorkspaceScreen({Key? key}) : super(key: key);
+  const WorkspaceScreen({
+    Key? key,
+    @PathParam() this.workspaceId = '',
+  }) : super(key: key);
+
+  final String workspaceId;
 
   @override
   State<WorkspaceScreen> createState() => _WorkspaceScreenState();
