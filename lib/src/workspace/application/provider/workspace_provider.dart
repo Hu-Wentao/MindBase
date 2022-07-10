@@ -102,7 +102,7 @@ class WorkspaceProvider extends ProviderSidecar {
   ) async =>
       await actWrapper(() => setInitialized("更新属性 [$dto]", () async {
             if (dto == null) return null;
-            await _metaService!.updateAttribute(origin, dto);
+            await _metaService!.updateAttribute(origin.toDto(), dto);
           }));
 
   Future<RecordMetaDto?> actQueryMeta(String metaId) =>

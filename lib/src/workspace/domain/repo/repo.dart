@@ -38,7 +38,8 @@ class WorkspaceRepo {
   // @override
   Future<void> deleteById(String id) async => _workspaceAcc.deleteBy(id);
 
-  Stream<Workspace> findAllByTeam(String teamId) => _workspaceAcc.findAllByTeam(teamId).asyncMap(dtoToDomain);
+  Stream<Workspace> findAllByTeam(String teamId) =>
+      _workspaceAcc.findAllByTeam(teamId).asyncMap(dtoToDomain);
 }
 
 // 需要传入指定集合ID, 因此无法注入
@@ -94,23 +95,23 @@ class MetaDtoRepo {
     final readyCreateAttrs =
         metaDto.attrs.where((e) => readyCreateKs.contains(e.k));
     for (final attr in readyCreateAttrs) {
-      await updateAttribute(null, attr);
+      await updateAttribute(originMeta, attr);
     }
   }
 
   /// 更新表属性
-  /// [originMeta]传null表示直接创建新列(请确保该列尚不存在)
-  Future updateAttribute(RecordMeta? originMeta, AttributeDto attr) async {
-    final index = originMeta?.attrs.indexWhere((at) => at.k == attr.k) ?? -1;
-    if ((index != -1)) {
+  /// [originMetaDto]传null表示直接创建新列(请确保该列尚不存在)
+  Future updateAttribute(RecordMetaDto originMetaDto, AttributeDto attr) async {
+    final index = originMetaDto.attrs.indexWhere((at) => at.k == attr.k);
+    if (index != -1) {
       // k已存在, 更新attr(只涉及Meta)
-      final dto = originMeta!.toDto();
+      final dto = originMetaDto;
       dto.attrs.replaceRange(index, index + 1, [attr]);
       await _update(dto);
       return;
     } else {
       // k不存在, 新增attr(更新Meta, 并操作对应的Record表)
-      final dto = originMeta!.toDto();
+      final dto = originMetaDto;
       dto.attrs.add(attr);
       await _update(dto);
       return await _createAttr(_serverDb, collectionId, attr);
