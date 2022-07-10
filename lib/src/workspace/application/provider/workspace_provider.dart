@@ -142,7 +142,8 @@ class WorkspaceProvider extends ProviderSidecar {
         metaId: queryGlobal ? null : metaId ?? (selectedMeta)?.id,
       );
 
-  Future<void> actSaveRecord(RecordDto? dto) => actWrapper(() async {
+  Future<BaseException?> actSaveRecord(RecordDto? dto) async =>
+      await actWrapper(() async {
         log("actSaveRecord ID[${dto?.id}]字段[${dto?.fields}]");
         // 无需set,因为插入成功后, watch会监听到新的变更
         if (dto == null) return;

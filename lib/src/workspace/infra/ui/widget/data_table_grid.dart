@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/workspace/application/provider/opened_workspace.dart';
 import 'package:mind_base/src/workspace/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
@@ -70,7 +72,7 @@ class RecordDataGrid extends StatelessWidget {
               .firstWhere((element) => element.id == ettId.value)
               .toDto()
               .updateBy(row);
-          pWorkspace.actSaveRecord(dto);
+          pWorkspace.actSaveRecord(dto).thenDialog(context);
           // widget.onSaveRecord(dto); // 同步到服务器
         },
         onSelected: (_) {
@@ -157,7 +159,7 @@ class DataFrameTitlePluto extends StatelessWidget {
   final RecordMeta meta;
   final OpenedWorkspace openedWorkspace;
   final PlutoGridStateManager stateManager;
-  final Future<void> Function(RecordDto? dto) onSaveRecord;
+  final Future<BaseException?> Function(RecordDto? dto) onSaveRecord;
   final Future<void> Function(RecordMetaDto? dto) onSaveMeta;
   final _kRecordBuilder = GlobalKey<FormBuilderState>();
   final kMetaBuilder = GlobalKey<FormBuilderState>();
@@ -191,7 +193,7 @@ class DataFrameTitlePluto extends StatelessWidget {
                     openedWorkspace: openedWorkspace,
                     kRecordBuilder: _kRecordBuilder,
                   ),
-                ),
+                ).thenDialog(c),
                 icon: const Icon(Icons.add),
                 label: const Text("新增一行"),
               ),

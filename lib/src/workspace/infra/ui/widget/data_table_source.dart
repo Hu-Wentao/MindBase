@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/workspace/application/provider/workspace_provider.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
@@ -138,7 +139,7 @@ class _GridRefCellWidgetState extends State<GridRefCellWidget> {
                             metaId: widget.meta.id) // todo 性能优化
                         .toDto()
                         .updateOnlyBy(rdCtx.column, selectRefRecordId);
-                    pWorkspace.actSaveRecord(dto);
+                    pWorkspace.actSaveRecord(dto).thenDialog(context);
                     // controller.text = event.row!.cells[selectFieldName]!.value.toString();
                   },
                 );
