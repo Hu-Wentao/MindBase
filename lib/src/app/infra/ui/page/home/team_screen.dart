@@ -55,6 +55,7 @@ class _TeamScreenState extends State<TeamScreen> {
     final lst = pManger.workspaces.keys.toList();
     return Expanded(
       child: SingleChildScrollView(
+        controller: ScrollController(),
         child: ExpansionPanelList(
           expansionCallback: _switchExpanded,
           children: List.generate(
