@@ -54,7 +54,7 @@ class RecordDataGrid extends StatelessWidget {
                   queryMetaFn: pWorkspace.openedWorkspace!.queryMeta,
                   allMetas: () => pWorkspace.metaList,
                 ).then((value) {
-                  return pWorkspace.actMetaUpdateAttr(origin, value);
+                  return pWorkspace.actMetaUpdateAttr(origin, value).thenDialog(context);
                 });
                 break;
               default:
