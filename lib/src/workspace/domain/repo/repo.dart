@@ -101,20 +101,18 @@ class MetaDtoRepo {
 
   /// 更新表属性
   /// [originMetaDto]传null表示直接创建新列(请确保该列尚不存在)
-  Future updateAttribute(RecordMetaDto originMetaDto, AttributeDto attr) async {
-    final index = originMetaDto.attrs.indexWhere((at) => at.k == attr.k);
+  Future updateAttribute(RecordMetaDto dto, AttributeDto attr) async {
+    final index = dto.attrs.indexWhere((at) => at.k == attr.k);
     if (index != -1) {
       // k已存在, 更新attr(只涉及Meta)
-      final dto = originMetaDto;
       dto.attrs.replaceRange(index, index + 1, [attr]);
       await _update(dto);
       return;
     } else {
       // k不存在, 新增attr(更新Meta, 并操作对应的Record表)
-      final dto = originMetaDto;
       dto.attrs.add(attr);
       await _update(dto);
-      return await _createAttr(_serverDb, collectionId, attr);
+      return await _createAttr(_serverDb, dto.id, attr);
     }
   }
 
@@ -270,6 +268,8 @@ class RecordDtoRepo {
     }
   }
 
+  /// 创建[Record]表
+  /// 集合id即对应的[RecordMeta]的id
   /// [teamId] 为空表示"所有人可读写"
   /// 默认权限为 "团队内可读写"
   /// [meta] 应当是固定内存地址的对象,这样可以确保meta本身是实时更新的
@@ -305,7 +305,7 @@ Future _createAttr(
 ) async {
   print('debug 为Record集合[$metaId]创建属性# create attr[$attr]');
   await _db.createStringAttribute(
-    collectionId: metaId, // ==Record集合Id
+    collectionId: metaId, // MetaId即==Record集合的Id
     key: attr.propId, // Appwrite BUG,属性名称不能用纯数字
     size: 511,
     xrequired: false,
