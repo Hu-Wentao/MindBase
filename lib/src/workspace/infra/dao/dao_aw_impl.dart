@@ -257,3 +257,19 @@ class RecordEttAccessor extends BaseAppwriteAccessor<RecordDto>
   Map<String, dynamic> dtoToJson(RecordDto dto) =>
       RecordDtoAppwriteX(dto).toJson();
 }
+
+class MetaViewEttAccessor extends BaseAppwriteAccessor<MetaViewDto>
+    with AppwriteAccessorWatchableMx<MetaViewDto> {
+  const MetaViewEttAccessor(Database db, String metaId) : super(db, metaId);
+
+  @override
+  RealtimeChannelHub get hub => sl<RealtimeChannelHub>();
+
+  @override
+  MetaViewDto jsonToDto(Map<String, dynamic> json) =>
+      MetaViewDtoAppwriteX.fromJson(json);
+
+  @override
+  Map<String, dynamic> dtoToJson(MetaViewDto dto) =>
+      MetaViewDtoAppwriteX(dto).toJson();
+}
