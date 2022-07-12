@@ -14,12 +14,12 @@ class MetaView implements IEtt<String> {
   final String id;
   final RecordMeta meta; // 组装得到
   final ViewType type; // 列类型
-  final List<String> colVisible; // 列排序与可见性
+  final List<String> cols; // 列排序与可见性
 
   MetaView(
     this.id,
     this.meta,
     this.type,
-    this.colVisible,
+    this.cols,
   );
 }

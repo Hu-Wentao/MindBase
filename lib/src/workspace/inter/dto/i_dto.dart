@@ -234,24 +234,31 @@ class MetaViewDto extends IEntityDto {
   @override
   String id;
   ViewType type;
-  List<String> colVisible;
+  List<String> cols;
 
   MetaViewDto(
     this.id,
     this.type,
-    this.colVisible,
+    this.cols,
   );
 
   static fromDomain(MetaView metaView) => MetaViewDto(
         metaView.id,
         metaView.type,
-        metaView.colVisible,
+        metaView.cols,
       );
 
   @override
   Map<String, dynamic> toJson() {
     throw UnimplementedError("使用[$runtimeType]相关Extension的方法");
   }
+
+  // static builder({required String id, required ViewType type, required List<String> cols}) {}
+  MetaViewDto.builder({
+    this.id = '',
+    this.type = ViewType.sheet,
+    this.cols = const [],
+  });
 }
 
 extension MethodX on Method {
