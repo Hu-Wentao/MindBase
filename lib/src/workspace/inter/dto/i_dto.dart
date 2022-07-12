@@ -6,6 +6,7 @@ import 'package:mind_base/src/core/infra/dto/dto_json_impl.dart';
 import 'package:mind_base/src/core/inter/i_dto.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
+import 'package:mind_base/src/workspace/domain/entity/meta_view.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:quiver/core.dart';
 
@@ -222,6 +223,34 @@ class RecordMetaDto extends IEntityDto {
   @override
   String toString() {
     return 'RecordMetaDto{id: $id, name: $name, memo: $memo, maxKey: $maxKey, attrs: $attrs, methods: $methods}';
+  }
+}
+
+extension MetaViewX on MetaView {
+  MetaView toDto() => MetaViewDto.fromDomain(this);
+}
+
+class MetaViewDto extends IEntityDto {
+  @override
+  String id;
+  ViewType type;
+  List<String> colVisible;
+
+  MetaViewDto(
+    this.id,
+    this.type,
+    this.colVisible,
+  );
+
+  static fromDomain(MetaView metaView) => MetaViewDto(
+        metaView.id,
+        metaView.type,
+        metaView.colVisible,
+      );
+
+  @override
+  Map<String, dynamic> toJson() {
+    throw UnimplementedError("使用[$runtimeType]相关Extension的方法");
   }
 }
 
