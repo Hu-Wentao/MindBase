@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:appwrite/models.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
+import 'package:mind_base/src/workspace/domain/entity/meta_view.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
@@ -125,12 +126,10 @@ extension IExprJsonDtoAppwriteX on IExprNodeDto {
               'IExprJsonDtoAppwriteX::toJson#未处理的类型[$runtimeType]');
 }
 
-// todo 重点单元测试
 extension RecordDtoAppwriteX on RecordDto {
   Map<String, dynamic> toJson() => fields.map((key, value) => MapEntry(
         PropertyX.getPropId(true, key), // 使用propId, 因为纯数值的属性名触发Appwrite的bug
-        jsonEncode(
-            RcdValueDtoAppwriteX(ValueDto.fromDomain(value)).toJson()),
+        jsonEncode(RcdValueDtoAppwriteX(ValueDto.fromDomain(value)).toJson()),
       ));
 
   static RecordDto fromDocument(Document doc) => fromJson(doc.data);
@@ -192,6 +191,22 @@ extension RecordMetaDtoAppwriteX on RecordMetaDto {
               .toList(),
     );
   }
+}
+
+extension MetaViewDtoAppwriteX on MetaViewDto {
+  toJson() => {
+        "id": id,
+        "type": type.name,
+        "cols": cols.join(","), // 改为以 , 分隔的String
+      };
+
+  static MetaViewDto fromDocument(Document doc) => fromJson(doc.data);
+
+  static MetaViewDto fromJson(Map<String, dynamic> json) => MetaViewDto.builder(
+        id: json['id'] as String,
+        type: ViewType.values.byName(json['type'] as String),
+        cols: (json['cols'] as String).split(","),
+      );
 }
 
 extension MethodDtoAppwriteX on MethodDto {
