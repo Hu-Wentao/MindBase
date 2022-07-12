@@ -124,7 +124,6 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
           builder: (c, pWorkspace, _) => FutureBuilder(
               future: pManager.actOpenWorkspaceById(widget.workspaceId),
               builder: (c, snap) {
-                // print("debug#_buildWorkspaceDetail#snap.connectionState: ${}");
                 return (pWorkspace.openedWorkspace?.id != widget.workspaceId &&
                         snap.connectionState != ConnectionState.done)
                     ? _buildWorkspaceSelector(context, pManager)
@@ -171,11 +170,11 @@ class _MetaTableListState extends State<MetaTableList> {
   final _kAttrBuilder = GlobalKey<FormBuilderState>();
   final _kMethodBuilder = GlobalKey<FormBuilderState>();
 
-  get pWorkspace => widget.pWorkspace;
+  WorkspaceProvider get pWorkspace => widget.pWorkspace;
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        width: 200,
+        width: 240,
         child: Stack(
           children: [
             // MetaList
@@ -183,39 +182,55 @@ class _MetaTableListState extends State<MetaTableList> {
               builder: (c, p, _) => (p == null)
                   // 此时本组件不应该存在
                   ? const Text("Error selectedWorkspace==null")
-                  : ListView.builder(
-                      itemCount: p.openedMetas.length,
-                      itemBuilder: (c, i) => ListTile(
-                        selected: p.openedMetas[i].meta.id ==
-                            pWorkspace.selectedMeta?.id,
-                        title: Text(p.openedMetas[i].meta.name),
-                        onTap: () =>
-                            pWorkspace.actSelectOpenMeta(p.openedMetas[i]),
-                        trailing: PopupMenuButton<String>(
-                          itemBuilder: (ctx) => [
-                            const PopupMenuItem(
-                              value: 'deleteViewEvt',
-                              child: ListTile(
-                                leading: Icon(Icons.delete),
-                                title: Text("删除视图"),
-                              ),
-                            ),
-                          ],
-                          onSelected: (value) {
-                            // 选中Item后,在这里会被二次调用
-                            switch (value) {
-                              case 'deleteViewEvt':
-                                pWorkspace
-                                    .actRemoveMeta(p.openedMetas[i].meta.id);
-                                break;
-                              default:
-                                print("debug#未知的value#$value");
-                                break;
-                            }
-                          },
+                  : SingleChildScrollView(
+                    controller: ScrollController(),
+                    child: ExpansionPanelList.radio(
+                        expansionCallback: (panelIndex, isExpanded) {
+                          if (isExpanded) {
+                            pWorkspace
+                                .actSelectOpenMeta(p.openedMetas[panelIndex]);
+                          }
+                        },
+                        children: List.generate(
+                          p.openedMetas.length,
+                          (i) => ExpansionPanelRadio(
+                              value: i,
+                                headerBuilder: (c, ex) => ListTile(
+                                    selected: p.openedMetas[i].meta.id ==
+                                        pWorkspace.selectedMeta?.id,
+                                    title: Text(p.openedMetas[i].meta.name),
+                                    onTap: () => pWorkspace
+                                        .actSelectOpenMeta(p.openedMetas[i]),
+                                    trailing: PopupMenuButton<String>(
+                                      itemBuilder: (ctx) => [
+                                        const PopupMenuItem(
+                                          value: 'deleteViewEvt',
+                                          child: ListTile(
+                                            leading: Icon(Icons.delete),
+                                            title: Text("删除表"),
+                                          ),
+                                        ),
+                                      ],
+                                      onSelected: (value) {
+                                        // 选中Item后,在这里会被二次调用
+                                        switch (value) {
+                                          case 'deleteViewEvt':
+                                            pWorkspace.actRemoveMeta(
+                                                p.openedMetas[i].meta.id);
+                                            break;
+                                          default:
+                                            print("debug#未知的value#$value");
+                                            break;
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                // todo 展示表对应的View
+                                body: const ListTile(title: Text("todo"),)),
                         ),
+                        animationDuration: const Duration(microseconds: 50),
                       ),
-                    ),
+                  ),
             ),
             // 新建Meta
             Column(
