@@ -230,14 +230,18 @@ extension RecordMetaDtoAppwriteX on RecordMetaDto {
 
 extension TableViewAppwriteX on TableView {
   toJson() => {
+        "index": index,
         "type": type.name,
+        "name": name,
         "cols": cols.join(","), // 改为以 , 分隔的String
       };
 
   static TableView fromDocument(Document doc) => fromJson(doc.data);
 
   static TableView fromJson(Map<String, dynamic> json) => TableView.builder(
+        index: json['index'] as int,
         type: ViewType.values.byName(json['type'] as String),
+        name: json['name'] as String,
         cols: (json['cols'] as String).split(","),
       );
 }

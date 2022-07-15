@@ -57,12 +57,44 @@ enum ViewType {
 }
 
 class TableView {
+  final int index; // ==-1 表示新增的View
+  final String name; // 视图名称
   final ViewType type; // 列类型
   final List<String> cols; // 列排序与可见性
 
-  const TableView(this.type, this.cols);
+  const TableView(this.index, this.name, this.type, this.cols);
 
-  TableView.builder({this.type = ViewType.sheet, this.cols = const []});
+  // -1 表示在实际插入时，应当被修正为最后一个
+  TableView.builder({
+    this.index = -1,
+    this.name = '新增表格视图',
+    this.type = ViewType.sheet,
+    this.cols = const [],
+  });
+
+  TableView update({
+    int? index,
+    ViewType? type,
+    String? name,
+    List<String>? cols,
+  }) =>
+      TableView.builder(
+        index: index ?? this.index,
+        name: name ?? this.name,
+        type: type ?? this.type,
+        cols: cols ?? this.cols,
+      );
+
+  /// 将 ::index ==-1  的View更新为 [views]中最大的index
+  TableView updateIndex(List<TableView> views, TableView view) {
+    if (view.index != -1) return this;
+    views.sort((a, b) => a.index - b.index);
+    final index = views.last.index + 1;
+    return view.update(index: index);
+  }
+
+  @override
+  String toString() => 'TableView{index: $index, name: $name, type: $type, cols: $cols}';
 }
 
 enum AttrTp {
