@@ -16,6 +16,7 @@ import 'package:mind_base/src/workspace/application/provider/workspace_provider.
 import 'package:mind_base/src/constants/pubspec.yaml.g.dart';
 import 'package:mind_base/src/user/infra/ui/dialog/auth_dialog.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/confirm_dialog.dart';
+ import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/import_data_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/record_meta_edit_dialog.dart';
 import 'package:mind_base/src/core/infra/ui/widget/RadiusInkWell.dart';

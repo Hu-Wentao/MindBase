@@ -183,8 +183,8 @@ class _MetaTableListState extends State<MetaTableList> {
                   // 此时本组件不应该存在
                   ? const Text("Error selectedWorkspace==null")
                   : SingleChildScrollView(
-                    controller: ScrollController(),
-                    child: ExpansionPanelList.radio(
+                      controller: ScrollController(),
+                      child: ExpansionPanelList.radio(
                         expansionCallback: (panelIndex, isExpanded) {
                           if (isExpanded) {
                             pWorkspace
@@ -194,43 +194,74 @@ class _MetaTableListState extends State<MetaTableList> {
                         children: List.generate(
                           p.openedMetas.length,
                           (i) => ExpansionPanelRadio(
-                              value: i,
-                                headerBuilder: (c, ex) => ListTile(
-                                    selected: p.openedMetas[i].meta.id ==
-                                        pWorkspace.selectedMeta?.id,
-                                    title: Text(p.openedMetas[i].meta.name),
-                                    onTap: () => pWorkspace
-                                        .actSelectOpenMeta(p.openedMetas[i]),
-                                    trailing: PopupMenuButton<String>(
-                                      itemBuilder: (ctx) => [
-                                        const PopupMenuItem(
-                                          value: 'deleteViewEvt',
-                                          child: ListTile(
-                                            leading: Icon(Icons.delete),
-                                            title: Text("删除表"),
-                                          ),
-                                        ),
-                                      ],
-                                      onSelected: (value) {
-                                        // 选中Item后,在这里会被二次调用
-                                        switch (value) {
-                                          case 'deleteViewEvt':
-                                            pWorkspace.actRemoveMeta(
-                                                p.openedMetas[i].meta.id);
-                                            break;
-                                          default:
-                                            print("debug#未知的value#$value");
-                                            break;
-                                        }
-                                      },
+                            value: i,
+                            headerBuilder: (c, ex) => ListTile(
+                              selected: p.openedMetas[i].meta.id ==
+                                  pWorkspace.selectedMeta?.id,
+                              title: Text(p.openedMetas[i].meta.name),
+                              onTap: () => pWorkspace
+                                  .actSelectOpenMeta(p.openedMetas[i]),
+                              trailing: PopupMenuButton<String>(
+                                itemBuilder: (ctx) => [
+                                  const PopupMenuItem(
+                                      value: "newTableViewSheet",
+                                      child: ListTile(
+                                        leading: Icon(Icons.add_chart_rounded),
+                                        title: Text("新增表格视图"),
+                                      )),
+                                  const PopupMenuItem(
+                                    value: 'deleteViewEvt',
+                                    child: ListTile(
+                                      leading: Icon(Icons.delete),
+                                      title: Text("删除表"),
                                     ),
                                   ),
-                                // todo 展示表对应的View
-                                body: const ListTile(title: Text("todo"),)),
+                                ],
+                                onSelected: (value) {
+                                  // 选中Item后,在这里会被二次调用
+                                  switch (value) {
+                                    case 'newTableViewSheet':
+                                      pWorkspace
+                                          .actNewTableView(ViewType.sheet,
+                                              p.openedMetas[i].meta)
+                                          .thenDialog(c);
+                                      break;
+                                    case 'deleteViewEvt':
+                                      pWorkspace
+                                          .actRemoveMeta(
+                                              p.openedMetas[i].meta.id)
+                                          .thenDialog(c);
+                                      break;
+                                    default:
+                                      print("debug#未知的value#$value");
+                                      break;
+                                  }
+                                },
+                              ),
+                            ),
+                            // todo 展示表对应的View
+                            // body: const ListTile(title: Text("todo")),
+                            body: ListView.separated(
+                              shrinkWrap: true,
+                              itemCount: p.openedMetas[i].meta.views.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final v = p.openedMetas[i].meta.views[index];
+                                return ListTile(
+                                  title: Text(v.name),
+                                  onTap: () => pWorkspace.actSelectView(v),
+                                );
+                              },
+                              separatorBuilder:
+                                  (BuildContext context, int index) =>
+                                      Container(
+                                          height: 1.0,
+                                          color: const Color(0xfff2f2f2)),
+                            ),
+                          ),
                         ),
                         animationDuration: const Duration(microseconds: 50),
                       ),
-                  ),
+                    ),
             ),
             // 新建Meta
             Column(

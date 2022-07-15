@@ -5,6 +5,7 @@ import 'package:dart_appwrite/dart_appwrite.dart' as server;
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
+import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 
@@ -191,6 +192,20 @@ class MetaDtoRepo {
   findAllBy(String metaName) => _metaAcc.findAllBy(metaName);
 
   deleteBy(String metaId) => _metaAcc.deleteBy(metaId);
+  /// 更新TableView视图, [view]的index为-1表示新增
+  updateTableView(RecordMetaDto dto, TableView view) async{
+    final index = view.index;
+    if (index != -1) {
+      // view 已存在, 更新view(只涉及Meta)
+      dto.views.replaceRange(index, index + 1, [view]);
+      await _update(dto);
+      return;
+    } else {
+      // k不存在, 新增view
+      dto.views.add(view);
+      return await _update(dto);
+    }
+  }
 }
 
 class RecordDtoRepo {

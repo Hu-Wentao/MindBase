@@ -6,6 +6,7 @@ import 'package:mind_base/src/workspace/application/service/workspace_service.da
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/workspace/domain/repo/repo.dart';
+import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/import_data_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/widget/data_table_source.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
@@ -163,6 +164,15 @@ class WorkspaceProvider extends ProviderSidecar {
         await _recordDtoRepo(meta).deleteBy(ettId);
       });
 
+  Future<BaseException?> actNewTableView(ViewType type, RecordMeta meta) async =>
+      await actWrapper(() async => await _metaService!.updateTableView(
+            meta.toDto(),
+            TableView.builder(
+                name: "未命名[${type.name}]视图",
+                type: type,
+                cols: meta.properties.map((e) => e.propId).toList()),
+          ));
+
   /// 获取已缓存的数据源
   IRecordDataGridSource actGetDataSource([String? metaId]) =>
       _getByMetaId(metaId ?? selectedMeta!.id);
@@ -172,4 +182,9 @@ class WorkspaceProvider extends ProviderSidecar {
 
   List<Record> getCachedRecordsByMeta(String metaId) =>
       openedMetas.firstWhere((element) => element.id == metaId).records;
+
+  actSelectView(TableView v) {
+    // todo
+    print("debug actSelectView $v");
+  }
 }

@@ -1,7 +1,7 @@
 import 'package:dart_appwrite/dart_appwrite.dart';
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/repo/repo.dart';
+import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 
 /// 有状态服务, 不能依赖注入
@@ -41,5 +41,10 @@ class MetaService {
 
   updateAttribute(RecordMetaDto origin, AttributeDto dto) {
     return _metaDtoRepo.updateAttribute(origin, dto);
+  }
+
+  /// view index==-1表示新增
+  updateTableView(RecordMetaDto origin, TableView view) {
+    return _metaDtoRepo.updateTableView(origin, view);
   }
 }
