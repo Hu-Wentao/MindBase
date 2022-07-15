@@ -110,10 +110,13 @@ class RecordMetaDto extends IEntityDto {
     required this.name,
     required this.memo,
     required this.maxKey,
-    this.attrs = const [],
-    this.methods = const [],
-    this.views = const [],
-  });
+    List<AttributeDto>? attrs,
+    List<MethodDto>? methods,
+    List<TableView>? views,
+  })  : // const [] 会导致 .add 方法报错
+        attrs = attrs ?? [],
+        methods = methods ?? [],
+        views = views ?? [];
 
   AttributeDto findAttr(int k) => attrs.firstWhere((element) => element.k == k);
 
@@ -135,20 +138,19 @@ class RecordMetaDto extends IEntityDto {
     String name = "",
     String memo = "",
     List<AttributeDto>? attributes,
-    List<MethodDto> methods = const [],
+    List<MethodDto>? methods,
+    List<TableView>? views,
   }) {
     final metaId = id ??= ObjectIdX.createHex;
     final attrs = attributes ??
         [
           AttributeDto.builder(
-            metaId: metaId,
             k: 0,
             name: "ID",
             memo: "系统生成的唯一ID",
             // expr: Expression.field(metaId, 0, AttrType.objectId),
           ),
           AttributeDto.builder(
-            metaId: metaId,
             k: 1,
             name: "metaId",
             memo: "元数据ID",
@@ -162,12 +164,17 @@ class RecordMetaDto extends IEntityDto {
       maxKey: attrs.length,
       attrs: attrs,
       methods: methods,
+      views: views,
     );
   }
 
   // 从Form中获取的Map
-  RecordMetaDto build(Map<String, String> map, List<AttributeDto> attributes,
-          List<MethodDto> methods) =>
+  RecordMetaDto build(
+    Map<String, String> map,
+    List<AttributeDto> attributes,
+    List<MethodDto> methods,
+    List<TableView>? views,
+  ) =>
       RecordMetaDto(
         id: (map['id']!),
         name: map['name']!,
@@ -175,6 +182,7 @@ class RecordMetaDto extends IEntityDto {
         maxKey: int.parse(map['maxKey']!),
         attrs: attributes,
         methods: methods,
+        views: views,
       );
 
   factory RecordMetaDto.fromForm(
@@ -200,6 +208,7 @@ class RecordMetaDto extends IEntityDto {
         maxKey: meta.maxKey,
         attrs: meta.attrs.map((e) => e.toDto()).toList(),
         methods: meta.methods.map((e) => e.toDto()).toList(),
+        views: meta.views,
       );
 
   @override
@@ -227,7 +236,6 @@ class RecordMetaDto extends IEntityDto {
     return 'RecordMetaDto{id: $id, name: $name, memo: $memo, maxKey: $maxKey, attrs: $attrs, methods: $methods}';
   }
 }
-
 
 extension MethodX on Method {
   MethodDto toDto() => MethodDto.ofDomain(this);
