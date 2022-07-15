@@ -10,7 +10,7 @@ main() {
         TableView.builder(index: 4),
       ];
       final t = TableView.builder(type: ViewType.sheet, cols: []);
-      final t2 = t.updateIndex(ts, t);
+      final t2 = t.updateIndex(ts);
       expect(t2.index, 5);
     });
   });
