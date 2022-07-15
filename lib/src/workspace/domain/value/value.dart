@@ -90,12 +90,14 @@ class TableView {
   /// 将 ::index ==-1  的View更新为 [views]中最大的index
   TableView updateIndex(List<TableView> views) {
     if (this.index != -1) return this;
-    final index = views.map((e)=>e.index).reduce(math.max) + 1;
+    final index =
+        views.isEmpty ? 1 : views.map((e) => e.index).reduce(math.max) + 1;
     return update(index: index);
   }
 
   @override
-  String toString() => 'TableView{index: $index, name: $name, type: $type, cols: $cols}';
+  String toString() =>
+      'TableView{index: $index, name: $name, type: $type, cols: $cols}';
 }
 
 enum AttrTp {
