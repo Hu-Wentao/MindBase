@@ -120,19 +120,28 @@ class MetaDtoRepo {
   // 更新Meta记录
   _update(RecordMetaDto dto) async {
     try {
-      await _metaAcc.update(dto);
+      return await _metaAcc.update(dto);
     } on AppwriteException catch (e) {
       if (e.type == 'collection_not_found') {
         // 集合不存在,则创建集合
         // fixme 新建的集合为"所有人可读写"
         await createMetaCollection(null);
         // 再次尝试
-        await _update(dto);
+        return await _update(dto);
       } else if (e.type == 'document_not_found') {
         // 文档不存在,新建文档
         // await insertEntity(dto);
         throw "Meta记录尚未创建,必须创建后才能更新Meta!";
+      } else if (e.type == 'document_invalid_structure') {
+        // 文档结构错误（老版本创建导致），更新文档结构
+        // Invalid document structure: Unknown attribute: "views"
+        final reg = RegExp('Unknown attribute: "(.+)"');
+        final attrName = reg.firstMatch("${e.message}")!.group(1) ?? '';
+        await updateMetaDocStructure(attrName);
+        // 再次尝试
+        return await _update(dto);
       }
+      rethrow;
     } catch (e) {
       print('insert meta error[$e], type ${e.runtimeType}');
       rethrow;
@@ -162,38 +171,70 @@ class MetaDtoRepo {
       read: permit,
       write: permit,
     );
-    // 添加属性 <固定属性,无需用户指定>
-    await _serverDb.createStringAttribute(
-        collectionId: collectionId, key: 'name', size: 127, xrequired: true);
-    await _serverDb.createStringAttribute(
-        collectionId: collectionId,
-        key: 'memo',
-        size: 255,
-        xrequired: false,
-        xdefault: '');
-    await _serverDb.createIntegerAttribute(
-        collectionId: collectionId, key: 'maxKey', xrequired: true);
-    await _serverDb.createStringAttribute(
-        collectionId: collectionId,
-        key: 'attrs',
-        size: 65535,
-        xrequired: false,
-        xdefault: '');
-    await _serverDb.createStringAttribute(
-        collectionId: collectionId,
-        key: 'methods',
-        size: 65535,
-        xrequired: false,
-        xdefault: '');
+    for (final attr in metaStructure.keys) {
+      await updateMetaDocStructure(attr);
+    }
   }
+
+  /// 更新meta文档的属性
+  /// 一般用于老版本数据结构升级
+  updateMetaDocStructure(String attributeName) async {
+    final structureCallback = metaStructure[attributeName];
+    if (structureCallback == null) {
+      throw '未知的RecordMeta属性名称: $attributeName';
+    } else {
+      await structureCallback.call(collectionId, _serverDb);
+    }
+  }
+
+  final metaStructure = {
+    'name': (String collectionId, server.Database _serverDb) async =>
+        await _serverDb.createStringAttribute(
+            collectionId: collectionId,
+            key: 'name',
+            size: 127,
+            xrequired: true),
+    'memo': (String collectionId, server.Database _serverDb) async =>
+        await _serverDb.createStringAttribute(
+            collectionId: collectionId,
+            key: 'memo',
+            size: 255,
+            xrequired: false,
+            xdefault: ''),
+    'maxKey': (String collectionId, server.Database _serverDb) async =>
+        await _serverDb.createIntegerAttribute(
+            collectionId: collectionId, key: 'maxKey', xrequired: true),
+    'attrs': (String collectionId, server.Database _serverDb) async =>
+        await _serverDb.createStringAttribute(
+            collectionId: collectionId,
+            key: 'attrs',
+            size: 65535,
+            xrequired: false,
+            xdefault: ''),
+    'methods': (String collectionId, server.Database _serverDb) async =>
+        await _serverDb.createStringAttribute(
+            collectionId: collectionId,
+            key: 'methods',
+            size: 65535,
+            xrequired: false,
+            xdefault: ''),
+    'views': (String collectionId, server.Database _serverDb) async =>
+        await _serverDb.createStringAttribute(
+            collectionId: collectionId,
+            key: 'views',
+            size: 65535,
+            xrequired: false,
+            xdefault: ''),
+  };
 
   findById(String metaId) => _metaAcc.findById(metaId);
 
   findAllBy(String metaName) => _metaAcc.findAllBy(metaName);
 
   deleteBy(String metaId) => _metaAcc.deleteBy(metaId);
+
   /// 更新TableView视图, [view]的index为-1表示新增
-  updateTableView(RecordMetaDto dto, TableView view) async{
+  updateTableView(RecordMetaDto dto, TableView view) async {
     final index = view.index;
     if (index != -1) {
       // view 已存在, 更新view(只涉及Meta)
