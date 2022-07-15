@@ -6,7 +6,6 @@ import 'package:mind_base/src/core/infra/dto/dto_json_impl.dart';
 import 'package:mind_base/src/core/inter/i_dto.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
-import 'package:mind_base/src/workspace/domain/entity/meta_view.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:quiver/core.dart';
 
@@ -104,6 +103,7 @@ class RecordMetaDto extends IEntityDto {
   int maxKey; // 等于Table中出现过key的数量, 用于新增Attr/Method,只能增加
   List<AttributeDto> attrs;
   List<MethodDto> methods;
+  List<TableView> views;
 
   RecordMetaDto({
     required this.id,
@@ -112,6 +112,7 @@ class RecordMetaDto extends IEntityDto {
     required this.maxKey,
     this.attrs = const [],
     this.methods = const [],
+    this.views = const [],
   });
 
   AttributeDto findAttr(int k) => attrs.firstWhere((element) => element.k == k);
@@ -218,6 +219,7 @@ class RecordMetaDto extends IEntityDto {
         maxKey: maxKey,
         attrs: attrs,
         methods: methods,
+        views: views,
       );
 
   @override
@@ -226,40 +228,6 @@ class RecordMetaDto extends IEntityDto {
   }
 }
 
-extension MetaViewX on MetaView {
-  MetaView toDto() => MetaViewDto.fromDomain(this);
-}
-
-class MetaViewDto extends IEntityDto {
-  @override
-  String id;
-  ViewType type;
-  List<String> cols;
-
-  MetaViewDto(
-    this.id,
-    this.type,
-    this.cols,
-  );
-
-  static fromDomain(MetaView metaView) => MetaViewDto(
-        metaView.id,
-        metaView.type,
-        metaView.cols,
-      );
-
-  @override
-  Map<String, dynamic> toJson() {
-    throw UnimplementedError("使用[$runtimeType]相关Extension的方法");
-  }
-
-  // static builder({required String id, required ViewType type, required List<String> cols}) {}
-  MetaViewDto.builder({
-    this.id = '',
-    this.type = ViewType.sheet,
-    this.cols = const [],
-  });
-}
 
 extension MethodX on Method {
   MethodDto toDto() => MethodDto.ofDomain(this);

@@ -51,6 +51,20 @@ class Error {
       };
 }
 
+enum ViewType {
+  sheet, // 列前缀 vs
+  form, // 列前缀  vf
+}
+
+class TableView {
+  final ViewType type; // 列类型
+  final List<String> cols; // 列排序与可见性
+
+  const TableView(this.type, this.cols);
+
+  TableView.builder({this.type = ViewType.sheet, this.cols = const []});
+}
+
 enum AttrTp {
   @Deprecated("考虑移除, 但需要先处理MongoJs相关转换问题")
   objectId, // 特殊处理的String类型, todo 考虑移除,直接用 String/ref/type表示; 但可能存在ObjectId相关转换的问题,需要谨慎处理

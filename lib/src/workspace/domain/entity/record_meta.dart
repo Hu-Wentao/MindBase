@@ -10,7 +10,7 @@ class RecordMeta implements IEtt<String> {
   int maxKey; // 等于Table中出现过key的数量, 用于新增Attr,只能增加
   List<Attribute> attrs; // 字段表
   List<Method> methods; // 方法表
-
+  List<TableView> views; // 视图表
   Map<int, Method> get methodMap =>
       Map.fromEntries(methods.map((e) => MapEntry(e.k, e)).toList());
 
@@ -24,6 +24,7 @@ class RecordMeta implements IEtt<String> {
     required this.maxKey,
     required this.attrs,
     required this.methods,
+    this.views = const [],
   });
 
   int nextKey() => maxKey + 1;
@@ -40,6 +41,7 @@ class RecordMeta implements IEtt<String> {
       maxKey: nextKey(),
       attrs: attrs..add(attr),
       methods: methods,
+      views: views,
       // properties: properties..add(attr),
     );
   }
@@ -64,6 +66,7 @@ class RecordMeta implements IEtt<String> {
     maxKey = meta.maxKey;
     attrs = meta.attrs;
     methods = meta.methods;
+    views = meta.views;
   }
 
   @override

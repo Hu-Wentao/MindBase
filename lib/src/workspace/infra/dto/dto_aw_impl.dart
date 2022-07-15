@@ -4,7 +4,6 @@ import 'dart:convert';
 
 import 'package:appwrite/models.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
-import 'package:mind_base/src/workspace/domain/entity/meta_view.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
@@ -165,11 +164,47 @@ extension RecordMetaDtoAppwriteX on RecordMetaDto {
         'methods': jsonEncode(
           methods.map((e) => MethodDtoAppwriteX(e).toJson()).toList(),
         ),
+        "views": jsonEncode(
+            views.map((e) => TableViewAppwriteX(e).toJson()).toList()),
       };
 
   static RecordMetaDto fromDocument(Document doc) => fromJson(doc.toFullJson());
 
   static RecordMetaDto fromJson(Map<String, dynamic> json) {
+    if (json['views'] != null) {
+      final a = json['attrs'] as String? ?? '';
+      final m = json['methods'] as String? ?? '';
+      final v = json['views'] as String? ?? '';
+      return RecordMetaDto(
+        id: (json['id'] as String?) ?? '请注入id或使用toFullJson',
+        name: json['name'] as String,
+        memo: json['memo'] as String? ?? '',
+        maxKey: json['maxKey'] as int,
+        attrs: a.isEmpty
+            ? []
+            : (jsonDecode(a) as List<dynamic>)
+                .map((e) =>
+                    AttributeDtoAppwriteX.fromJson(e as Map<String, dynamic>))
+                .toList(),
+        methods: m.isEmpty
+            ? []
+            : (jsonDecode(m) as List<dynamic>)
+                .map((e) =>
+                    MethodDtoAppwriteX.fromJson(e as Map<String, dynamic>))
+                .toList(),
+        views: v.isEmpty
+            ? []
+            : (jsonDecode(v) as List<dynamic>)
+                .map((e) =>
+                    TableViewAppwriteX.fromJson(v as Map<String, dynamic>))
+                .toList(),
+      );
+    } else {
+      return _fromJson_1_0_0(json);
+    }
+  }
+
+  static RecordMetaDto _fromJson_1_0_0(Map<String, dynamic> json) {
     final a = json['attrs'] as String? ?? '';
     final m = json['methods'] as String? ?? '';
     return RecordMetaDto(
@@ -193,17 +228,15 @@ extension RecordMetaDtoAppwriteX on RecordMetaDto {
   }
 }
 
-extension MetaViewDtoAppwriteX on MetaViewDto {
+extension TableViewAppwriteX on TableView {
   toJson() => {
-        "id": id,
         "type": type.name,
         "cols": cols.join(","), // 改为以 , 分隔的String
       };
 
-  static MetaViewDto fromDocument(Document doc) => fromJson(doc.data);
+  static TableView fromDocument(Document doc) => fromJson(doc.data);
 
-  static MetaViewDto fromJson(Map<String, dynamic> json) => MetaViewDto.builder(
-        id: json['id'] as String,
+  static TableView fromJson(Map<String, dynamic> json) => TableView.builder(
         type: ViewType.values.byName(json['type'] as String),
         cols: (json['cols'] as String).split(","),
       );
