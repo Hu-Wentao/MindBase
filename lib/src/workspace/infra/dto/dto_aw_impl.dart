@@ -196,7 +196,7 @@ extension RecordMetaDtoAppwriteX on RecordMetaDto {
             ? []
             : (jsonDecode(v) as List<dynamic>)
                 .map((e) =>
-                    TableViewAppwriteX.fromJson(v as Map<String, dynamic>))
+                    TableViewAppwriteX.fromJson(e as Map<String, dynamic>))
                 .toList(),
       );
     } else {
@@ -204,6 +204,7 @@ extension RecordMetaDtoAppwriteX on RecordMetaDto {
     }
   }
 
+  // 兼容 1.0.0版本，（实际上是兼容1.1之前的版本）
   static RecordMetaDto _fromJson_1_0_0(Map<String, dynamic> json) {
     final a = json['attrs'] as String? ?? '';
     final m = json['methods'] as String? ?? '';
