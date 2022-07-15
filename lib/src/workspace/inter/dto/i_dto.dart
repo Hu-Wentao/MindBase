@@ -218,9 +218,10 @@ class RecordMetaDto extends IEntityDto {
   RecordMeta toDm(QueryMetaFn toMeta) => toDomain(
         attrs.map((a) => a.toDomain(toMeta)).toList(),
         methods.map((e) => e.toDomain(toMeta)).toList(),
+        views,
       );
 
-  RecordMeta toDomain(List<Attribute> attrs, List<Method> methods) =>
+  RecordMeta toDomain(List<Attribute> attrs, List<Method> methods,List<TableView> views) =>
       RecordMeta(
         id: id,
         name: name,
@@ -233,7 +234,7 @@ class RecordMetaDto extends IEntityDto {
 
   @override
   String toString() {
-    return 'RecordMetaDto{id: $id, name: $name, memo: $memo, maxKey: $maxKey, attrs: $attrs, methods: $methods}';
+    return 'RecordMetaDto{id: $id, name: $name, memo: $memo, maxKey: $maxKey, attrs: $attrs, methods: $methods, views: $views}';
   }
 }
 
