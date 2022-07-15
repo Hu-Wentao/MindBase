@@ -201,8 +201,9 @@ class MetaDtoRepo {
       await _update(dto);
       return;
     } else {
+      final v = view.updateIndex(dto.views);
       // k不存在, 新增view
-      dto.views.add(view);
+      dto.views.add(v);
       return await _update(dto);
     }
   }

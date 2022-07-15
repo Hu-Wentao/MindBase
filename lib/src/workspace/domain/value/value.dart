@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:bson/bson.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -86,11 +88,10 @@ class TableView {
       );
 
   /// 将 ::index ==-1  的View更新为 [views]中最大的index
-  TableView updateIndex(List<TableView> views, TableView view) {
-    if (view.index != -1) return this;
-    views.sort((a, b) => a.index - b.index);
-    final index = views.last.index + 1;
-    return view.update(index: index);
+  TableView updateIndex(List<TableView> views) {
+    if (this.index != -1) return this;
+    final index = views.map((e)=>e.index).reduce(math.max) + 1;
+    return update(index: index);
   }
 
   @override
