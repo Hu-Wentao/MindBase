@@ -12,6 +12,7 @@ import 'package:mind_base/src/core/infra/ui/dialog/confirm_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/attribute_edit_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/record_edit_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/record_meta_edit_dialog.dart';
+import 'package:mind_base/src/workspace/infra/ui/widget/column_menu_delegate.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:provider/provider.dart';
@@ -38,14 +39,15 @@ class RecordDataGrid extends StatelessWidget {
         columns: data.cachedColumns,
         onLoaded: (loadedEvt) {
           // 为数据源绑定新的stateManager, 以便在数据源更新的时候,能够同时刷新UI
-          data.stateManager = loadedEvt.stateManager;
-          loadedEvt.stateManager.eventManager!
-              .listener((PlutoGridEvent plutoEvent) {
-            switch (plutoEvent.runtimeType) {
-              case PlutoGridInsertColumnEvent:
-                // final evt =
-                //     plutoEvent as PlutoGridInsertColumnEvent;
-                // final columnIdx = evt.index;
+          data.stateManager = loadedEvt.stateManager
+            // ..eventManager!.listener((PlutoGridEvent plutoEvent) {
+            //   switch (plutoEvent.runtimeType) {
+            //     default:
+            //       break;
+            //   }
+            // })
+            ..setColumnMenuDelegate(MindBaseColumnMenuDelegate(
+              onInsertCol: (context, stateManager, column, isInsertLeft) {
                 final origin = openedMeta.meta;
                 showAttributeEditDialog(
                   context: context,
@@ -54,13 +56,16 @@ class RecordDataGrid extends StatelessWidget {
                   queryMetaFn: pWorkspace.openedWorkspace!.queryMeta,
                   allMetas: () => pWorkspace.metaList,
                 ).then((value) {
-                  return pWorkspace.actMetaUpdateAttr(origin, value).thenDialog(context);
+                  return pWorkspace
+                      .actMetaUpdateAttr(origin, value)
+                      .thenDialog(context);
                 });
-                break;
-              default:
-                break;
-            }
-          });
+                // stateManager.insertColumn(
+                //   column,
+                //   isInsertLeft ? PlutoColumnInsertPosition.left : PlutoColumnInsertPosition.right,
+                // );
+              },
+            ));
         },
         onChanged: (_) {
           print("#debug #onChanged $_");
@@ -116,7 +121,7 @@ class RecordDataGrid extends StatelessWidget {
           // defaultCellPadding: 15,
           // defaultColumnTitlePadding: 15,
           // iconSize: 15,
-          enableColumnBorder: true,
+          // enableColumnBorder: true,
           // enableGridBorderShadow: true,
           enableMoveHorizontalInEditing: true,
           // enableRowColorAnimation: false,
@@ -124,14 +129,14 @@ class RecordDataGrid extends StatelessWidget {
           /// 以下两项配置列移动,
           enableMoveDownAfterSelecting: true,
           enterKeyAction: PlutoGridEnterKeyAction.editingAndMoveDown,
-          gridBorderRadius: BorderRadius.all(Radius.circular(10)),
-          gridPopupBorderRadius: BorderRadius.all(Radius.circular(7)),
-          scrollbarConfig: PlutoGridScrollbarConfig(
-            isAlwaysShown: false,
-            scrollbarThickness: 8,
-            scrollbarThicknessWhileDragging: 10,
-          ),
-          localeText: PlutoGridLocaleText.china(),
+          // gridBorderRadius: BorderRadius.all(Radius.circular(10)),
+          // gridPopupBorderRadius: BorderRadius.all(Radius.circular(7)),
+          // scrollbarConfig: PlutoGridScrollbarConfig(
+          //   isAlwaysShown: false,
+          //   scrollbarThickness: 8,
+          //   scrollbarThicknessWhileDragging: 10,
+          // ),
+          localeText: MindBaseLocalText.china(),
           //   columnFilterConfig: PlutoGridColumnFilterConfig(
           //     filters: const [
           //       ...FilterHelper.defaultFilters,
