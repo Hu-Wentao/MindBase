@@ -238,7 +238,7 @@ extension ColViewInfoAppwriteX on ColViewInfo {
 
   static ColViewInfo fromJson(Map<String, dynamic> json) => ColViewInfo(
         json['propId'] as String,
-        json['width'] as int,
+        json['width'] as double,
         json['visible'] as bool? ?? false,
   );
 }

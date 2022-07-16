@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:bson/bson.dart';
+import 'package:flutter/material.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -70,7 +71,7 @@ enum ColWidthType {
 /// 包含列propId和宽度
 class ColViewInfo {
   final String propId;
-  final int width;
+  final double width;
   final bool visible; // 不能合并到width
 
   const ColViewInfo(this.propId, this.width, this.visible);
@@ -80,7 +81,8 @@ class ColViewInfo {
 
   // 隐藏列
   // 如果没有特定列的propId，也表示隐藏改列
-  const ColViewInfo.visible(this.propId, [this.visible = true, this.width = -1]);
+  const ColViewInfo.visible(this.propId,
+      [this.visible = true, this.width = -1]);
 
   ColWidthType get colWidthType => width > 0
       ? ColWidthType.value
@@ -88,7 +90,7 @@ class ColViewInfo {
 
   ColViewInfo copyWith({
     String? propId,
-    int? width,
+    double? width,
     bool? visible,
   }) =>
       ColViewInfo(
@@ -98,7 +100,8 @@ class ColViewInfo {
       );
 
   @override
-  String toString() => 'ColViewInfo{propId: $propId, width: $width}';
+  String toString() =>
+      'ColViewInfo{propId: $propId, width: $width, visible: $visible}';
 }
 
 ///
@@ -146,6 +149,20 @@ class TableView {
   @override
   String toString() =>
       'TableView{vId: $vId, name: $name, type: $type, cols: $cols}';
+
+  /// 转换列，适配View
+  transformCols(List plutoCols) {
+    final r = [];
+    for (final c in cols) {
+      r.add(
+        plutoCols.firstWhere(
+            (col) => (col.key as ValueKey<String>).value == c.propId)
+          ..width = c.width
+          ..hide = !c.visible,
+      );
+    }
+    return r;
+  }
 }
 
 /// === AttrType （属性类型）相关值对象 ===
