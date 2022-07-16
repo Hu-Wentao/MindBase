@@ -233,12 +233,14 @@ extension ColViewInfoAppwriteX on ColViewInfo {
   toJson() => {
         "propId": propId,
         "width": width,
+        "visible": visible,
       };
 
   static ColViewInfo fromJson(Map<String, dynamic> json) => ColViewInfo(
         json['propId'] as String,
         json['width'] as int,
-      );
+        json['visible'] as bool? ?? false,
+  );
 }
 
 extension TableViewAppwriteX on TableView {
