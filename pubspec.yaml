@@ -89,11 +89,11 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
 
-#dependency_overrides:
-#  pluto_grid:
-#    git:
-#      url: https://github.com/Hu-Wentao/pluto_grid.git
-#      ref: feat_insert_column_menu_item
+dependency_overrides:
+  pluto_grid:
+    git:
+      url: https://e.coding.net/shuttlecloud/mindbase/pluto_grid.git
+      ref: fix_completion_pluto_grid_popup_on_evet
 #    path: D:\_proj\pluto_grid
 #  get_arch_core:
 #    path: ../get_arch/get_arch_core

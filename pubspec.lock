@@ -831,9 +831,11 @@ packages:
   pluto_grid:
     dependency: "direct main"
     description:
-      name: pluto_grid
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: "."
+      ref: fix_completion_pluto_grid_popup_on_evet
+      resolved-ref: "9cfeb4fb4feb5bffebf7a50634fbf4e04be2b5d1"
+      url: "https://e.coding.net/shuttlecloud/mindbase/pluto_grid.git"
+    source: git
     version: "5.0.3"
   pool:
     dependency: transitive

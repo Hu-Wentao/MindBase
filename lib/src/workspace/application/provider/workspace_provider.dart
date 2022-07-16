@@ -29,6 +29,8 @@ class WorkspaceProvider extends ProviderSidecar {
 
   OpenedMeta? selectedMeta;
 
+  TableView? selectedTableView; // 选中meta所适配的视图，可以为null
+
   WorkspaceProvider([this.openedWorkspace])
       : super(onCatch: ExceptionAdapter.of);
 
@@ -106,11 +108,11 @@ class WorkspaceProvider extends ProviderSidecar {
             await _metaService!.updateAttribute(origin.toDto(), dto);
           }));
 
-  Future<RecordMetaDto?> actQueryMeta(String metaId) =>
-      _metaService!.findById(metaId);
+  // Future<RecordMetaDto?> actQueryMeta(String metaId) =>
+  //     _metaService!.findById(metaId);
 
-  Future<List<RecordMetaDto>> actQueryMetaByName(String metaName) async =>
-      _metaService!.findAllBy(metaName).toList();
+  // Future<List<RecordMetaDto>> actQueryMetaByName(String metaName) async =>
+  //     _metaService!.findAllBy(metaName).toList();
 
   Future<BaseException?> actRemoveMeta(String metaId) async =>
       await actWrapper(() => setInitialized("删除Meta [$metaId]", () async {
@@ -186,5 +188,17 @@ class WorkspaceProvider extends ProviderSidecar {
   List<Record> getCachedRecordsByMeta(String metaId) =>
       openedMetas.firstWhere((element) => element.id == metaId).records;
 
-  actSelectView(TableView v) {}
+  Future<BaseException?> actSelectView(TableView v) async =>
+      await actWrapper(() => setSelectedTableView(v));
+
+  Future<BaseException?> actUpdateView(RecordMetaDto dto, TableView v) async =>
+      await actWrapper(() async {
+        await _metaService!.updateTableView(dto, v);
+      });
+
+  /// set方法 ======
+
+  setSelectedTableView(TableView? v) => setInitialized('设置TableView[$v]', () {
+        selectedTableView = v;
+      });
 }
