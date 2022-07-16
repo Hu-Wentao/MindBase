@@ -243,7 +243,7 @@ extension ColViewInfoAppwriteX on ColViewInfo {
 
 extension TableViewAppwriteX on TableView {
   toJson() => {
-        "index": index,
+        "vId": vId,
         "type": type.name,
         "name": name,
         "cols": jsonEncode(cols.map((e) => e.toJson()).toList()),
@@ -252,7 +252,7 @@ extension TableViewAppwriteX on TableView {
   static TableView fromDocument(Document doc) => fromJson(doc.data);
 
   static TableView fromJson(Map<String, dynamic> json) => TableView.builder(
-        index: json['index'] as int,
+        vId: json['vId'] as int,
         type: ViewType.values.byName(json['type'] as String),
         name: json['name'] as String,
         cols: (jsonDecode(json['cols'] as String) as List)

@@ -89,30 +89,32 @@ class ColViewInfo {
   String toString() => 'ColViewInfo{propId: $propId, width: $width}';
 }
 
+///
+/// TableView 实例的排序即List<TableView>的元素顺序
 class TableView {
-  final int index; // ==-1 表示新增的View
+  final int vId; // ==-1 表示新增的View
   final String name; // 视图名称
   final ViewType type; // 列类型
   final List<ColViewInfo> cols; // 列排序与可见性
 
-  const TableView(this.index, this.name, this.type, this.cols);
+  const TableView(this.vId, this.name, this.type, this.cols);
 
   // -1 表示在实际插入时，应当被修正为最后一个
   TableView.builder({
-    this.index = -1,
+    this.vId = -1,
     this.name = '新增表格视图',
     this.type = ViewType.sheet,
     this.cols = const [],
   });
 
   TableView update({
-    int? index,
+    int? vId,
     ViewType? type,
     String? name,
     List<ColViewInfo>? cols,
   }) =>
       TableView.builder(
-        index: index ?? this.index,
+        vId: vId ?? this.vId,
         name: name ?? this.name,
         type: type ?? this.type,
         cols: cols ?? this.cols,
@@ -120,15 +122,15 @@ class TableView {
 
   /// 将 ::index ==-1  的View更新为 [views]中最大的index
   TableView updateIndex(List<TableView> views) {
-    if (this.index != -1) return this;
-    final index =
-        views.isEmpty ? 1 : views.map((e) => e.index).reduce(math.max) + 1;
-    return update(index: index);
+    if (this.vId != -1) return this;
+    final vId =
+        views.isEmpty ? 1 : views.map((e) => e.vId).reduce(math.max) + 1;
+    return update(vId: vId);
   }
 
   @override
   String toString() =>
-      'TableView{index: $index, name: $name, type: $type, cols: $cols}';
+      'TableView{vId: $vId, name: $name, type: $type, cols: $cols}';
 }
 
 /// === AttrType （属性类型）相关值对象 ===

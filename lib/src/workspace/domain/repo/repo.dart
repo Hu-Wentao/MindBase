@@ -235,10 +235,10 @@ class MetaDtoRepo {
 
   /// 更新TableView视图, [view]的index为-1表示新增
   updateTableView(RecordMetaDto dto, TableView view) async {
-    final index = view.index;
-    if (index != -1) {
+    final vId = view.vId;
+    if (vId != -1) {
       // view 已存在, 更新view(只涉及Meta)
-      dto.views.replaceRange(index, index + 1, [view]);
+      dto.views.replaceRange(vId, vId + 1, [view]);
       await _update(dto);
       return;
     } else {
