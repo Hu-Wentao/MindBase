@@ -238,7 +238,8 @@ class MetaDtoRepo {
     final vId = view.vId;
     if (vId != -1) {
       // view 已存在, 更新view(只涉及Meta)
-      dto.views.replaceRange(vId, vId + 1, [view]);
+      final idx  = dto.views.indexWhere((v) => v.vId == vId);
+      dto.views.replaceRange(idx, idx + 1, [view]);
       await _update(dto);
       return;
     } else {
