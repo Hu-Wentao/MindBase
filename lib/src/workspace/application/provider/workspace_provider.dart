@@ -164,13 +164,16 @@ class WorkspaceProvider extends ProviderSidecar {
         await _recordDtoRepo(meta).deleteBy(ettId);
       });
 
-  Future<BaseException?> actNewTableView(ViewType type, RecordMeta meta) async =>
+  Future<BaseException?> actNewTableView(
+          ViewType type, RecordMeta meta) async =>
       await actWrapper(() async => await _metaService!.updateTableView(
             meta.toDto(),
             TableView.builder(
                 name: "未命名[${type.name}]视图",
                 type: type,
-                cols: meta.properties.map((e) => e.propId).toList()),
+                cols: meta.properties
+                    .map((e) => ColViewInfo.auto(e.propId))
+                    .toList()),
           ));
 
   /// 获取已缓存的数据源
@@ -183,8 +186,5 @@ class WorkspaceProvider extends ProviderSidecar {
   List<Record> getCachedRecordsByMeta(String metaId) =>
       openedMetas.firstWhere((element) => element.id == metaId).records;
 
-  actSelectView(TableView v) {
-    // todo
-    print("debug actSelectView $v");
-  }
+  actSelectView(TableView v) {}
 }

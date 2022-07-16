@@ -53,16 +53,47 @@ class Error {
       };
 }
 
+/// === TableView （表视图）相关值对象 ===
+
 enum ViewType {
   sheet, // 列前缀 vs
   form, // 列前缀  vf
+}
+
+enum ColWidthType {
+  auto,
+  hide,
+  value,
+}
+
+/// 列 视图信息
+/// 包含列propId和宽度
+class ColViewInfo {
+  final String propId;
+  final int width;
+
+  const ColViewInfo(this.propId, this.width);
+
+  // 自动宽度
+  const ColViewInfo.auto(this.propId) : width = 0;
+
+  // 隐藏列
+  // 如果没有特定列的propId，也表示隐藏改列
+  const ColViewInfo.hide(this.propId) : width = -1;
+
+  ColWidthType get colWidthType => width > 0
+      ? ColWidthType.value
+      : (width == 0 ? ColWidthType.auto : ColWidthType.hide);
+
+  @override
+  String toString() => 'ColViewInfo{propId: $propId, width: $width}';
 }
 
 class TableView {
   final int index; // ==-1 表示新增的View
   final String name; // 视图名称
   final ViewType type; // 列类型
-  final List<String> cols; // 列排序与可见性
+  final List<ColViewInfo> cols; // 列排序与可见性
 
   const TableView(this.index, this.name, this.type, this.cols);
 
@@ -78,7 +109,7 @@ class TableView {
     int? index,
     ViewType? type,
     String? name,
-    List<String>? cols,
+    List<ColViewInfo>? cols,
   }) =>
       TableView.builder(
         index: index ?? this.index,
@@ -99,6 +130,8 @@ class TableView {
   String toString() =>
       'TableView{index: $index, name: $name, type: $type, cols: $cols}';
 }
+
+/// === AttrType （属性类型）相关值对象 ===
 
 enum AttrTp {
   @Deprecated("考虑移除, 但需要先处理MongoJs相关转换问题")

@@ -229,12 +229,24 @@ extension RecordMetaDtoAppwriteX on RecordMetaDto {
   }
 }
 
+extension ColViewInfoAppwriteX on ColViewInfo {
+  toJson() => {
+        "propId": propId,
+        "width": width,
+      };
+
+  static ColViewInfo fromJson(Map<String, dynamic> json) => ColViewInfo(
+        json['propId'] as String,
+        json['width'] as int,
+      );
+}
+
 extension TableViewAppwriteX on TableView {
   toJson() => {
         "index": index,
         "type": type.name,
         "name": name,
-        "cols": cols.join(","), // 改为以 , 分隔的String
+        "cols": jsonEncode(cols.map((e) => e.toJson()).toList()),
       };
 
   static TableView fromDocument(Document doc) => fromJson(doc.data);
@@ -243,7 +255,11 @@ extension TableViewAppwriteX on TableView {
         index: json['index'] as int,
         type: ViewType.values.byName(json['type'] as String),
         name: json['name'] as String,
-        cols: (json['cols'] as String).split(","),
+        cols: (jsonDecode(json['cols'] as String) as List)
+            .map(
+              (e) => ColViewInfoAppwriteX.fromJson(e as Map<String, dynamic>),
+            )
+            .toList(),
       );
 }
 
