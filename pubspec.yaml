@@ -37,7 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   get_arch_core:
     git:
-      url: https://github.com/GetArch/get_arch_core.git
+      url: https://e.coding.net/shuttlecloud/company/get_arch_core.git
       ref: v3.0
 #  mongo_dart:
   logging:

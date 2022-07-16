@@ -496,7 +496,7 @@ packages:
       path: "."
       ref: "v3.0"
       resolved-ref: "8f618ef2d8aa9e1ed28e7a278e6698b4d7536b8d"
-      url: "https://github.com/GetArch/get_arch_core.git"
+      url: "https://e.coding.net/shuttlecloud/company/get_arch_core.git"
     source: git
     version: "3.0.0"
   get_it:
