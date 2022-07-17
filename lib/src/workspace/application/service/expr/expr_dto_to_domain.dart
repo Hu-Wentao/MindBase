@@ -93,9 +93,8 @@ class ExprDtoToDomain {
     }
 
     // type: 字段的类型, value: 字段的名称(而不是字段的值,如果时值,则应当时访问Record的结果)
-    final ExprValue prop = getMember(objectType.meta, expr.property.name);
-    // final propValue = Value.of(prop.propId);
-
+    // 这里假定只有 字段与getter
+    final ExprValue prop = getMember(objectType.meta, expr.property.name) as ExprValue;
     return Expression(
       fn: IFunc.memberFunc,
       ag: [objectV, prop],
@@ -190,7 +189,7 @@ class ExprDtoToDomain {
   /// DTO>Domain的 getMember应该返回什么?
   /// 应该返回Meta中的prop,而不是propId,因为还涉及到类型推断逻辑
   @protected
-  ExprValue getMember(dynamic obj, String member) {
+  IExpr getMember(dynamic obj, String member) {
     // dynamic getMember(IExpr value, String member) {
     //   final obj = value.value;
     for (var a in memberAccessors) {
