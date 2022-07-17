@@ -191,7 +191,18 @@ class MetaDtoRepo {
     if (structureCallback == null) {
       throw '未知的RecordMeta属性名称: $attributeName';
     } else {
-      await structureCallback.call(collectionId, _serverDb);
+      try {
+        await structureCallback.call(collectionId, _serverDb);
+      } on AppwriteException catch (e) {
+        if (e.type == 'attribute_already_exists' && e.code == 409) {
+          // 属性已存在,忽略
+          return;
+        } else {
+          rethrow;
+        }
+      } catch (e) {
+        rethrow;
+      }
     }
   }
 
