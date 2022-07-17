@@ -72,6 +72,7 @@ dependencies:
   feedback:
   url_launcher:
   json_editor:
+  collection:
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -93,7 +94,7 @@ dependency_overrides:
   pluto_grid:
     git:
       url: https://e.coding.net/shuttlecloud/mindbase/pluto_grid.git
-      ref: fix_completion_pluto_grid_popup_on_evet
+      ref: feat_col_width_change_evt
 #    path: D:\_proj\pluto_grid
 #  get_arch_core:
 #    path: ../get_arch/get_arch_core
