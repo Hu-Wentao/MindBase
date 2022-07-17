@@ -180,7 +180,7 @@ class WorkspaceProvider extends ProviderSidecar {
                 name: "未命名[${type.name}]视图",
                 type: type,
                 cols: meta.properties
-                    .map((e) => ColViewInfo.auto(e.propId))
+                    .map((e) => ColViewInfo.build(propId:e.propId))
                     .toList()),
           ));
 

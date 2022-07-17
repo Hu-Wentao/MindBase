@@ -77,8 +77,6 @@ class ColViewInfo {
     this.width = 100,
   });
 
-  const ColViewInfo.auto(this.propId, [this.visible = true, this.width = 100]);
-
   ColViewInfo copyWith({
     String? propId,
     double? width,
