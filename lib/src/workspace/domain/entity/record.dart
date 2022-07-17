@@ -36,7 +36,14 @@ class Record implements IEtt<String> {
   ExprValue getFieldByAttrName(String name) => getField(name.parsePropK);
 
   ExprValue getField(int attrKey) {
-    final prop = meta.attrs.firstWhere((attr) => attr.k == attrKey);
+    final pIndex = meta.attrs.indexWhere((attr) => attr.k == attrKey);
+    if (pIndex == -1) {
+      // 找不到属性，通常是因为新增列，但没有填充值导致的
+      return ExprValue.build(
+          type: AttrType.string, ag: [null, "Error#找不到Prop[$attrKey]"]);
+    }
+
+    final prop = meta.attrs[pIndex];
     final value = fields[attrKey];
     return ExprValue.build(
         type: prop.type,

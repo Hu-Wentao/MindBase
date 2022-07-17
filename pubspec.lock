@@ -177,7 +177,7 @@ packages:
     source: hosted
     version: "4.1.0"
   collection:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: collection
       url: "https://pub.flutter-io.cn"
@@ -831,9 +831,11 @@ packages:
   pluto_grid:
     dependency: "direct main"
     description:
-      name: pluto_grid
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: "."
+      ref: feat_on_col_moved_evt
+      resolved-ref: "510a14fe8fe4b327288b77c3d179b569a0f4619e"
+      url: "https://e.coding.net/shuttlecloud/mindbase/pluto_grid.git"
+    source: git
     version: "5.0.3"
   pool:
     dependency: transitive

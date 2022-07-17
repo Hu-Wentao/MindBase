@@ -60,7 +60,7 @@ enum MindBaseColumnMenu {
   freezeToStart,
   freezeToEnd,
   hideColumn,
-  setColumns,
+  // setColumns, // 被字段管理取代
   autoFit,
   setFilter,
   resetFilter,
@@ -68,7 +68,7 @@ enum MindBaseColumnMenu {
 
 class MindBaseColumnMenuDelegate
     implements PlutoColumnMenuDelegate<MindBaseColumnMenu> {
-  const MindBaseColumnMenuDelegate({this.onInsertCol});
+  const MindBaseColumnMenuDelegate({this.onInsertCol, this.onHideCol});
 
   final void Function(
     BuildContext context,
@@ -76,6 +76,12 @@ class MindBaseColumnMenuDelegate
     PlutoColumn column,
     bool isInsertLeft,
   )? onInsertCol;
+
+  final void Function(
+    BuildContext context,
+    PlutoGridStateManager stateManager,
+    PlutoColumn column,
+  )? onHideCol;
 
   @override
   List<PopupMenuEntry<MindBaseColumnMenu>> buildMenuItems({
@@ -106,6 +112,14 @@ class MindBaseColumnMenuDelegate
           selected == MindBaseColumnMenu.insertToLeft,
         );
         break;
+      case MindBaseColumnMenu.hideColumn:
+        onHideCol?.call(
+          context,
+          stateManager,
+          column,
+        );
+        // stateManager.hideColumn(column, true);
+        break;
       case MindBaseColumnMenu.unfreeze:
         stateManager.toggleFrozenColumn(column, PlutoColumnFrozen.none);
         break;
@@ -120,13 +134,10 @@ class MindBaseColumnMenuDelegate
         stateManager.autoFitColumn(context, column);
         stateManager.notifyResizingListeners();
         break;
-      case MindBaseColumnMenu.hideColumn:
-        stateManager.hideColumn(column, true);
-        break;
-      case MindBaseColumnMenu.setColumns:
-        if (!mounted) return;
-        stateManager.showSetColumnsPopup(context);
-        break;
+      // case MindBaseColumnMenu.setColumns:
+      //   if (!mounted) return;
+      //   stateManager.showSetColumnsPopup(context);
+      //   break;
       case MindBaseColumnMenu.setFilter:
         if (!mounted) return;
         stateManager.showFilterPopup(context, calledColumn: column);
@@ -138,88 +149,89 @@ class MindBaseColumnMenuDelegate
         break;
     }
   }
-}
 
-List<PopupMenuEntry<MindBaseColumnMenu>> _getColumnMenuItems({
-  required PlutoGridStateManager stateManager,
-  required PlutoColumn column,
-}) {
-  final Color textColor = stateManager.style.cellTextStyle.color!;
+  List<PopupMenuEntry<MindBaseColumnMenu>> _getColumnMenuItems({
+    required PlutoGridStateManager stateManager,
+    required PlutoColumn column,
+  }) {
+    final Color textColor = stateManager.style.cellTextStyle.color!;
 
-  final Color disableTextColor = textColor.withOpacity(0.5);
+    final Color disableTextColor = textColor.withOpacity(0.5);
 
-  final bool enoughFrozenColumnsWidth = stateManager.enoughFrozenColumnsWidth(
-    stateManager.maxWidth! - column.width,
-  );
+    final bool enoughFrozenColumnsWidth = stateManager.enoughFrozenColumnsWidth(
+      stateManager.maxWidth! - column.width,
+    );
 
-  final localeText = stateManager.localeText as MindBaseLocalText;
+    final localeText = stateManager.localeText as MindBaseLocalText;
 
-  return [
-    _buildMenuItem(
-      value: MindBaseColumnMenu.insertToLeft,
-      text: localeText.insertToLeft,
-      textColor: textColor,
-    ),
-    _buildMenuItem(
-      value: MindBaseColumnMenu.insertToRight,
-      text: localeText.insertToRight,
-      textColor: textColor,
-    ),
-    const PopupMenuDivider(),
-    if (column.frozen.isFrozen == true)
+    return [
       _buildMenuItem(
-        value: MindBaseColumnMenu.unfreeze,
-        text: localeText.unfreezeColumn,
+        value: MindBaseColumnMenu.insertToLeft,
+        text: localeText.insertToLeft,
         textColor: textColor,
       ),
-    if (column.frozen.isFrozen != true) ...[
       _buildMenuItem(
-        value: MindBaseColumnMenu.freezeToStart,
-        enabled: enoughFrozenColumnsWidth,
-        text: localeText.freezeColumnToStart,
-        textColor: enoughFrozenColumnsWidth ? textColor : disableTextColor,
-      ),
-      _buildMenuItem(
-        value: MindBaseColumnMenu.freezeToEnd,
-        enabled: enoughFrozenColumnsWidth,
-        text: localeText.freezeColumnToEnd,
-        textColor: enoughFrozenColumnsWidth ? textColor : disableTextColor,
-      ),
-    ],
-    const PopupMenuDivider(),
-    _buildMenuItem(
-      value: MindBaseColumnMenu.autoFit,
-      text: localeText.autoFitColumn,
-      textColor: textColor,
-    ),
-    if (column.enableHideColumnMenuItem == true)
-      _buildMenuItem(
-        value: MindBaseColumnMenu.hideColumn,
-        text: localeText.hideColumn,
-        textColor: textColor,
-        enabled: stateManager.refColumns.length > 1,
-      ),
-    if (column.enableSetColumnsMenuItem == true)
-      _buildMenuItem(
-        value: MindBaseColumnMenu.setColumns,
-        text: localeText.setColumns,
+        value: MindBaseColumnMenu.insertToRight,
+        text: localeText.insertToRight,
         textColor: textColor,
       ),
-    if (column.enableFilterMenuItem == true) ...[
+      const PopupMenuDivider(),
+      if (column.frozen.isFrozen == true)
+        _buildMenuItem(
+          value: MindBaseColumnMenu.unfreeze,
+          text: localeText.unfreezeColumn,
+          textColor: textColor,
+        ),
+      if (column.frozen.isFrozen != true) ...[
+        _buildMenuItem(
+          value: MindBaseColumnMenu.freezeToStart,
+          enabled: enoughFrozenColumnsWidth,
+          text: localeText.freezeColumnToStart,
+          textColor: enoughFrozenColumnsWidth ? textColor : disableTextColor,
+        ),
+        _buildMenuItem(
+          value: MindBaseColumnMenu.freezeToEnd,
+          enabled: enoughFrozenColumnsWidth,
+          text: localeText.freezeColumnToEnd,
+          textColor: enoughFrozenColumnsWidth ? textColor : disableTextColor,
+        ),
+      ],
       const PopupMenuDivider(),
       _buildMenuItem(
-        value: MindBaseColumnMenu.setFilter,
-        text: localeText.setFilter,
+        value: MindBaseColumnMenu.autoFit,
+        text: localeText.autoFitColumn,
         textColor: textColor,
       ),
-      _buildMenuItem(
-        value: MindBaseColumnMenu.resetFilter,
-        text: localeText.resetFilter,
-        textColor: textColor,
-        enabled: stateManager.hasFilter,
-      ),
-    ],
-  ];
+      // if (column.enableHideColumnMenuItem == true)
+      if (onHideCol != null)
+        _buildMenuItem(
+          value: MindBaseColumnMenu.hideColumn,
+          text: localeText.hideColumn,
+          textColor: textColor,
+          enabled: stateManager.refColumns.length > 1,
+        ),
+      // if (column.enableSetColumnsMenuItem == true)
+      //   _buildMenuItem(
+      //     value: MindBaseColumnMenu.setColumns,
+      //     text: localeText.setColumns,
+      //     textColor: textColor,
+      //   ),
+      if (column.enableFilterMenuItem == true) ...[
+        const PopupMenuDivider(),
+        _buildMenuItem(
+          value: MindBaseColumnMenu.setFilter,
+          text: localeText.setFilter,
+          textColor: textColor,
+        ),
+        _buildMenuItem(
+          value: MindBaseColumnMenu.resetFilter,
+          text: localeText.resetFilter,
+          textColor: textColor,
+          enabled: stateManager.hasFilter,
+        ),
+      ],
+    ];
+  }
 }
 
 PopupMenuItem<MindBaseColumnMenu> _buildMenuItem<MindBaseColumnMenu>({

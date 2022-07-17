@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:bson/bson.dart';
+import 'package:flutter/material.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -60,33 +61,36 @@ enum ViewType {
   form, // 列前缀  vf
 }
 
-enum ColWidthType {
-  auto,
-  hide,
-  value,
-}
-
 /// 列 视图信息
 /// 包含列propId和宽度
 class ColViewInfo {
   final String propId;
-  final int width;
+  final double width;
+  final bool visible; // 不能合并到width
+  double get minWidth => 60;
 
-  const ColViewInfo(this.propId, this.width);
+  const ColViewInfo(this.propId, this.width, this.visible);
 
-  // 自动宽度
-  const ColViewInfo.auto(this.propId) : width = 0;
+  const ColViewInfo.build({
+    required this.propId,
+    this.visible = true,
+    this.width = 100,
+  });
 
-  // 隐藏列
-  // 如果没有特定列的propId，也表示隐藏改列
-  const ColViewInfo.hide(this.propId) : width = -1;
-
-  ColWidthType get colWidthType => width > 0
-      ? ColWidthType.value
-      : (width == 0 ? ColWidthType.auto : ColWidthType.hide);
+  ColViewInfo copyWith({
+    String? propId,
+    double? width,
+    bool? visible,
+  }) =>
+      ColViewInfo(
+        propId ?? this.propId,
+        width ?? this.width,
+        visible ?? this.visible,
+      );
 
   @override
-  String toString() => 'ColViewInfo{propId: $propId, width: $width}';
+  String toString() =>
+      'ColViewInfo{propId: $propId, width: $width, visible: $visible}';
 }
 
 ///
@@ -107,7 +111,10 @@ class TableView {
     this.cols = const [],
   });
 
-  TableView update({
+  @Deprecated("copyWith")
+  get update => copyWith;
+
+  TableView copyWith({
     int? vId,
     ViewType? type,
     String? name,
@@ -125,7 +132,7 @@ class TableView {
     if (this.vId != -1) return this;
     final vId =
         views.isEmpty ? 1 : views.map((e) => e.vId).reduce(math.max) + 1;
-    return update(vId: vId);
+    return copyWith(vId: vId);
   }
 
   @override
