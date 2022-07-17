@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -310,8 +311,11 @@ class DataFrameTitlePluto extends StatelessWidget {
                 'name': PlutoCell(value: e.name),
                 propIdField: PlutoCell(value: e.propId),
               },
-              // 如果存在于cols中，则勾选
-              checked: view!.cols.any((col) => col.propId == e.propId),
+              // 可见即勾选
+              checked: view?.cols
+                      .firstWhereOrNull((element) => element.propId == e.propId)
+                      ?.visible ??
+                  false,
             ))
         .toList();
     // refColumns.originalList.map(toRow).toList();
