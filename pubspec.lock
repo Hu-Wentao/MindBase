@@ -833,7 +833,7 @@ packages:
     description:
       path: "."
       ref: feat_col_width_change_evt
-      resolved-ref: a66fdca52073dfbc1cbf1de037fb428d6f0b3b60
+      resolved-ref: "3032f4c910b13dccae80e03cc187bc08393d0f24"
       url: "https://e.coding.net/shuttlecloud/mindbase/pluto_grid.git"
     source: git
     version: "5.0.3"
