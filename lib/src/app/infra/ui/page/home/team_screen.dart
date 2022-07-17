@@ -75,7 +75,7 @@ class _TeamScreenState extends State<TeamScreen> {
   _buildTeamTile(
     BuildContext c,
     bool isExpanded,
-    team,
+    Team team,
     WorkspaceManagerProvider pManger,
   ) =>
       ListTile(
@@ -143,7 +143,11 @@ class _TeamScreenState extends State<TeamScreen> {
         ),
       );
 
-  ExpansionPanel _buildExpansionPanel(int index, lst, pManger) =>
+  ExpansionPanel _buildExpansionPanel(
+    int index,
+    List<Team> lst,
+    WorkspaceManagerProvider pManger,
+  ) =>
       ExpansionPanel(
         canTapOnHeader: true,
         isExpanded: _panelExpanded[index] ??= false,

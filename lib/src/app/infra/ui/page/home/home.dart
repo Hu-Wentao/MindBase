@@ -1,4 +1,5 @@
 import 'package:adaptive_navigation/adaptive_navigation.dart';
+import 'package:appwrite/models.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
