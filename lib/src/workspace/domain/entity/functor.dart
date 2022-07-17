@@ -157,7 +157,7 @@ class ExprValue extends IExpr with IFunctor, EquatableMixin {
     }
   }
 
-  factory ExprValue.err(String? e) => ExprValue.of("", e);
+  factory ExprValue.err(String? e) => ExprValue.of(null, e);
 
   @override
   String toString() => '($ag:${type.name})';
