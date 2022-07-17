@@ -105,6 +105,34 @@ class RecordDataGrid extends StatelessWidget {
                   );
                 });
               },
+        onColMoved: (view == null)
+            ? null
+            : (_) {
+                // print("debug onColMoved evt $_");
+                // 注意，evt提供到index都是基于可见列的排序，而cols内还包含列不可见列的信息
+                final isMoveLeftToRight = _.originIdx < _.targetIdx;
+                var moveCount = (_.originIdx - _.targetIdx).abs(); // 剩余需要移动的个数
+
+                final propId = _.column.field;
+                final startInfoIndex =
+                    view.cols.indexWhere((element) => element.propId == propId);
+                int destInfoIndex = startInfoIndex;
+                do {
+                  // 移动
+                  destInfoIndex += (isMoveLeftToRight ? 1 : -1);
+                  // 是否有效(如果不可见，则剩余移动步数-0)
+                  moveCount -= (view.cols[destInfoIndex].visible ? 1 : 0);
+                } while (!(moveCount == 0 ||
+                    destInfoIndex < 0 ||
+                    destInfoIndex >= view.cols.length));
+
+                final nInfo = view.cols.removeAt(startInfoIndex);
+                final nCols = view.cols..insert(destInfoIndex - 1, nInfo);
+                pWorkspace.actUpdateView(
+                  originMeta.toDto(),
+                  view.copyWith(cols: nCols),
+                );
+              },
         onChanged: (_) {
           // print("#debug #onChanged $_");
           final row = _.row!;
@@ -248,7 +276,7 @@ class DataFrameTitlePluto extends StatelessWidget {
               // 只有在 指定了视图 时，才提供"字段管理"功能
               if (view != null)
                 TextButton.icon(
-                  onPressed: () => _fieldManager(c, meta.toDto()),
+                  onPressed: () => _fieldManager(c, meta.toDto(), view!),
                   icon: const Icon(Icons.blur_linear_outlined),
                   label: const Text("字段管理"),
                 ),
@@ -297,7 +325,7 @@ class DataFrameTitlePluto extends StatelessWidget {
       );
 
   // 字段管理
-  void _fieldManager(BuildContext context, RecordMetaDto dto) {
+  void _fieldManager(BuildContext context, RecordMetaDto dto, TableView view) {
     const propIdField = 'propIdField';
     var columns = [
       PlutoColumn(
@@ -327,13 +355,26 @@ class DataFrameTitlePluto extends StatelessWidget {
                 propIdField: PlutoCell(value: e.propId),
               },
               // 可见即勾选
-              checked: view?.cols
+              checked: view.cols
                       .firstWhereOrNull((element) => element.propId == e.propId)
                       ?.visible ??
                   false,
             ))
         .toList();
-    // refColumns.originalList.map(toRow).toList();
+    // fixme "view有，meta没有"的情况，会对"列drag移动"，""，产生影；考虑在加载view的时候，就自动清理view中meta已删除的列
+    // 根据view元素顺序为排序权重，没有的就放最后
+    // <propId,权重> 权重越小，越靠左
+    final weightMap = Map.fromEntries(view.cols
+        .map((e) => e.propId)
+        .toList()
+        .mapIndexed((index, element) => MapEntry(element, index)));
+    attrRows.sort((r1, r2) {
+      final r1propId = r1.cells[propIdField]!.value;
+      final r1w = weightMap[r1propId] ?? double.infinity;
+      final r2propId = r2.cells[propIdField]!.value;
+      final r2w = weightMap[r2propId] ?? double.infinity;
+      return r1w.compareTo(r2w);
+    });
 
     PlutoGridStateManager? popUpGridManger;
 
