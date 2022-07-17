@@ -24,6 +24,22 @@ abstract class IRecordDataGridSource {
   onRemoveEvt(String recordId, int index);
 }
 
+extension TableViewX on TableView {
+  /// 转换列，适配View
+  List<PlutoColumn> transformCols(List<PlutoColumn> plutoCols) {
+    final r = <PlutoColumn>[];
+    for (final info in cols) {
+      r.add(
+        plutoCols.firstWhere((col) => col.field == info.propId)
+          ..width = info.width
+          ..minWidth = info.minWidth
+          ..hide = !info.visible,
+      );
+    }
+    return r;
+  }
+}
+
 extension PlutoRecordMetaX on RecordMeta {
   List<PlutoColumn> get toPlutoCols => properties
       .map((prop) => PlutoColumn(
