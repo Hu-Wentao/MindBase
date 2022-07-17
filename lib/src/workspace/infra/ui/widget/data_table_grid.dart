@@ -53,6 +53,7 @@ class RecordDataGrid extends StatelessWidget {
             //       break;
             //   }
             // })
+            // 配置列菜单项
             ..setColumnMenuDelegate(MindBaseColumnMenuDelegate(
                 // 向左/右新增列
                 onInsertCol: (context, stateManager, column, isInsertLeft) {
@@ -81,29 +82,29 @@ class RecordDataGrid extends StatelessWidget {
                             originMeta.toDto(), view.copyWith(cols: nCols));
                       }));
         },
-        onColWidthChanged: (_) {
-          print("debug 宽度 final nWidth = ${_.column.width};");
-          // print("debug RecordDataGrid onColWidthChanged #${_.column}");
-          if (view == null) return;
-          // 防抖, 避免无效更新
-          EasyDebounce.debounce('调整列宽度', const Duration(seconds: 1), () {
-            var nWidth = _.column.width;
-            final propId = _.column.field;
-            final originIndex = view.cols.indexWhere((c) => c.propId == propId);
-            final originCol = view.cols[originIndex];
-            final originWidth = originCol.width;
-            // 如果新旧宽度差小于 0.1, 则不更新; 否则保留1位小数并更新
-            if ((originWidth - nWidth).abs() < 0.1) return;
-            nWidth = (nWidth * 10).toInt() / 10;
-            final nCol = originCol.copyWith(width: nWidth);
-            final nCols = view.cols
-              ..replaceRange(originIndex, originIndex + 1, [nCol]);
-            pWorkspace.actUpdateView(
-              originMeta.toDto(),
-              view.copyWith(cols: nCols),
-            );
-          });
-        },
+        onColWidthChanged: (view == null)
+            ? null
+            : (evt) {
+                // 防抖, 避免无效更新
+                EasyDebounce.debounce('调整列宽度', const Duration(seconds: 1), () {
+                  var nWidth = evt.column.width;
+                  final propId = evt.column.field;
+                  final originIndex =
+                      view.cols.indexWhere((c) => c.propId == propId);
+                  final originCol = view.cols[originIndex];
+                  final originWidth = originCol.width;
+                  // 如果新旧宽度差小于 0.1, 则不更新; 否则保留1位小数并更新
+                  if ((originWidth - nWidth).abs() < 0.1) return;
+                  nWidth = (nWidth * 10).toInt() / 10;
+                  final nCol = originCol.copyWith(width: nWidth);
+                  final nCols = view.cols
+                    ..replaceRange(originIndex, originIndex + 1, [nCol]);
+                  pWorkspace.actUpdateView(
+                    originMeta.toDto(),
+                    view.copyWith(cols: nCols),
+                  );
+                });
+              },
         onChanged: (_) {
           // print("#debug #onChanged $_");
           final row = _.row!;
