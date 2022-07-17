@@ -832,8 +832,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: feat_col_width_change_evt
-      resolved-ref: "3032f4c910b13dccae80e03cc187bc08393d0f24"
+      ref: feat_on_col_moved_evt
+      resolved-ref: "510a14fe8fe4b327288b77c3d179b569a0f4619e"
       url: "https://e.coding.net/shuttlecloud/mindbase/pluto_grid.git"
     source: git
     version: "5.0.3"

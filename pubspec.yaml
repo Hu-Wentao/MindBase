@@ -94,7 +94,7 @@ dependency_overrides:
   pluto_grid:
     git:
       url: https://e.coding.net/shuttlecloud/mindbase/pluto_grid.git
-      ref: feat_col_width_change_evt
+      ref: feat_on_col_moved_evt
 #    path: D:\_proj\pluto_grid
 #  get_arch_core:
 #    path: ../get_arch/get_arch_core
