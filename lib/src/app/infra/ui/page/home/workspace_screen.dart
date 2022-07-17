@@ -239,8 +239,6 @@ class _MetaTableListState extends State<MetaTableList> {
                                 },
                               ),
                             ),
-                            // todo 展示表对应的View
-                            // body: const ListTile(title: Text("todo")),
                             body: ListView.separated(
                               shrinkWrap: true,
                               itemCount: p.openedMetas[i].meta.views.length,
@@ -248,7 +246,9 @@ class _MetaTableListState extends State<MetaTableList> {
                                 final v = p.openedMetas[i].meta.views[index];
                                 return ListTile(
                                   title: Text(v.name),
-                                  onTap: () => pWorkspace.actSelectView(v),
+                                  onTap: () => pWorkspace
+                                      .actSelectView(v)
+                                      .thenDialog(context),
                                 );
                               },
                               separatorBuilder:
