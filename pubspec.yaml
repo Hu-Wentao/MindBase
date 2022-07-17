@@ -39,7 +39,7 @@ dependencies:
     git:
       url: https://e.coding.net/shuttlecloud/company/get_arch_core.git
       ref: v3.0
-#  mongo_dart:
+  #  mongo_dart:
   logging:
   provider:
   provider_sidecar:
@@ -55,7 +55,7 @@ dependencies:
   adaptive_navigation:
   line_icons:
   ndialog:
-#  syncfusion_flutter_datagrid: "20.1.47"
+  #  syncfusion_flutter_datagrid: "20.1.47"
   freezed_annotation:
   petitparser:
   quiver:
@@ -95,6 +95,7 @@ dependency_overrides:
     git:
       url: https://e.coding.net/shuttlecloud/mindbase/pluto_grid.git
       ref: feat_on_col_moved_evt
+  analyzer: ">=4.2.0 <5.0.0"
 #    path: D:\_proj\pluto_grid
 #  get_arch_core:
 #    path: ../get_arch/get_arch_core
