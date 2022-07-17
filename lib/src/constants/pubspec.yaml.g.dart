@@ -40,16 +40,16 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.0.2';
+const String version = r'1.1.0';
 
 /// The major version number: "1" in "1.2.3".
 const int major = 1;
 
 /// The minor version number: "2" in "1.2.3".
-const int minor = 0;
+const int minor = 1;
 
 /// The patch version number: "3" in "1.2.3".
-const int patch = 2;
+const int patch = 0;
 
 /// The pre-release identifier: "foo" in "1.2.3-foo".
 const List<String> pre = <String>[];
@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1657558406;
+const int timestamp = 1658083412;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -83,7 +83,7 @@ const String publishTo = r'none';
 
 /// Environment
 const Map<String, String> environment = <String, String>{
-  'sdk': '>=2.16.1 <3.0.0',
+  'sdk': '>=2.18.0-44.1.beta <3.0.0',
 };
 
 /// Dependencies
@@ -97,7 +97,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'cupertino_icons': r'^1.0.2',
   'get_arch_core': <String, Object>{
     'git': <String, Object>{
-      'url': r'https://github.com/GetArch/get_arch_core.git',
+      'url': r'https://e.coding.net/shuttlecloud/company/get_arch_core.git',
       'ref': r'v3.0',
     },
   },
@@ -111,7 +111,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'form_builder_validators': r'7.9.0',
   'auto_route': r'4.0.1',
   'json_annotation': r'>=4.4.0',
-  'pluto_grid': r'4.0.0',
+  'pluto_grid': r'5.0.3',
   'appwrite': r'4.0.2',
   'dart_appwrite': r'5.0.1',
 };
@@ -128,10 +128,11 @@ const Map<String, Object> devDependencies = <String, Object>{
 const Map<String, Object> dependencyOverrides = <String, Object>{
   'pluto_grid': <String, Object>{
     'git': <String, Object>{
-      'url': r'https://github.com/Hu-Wentao/pluto_grid.git',
-      'ref': r'feat_insert_column_menu_item',
+      'url': r'https://e.coding.net/shuttlecloud/mindbase/pluto_grid.git',
+      'ref': r'feat_on_col_moved_evt',
     },
   },
+  'analyzer': r'>=4.2.0 <5.0.0',
 };
 
 /// Executables
