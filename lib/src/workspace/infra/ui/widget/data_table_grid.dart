@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get_arch_core/get_arch_core.dart';
@@ -33,12 +34,15 @@ class RecordDataGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final data = openedMeta.dataSource;
     final view = pWorkspace.selectedTableView;
+    final originMeta = openedMeta.meta;
+    // print(
+    //     "debug RecordDataGrid build valueKey ${"${openedMeta.ver}-${view?.vId}"}");
     return Expanded(
       child: PlutoGrid(
         // key不一致的时候才会刷新UI
         key: ValueKey("${openedMeta.ver}-${view?.vId}"),
         rows: data.cachedRows,
-        columns: data.cachedColumns,
+        columns: view?.transformCols(data.cachedColumns) ?? data.cachedColumns,
         onLoaded: (loadedEvt) {
           // 为数据源绑定新的stateManager, 以便在数据源更新的时候,能够同时刷新UI
           data.stateManager = loadedEvt.stateManager
@@ -50,27 +54,43 @@ class RecordDataGrid extends StatelessWidget {
             // })
             ..setColumnMenuDelegate(MindBaseColumnMenuDelegate(
               onInsertCol: (context, stateManager, column, isInsertLeft) {
-                final origin = openedMeta.meta;
                 showAttributeEditDialog(
                   context: context,
-                  initKey: origin.nextKey(),
+                  initKey: originMeta.nextKey(),
                   kAttrBuilder: GlobalKey<FormBuilderState>(),
                   queryMetaFn: pWorkspace.openedWorkspace!.queryMeta,
                   allMetas: () => pWorkspace.metaList,
-                ).then((value) {
-                  return pWorkspace
-                      .actMetaUpdateAttr(origin, value)
-                      .thenDialog(context);
-                });
-                // stateManager.insertColumn(
-                //   column,
-                //   isInsertLeft ? PlutoColumnInsertPosition.left : PlutoColumnInsertPosition.right,
-                // );
+                ).then((value) => pWorkspace
+                    .actMetaUpdateAttr(originMeta, value)
+                    .thenDialog(context));
               },
             ));
         },
+        onColWidthChanged: (_) {
+          print("debug 宽度 final nWidth = ${_.column.width};");
+          // print("debug RecordDataGrid onColWidthChanged #${_.column}");
+          if (view == null) return;
+          // 防抖, 避免无效更新
+          EasyDebounce.debounce('调整列宽度', const Duration(seconds: 1), () {
+            var nWidth = _.column.width;
+            final propId = _.column.field;
+            final originIndex = view.cols.indexWhere((c) => c.propId == propId);
+            final originCol = view.cols[originIndex];
+            final originWidth = originCol.width;
+            // 如果新旧宽度差小于 0.1, 则不更新; 否则保留1位小数并更新
+            if ((originWidth - nWidth).abs() < 0.1) return;
+            nWidth = (nWidth * 10).toInt() / 10;
+            final nCol = originCol.copyWith(width: nWidth);
+            final nCols = view.cols
+              ..replaceRange(originIndex, originIndex + 1, [nCol]);
+            pWorkspace.actUpdateView(
+              originMeta.toDto(),
+              view.copyWith(cols: nCols),
+            );
+          });
+        },
         onChanged: (_) {
-          print("#debug #onChanged $_");
+          // print("#debug #onChanged $_");
           final row = _.row!;
           final ettId = row.key as ValueKey<String>;
 
@@ -342,7 +362,6 @@ class DataFrameTitlePluto extends StatelessWidget {
       // onChanged: (e){
       //   print("debug onChanged ${e.value}, ${e.rowIdx}, ${e.row?.cells.entries.map((e) => "${e.key}-${e.value.value}")}");
       // }
-
     );
   }
 }
