@@ -29,7 +29,13 @@ class WorkspaceProvider extends ProviderSidecar {
 
   OpenedMeta? selectedMeta;
 
-  TableView? selectedTableView; // 选中meta所适配的视图，可以为null
+  int? selectedVId; // 选中meta所适配的视图，可以为null
+  TableView? get selectedTableView {
+    final i =
+        selectedMeta?.meta.views.indexWhere((v) => v.vId == selectedVId) ?? -1;
+    print("debug selectedTableView i#$i,vId$selectedVId,views${selectedMeta?.meta.views}");
+    return (i != -1) ? selectedMeta?.meta.views[i] : null;
+  }
 
   WorkspaceProvider([this.openedWorkspace])
       : super(onCatch: ExceptionAdapter.of);
@@ -199,6 +205,6 @@ class WorkspaceProvider extends ProviderSidecar {
   /// set方法 ======
 
   setSelectedTableView(TableView? v) => setInitialized('设置TableView[$v]', () {
-        selectedTableView = v;
+        selectedVId = v?.vId;
       });
 }
