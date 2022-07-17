@@ -61,32 +61,17 @@ enum ViewType {
   form, // 列前缀  vf
 }
 
-enum ColWidthType {
-  auto,
-  hide,
-  value,
-}
-
 /// 列 视图信息
 /// 包含列propId和宽度
 class ColViewInfo {
   final String propId;
   final double width;
   final bool visible; // 不能合并到width
+  double get minWidth => 60;
 
   const ColViewInfo(this.propId, this.width, this.visible);
 
-  // 自动宽度
-  const ColViewInfo.auto(this.propId, [this.visible = false]) : width = 0;
-
-  // 隐藏列
-  // 如果没有特定列的propId，也表示隐藏改列
-  const ColViewInfo.visible(this.propId,
-      [this.visible = true, this.width = -1]);
-
-  ColWidthType get colWidthType => width > 0
-      ? ColWidthType.value
-      : (width == 0 ? ColWidthType.auto : ColWidthType.hide);
+  const ColViewInfo.auto(this.propId, [this.visible = true, this.width = 100]);
 
   ColViewInfo copyWith({
     String? propId,
@@ -149,20 +134,6 @@ class TableView {
   @override
   String toString() =>
       'TableView{vId: $vId, name: $name, type: $type, cols: $cols}';
-
-  /// 转换列，适配View
-  transformCols(List plutoCols) {
-    final r = [];
-    for (final c in cols) {
-      r.add(
-        plutoCols.firstWhere(
-            (col) => (col.key as ValueKey<String>).value == c.propId)
-          ..width = c.width
-          ..hide = !c.visible,
-      );
-    }
-    return r;
-  }
 }
 
 /// === AttrType （属性类型）相关值对象 ===
