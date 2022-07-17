@@ -54,29 +54,32 @@ class RecordDataGrid extends StatelessWidget {
             //   }
             // })
             ..setColumnMenuDelegate(MindBaseColumnMenuDelegate(
+                // 向左/右新增列
                 onInsertCol: (context, stateManager, column, isInsertLeft) {
-              showAttributeEditDialog(
-                context: context,
-                initKey: originMeta.nextKey(),
-                kAttrBuilder: GlobalKey<FormBuilderState>(),
-                queryMetaFn: pWorkspace.openedWorkspace!.queryMeta,
-                allMetas: () => pWorkspace.metaList,
-              ).then((value) => pWorkspace
-                  .actMetaUpdateAttr(originMeta, value)
-                  .thenDialog(context));
-            }, onHideCol: (context, stateManager, column) {
-              // onHideCol:view==null?null: (context, stateManager, column) {
-              if (view == null) return;
-              final propId = column.field;
-              final originIndex =
-                  view.cols.indexWhere((c) => c.propId == propId);
-              final originCol = view.cols[originIndex];
-              final nCol = originCol.copyWith(visible: false);
-              final nCols = view.cols
-                ..replaceRange(originIndex, originIndex + 1, [nCol]);
-              pWorkspace.actUpdateView(
-                  originMeta.toDto(), view.copyWith(cols: nCols));
-            }));
+                  showAttributeEditDialog(
+                    context: context,
+                    initKey: originMeta.nextKey(),
+                    kAttrBuilder: GlobalKey<FormBuilderState>(),
+                    queryMetaFn: pWorkspace.openedWorkspace!.queryMeta,
+                    allMetas: () => pWorkspace.metaList,
+                  ).then((value) => pWorkspace
+                      .actMetaUpdateAttr(originMeta, value)
+                      .thenDialog(context));
+                },
+                // 隐藏列
+                onHideCol: view == null
+                    ? null
+                    : (context, stateManager, column) {
+                        final propId = column.field;
+                        final originIndex =
+                            view.cols.indexWhere((c) => c.propId == propId);
+                        final originCol = view.cols[originIndex];
+                        final nCol = originCol.copyWith(visible: false);
+                        final nCols = view.cols
+                          ..replaceRange(originIndex, originIndex + 1, [nCol]);
+                        pWorkspace.actUpdateView(
+                            originMeta.toDto(), view.copyWith(cols: nCols));
+                      }));
         },
         onColWidthChanged: (_) {
           print("debug 宽度 final nWidth = ${_.column.width};");
