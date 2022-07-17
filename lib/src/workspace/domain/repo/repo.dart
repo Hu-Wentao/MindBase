@@ -63,15 +63,23 @@ class MetaDtoRepo {
 
   /// 插入Meta记录的同时, 创建对应的Record集合;
   /// 解决监听不存在Record集合,在集合被创建后无法收到消息的问题
-  insertDto(RecordMetaDto meta) async {
-    final r =
-        await insertMetaDtoWithCreateRecordCollection(meta).catchError((e, s) {
+  insertDto(RecordMetaDto dto) async {
+    final r = await insertMetaDtoWithCreateRecordCollection(dto)
+        .catchError((e, s) async {
       if (e is AppwriteException && e.type == 'collection_not_found') {
         // 集合不存在,则创建集合
         // fixme 新建的集合为"所有人可读写"
         return createMetaCollection(null)
             // 再次尝试
-            .then((_) => insertMetaDtoWithCreateRecordCollection(meta));
+            .then((_) => insertDto(dto));
+      } else if (e.type == 'document_invalid_structure') {
+        // 文档结构错误（老版本创建导致），更新文档结构
+        // Invalid document structure: Unknown attribute: "views"
+        final reg = RegExp('Unknown attribute: "(.+)"');
+        final attrName = reg.firstMatch("${e.message}")!.group(1) ?? '';
+        await updateMetaDocStructure(attrName);
+        // 再次尝试
+        return await insertDto(dto);
       } else {
         return ExceptionAdapter.of(e, s);
       }
@@ -238,10 +246,9 @@ class MetaDtoRepo {
     final vId = view.vId;
     if (vId != -1) {
       // view 已存在, 更新view(只涉及Meta)
-      final idx  = dto.views.indexWhere((v) => v.vId == vId);
+      final idx = dto.views.indexWhere((v) => v.vId == vId);
       dto.views.replaceRange(idx, idx + 1, [view]);
-      await _update(dto);
-      return;
+      return await _update(dto);
     } else {
       final v = view.updateIndex(dto.views);
       // k不存在, 新增view
