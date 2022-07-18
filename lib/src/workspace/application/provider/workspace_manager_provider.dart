@@ -67,11 +67,13 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   /// 新建工作空间
   Future<BaseException?> actCreateWorkspace(
     Team? team,
-    String spaceName,
-  ) async =>
+    String spaceName, {
+    Function(Team t, WorkspaceDto ws)? onCreated,
+  }) async =>
       await actWrapper(() async {
         final r = await _workspaceSrv.createWorkspaceDto(team, spaceName);
         _addWorkspace(r.value1, r.value2);
+        onCreated?.call(r.value1, r.value2);
         setInitialized("创建工作空间成功");
       });
 

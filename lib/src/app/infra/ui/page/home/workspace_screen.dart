@@ -16,8 +16,10 @@ class WorkspacesScreen extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<WorkspaceManagerProvider>()
-                        .actCreateWorkspace(null, '新建空间')
-                        .thenDialog(context);
+                        .actCreateWorkspace(null, '新建空间', onCreated: (t, w) {
+                      // 创建完成后进入新建空间
+                      context.go('/workspace/${w.id}');
+                    }).thenDialog(context);
                   },
                 ),
               ),
