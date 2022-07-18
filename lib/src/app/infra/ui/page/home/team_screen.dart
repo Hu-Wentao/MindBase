@@ -163,10 +163,11 @@ class _TeamScreenState extends State<TeamScreen> {
             trailing: IconButton(
                 onPressed: () {
                   try {
-                    final id = pManger.workspaces[lst[index]]![i].id;
-                    // print("debug 尝试跳转路由 #$id");
-                    context.navigateTo(const WorkspaceRoute());
-                    context.replaceRoute(WorkspaceScreenRoute(workspaceId: id));
+                    final wsId = pManger.workspaces[lst[index]]![i].id;
+                    // print("debug 尝试跳转路由 #$wsId");
+                    // context.navigateTo(const WorkspaceRoute());
+                    // context.replaceRoute(WorkspaceScreenRoute(workspaceId: wsId));
+                    context.go('/workspace/$wsId');
                   } catch (e, s) {
                     print("debug #$e, #$s");
                   }
