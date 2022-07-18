@@ -221,7 +221,8 @@ class RecordMetaDto extends IEntityDto {
         views,
       );
 
-  RecordMeta toDomain(List<Attribute> attrs, List<Method> methods,List<TableView> views) =>
+  RecordMeta toDomain(
+          List<Attribute> attrs, List<Method> methods, List<TableView> views) =>
       RecordMeta(
         id: id,
         name: name,
@@ -235,6 +236,25 @@ class RecordMetaDto extends IEntityDto {
   @override
   String toString() {
     return 'RecordMetaDto{id: $id, name: $name, memo: $memo, maxKey: $maxKey, attrs: $attrs, methods: $methods, views: $views}';
+  }
+
+  RecordMetaDto updateView(TableView view) {
+    // 保留meta中存在的props (view中有,但meta中已被移除的列Info 将被删除)
+    view.cols.retainWhere((ele) =>
+        attrs.any((at) => at.propId == ele.propId) ||
+        methods.any((mt) => mt.propId == ele.propId));
+
+    final vId = view.vId;
+    if (vId != -1) {
+      // k (view)已存在, 更新view(只涉及Meta)
+      final idx = views.indexWhere((v) => v.vId == vId);
+      views.replaceRange(idx, idx + 1, [view]);
+    } else {
+      // k (view)不存在, 新增view
+      final v = view.updateIndex(views);
+      views.add(v);
+    }
+    return this;
   }
 }
 
@@ -284,6 +304,8 @@ class MethodDto extends IDto {
           memo: method.memo,
           expr: IExprNodeDto.fromDomain(method.expr),
         );
+
+  String get propId => PropertyX.getPropId(false, k);
 
   MethodDto copyWith({
     k,
