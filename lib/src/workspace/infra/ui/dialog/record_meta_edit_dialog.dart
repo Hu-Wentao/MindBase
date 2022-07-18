@@ -48,7 +48,20 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
                   kMethodBuilder: originMeta == null ? null : kMethodBuilder,
                   queryMetaFn: queryMetaFn,
                 );
-                Navigator.pop<RecordMetaDto>(context, dto);
+                // 仅用于修复 #490, 后续需要根据 表单视图 适配;
+                RecordMetaDto? r;
+                if (originMeta != null && dto != null) {
+                  r = originMeta
+                    ..name = dto.name
+                    ..memo = dto.memo
+                    ..maxKey = dto.maxKey
+                    ..attrs = dto.attrs
+                    // ..views = dto.views; // 不更新view
+                    ..methods = dto.methods;
+                } else {
+                  r = dto;
+                }
+                Navigator.pop<RecordMetaDto>(context, r);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("请检查表单")),
