@@ -160,7 +160,7 @@ class WorkspaceService {
       await _teams.delete(teamId: teamId);
 
   /// 直接拉取用户到团队,无需同意.
-  inviteMember(
+  Future<void> inviteMember(
     Team team,
     String userEmail, [
     List<String> roles = const [],
@@ -174,4 +174,14 @@ class WorkspaceService {
     );
     print("debug member ${r.toMap()}");
   }
+
+  Future<void> updateWorkspaceName(
+    WorkspaceDto space,
+    String nName,
+  ) {
+    final dto = space..name = nName;
+    return _workspaceRepo.update(dto);
+  }
+
+  Future<void> deleteSpace(String id) => _workspaceRepo.deleteById(id);
 }

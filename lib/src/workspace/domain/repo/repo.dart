@@ -41,6 +41,8 @@ class WorkspaceRepo {
 
   Stream<Workspace> findAllByTeam(String teamId) =>
       _workspaceAcc.findAllByTeam(teamId).asyncMap(dtoToDomain);
+
+  Future<void> update(WorkspaceDto dto) => _workspaceAcc.update(dto);
 }
 
 // 需要传入指定集合ID, 因此无法注入

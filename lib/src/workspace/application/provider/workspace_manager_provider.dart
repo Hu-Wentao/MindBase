@@ -55,9 +55,11 @@ class WorkspaceManagerProvider extends ProviderSidecar {
   }
 
   actSyncUserInfo(User nUser) async => await actWrapper(() async {
-        setInitialized("刷新已登录用户", () {
-          user = nUser;
-        });
+        if (user != nUser) {
+          setInitialized("刷新已登录用户", () {
+            user = nUser;
+          });
+        }
         workspaces = await (_workspaceSrv.queryAllUserWorkspaceDtoList());
         setInitialized("已同步用户数据");
       });
@@ -127,9 +129,8 @@ class WorkspaceManagerProvider extends ProviderSidecar {
 
   Future<Team?> actRenameTeam(Team team, String? newName) async {
     if (newName == null) return null;
-    final tm = await _workspaceSrv.updateName(team, newName);
-    print("已更新团队名称#${tm.$id}, ${tm.name}");
-    actSyncUserInfo(user!);
+    await _workspaceSrv.updateName(team, newName);
+    await actSyncUserInfo(user!);
     return null;
   }
 
@@ -142,5 +143,25 @@ class WorkspaceManagerProvider extends ProviderSidecar {
       await actWrapper(() async {
         if (userEmail == null) return;
         await _workspaceSrv.inviteMember(team, userEmail);
+      });
+
+  Future<BaseException?> actRenameSpace(
+          WorkspaceDto space, String? nName) async =>
+      await actWrapper(() async {
+        if (nName == null) return;
+        await _workspaceSrv.updateWorkspaceName(space, nName);
+        setInitialized('更新工作空间名称[$nName]', () async {
+          // 刷新缓存
+          await actSyncUserInfo(user!);
+        });
+      });
+
+  Future<BaseException?> actDeleteSpace(String id) async =>
+      await actWrapper(() async {
+        await _workspaceSrv.deleteSpace(id);
+        setInitialized('删除工作空间[$id]', () async {
+          // 刷新缓存
+          await actSyncUserInfo(user!);
+        });
       });
 }
