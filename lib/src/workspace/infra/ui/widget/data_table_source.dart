@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/workspace/application/provider/workspace_provider.dart';
@@ -29,12 +30,11 @@ extension TableViewX on TableView {
   List<PlutoColumn> transformCols(List<PlutoColumn> plutoCols) {
     final r = <PlutoColumn>[];
     for (final info in cols) {
-      r.add(
-        plutoCols.firstWhere((col) => col.field == info.propId)
-          ..width = info.width
-          ..minWidth = info.minWidth
-          ..hide = !info.visible,
-      );
+      final col = plutoCols.firstWhereOrNull((col) => col.field == info.propId)
+        ?..width = info.width
+        ..minWidth = info.minWidth
+        ..hide = !info.visible;
+      if (col != null) r.add(col);
     }
     return r;
   }
