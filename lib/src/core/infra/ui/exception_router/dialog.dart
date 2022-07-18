@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:logging/logging.dart';
@@ -47,7 +46,8 @@ class DialogFactory {
             },
           ),
           TextButton(
-              child: const Text("取消"), onPressed: () => context.popRoute()),
+              child: const Text("取消"),
+              onPressed: () => Navigator.of(context).pop()),
         ],
       );
 
@@ -61,7 +61,8 @@ class DialogFactory {
         content: Text(exception.msg),
         actions: <Widget>[
           TextButton(
-              child: const Text("Ok"), onPressed: () => context.popRoute()),
+              child: const Text("Ok"),
+              onPressed: () => Navigator.of(context).pop()),
         ],
       );
 }
