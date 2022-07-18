@@ -158,7 +158,7 @@ class _TeamScreenState extends State<TeamScreen> {
         body: ListView.separated(
           itemCount: pManger.workspaces[lst[index]]!.length,
           itemBuilder: (BuildContext context, int i) => ListTile(
-            leading: const Icon(Icons.workspaces),
+            leading: const Icon(Icons.space_dashboard_rounded),
             title: Text(pManger.workspaces[lst[index]]![i].name.toString()),
             trailing: IconButton(
                 onPressed: () {
