@@ -399,11 +399,11 @@ class DataFrameTitlePluto extends StatelessWidget {
         final nCols = <ColViewInfo>[];
         for (var e in popUpGridManger!.refRows.originalList) {
           final propId = e.cells[propIdField]!.value;
-          final col = view!.cols.firstWhere((col) => col.propId == propId);
+          final col = view.cols.firstWhere((col) => col.propId == propId);
           nCols.add(col);
         }
         // 提交请求
-        onUpdateView(dto, view!.copyWith(cols: nCols)).thenDialog(context);
+        onUpdateView(dto, view.copyWith(cols: nCols)).thenDialog(context);
       },
       onRowChecked: (e) {
         // 设置是否隐藏
@@ -411,7 +411,7 @@ class DataFrameTitlePluto extends StatelessWidget {
         //     "debug onRowChecked #${e.isChecked}, ${e.rowIdx}, ${e.row?.cells.entries.map((e) => "${e.key}-${e.value.value}")}");
         final visible = e.isChecked ?? true;
         final propId = e.row?.cells[propIdField]?.value;
-        final idx = view!.cols.indexWhere((e) => e.propId == propId);
+        final idx = view.cols.indexWhere((e) => e.propId == propId);
         ColViewInfo nInfo;
         List<ColViewInfo> nInfos;
         if (idx == -1) {
@@ -420,14 +420,14 @@ class DataFrameTitlePluto extends StatelessWidget {
             propId: propId,
             visible: visible,
           );
-          nInfos = [...view!.cols, nInfo];
+          nInfos = [...view.cols, nInfo];
         } else {
-          nInfo = view!.cols[idx].copyWith(visible: visible);
+          nInfo = view.cols[idx].copyWith(visible: visible);
           // 由于直接刷新了对应list，因此无需赋值
-          nInfos = view!.cols..replaceRange(idx, idx + 1, [nInfo]);
+          nInfos = view.cols..replaceRange(idx, idx + 1, [nInfo]);
         }
         // 提交请求
-        onUpdateView(dto, view!.copyWith(cols: nInfos)).thenDialog(context);
+        onUpdateView(dto, view.copyWith(cols: nInfos)).thenDialog(context);
       },
       // onChanged: (e){
       //   print("debug onChanged ${e.value}, ${e.rowIdx}, ${e.row?.cells.entries.map((e) => "${e.key}-${e.value.value}")}");
