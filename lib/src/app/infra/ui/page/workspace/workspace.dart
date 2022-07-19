@@ -259,50 +259,7 @@ class _MetaTableListState extends State<MetaTableList> {
                             final meta = p.openedMetas[i].meta;
                             return ExpansionPanelRadio(
                               value: i,
-                              headerBuilder: (c, ex) => ListTile(
-                                selected:
-                                    meta.id == pWorkspace.selectedMeta?.id,
-                                title: Text(meta.name),
-                                onTap: () => pWorkspace
-                                    .actSelectOpenMeta(p.openedMetas[i]),
-                                trailing: PopupMenuButton<String>(
-                                  itemBuilder: (ctx) => [
-                                    const PopupMenuItem(
-                                        value: "newTableViewSheet",
-                                        child: ListTile(
-                                          leading:
-                                              Icon(Icons.add_chart_rounded),
-                                          title: Text("新增表格视图"),
-                                        )),
-                                    const PopupMenuItem(
-                                      value: 'deleteViewEvt',
-                                      child: ListTile(
-                                        leading: Icon(Icons.delete),
-                                        title: Text("删除表"),
-                                      ),
-                                    ),
-                                  ],
-                                  onSelected: (value) {
-                                    // 选中Item后,在这里会被二次调用
-                                    switch (value) {
-                                      case 'newTableViewSheet':
-                                        pWorkspace
-                                            .actNewTableView(
-                                                ViewType.sheet, meta)
-                                            .thenDialog(c);
-                                        break;
-                                      case 'deleteViewEvt':
-                                        pWorkspace
-                                            .actRemoveMeta(meta.id)
-                                            .thenDialog(c);
-                                        break;
-                                      default:
-                                        print("debug#未知的value#$value");
-                                        break;
-                                    }
-                                  },
-                                ),
-                              ),
+                              headerBuilder: (c, ex) => TableTile(meta: meta),
 
                               /// 构建视图列表
                               body: ListView.separated(
@@ -377,6 +334,79 @@ class _MetaTableListState extends State<MetaTableList> {
               ],
             )
           ],
+        ),
+      );
+}
+
+class TableTile extends StatelessWidget {
+  final RecordMeta meta;
+
+  const TableTile({Key? key, required this.meta}) : super(key: key);
+
+  WorkspaceProvider pWorkspace(BuildContext context) =>
+      context.read<WorkspaceProvider>();
+
+  WorkspaceManagerProvider pManager(BuildContext context) =>
+      context.read<WorkspaceManagerProvider>();
+
+  @override
+  Widget build(BuildContext context) => ListTile(
+        selected: meta.id == pWorkspace(context).selectedMeta?.id,
+        title: Text(meta.name),
+        onTap: () => pWorkspace(context).setSelectMetaBy(meta.id),
+        trailing: PopupMenuButton<String>(
+          itemBuilder: (ctx) => [
+            const PopupMenuItem(
+              value: "renameTableEvt",
+              child: ListTile(
+                leading: Icon(Icons.drive_file_rename_outline_rounded),
+                title: Text("重命名表"),
+              ),
+            ),
+            const PopupMenuDivider(),
+            const PopupMenuItem(
+                value: "newTableViewSheet",
+                child: ListTile(
+                  leading: Icon(Icons.add_chart_rounded),
+                  title: Text("新增表格视图"),
+                )),
+            const PopupMenuDivider(),
+            const PopupMenuItem(
+              value: 'deleteTableEvt',
+              child: ListTile(
+                leading: Icon(Icons.delete),
+                title: Text("删除表"),
+              ),
+            ),
+          ],
+          onSelected: (value) async {
+            // 选中Item后,在这里会被二次调用
+            switch (value) {
+              case "renameTableEvt":
+                pWorkspace(context)
+                    .actUpdateMetaName(
+                        meta,
+                        await showTextInputDialog(
+                          context: context,
+                          title: "重命名表",
+                          origin: meta.name,
+                          hint: meta.name,
+                        ))
+                    .thenDialog(context);
+                break;
+              case 'newTableViewSheet':
+                pWorkspace(context)
+                    .actNewTableView(ViewType.sheet, meta)
+                    .thenDialog(context);
+                break;
+              case 'deleteTableEvt':
+                pWorkspace(context).actRemoveMeta(meta.id).thenDialog(context);
+                break;
+              default:
+                print("debug#未知的value#$value");
+                break;
+            }
+          },
         ),
       );
 }
