@@ -27,7 +27,13 @@ class WorkspaceProvider extends ProviderSidecar {
 
   List<OpenedMeta> get openedMetas => openedWorkspace!.openedMetas;
 
-  OpenedMeta? selectedMeta;
+  String? selectedMetaId;
+
+  OpenedMeta? get selectedMeta {
+    if (selectedMetaId == null) return null;
+    final i = openedMetas.indexWhere((v) => v.id == selectedMetaId);
+    return (i != -1) ? openedMetas[i] : null;
+  }
 
   int? selectedVId; // 选中meta所适配的视图，可以为null
   TableView? get selectedTableView {
@@ -131,13 +137,27 @@ class WorkspaceProvider extends ProviderSidecar {
   /// RecordProvider
 
   // 选择一个已经打开的meta
+  @Deprecated("setSelectMetaBy")
   Future<void> actSelectOpenMeta(OpenedMeta? meta) => actWrapper(
         () => selectedMeta != meta
             ? setInitialized(
                 meta == null ? "取消监听Meta" : "开始/切换监听Meta[${meta.name}]",
-                () => selectedMeta = meta)
+                () => selectedMetaId = meta?.id)
             : null,
       );
+
+  // 选择一个已经打开的meta
+  setSelectMetaBy(String? metaId) => selectedMetaId != metaId
+      ? setInitialized(metaId == null ? "取消监听Meta" : "开始/切换监听Meta[$metaId]",
+          () => selectedMetaId = metaId)
+      : null;
+
+  Future<BaseException?> actUpdateMetaName(
+      RecordMeta meta, String? nName) async {
+    if (nName == null) return null;
+    final nDto = meta.toDto()..name = nName;
+    return await actUpdateMeta(meta, nDto);
+  }
 
   @Deprecated("尝试使用 FindRecordFn")
   Record actQueryRecordBy(
