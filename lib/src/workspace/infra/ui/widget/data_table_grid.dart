@@ -127,7 +127,7 @@ class RecordDataGrid extends StatelessWidget {
                     destInfoIndex >= view.cols.length));
 
                 final nInfo = view.cols.removeAt(startInfoIndex);
-                final nCols = view.cols..insert(destInfoIndex - 1, nInfo);
+                final nCols = view.cols..insert(destInfoIndex, nInfo);
                 pWorkspace.actUpdateView(
                   originMeta.toDto(),
                   view.copyWith(cols: nCols),
