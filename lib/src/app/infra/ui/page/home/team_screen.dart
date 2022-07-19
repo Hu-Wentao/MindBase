@@ -160,22 +160,16 @@ class _TeamScreenState extends State<TeamScreen> {
           itemBuilder: (BuildContext context, int i) => ListTile(
             leading: const Icon(Icons.space_dashboard_rounded),
             title: Text(pManger.workspaces[lst[index]]![i].name.toString()),
-            trailing: IconButton(
-                onPressed: () {
-                  try {
-                    final wsId = pManger.workspaces[lst[index]]![i].id;
-                    // print("debug 尝试跳转路由 #$wsId");
-                    // context.navigateTo(const WorkspaceRoute());
-                    // context.replaceRoute(WorkspaceScreenRoute(workspaceId: wsId));
-                    context.go('/workspace/$wsId');
-                  } catch (e, s) {
-                    print("debug #$e, #$s");
-                  }
-                },
-                icon: const Icon(Icons.open_in_new)),
+            trailing: Link(
+              uri: Uri.tryParse(
+                  '/workspace/${pManger.workspaces[lst[index]]![i].id}'),
+              builder: (ctx, followLink) => IconButton(
+                icon: const Icon(Icons.open_in_new),
+                onPressed: followLink,
+              ),
+            ),
           ),
-          separatorBuilder: (BuildContext context, int index) =>
-              Container(height: 1.0, color: const Color(0xfff2f2f2)),
+          separatorBuilder: (context, int index) => const Divider(),
           shrinkWrap: true,
           // physics: const NeverScrollableScrollPhysics(),
         ),
