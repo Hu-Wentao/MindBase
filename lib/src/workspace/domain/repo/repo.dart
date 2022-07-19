@@ -258,6 +258,11 @@ class MetaDtoRepo {
   updateTableView(RecordMetaDto dto, TableView view) async {
     return await _update(dto.updateView(view));
   }
+
+  deleteTableView(RecordMetaDto dto, int vId) async {
+    return await _update(
+        dto..views.removeWhere((element) => element.vId == vId));
+  }
 }
 
 class RecordDtoRepo {

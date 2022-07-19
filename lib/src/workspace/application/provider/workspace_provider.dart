@@ -33,7 +33,6 @@ class WorkspaceProvider extends ProviderSidecar {
   TableView? get selectedTableView {
     final i =
         selectedMeta?.meta.views.indexWhere((v) => v.vId == selectedVId) ?? -1;
-    print("debug selectedTableView i#$i,vId$selectedVId,views${selectedMeta?.meta.views}");
     return (i != -1) ? selectedMeta?.meta.views[i] : null;
   }
 
@@ -180,7 +179,7 @@ class WorkspaceProvider extends ProviderSidecar {
                 name: "未命名[${type.name}]视图",
                 type: type,
                 cols: meta.properties
-                    .map((e) => ColViewInfo.build(propId:e.propId))
+                    .map((e) => ColViewInfo.build(propId: e.propId))
                     .toList()),
           ));
 
@@ -200,6 +199,18 @@ class WorkspaceProvider extends ProviderSidecar {
   Future<BaseException?> actUpdateView(RecordMetaDto dto, TableView v) async =>
       await actWrapper(() async {
         await _metaService!.updateTableView(dto, v);
+      });
+
+  Future<BaseException?> actUpdateViewName(
+      RecordMetaDto dto, TableView view, String? nName) async {
+    if (nName == null) return null;
+    final nView = view.copyWith(name: nName);
+    return await actUpdateView(dto, nView);
+  }
+
+  Future<BaseException?> actDeleteView(RecordMetaDto dto, int vId) async =>
+      await actWrapper(() async {
+        await _metaService!.deleteTableView(dto, vId);
       });
 
   /// set方法 ======

@@ -47,4 +47,8 @@ class MetaService {
   updateTableView(RecordMetaDto origin, TableView view) {
     return _metaDtoRepo.updateTableView(origin, view);
   }
+
+  deleteTableView(RecordMetaDto dto, int vId) {
+    return _metaDtoRepo.deleteTableView(dto,vId);
+  }
 }

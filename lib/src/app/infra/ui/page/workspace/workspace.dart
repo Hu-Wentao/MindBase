@@ -4,6 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/confirm_dialog.dart';
+import 'package:mind_base/src/core/infra/ui/dialog/text_input_dialog.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/core/infra/ui/widget/RadiusInkWell.dart';
 import 'package:mind_base/src/feedback/infra/ui/widget/feedback_btn.dart';
@@ -12,10 +13,12 @@ import 'package:mind_base/src/user/infra/ui/dialog/auth_dialog.dart';
 import 'package:mind_base/src/workspace/application/provider/opened_workspace.dart';
 import 'package:mind_base/src/workspace/application/provider/workspace_manager_provider.dart';
 import 'package:mind_base/src/workspace/application/provider/workspace_provider.dart';
+import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/import_data_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/record_meta_edit_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/widget/data_table_grid.dart';
+import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 import 'package:provider/provider.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
@@ -252,71 +255,70 @@ class _MetaTableListState extends State<MetaTableList> {
                         },
                         children: List.generate(
                           p.openedMetas.length,
-                          (i) => ExpansionPanelRadio(
-                            value: i,
-                            headerBuilder: (c, ex) => ListTile(
-                              selected: p.openedMetas[i].meta.id ==
-                                  pWorkspace.selectedMeta?.id,
-                              title: Text(p.openedMetas[i].meta.name),
-                              onTap: () => pWorkspace
-                                  .actSelectOpenMeta(p.openedMetas[i]),
-                              trailing: PopupMenuButton<String>(
-                                itemBuilder: (ctx) => [
-                                  const PopupMenuItem(
-                                      value: "newTableViewSheet",
+                          (i) {
+                            final meta = p.openedMetas[i].meta;
+                            return ExpansionPanelRadio(
+                              value: i,
+                              headerBuilder: (c, ex) => ListTile(
+                                selected:
+                                    meta.id == pWorkspace.selectedMeta?.id,
+                                title: Text(meta.name),
+                                onTap: () => pWorkspace
+                                    .actSelectOpenMeta(p.openedMetas[i]),
+                                trailing: PopupMenuButton<String>(
+                                  itemBuilder: (ctx) => [
+                                    const PopupMenuItem(
+                                        value: "newTableViewSheet",
+                                        child: ListTile(
+                                          leading:
+                                              Icon(Icons.add_chart_rounded),
+                                          title: Text("新增表格视图"),
+                                        )),
+                                    const PopupMenuItem(
+                                      value: 'deleteViewEvt',
                                       child: ListTile(
-                                        leading: Icon(Icons.add_chart_rounded),
-                                        title: Text("新增表格视图"),
-                                      )),
-                                  const PopupMenuItem(
-                                    value: 'deleteViewEvt',
-                                    child: ListTile(
-                                      leading: Icon(Icons.delete),
-                                      title: Text("删除表"),
+                                        leading: Icon(Icons.delete),
+                                        title: Text("删除表"),
+                                      ),
                                     ),
-                                  ),
-                                ],
-                                onSelected: (value) {
-                                  // 选中Item后,在这里会被二次调用
-                                  switch (value) {
-                                    case 'newTableViewSheet':
-                                      pWorkspace
-                                          .actNewTableView(ViewType.sheet,
-                                              p.openedMetas[i].meta)
-                                          .thenDialog(c);
-                                      break;
-                                    case 'deleteViewEvt':
-                                      pWorkspace
-                                          .actRemoveMeta(
-                                              p.openedMetas[i].meta.id)
-                                          .thenDialog(c);
-                                      break;
-                                    default:
-                                      print("debug#未知的value#$value");
-                                      break;
-                                  }
-                                },
+                                  ],
+                                  onSelected: (value) {
+                                    // 选中Item后,在这里会被二次调用
+                                    switch (value) {
+                                      case 'newTableViewSheet':
+                                        pWorkspace
+                                            .actNewTableView(
+                                                ViewType.sheet, meta)
+                                            .thenDialog(c);
+                                        break;
+                                      case 'deleteViewEvt':
+                                        pWorkspace
+                                            .actRemoveMeta(meta.id)
+                                            .thenDialog(c);
+                                        break;
+                                      default:
+                                        print("debug#未知的value#$value");
+                                        break;
+                                    }
+                                  },
+                                ),
                               ),
-                            ),
-                            body: ListView.separated(
-                              shrinkWrap: true,
-                              itemCount: p.openedMetas[i].meta.views.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                final v = p.openedMetas[i].meta.views[index];
-                                return ListTile(
-                                  title: Text(v.name),
-                                  onTap: () => pWorkspace
-                                      .actSelectView(v)
-                                      .thenDialog(context),
-                                );
-                              },
-                              separatorBuilder:
-                                  (BuildContext context, int index) =>
-                                      Container(
-                                          height: 1.0,
-                                          color: const Color(0xfff2f2f2)),
-                            ),
-                          ),
+
+                              /// 构建视图列表
+                              body: ListView.separated(
+                                  shrinkWrap: true,
+                                  itemCount: meta.views.length,
+                                  itemBuilder: (context, int index) {
+                                    final v = meta.views[index];
+                                    return TableViewTile(
+                                      meta: meta,
+                                      view: v,
+                                    );
+                                  },
+                                  separatorBuilder: (ctx, i) =>
+                                      const Divider()),
+                            );
+                          },
                         ),
                         animationDuration: const Duration(microseconds: 50),
                       ),
@@ -376,5 +378,73 @@ class _MetaTableListState extends State<MetaTableList> {
             )
           ],
         ),
+      );
+}
+
+class TableViewTile extends StatelessWidget {
+  final TableView view;
+  final RecordMeta meta;
+
+  const TableViewTile({
+    Key? key,
+    required this.view,
+    required this.meta,
+  }) : super(key: key);
+
+  WorkspaceProvider pWorkspace(BuildContext context) =>
+      context.read<WorkspaceProvider>();
+
+  WorkspaceManagerProvider pManager(BuildContext context) =>
+      context.read<WorkspaceManagerProvider>();
+
+  @override
+  Widget build(BuildContext context) => ListTile(
+        title: Text(view.name),
+        trailing: PopupMenuButton<String>(
+          itemBuilder: (ctx) => [
+            const PopupMenuItem(
+              value: "rename",
+              child: Text("重命名视图"),
+            ),
+            const PopupMenuDivider(),
+            const PopupMenuItem(
+              value: "delete",
+              child: Text("删除"),
+            )
+          ],
+          onSelected: (key) async {
+            final dto = meta.toDto();
+            switch (key) {
+              case "rename":
+                await pWorkspace(context)
+                    .actUpdateViewName(
+                      dto,
+                      view,
+                      await showTextInputDialog(
+                        context: context,
+                        title: "重命名视图",
+                        origin: view.name,
+                        hint: view.name,
+                      ),
+                    )
+                    .thenDialog(context);
+                break;
+              case "delete":
+                await showConfirmDialog(
+                    context: context,
+                    title: "确认删除视图[${view.name}]吗?",
+                    onConfirm: () async {
+                      await pWorkspace(context)
+                          .actDeleteView(dto, view.vId)
+                          .thenDialog(context);
+                    });
+                break;
+              default:
+                throw "error 未知的 key[$key]";
+            }
+          },
+        ),
+        onTap: () =>
+            pWorkspace(context).actSelectView(view).thenDialog(context),
       );
 }
