@@ -239,47 +239,50 @@ class _MetaTableListState extends State<MetaTableList> {
         width: 240,
         child: Stack(
           children: [
-            // MetaList
-            Consumer<OpenedWorkspace?>(
-              builder: (c, p, _) => (p == null)
-                  // 此时本组件不应该存在
-                  ? const Text("Error selectedWorkspace==null")
-                  : SingleChildScrollView(
-                      controller: ScrollController(),
-                      child: ExpansionPanelList.radio(
-                        expansionCallback: (panelIndex, isExpanded) {
-                          if (isExpanded) {
-                            pWorkspace
-                                .actSelectOpenMeta(p.openedMetas[panelIndex]);
-                          }
-                        },
-                        children: List.generate(
-                          p.openedMetas.length,
-                          (i) {
-                            final meta = p.openedMetas[i].meta;
-                            return ExpansionPanelRadio(
-                              value: i,
-                              headerBuilder: (c, ex) => TableTile(meta: meta),
-
-                              /// 构建视图列表
-                              body: ListView.separated(
-                                  shrinkWrap: true,
-                                  itemCount: meta.views.length,
-                                  itemBuilder: (context, int index) {
-                                    final v = meta.views[index];
-                                    return TableViewTile(
-                                      meta: meta,
-                                      view: v,
-                                    );
-                                  },
-                                  separatorBuilder: (ctx, i) =>
-                                      const Divider()),
-                            );
+            /// 左侧Meta列表
+            Padding(
+              padding: const EdgeInsets.only(bottom: 48),
+              child: Consumer<OpenedWorkspace?>(
+                builder: (c, p, _) => (p == null)
+                    // 此时本组件不应该存在
+                    ? const Text("Error selectedWorkspace==null")
+                    : SingleChildScrollView(
+                        controller: ScrollController(),
+                        child: ExpansionPanelList.radio(
+                          expansionCallback: (panelIndex, isExpanded) {
+                            if (isExpanded) {
+                              pWorkspace
+                                  .actSelectOpenMeta(p.openedMetas[panelIndex]);
+                            }
                           },
+                          children: List.generate(
+                            p.openedMetas.length,
+                            (i) {
+                              final meta = p.openedMetas[i].meta;
+                              return ExpansionPanelRadio(
+                                value: i,
+                                headerBuilder: (c, ex) => TableTile(meta: meta),
+
+                                /// 构建视图列表
+                                body: ListView.separated(
+                                    shrinkWrap: true,
+                                    itemCount: meta.views.length,
+                                    itemBuilder: (context, int index) {
+                                      final v = meta.views[index];
+                                      return TableViewTile(
+                                        meta: meta,
+                                        view: v,
+                                      );
+                                    },
+                                    separatorBuilder: (ctx, i) =>
+                                        const Divider()),
+                              );
+                            },
+                          ),
+                          animationDuration: const Duration(microseconds: 50),
                         ),
-                        animationDuration: const Duration(microseconds: 50),
                       ),
-                    ),
+              ),
             ),
             // 新建Meta
             Column(
