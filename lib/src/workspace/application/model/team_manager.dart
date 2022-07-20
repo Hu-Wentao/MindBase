@@ -45,6 +45,7 @@ extension TeamManagerModelX on TeamManagerModel {
           teams.add(m);
           setInitialized("刷新Team信息");
         }
+        setInitialized("Team信息刷新完成");
       });
 
   Future<BaseException?> actDeleteTeam(String teamId) async =>
