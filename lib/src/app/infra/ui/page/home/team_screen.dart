@@ -28,13 +28,53 @@ class _TeamScreenState extends State<TeamScreen> {
             child: const Text('请先登录')),
       );
 
-  Widget _buildTeamPanel(BuildContext c) => Consumer<WorkspaceManagerProvider>(
-      builder: (c, pManger, _) => Column(
-            children: [
-              _buildTitleBar(c),
-              _buildTeamList(c, pManger),
-            ],
-          ));
+  Widget _buildTeamPanel(BuildContext c) => Column(
+        children: [
+          _buildTitleBar(c),
+          Consumer<TeamManagerModel>(
+              builder: (c, pManger, _) => Expanded(
+                    child: SingleChildScrollView(
+                      controller: ScrollController(),
+                      child: ExpansionPanelList(
+                        expansionCallback: _switchExpanded,
+                        children: List.generate(pManger.teams.length, (index) {
+                          final team = pManger.teams[index];
+                          return ExpansionPanel(
+                            canTapOnHeader: true,
+                            isExpanded: _panelExpanded[index] ??= false,
+                            headerBuilder:
+                                (BuildContext context, bool isExpanded) {
+                              return _buildTeamTile(
+                                  context, isExpanded, team, pManger);
+                            },
+                            body: ListView.separated(
+                              itemCount: team.workspaces.length,
+                              itemBuilder: (BuildContext context, int i) {
+                                final space = team.workspaces[i];
+                                return Link(
+                                  uri: Uri.tryParse('/workspace/${space.id}'),
+                                  builder: (ctx, followLink) => ListTile(
+                                    leading: const Icon(
+                                        Icons.space_dashboard_rounded),
+                                    title: Text(space.name),
+                                    onTap: followLink,
+                                  ),
+                                );
+                              },
+                              separatorBuilder: (context, int index) =>
+                                  const Divider(),
+                              shrinkWrap: true,
+                              // physics: const Neve
+                              // physics: const NeverScrollableScrollPhysics(),
+                            ),
+                          );
+                        }),
+                        animationDuration: const Duration(microseconds: 50),
+                      ),
+                    ),
+                  )),
+        ],
+      );
 
   _buildTitleBar(c) => Row(
         children: [
@@ -51,23 +91,6 @@ class _TeamScreenState extends State<TeamScreen> {
         ],
       );
 
-  _buildTeamList(BuildContext c, WorkspaceManagerProvider pManger) {
-    final lst = pManger.workspaces.keys.toList();
-    return Expanded(
-      child: SingleChildScrollView(
-        controller: ScrollController(),
-        child: ExpansionPanelList(
-          expansionCallback: _switchExpanded,
-          children: List.generate(
-            lst.length,
-            (i) => _buildExpansionPanel(i, lst, pManger),
-          ),
-          animationDuration: const Duration(microseconds: 50),
-        ),
-      ),
-    );
-  }
-
   void _switchExpanded(int panelIndex, bool isExpanded) => setState(() {
         _panelExpanded[panelIndex] = !isExpanded;
       });
@@ -75,8 +98,8 @@ class _TeamScreenState extends State<TeamScreen> {
   _buildTeamTile(
     BuildContext c,
     bool isExpanded,
-    Team team,
-    WorkspaceManagerProvider pManger,
+    TeamModel team,
+    TeamManagerModel pManger,
   ) =>
       ListTile(
         leading: Icon(Icons.group, color: (isExpanded ? Colors.blue : null)),
@@ -84,8 +107,7 @@ class _TeamScreenState extends State<TeamScreen> {
           team.name,
           style: Theme.of(context).textTheme.titleMedium,
         ),
-        subtitle: Text(
-            "成员: ${team.total}  工作空间: ${pManger.workspaces[team]!.length}"),
+        subtitle: Text("成员: ${team.total}  工作空间: ${team.workspaces.length}"),
         trailing: PopupMenuButton<String>(
           itemBuilder: (ctx) => [
             const PopupMenuItem(
@@ -105,8 +127,7 @@ class _TeamScreenState extends State<TeamScreen> {
           onSelected: (key) async {
             switch (key) {
               case "rename":
-                await pManger.actRenameTeam(
-                  team,
+                await team.actRenameTeam(
                   await showTextInputDialog(
                     context: context,
                     title: "重命名团队",
@@ -116,9 +137,8 @@ class _TeamScreenState extends State<TeamScreen> {
                 );
                 break;
               case "invite":
-                await pManger
+                await team
                     .actInviteMember(
-                      team,
                       await showTextInputDialog(
                         context: context,
                         title: "${team.name} 团队邀请成员",
@@ -133,45 +153,13 @@ class _TeamScreenState extends State<TeamScreen> {
                     context: context,
                     title: "确认删除团队[${team.name}]吗?",
                     onConfirm: () {
-                      pManger.actDeleteTeam(team.$id);
+                      pManger.actDeleteTeam(team.id);
                     });
                 break;
               default:
                 throw "error 未知的 key[$key]";
             }
           },
-        ),
-      );
-
-  ExpansionPanel _buildExpansionPanel(
-    int index,
-    List<Team> lst,
-    WorkspaceManagerProvider pManger,
-  ) =>
-      ExpansionPanel(
-        canTapOnHeader: true,
-        isExpanded: _panelExpanded[index] ??= false,
-        headerBuilder: (BuildContext context, bool isExpanded) {
-          final team = lst[index];
-          return _buildTeamTile(context, isExpanded, team, pManger);
-        },
-        body: ListView.separated(
-          itemCount: pManger.workspaces[lst[index]]!.length,
-          itemBuilder: (BuildContext context, int i) => ListTile(
-            leading: const Icon(Icons.space_dashboard_rounded),
-            title: Text(pManger.workspaces[lst[index]]![i].name.toString()),
-            trailing: Link(
-              uri: Uri.tryParse(
-                  '/workspace/${pManger.workspaces[lst[index]]![i].id}'),
-              builder: (ctx, followLink) => IconButton(
-                icon: const Icon(Icons.open_in_new),
-                onPressed: followLink,
-              ),
-            ),
-          ),
-          separatorBuilder: (context, int index) => const Divider(),
-          shrinkWrap: true,
-          // physics: const NeverScrollableScrollPhysics(),
         ),
       );
 }

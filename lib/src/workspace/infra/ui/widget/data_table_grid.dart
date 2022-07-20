@@ -6,8 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
-import 'package:mind_base/src/workspace/application/provider/opened_workspace.dart';
-import 'package:mind_base/src/workspace/application/provider/workspace_provider.dart';
+import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/confirm_dialog.dart';
@@ -18,26 +17,26 @@ import 'package:mind_base/src/workspace/infra/ui/dialog/record_meta_edit_dialog.
 import 'package:mind_base/src/workspace/infra/ui/widget/column_menu_delegate.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 import 'package:pluto_grid/pluto_grid.dart';
-import 'package:provider/provider.dart';
 
 import 'data_table_source.dart';
 
 /// 适配Pluto表格
 class RecordDataGrid extends StatelessWidget {
+  final OpenedWorkspace openedSpace;
   final OpenedMeta openedMeta;
-  final WorkspaceProvider pWorkspace;
+  final TableView? view;
 
-  const RecordDataGrid(
-      {Key? key, required this.openedMeta, required this.pWorkspace})
-      : super(key: key);
+  const RecordDataGrid({
+    Key? key,
+    required this.openedSpace,
+    required this.openedMeta,
+    this.view,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final data = openedMeta.dataSource;
-    final view = pWorkspace.selectedTableView;
     final originMeta = openedMeta.meta;
-    // print(
-    //     "debug RecordDataGrid build valueKey ${"${openedMeta.ver}-${view?.vId}"}");
     return Expanded(
       child: PlutoGrid(
         // key不一致的时候才会刷新UI
@@ -61,11 +60,10 @@ class RecordDataGrid extends StatelessWidget {
                     context: context,
                     initKey: originMeta.nextKey(),
                     kAttrBuilder: GlobalKey<FormBuilderState>(),
-                    queryMetaFn: pWorkspace.openedWorkspace!.queryMeta,
-                    allMetas: () => pWorkspace.metaList,
-                  ).then((value) => pWorkspace
-                      .actMetaUpdateAttr(originMeta, value)
-                      .thenDialog(context));
+                    queryMetaFn: openedSpace.queryMeta,
+                    allMetas: openedSpace.allMetas,
+                  ).then((value) =>
+                      openedMeta.actMetaUpdateAttr(value).thenDialog(context));
                 },
                 // 隐藏列
                 onHideCol: view == null
@@ -73,13 +71,12 @@ class RecordDataGrid extends StatelessWidget {
                     : (context, stateManager, column) {
                         final propId = column.field;
                         final originIndex =
-                            view.cols.indexWhere((c) => c.propId == propId);
-                        final originCol = view.cols[originIndex];
+                            view!.cols.indexWhere((c) => c.propId == propId);
+                        final originCol = view!.cols[originIndex];
                         final nCol = originCol.copyWith(visible: false);
-                        final nCols = view.cols
+                        final nCols = view!.cols
                           ..replaceRange(originIndex, originIndex + 1, [nCol]);
-                        pWorkspace.actUpdateView(
-                            originMeta.toDto(), view.copyWith(cols: nCols));
+                        openedMeta.actUpdateView(view!.copyWith(cols: nCols));
                       }));
         },
         onColWidthChanged: (view == null)
@@ -90,18 +87,17 @@ class RecordDataGrid extends StatelessWidget {
                   var nWidth = evt.column.width;
                   final propId = evt.column.field;
                   final originIndex =
-                      view.cols.indexWhere((c) => c.propId == propId);
-                  final originCol = view.cols[originIndex];
+                      view!.cols.indexWhere((c) => c.propId == propId);
+                  final originCol = view!.cols[originIndex];
                   final originWidth = originCol.width;
                   // 如果新旧宽度差小于 0.1, 则不更新; 否则保留1位小数并更新
                   if ((originWidth - nWidth).abs() < 0.1) return;
                   nWidth = (nWidth * 10).toInt() / 10;
                   final nCol = originCol.copyWith(width: nWidth);
-                  final nCols = view.cols
+                  final nCols = view!.cols
                     ..replaceRange(originIndex, originIndex + 1, [nCol]);
-                  pWorkspace.actUpdateView(
-                    originMeta.toDto(),
-                    view.copyWith(cols: nCols),
+                  openedMeta.actUpdateView(
+                    view!.copyWith(cols: nCols),
                   );
                 });
               },
@@ -114,23 +110,22 @@ class RecordDataGrid extends StatelessWidget {
                 var moveCount = (_.originIdx - _.targetIdx).abs(); // 剩余需要移动的个数
 
                 final propId = _.column.field;
-                final startInfoIndex =
-                    view.cols.indexWhere((element) => element.propId == propId);
+                final startInfoIndex = view!.cols
+                    .indexWhere((element) => element.propId == propId);
                 int destInfoIndex = startInfoIndex;
                 do {
                   // 移动
                   destInfoIndex += (isMoveLeftToRight ? 1 : -1);
                   // 是否有效(如果不可见，则剩余移动步数-0)
-                  moveCount -= (view.cols[destInfoIndex].visible ? 1 : 0);
+                  moveCount -= (view!.cols[destInfoIndex].visible ? 1 : 0);
                 } while (!(moveCount == 0 ||
                     destInfoIndex < 0 ||
-                    destInfoIndex >= view.cols.length));
+                    destInfoIndex >= view!.cols.length));
 
-                final nInfo = view.cols.removeAt(startInfoIndex);
-                final nCols = view.cols..insert(destInfoIndex, nInfo);
-                pWorkspace.actUpdateView(
-                  originMeta.toDto(),
-                  view.copyWith(cols: nCols),
+                final nInfo = view!.cols.removeAt(startInfoIndex);
+                final nCols = view!.cols..insert(destInfoIndex, nInfo);
+                openedMeta.actUpdateView(
+                  view!.copyWith(cols: nCols),
                 );
               },
         onChanged: (_) {
@@ -143,7 +138,7 @@ class RecordDataGrid extends StatelessWidget {
               .firstWhere((element) => element.id == ettId.value)
               .toDto()
               .updateBy(row);
-          pWorkspace.actSaveRecord(dto).thenDialog(context);
+          openedMeta.actSaveRecord(dto).thenDialog(context);
           // widget.onSaveRecord(dto); // 同步到服务器
         },
         onSelected: (_) {
@@ -162,21 +157,16 @@ class RecordDataGrid extends StatelessWidget {
         onRowsMoved: (_) {
           print("#debug #onRowsMoved $_");
         },
-        createHeader: (manager) => Consumer<OpenedWorkspace>(
-          builder: (c, p, _) => DataFrameTitlePluto(
-            meta: openedMeta.meta,
-            view: view,
-            stateManager: manager,
-            onSaveMeta: (dto) => pWorkspace.actUpdateMeta(
-              pWorkspace.selectedMeta!.meta,
-              dto,
-            ),
-            onSaveRecord: pWorkspace.actSaveRecord,
-            onUpdateView: pWorkspace.actUpdateView,
-            openedWorkspace: p,
-            queryMetaFn: p.queryMeta,
-            allMetas: p.allMetas,
-          ),
+        createHeader: (manager) => DataFrameTitlePluto(
+          openedMeta: openedMeta,
+          view: view,
+          stateManager: manager,
+          onSaveMeta: openedMeta.actUpdateMeta,
+          onSaveRecord: openedMeta.actSaveRecord,
+          onUpdateView: (m, v) => openedMeta.actUpdateView(v),
+          openedWorkspace: openedSpace,
+          queryMetaFn: openedSpace.queryMeta,
+          allMetas: openedSpace.allMetas,
         ),
         // createFooter: (_) {             },
         // rowColorCallback: (_) {},
@@ -227,7 +217,7 @@ class RecordDataGrid extends StatelessWidget {
 ///
 /// 表格标题栏
 class DataFrameTitlePluto extends StatelessWidget {
-  final RecordMeta meta;
+  final OpenedMeta openedMeta;
   final TableView? view; // 当前视图，可以为空
   final OpenedWorkspace openedWorkspace;
   final PlutoGridStateManager stateManager;
@@ -244,7 +234,7 @@ class DataFrameTitlePluto extends StatelessWidget {
 
   DataFrameTitlePluto({
     Key? key,
-    required this.meta,
+    required this.openedMeta,
     this.view,
     required this.openedWorkspace,
     required this.stateManager,
@@ -255,9 +245,9 @@ class DataFrameTitlePluto extends StatelessWidget {
     required this.onUpdateView,
   }) : super(key: key);
 
+  RecordMeta get meta => openedMeta.meta;
   @override
-  Widget build(BuildContext context) => Consumer<WorkspaceProvider>(
-        builder: (c, pWorkspace, _) => SingleChildScrollView(
+  Widget build(BuildContext context) =>SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
@@ -269,14 +259,14 @@ class DataFrameTitlePluto extends StatelessWidget {
                     openedWorkspace: openedWorkspace,
                     kRecordBuilder: _kRecordBuilder,
                   ),
-                ).thenDialog(c),
+                ).thenDialog(context),
                 icon: const Icon(Icons.add),
                 label: const Text("新增一行"),
               ),
               // 只有在 指定了视图 时，才提供"字段管理"功能
               if (view != null)
                 TextButton.icon(
-                  onPressed: () => _fieldManager(c, meta.toDto(), view!),
+                  onPressed: () => _fieldManager(context, meta.toDto(), view!),
                   icon: const Icon(Icons.blur_linear_outlined),
                   label: const Text("字段管理"),
                 ),
@@ -295,7 +285,7 @@ class DataFrameTitlePluto extends StatelessWidget {
                         final recordIds = checked
                             .map((e) => (e.key as ValueKey<String>).value);
                         for (final recordId in recordIds) {
-                          await pWorkspace.actRemoveRecord(meta, recordId);
+                          await openedMeta.actRemoveRecord(recordId);
                         }
                       },
                     );
@@ -321,7 +311,6 @@ class DataFrameTitlePluto extends StatelessWidget {
               ),
             ],
           ),
-        ),
       );
 
   // 字段管理

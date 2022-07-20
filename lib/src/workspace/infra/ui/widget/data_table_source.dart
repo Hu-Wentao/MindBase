@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
-import 'package:mind_base/src/workspace/application/provider/workspace_provider.dart';
+import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
@@ -41,7 +40,7 @@ extension TableViewX on TableView {
 }
 
 extension PlutoRecordMetaX on RecordMeta {
-  List<PlutoColumn> get toPlutoCols => properties
+  List<PlutoColumn> toPlutoCols(OpenedMeta openedMeta) => properties
       .map((prop) => PlutoColumn(
             title: prop.name,
             // 展示在UI的列标题
@@ -60,7 +59,7 @@ extension PlutoRecordMetaX on RecordMeta {
             // 允许编辑
             // this.hide = false,// 隐藏列
             renderer: prop.type.isRef
-                ? (rdCtx) => GridRefCellWidget(prop, rdCtx, this)
+                ? (rdCtx) => GridRefCellWidget(prop, rdCtx, openedMeta)
                 : null,
           ))
       .toList()
@@ -87,7 +86,7 @@ extension PlutoRecordMetaX on RecordMeta {
 
 /// Ref单元格, 可以通过弹出GridPopup来选择其他记录
 class GridRefCellWidget extends StatefulWidget {
-  final RecordMeta meta;
+  final OpenedMeta meta;
   final Property prop;
   final PlutoColumnRendererContext rdCtx;
 
@@ -103,17 +102,15 @@ class _GridRefCellWidgetState extends State<GridRefCellWidget> {
   Widget build(BuildContext context) {
     Property prop = widget.prop;
     PlutoColumnRendererContext rdCtx = widget.rdCtx;
-
-    // todo 本地单元格更新, 需要操作Manager, 如果网速够快, 直接provider更新数据源问题不大
-    // final manager =
     final refMetaId = (prop.type.r!);
-    return Consumer<WorkspaceProvider>(
-        builder: (context, pWorkspace, child) => TextButton(
+    return Consumer<OpenedWorkspace>(
+        builder: (context, spaceX, child) => TextButton(
               onPressed: () {
-                final refDataSource = pWorkspace.actGetDataSource(refMetaId)
-                    as RecordDataGridSourcePluto;
-                // final cols = meta.toPlutoCols;
-                // pop菜单
+                final refDataSource = widget.meta.at.openedMetas
+                    .firstWhere((m) => m.meta.id == refMetaId)
+                    .dataSource;
+
+                /// pop菜单
                 PlutoGridPopup(
                   context: context,
                   columns: refDataSource.cachedColumns,
@@ -141,20 +138,14 @@ class _GridRefCellWidgetState extends State<GridRefCellWidget> {
                     // 选中记录的Id
                     final selectRefRecordId =
                         (event.row!.key as ValueKey<String>).value;
-                    // final dto = pWorkspace
-                    //     .actQueryRecordBy(selectRefRecordId, metaId: refMetaId)
-                    //     .toDto()
-                    //     .updateBy(meta, row);
-                    final ettId = rdCtx.row.key as ValueKey<String>;
+                    final originRecordId = rdCtx.row.key as ValueKey<String>;
 
-                    // 更新的DTO
-                    final dto = pWorkspace
-                        .actQueryRecordBy(ettId.value,
-                            metaId: widget.meta.id) // todo 性能优化
+                    // 更新的Record(todo 考虑改为只更新单个字段)
+                    final dto = widget.meta.records
+                        .firstWhere((rcd) => rcd.id == originRecordId.value)
                         .toDto()
                         .updateOnlyBy(rdCtx.column, selectRefRecordId);
-                    pWorkspace.actSaveRecord(dto).thenDialog(context);
-                    // controller.text = event.row!.cells[selectFieldName]!.value.toString();
+                    widget.meta.actSaveRecord(dto);
                   },
                 );
               },
