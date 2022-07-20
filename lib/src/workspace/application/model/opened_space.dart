@@ -180,7 +180,7 @@ class OpenedWorkspace extends ProviderSidecar {
 }
 
 extension OpenedSpaceX on OpenedWorkspace {
-  MetaService get _metaService => sl<MetaService>();
+  MetaService get _metaService => MetaService.withDI(sl, id)!;
 
   WorkspaceService get _workspaceSrv => sl<WorkspaceService>();
 

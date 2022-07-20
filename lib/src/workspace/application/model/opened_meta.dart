@@ -165,7 +165,7 @@ class OpenedMeta extends ProviderSidecar {
 }
 
 extension OpenedMetaX on OpenedMeta {
-  MetaService get _metaService => sl<MetaService>();
+  MetaService get _metaService => MetaService.withDI(sl, at.id)!;
 
   RecordDtoRepo get _recordDtoRepo => RecordDtoRepo.withDI(sl, meta);
 
