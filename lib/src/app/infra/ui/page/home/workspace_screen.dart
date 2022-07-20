@@ -23,99 +23,6 @@ class WorkspacesScreen extends StatelessWidget {
                 Future.value(UnLoginException("登录后再查看", "")).thenDialog(c),
             child: const Text('请先登录')),
       );
-
-// Widget _buildTeamPanel(BuildContext context) => Column(
-//       children: [
-//         Row(
-//           children: [
-//             RadiusInkWell(
-//               margin: const EdgeInsets.all(10),
-//               child: TextButton.icon(
-//                 icon: const Icon(Icons.add),
-//                 label: const Text("创建工作空间"),
-//                 onPressed: () {
-//                   context
-//                       .read<OpenedSpaceManagerModel>()
-//                       .actCreateWorkspace(null, '新建空间', onCreated: (t, w) {
-//                     // 创建完成后进入新建空间
-//                     context.go('/workspace/${w.id}');
-//                   }).thenDialog(context);
-//                 },
-//               ),
-//             ),
-//           ],
-//         ),
-//         const Divider(),
-//         Consumer<TeamManagerModel>(
-//             builder: (c, teamManager, _) => Expanded(
-//                   child: SingleChildScrollView(
-//                     child: Column(
-//                       mainAxisSize: MainAxisSize.min,
-//                       children: teamManager.workspaces.entries
-//                           .expand((entry) => entry.value.map(
-//                                 (e) => Tuple2(entry.key, e),
-//                               ))
-//                           .map(
-//                         (e) {
-//                           final team = e.value1;
-//                           final space = e.value2;
-//                           return ListTile(
-//                             leading:
-//                                 const Icon(Icons.space_dashboard_rounded),
-//                             title: Text(space.name),
-//                             subtitle: Text(team.name),
-//                             trailing: PopupMenuButton<String>(
-//                               itemBuilder: (ctx) => [
-//                                 const PopupMenuItem(
-//                                   value: "rename",
-//                                   child: Text("重命名空间"),
-//                                 ),
-//                                 const PopupMenuDivider(),
-//                                 const PopupMenuItem(
-//                                   value: "delete",
-//                                   child: Text("删除"),
-//                                 )
-//                               ],
-//                               onSelected: (key) async {
-//                                 switch (key) {
-//                                   case "rename":
-//                                     await teamManager
-//                                         .actRenameSpace(
-//                                           space,
-//                                           await showTextInputDialog(
-//                                             context: context,
-//                                             title: "重命名工作空间",
-//                                             origin: space.name,
-//                                             hint: space.name,
-//                                           ),
-//                                         )
-//                                         .thenDialog(context);
-//                                     break;
-//                                   case "delete":
-//                                     await showConfirmDialog(
-//                                         context: context,
-//                                         title: "确认删除工作空间[${space.name}]吗?",
-//                                         onConfirm: () async {
-//                                           await teamManager
-//                                               .actDeleteSpace(space.id)
-//                                               .thenDialog(context);
-//                                         });
-//                                     break;
-//                                   default:
-//                                     throw "error 未知的 key[$key]";
-//                                 }
-//                               },
-//                             ),
-//                             onTap: () =>
-//                                 context.go('/workspace/${e.value2.id}'),
-//                           );
-//                         },
-//                       ).toList(),
-//                     ),
-//                   ),
-//                 ))
-//       ],
-//     );
 }
 
 class TeamPanel extends StatefulWidget {
@@ -129,15 +36,9 @@ class _TeamPanelState extends State<TeamPanel> {
   final _panelExpanded = <int, bool>{};
 
   // 此处添加Future避免报错
-  void _onExpandedCall(int panelIndex, bool isExpanded) => Future.delayed(
-      Duration.zero,
-      () => setState(() {
-            _panelExpanded[panelIndex] = !isExpanded;
-          }));
-
-  bool _switchExpanded(int panelIdx) {
-    return _panelExpanded[panelIdx] = !(_panelExpanded[panelIdx] ??= false);
-  }
+  void _onExpandedCall(int panelIndex, bool isExpanded) => setState(() {
+        _panelExpanded[panelIndex] = !isExpanded;
+      });
 
   @override
   Widget build(BuildContext context) => Expanded(
@@ -145,6 +46,8 @@ class _TeamPanelState extends State<TeamPanel> {
           controller: ScrollController(),
           child: Consumer<TeamManagerModel>(
               builder: (c, teamManger, _) => ExpansionPanelList(
+                    // 当元素增减,强制刷新ExpansionPanelList,否则展开/折叠会报错
+                    key: ValueKey(teamManger.teams.length),
                     expansionCallback: _onExpandedCall,
                     children: List.generate(
                       teamManger.teams.length,
