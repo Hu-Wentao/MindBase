@@ -14,8 +14,6 @@ import 'meta_service.dart';
 
 @lazySingleton
 class WorkspaceService {
-  final Teams _teams;
-  final srv.Teams _srvTeams;
   final Database _db;
   final WorkspaceRepo _workspaceRepo;
 
@@ -24,10 +22,8 @@ class WorkspaceService {
 
   const WorkspaceService(
     this._db,
-    this._teams,
     this._workspaceRepo,
     this._workspaceEttAcc,
-    this._srvTeams,
   );
 
   RecordMetaEttAccessor _getMetaAcc(String workspaceId) =>
@@ -70,8 +66,7 @@ class WorkspaceService {
       List.generate(teams.length, (index) => <WorkspaceDto>[]),
     );
     for (final t in teams) {
-      final w = await _workspaceEttAcc.findAllByTeam(t.$id).toList();
-      // print("debug workspaceList $w");
+      final w = await queryWorkspaceDto(t.$id);
       if (w.isNotEmpty) {
         r[t] ??= <WorkspaceDto>[];
         r[t]!.addAll(w);
@@ -80,44 +75,31 @@ class WorkspaceService {
     return r;
   }
 
-  /// 获取用户的所有Team
-  Future<List<Team>> queryAllUserTeams() async => (await _teams.list()).teams;
+  Future<List<WorkspaceDto>> queryWorkspaceDto(String teamId) async {
+    return await _workspaceEttAcc.findAllByTeam(teamId).toList();
+  }
 
-  Future<Map<Team, List<Workspace>>> queryAllUserWorkspaces() async =>
-      queryWorkspacesBy(await queryAllUserTeams());
-
-  Future<Map<Team, List<WorkspaceDto>>> queryAllUserWorkspaceDtoList() async =>
-      queryWorkspaceDtoBy(await queryAllUserTeams());
-
-  /// 创建团队工作空间(没有团队的话将会自动创建团队)
-  Future<Tuple2<Team, WorkspaceDto>> createWorkspaceDto(
-    Team? team,
+  Future<WorkspaceDto> createWorkspaceDtoBy(
+    String teamId,
     String spaceName,
   ) async {
-    team ??= await _teams.create(
-      teamId: ObjectIdX.createHex,
-      name: "$spaceName-team",
-      // roles: []
-    );
     final dto = WorkspaceDto(
       id: ObjectIdX.createHex,
-      teamId: team.$id,
+      teamId: teamId,
       name: spaceName,
       metas: [],
     );
     // 行级别的读写权限控制
-    final readPermit = ["team:${team.$id}"]; // 团队成员可读
+    final readPermit = ["team:$teamId"]; // 团队成员可读
     final writePermit = [
-      "team:${team.$id}/owner"
+      "team:$teamId/owner"
     ]; // 团队所有者可写(指`owner`可以更改工作空间名称等字段)
     final r = await _workspaceEttAcc.insert(
       dto,
       read: readPermit,
       write: writePermit,
     );
-    // print("debug #新建 Workspace成功$r");
-    // final ws = (await _workspaceRepo.findById(r.$id))!;
-    return Tuple2(team, dto);
+    return dto;
   }
 
   /// 打开工作空间 (workspaceId)
@@ -162,29 +144,6 @@ class WorkspaceService {
       await rcdRepo.insert(rcd);
       await Future.delayed(const Duration(milliseconds: 50));
     }
-  }
-
-  Future<Team> updateName(Team team, String newName) async {
-    return await _teams.update(teamId: team.$id, name: newName);
-  }
-
-  Future<void> deleteTeam(String teamId) async =>
-      await _teams.delete(teamId: teamId);
-
-  /// 直接拉取用户到团队,无需同意.
-  Future<void> inviteMember(
-    Team team,
-    String userEmail, [
-    List<String> roles = const [],
-  ]) async {
-    final r = await _srvTeams.createMembership(
-      teamId: team.$id,
-      email: userEmail,
-      roles: [],
-      // roles: roles ?? ["team:${team.$id}"], // 默认角色为 "团队成员"
-      url: 'http://app.shuttlecloud.cn',
-    );
-    print("debug member ${r.toMap()}");
   }
 
   Future<void> updateWorkspaceName(
