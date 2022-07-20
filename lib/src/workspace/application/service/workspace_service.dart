@@ -120,18 +120,30 @@ class WorkspaceService {
     return Tuple2(team, dto);
   }
 
+  /// 打开工作空间 (workspaceId)
+  Future<OpenedWorkspace> openWorkspaceBy(String workspaceId) async {
+    final dm = await _workspaceRepo.findById(workspaceId);
+    if (dm == null) throw "找不到工作空间";
+    return openWorkspaceDm(dm);
+  }
+
+  /// 打开工作空间 (DTO)
   Future<OpenedWorkspace> openWorkspace(WorkspaceDto dto) async {
     final workspace = await _workspaceRepo.dtoToDomain(dto);
-    return OpenedWorkspace.openBy(
-      workspace: workspace,
-      fetchAllMeta: _getMetaAcc(workspace.id).findAll,
-      watchAllMeta: _getMetaAcc(workspace.id).watchAll(),
-      getFetchAllRecords: (String metaId) =>
-          _getRecordAcc(workspace, metaId).findAll(),
-      getWatchAllRecords: (String metaId) =>
-          _getRecordAcc(workspace, metaId).watchAll(),
-    );
+    return openWorkspaceDm(workspace);
   }
+
+  /// 打开工作空间 (Domain)
+  Future<OpenedWorkspace> openWorkspaceDm(Workspace workspace) async =>
+      OpenedWorkspace.openBy(
+        workspace: workspace,
+        fetchAllMeta: _getMetaAcc(workspace.id).findAll,
+        watchAllMeta: _getMetaAcc(workspace.id).watchAll(),
+        getFetchAllRecords: (String metaId) =>
+            _getRecordAcc(workspace, metaId).findAll(),
+        getWatchAllRecords: (String metaId) =>
+            _getRecordAcc(workspace, metaId).watchAll(),
+      );
 
   /// 同时创建Meta与数据
   Future insertTable(MetaService _metaSrv, TableDto table) async {
