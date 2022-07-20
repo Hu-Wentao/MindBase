@@ -152,7 +152,7 @@ class _TeamPanelState extends State<TeamPanel> {
                         final team = teamManger.teams[index];
                         return ExpansionPanel(
                           canTapOnHeader: true,
-                          isExpanded: _panelExpanded[index] ??= false,
+                          isExpanded: _panelExpanded[index] ??= true,
                           headerBuilder: (c, bool isExpanded) => TeamTile(
                             isExpanded: isExpanded,
                             team: team,
