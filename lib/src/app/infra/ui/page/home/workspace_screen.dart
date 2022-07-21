@@ -84,36 +84,88 @@ class _TeamPanelState extends State<TeamPanel> {
                       (index) {
                         final team = teamManger.teams[index];
                         return ExpansionPanel(
-                          canTapOnHeader: true,
-                          isExpanded: _panelExpanded[index] ??= true,
-                          headerBuilder: (c, bool isExpanded) => TeamTile(
-                            isExpanded: isExpanded,
-                            team: team,
-                          ),
-                          body: ListView.separated(
-                            itemCount: team.workspaces.length,
-                            itemBuilder: (BuildContext context, int i) {
-                              final space = team.workspaces[i];
-                              return Link(
-                                uri: Uri.tryParse('/workspace/${space.id}'),
-                                builder: (ctx, followLink) => ListTile(
-                                  leading:
-                                      const Icon(Icons.space_dashboard_rounded),
-                                  title: Text(space.name),
-                                  onTap: followLink,
+                            canTapOnHeader: true,
+                            isExpanded: _panelExpanded[index] ??= true,
+                            headerBuilder: (c, bool isExpanded) => TeamTile(
+                                  isExpanded: isExpanded,
+                                  team: team,
                                 ),
-                              );
-                            },
-                            separatorBuilder: (context, int index) =>
-                                const Divider(),
-                            shrinkWrap: true,
-                            // physics: const NeverScrollableScrollPhysics(),
-                          ),
-                        );
+                            body: ChangeNotifierProvider<TeamModel>.value(
+                                value: team,
+                                child: Consumer<TeamModel>(
+                                  builder: (c, team, _) => ListView.separated(
+                                    itemCount: team.workspaces.length,
+                                    itemBuilder:
+                                        (BuildContext context, int i) =>
+                                            WorkspaceTile(
+                                      team: team,
+                                      space: team.workspaces[i],
+                                    ),
+                                    separatorBuilder: (context, int index) =>
+                                        const Divider(),
+                                    shrinkWrap: true,
+                                  ),
+                                )));
                       },
                     ),
                     animationDuration: const Duration(microseconds: 50),
                   )),
+        ),
+      );
+}
+
+class WorkspaceTile extends StatelessWidget {
+  final TeamModel team;
+  final WorkspaceDto space;
+
+  const WorkspaceTile({Key? key, required this.space, required this.team})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => Link(
+        uri: Uri.tryParse('/workspace/${space.id}'),
+        builder: (ctx, followLink) => ListTile(
+          leading: const Icon(Icons.space_dashboard_rounded),
+          title: Text(space.name),
+          trailing: PopupMenuButton<String>(
+            itemBuilder: (ctx) => [
+              const PopupMenuItem(
+                value: "rename",
+                child: Text("重命名空间"),
+              ),
+              const PopupMenuDivider(),
+              const PopupMenuItem(
+                value: "delete",
+                child: Text("删除空间"),
+              )
+            ],
+            onSelected: (key) async {
+              switch (key) {
+                case "rename":
+                  await team.actRenameSpaceName(
+                    space,
+                    await showTextInputDialog(
+                      context: context,
+                      title: "重命名空间",
+                      origin: space.name,
+                      hint: space.name,
+                    ),
+                  );
+                  break;
+                case "delete":
+                  await showConfirmDialog(
+                    context: context,
+                    title: "确认删除空间[${space.name}]吗?",
+                    onConfirm: () =>
+                        team.actDeleteSpace(space.id).thenDialog(context),
+                  );
+                  break;
+                default:
+                  throw "error 未知的 key[$key]";
+              }
+            },
+          ),
+          onTap: followLink,
         ),
       );
 }
