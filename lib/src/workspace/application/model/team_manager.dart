@@ -54,4 +54,11 @@ extension TeamManagerModelX on TeamManagerModel {
         teams.removeWhere((tm) => tm.id == teamId);
         setInitialized("删除Team[$teamId]");
       });
+
+  Future<BaseException?> actCreateTeam(String name) async =>
+      await actWrapper(() async {
+        final tm = await _teamSrv.createTeam(name);
+        teams.add(TeamModel(tm));
+        setInitialized("创建Team[${tm.$id}]");
+      });
 }

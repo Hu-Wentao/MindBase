@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dart_appwrite/dart_appwrite.dart' as srv;
+import 'package:flutter/widgets.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/core/inter/i_dao.dart';
