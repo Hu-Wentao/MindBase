@@ -7,7 +7,7 @@ import 'package:mind_base/src/user/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/user/domain/value/value.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
-class UserProvider extends ProviderSidecar {
+class UserProvider extends ProviderSidecar<BaseException?> {
   late final AccountService _accountService;
 
   // 表示已登陆的用户, 后期考虑持久化到本地,以便客户端/网页自动登录
@@ -41,6 +41,7 @@ class UserProvider extends ProviderSidecar {
         _setLogout("尚未登录");
       }
       setInitialized("初始化出错,$e");
+      rethrow;
     }
   }
 
