@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/feedback/infra/ui/widget/feedback_btn.dart';
 import 'package:mind_base/src/user/infra/ui/components/user_tile.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
@@ -42,8 +43,13 @@ class _WorkspacePageState extends State<WorkspacePage> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       Provider.of<OpenedSpaceManagerModel>(context, listen: false)
           .actOpenWorkspaceById(workspaceId!)
-          .then((value) => Future.delayed(
-              const Duration(milliseconds: 500), () => setState(() {})));
+          .then((value) {
+        if (value != null) {
+          value.showDialog(context);
+        }
+        return Future.delayed(
+            const Duration(milliseconds: 500), () => setState(() {}));
+      });
     });
   }
 
