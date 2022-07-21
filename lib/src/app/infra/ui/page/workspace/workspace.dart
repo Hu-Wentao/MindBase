@@ -39,6 +39,12 @@ class _WorkspacePageState extends State<WorkspacePage> {
     workspaceId = widget.workspaceId;
     metaId = widget.metaId;
     viewId = widget.viewId;
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      Provider.of<OpenedSpaceManagerModel>(context, listen: false)
+          .actOpenWorkspaceById(workspaceId!)
+          .then((value) => Future.delayed(
+              const Duration(milliseconds: 500), () => setState(() {})));
+    });
   }
 
   @override
@@ -50,91 +56,86 @@ class _WorkspacePageState extends State<WorkspacePage> {
   }
 
   @override
-  Widget build(BuildContext context) => Consumer<OpenedSpaceManagerModel>(
-      builder: (c, model, _) => FutureBuilder(
-          key: ValueKey(workspaceId),
-          future: model.actOpenWorkspaceById(workspaceId!),
-          builder: (c, s) {
-            switch (s.connectionState) {
-              case ConnectionState.none:
-              case ConnectionState.waiting:
-              case ConnectionState.active:
-                return const Scaffold(body: CircularProgressIndicator());
-              case ConnectionState.done:
-                final space = model.openedWorkspaces
-                    .firstWhere((element) => element.id == workspaceId);
-                return Scaffold(
-                  appBar: AppBar(
-                    leading: IconButton(
-                      icon: const Icon(Icons.home_rounded),
-                      onPressed: () => context.go('/'),
-                    ),
-                    title: SpaceSelectorBar(
-                      spaceName: space.name,
-                      menuBtn: PopupMenuButton<String>(
-                        itemBuilder: (ctx) => [
-                          ...model.openedWorkspaces.map(
-                            (e) => PopupMenuItem<String>(
-                              value: 'selectWorkspaceEvt${e.id}',
-                              child: ListTile(
-                                leading:
-                                    const Icon(Icons.space_dashboard_rounded),
-                                title: Text(e.name),
-                              ),
-                            ),
-                          ),
-                        ],
-                        onSelected: (value) {
-                          // 选中Item后,在这里会被二次调用
-                          switch (value) {
-                            default:
-                              if (value.startsWith('selectWorkspaceEvt')) {
-                                final wsId = value
-                                    .substring('selectWorkspaceEvt'.length);
-                                context.go('/workspace/$wsId');
-                                return;
-                              }
-                              print("debug#未知的value#$value");
-                              break;
-                          }
-                        },
+  Widget build(BuildContext context) =>
+      Consumer<OpenedSpaceManagerModel>(builder: (c, model, _) {
+        final space = model.openedWorkspaces
+            .firstWhereOrNull((element) => element.id == workspaceId);
+        return Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.home_rounded),
+              onPressed: () => context.go('/'),
+            ),
+            title: SpaceSelectorBar(
+              spaceName: Text(space?.name ?? 'loading ...'),
+              menuBtn: PopupMenuButton<String>(
+                itemBuilder: (ctx) => [
+                  ...model.openedWorkspaces.map(
+                    (e) => PopupMenuItem<String>(
+                      value: 'selectWorkspaceEvt${e.id}',
+                      child: ListTile(
+                        leading: const Icon(Icons.space_dashboard_rounded),
+                        title: Text(e.name),
                       ),
                     ),
-                    // title: const WorkspaceSelectorTitle(),
-                    actions: const [
-                      UserInfoTile(),
-                      FeedbackBtn(),
-                    ],
                   ),
-                  body: ChangeNotifierProvider<OpenedWorkspace?>.value(
-                    value: space,
-                    child: ChangeNotifierProvider<OpenedMeta?>.value(
-                      value: space.openedMetas
-                          .firstWhereOrNull((element) => element.id == metaId),
-                      child: Row(
-                        children: [
-                          /// 左侧Meta List
-                          MetaTableList(openedSpace: space),
+                ],
+                onSelected: (value) {
+                  // 选中Item后,在这里会被二次调用
+                  switch (value) {
+                    default:
+                      if (value.startsWith('selectWorkspaceEvt')) {
+                        final wsId =
+                            value.substring('selectWorkspaceEvt'.length);
+                        context.go('/workspace/$wsId');
+                        return;
+                      }
+                      print("debug#未知的value#$value");
+                      break;
+                  }
+                },
+              ),
+            ),
+            // title: const WorkspaceSelectorTitle(),
+            actions: const [
+              UserInfoTile(),
+              FeedbackBtn(),
+            ],
+          ),
+          body: ChangeNotifierProvider<OpenedWorkspace?>.value(
+            value: space,
+            child: ChangeNotifierProvider<OpenedMeta?>.value(
+              value: metaId == ''
+                  ? null
+                  : space?.openedMetas
+                      .firstWhereOrNull((element) => element.id == metaId),
+              child: Row(
+                children: [
+                  /// 左侧Meta List
+                  MetaTableList(
+                    openedSpace: space,
+                    metaId: metaId,
+                  ),
 
-                          /// 右侧 table
-                          Consumer<OpenedMeta?>(
-                            builder: (c, openedMeta, _) => (openedMeta == null)
-                                ? const Expanded(
-                                    child: Center(child: Text("请选择/创建 一个Meta")),
-                                  )
-                                : RecordDataGrid(
-                                    openedSpace: space,
-                                    openedMeta: openedMeta,
-                                    view: openedMeta.meta.views
-                                        .firstWhereOrNull(
-                                            (element) => element.vId == viewId),
-                                  ),
-                          ),
-                        ],
-                      ),
+                  /// 右侧 table
+                  if (space != null)
+                    Consumer<OpenedMeta?>(
+                      builder: (c, openedMeta, _) => (openedMeta == null)
+                          ? const Expanded(
+                              child: Center(child: Text("请选择/创建 一个Meta")),
+                            )
+                          : RecordDataGrid(
+                              openedSpace: space,
+                              openedMeta: openedMeta,
+                              view: viewId == -1 // -1代表无视图
+                                  ? null
+                                  : openedMeta.meta.views.firstWhereOrNull(
+                                      (element) => element.vId == viewId)),
                     ),
-                  ),
-                );
-            }
-          }));
+                ],
+              ),
+            ),
+          ),
+        );
+      });
 }
