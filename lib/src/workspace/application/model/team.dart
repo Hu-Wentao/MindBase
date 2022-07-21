@@ -55,4 +55,19 @@ extension TeamModelX on TeamModel {
         setInitialized("创建工作空间成功");
         onCreated?.call(r);
       });
+
+  Future<BaseException?> actRenameSpaceName(
+          WorkspaceDto space, String? nName) async =>
+      await actWrapper(() async {
+        if (nName == null) return;
+        final r = await _workspaceSrv.updateWorkspaceName(space, nName);
+        setInitialized("重命名工作空间[$nName]完成");
+      });
+
+  Future<BaseException?> actDeleteSpace(String spaceId) async =>
+      await actWrapper(() async {
+        final r = await _workspaceSrv.deleteSpace(spaceId);
+        workspaces.removeWhere((w) => w.id == spaceId);
+        setInitialized("删除工作空间[$spaceId]完成");
+      });
 }
