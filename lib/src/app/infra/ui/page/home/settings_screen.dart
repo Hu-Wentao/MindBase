@@ -11,6 +11,13 @@ class SettingScreen extends StatelessWidget {
           const ListTile(title: Text("版本号"), trailing: Text(version)),
           if (kDebugMode) ...[
             ListTile(
+              title: const Text("测试空间视图Url跳转"),
+              onTap: () {
+                // 学生测试, 学生表4, view1
+                context.go('/workspace/629393c8ebbbf5094df3e564/meta/62b88d0a1859252c4816ed24/view/1');
+              },
+            ),
+            ListTile(
               title: const Text("测试异常抛出"),
               onTap: () {
                 Future.value(BaseException("error")).thenDialog(context);
