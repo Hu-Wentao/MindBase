@@ -105,7 +105,6 @@ class OpenedWorkspace extends ProviderSidecar {
     notifyListeners();
   }
 
-  @Deprecated("应当使用 selectedMeta.getRecords()")
   List<Record> getRecords(String metaId) =>
       openedMetas[__indexByOpenedMetas(metaId)].records;
 
