@@ -43,6 +43,7 @@ class OpenedSpaceManagerModel extends ProviderSidecar {
   Future<OpenedWorkspace> _openCacheWorkspaceById(String workspaceId) async {
     final ws = await _workspaceSrv.openWorkspaceBy(workspaceId);
     openedWorkspaces.add(ws);
+    setInitialized("打开工作空间[$workspaceId]成功");
     return ws;
   }
 
