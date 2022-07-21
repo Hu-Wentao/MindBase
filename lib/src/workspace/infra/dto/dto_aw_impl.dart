@@ -236,11 +236,24 @@ extension ColViewInfoAppwriteX on ColViewInfo {
         "visible": visible,
       };
 
-  static ColViewInfo fromJson(Map<String, dynamic> json) => ColViewInfo(
+  static ColViewInfo fromJson(Map<String, dynamic> json) {
+    try {
+      return ColViewInfo(
         json['propId'] as String,
         json['width'] as double,
         json['visible'] as bool? ?? false,
-  );
+      );
+    } catch (e) {
+      if ("$e" == "type 'int' is not a subtype of type 'double' in type cast") {
+        return ColViewInfo(
+          json['propId'] as String,
+          (json['width'] as int).toDouble(),
+          json['visible'] as bool? ?? false,
+        );
+      }
+      rethrow;
+    }
+  }
 }
 
 extension TableViewAppwriteX on TableView {
