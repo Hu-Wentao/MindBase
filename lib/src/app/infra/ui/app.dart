@@ -20,31 +20,32 @@ final _router = GoRouter(routes: [
   GoRoute(
       path: '/workspace/:workspaceId',
       builder: (c, s) {
-        print("debug workspace ${s.path}");
+        // print("debug workspaceA ${s.path}");
         return WorkspacePage(
-          key: ValueKey(s.params['workspaceId']),
-            // key: ValueKey("workspace${s.params['workspaceId']}"),
-            // key: const ValueKey("workspace"),
+            key: ValueKey(s.params['workspaceId']),
             workspaceId: s.params['workspaceId']);
       },
       routes: [
         GoRoute(
             path: 'meta/:metaId',
-            builder: (c, s) => WorkspacePage(
-                key: ValueKey(s.params['workspaceId']),
-                // key: ValueKey("workspace${s.params['workspaceId']}"),
-                workspaceId: s.params['workspaceId'],
-                metaId: s.params['metaId']),
+            builder: (c, s) {
+              // print("debug workspaceB ${s.path}");
+              return WorkspacePage(
+                  key: ValueKey(s.params['workspaceId']),
+                  workspaceId: s.params['workspaceId'],
+                  metaId: s.params['metaId']);
+            },
             routes: [
               GoRoute(
                   path: 'view/:viewId',
-                  builder: (c, s) => WorkspacePage(
-                      key: ValueKey(s.params['workspaceId']),
-                      // key: ValueKey("workspace${s.params['workspaceId']}"),
-                      // key: const ValueKey("workspace"),
-                      workspaceId: s.params['workspaceId'],
-                      metaId: s.params['metaId'],
-                      viewId: int.tryParse(s.params['viewId']!))),
+                  builder: (c, s) {
+                    // print("debug workspaceC ${s.path}");
+                    return WorkspacePage(
+                        key: ValueKey(s.params['workspaceId']),
+                        workspaceId: s.params['workspaceId'],
+                        metaId: s.params['metaId'],
+                        viewId: int.parse(s.params['viewId']!));
+                  }),
             ]),
       ]),
 ]);
@@ -60,17 +61,6 @@ class MindBaseApp extends StatelessWidget {
           ChangeNotifierProvider<UserProvider>(
             create: (_) => UserProvider()..actInitializing(),
           ),
-          // 根据User登录状态自动切换状态
-          // ChangeNotifierProxyProvider<UserProvider, WorkspaceManagerProvider>(
-          //     create: (_) => WorkspaceManagerProvider(),
-          //     update: (c, u, pre) => pre!..onUserUpdate(u.user)),
-          // ChangeNotifierProxyProvider<WorkspaceManagerProvider,
-          //     WorkspaceProvider>(
-          //   create: (_) => WorkspaceProvider(),
-          //   update: (c, wm, pre) =>
-          //       pre!..actOnSelectedWorkspaceUpdate(wm.selectedWorkspace),
-          // ),
-
           ChangeNotifierProxyProvider<UserProvider, OpenedSpaceManagerModel>(
               create: (_) => OpenedSpaceManagerModel(),
               update: (c, u, pre) => pre!..onUserUpdate(u.user)),
