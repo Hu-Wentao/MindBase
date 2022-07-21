@@ -179,19 +179,19 @@ class TeamTile extends StatelessWidget {
                   .thenDialog(context);
               break;
             case "create_space":
-              context
-                  .read<OpenedSpaceManagerModel>()
-                  .actCreateWorkspace(team.id, '新建空间', onCreated: (w) {
-                // 创建完成后进入新建空间
+              await team.actCreateWorkspace('新建空间', onCreated: (w) {
                 context.go('/workspace/${w.id}');
               }).thenDialog(context);
               break;
             case "delete":
               await showConfirmDialog(
-                  context: context,
-                  title: "确认删除团队[${team.name}]吗?",
-                  onConfirm: () =>
-                      context.read<TeamManagerModel>().actDeleteTeam(team.id));
+                context: context,
+                title: "确认删除团队[${team.name}]吗?",
+                onConfirm: () => context
+                    .read<TeamManagerModel>()
+                    .actDeleteTeam(team.id)
+                    .thenDialog(context),
+              );
               break;
             default:
               throw "error 未知的 key[$key]";
