@@ -66,10 +66,11 @@ class MetaDtoRepo {
 
   /// 插入Meta记录的同时, 创建对应的Record集合;
   /// 解决监听不存在Record集合,在集合被创建后无法收到消息的问题
-  insertDto(RecordMetaDto dto) async {
-    final r = await insertMetaDtoWithCreateRecordCollection(dto)
-        .catchError((e, s) async {
-      if (e is AppwriteException && e.type == 'collection_not_found') {
+  Future insertDto(RecordMetaDto dto) async {
+    try {
+      return await insertMetaDtoWithCreateRecordCollection(dto);
+    } on AppwriteException catch (e, s) {
+      if (e.type == 'collection_not_found') {
         // 集合不存在,则创建集合
         // fixme 新建的集合为"所有人可读写"
         return createMetaCollection(null)
@@ -83,12 +84,11 @@ class MetaDtoRepo {
         await updateMetaDocStructure(attrName);
         // 再次尝试
         return await insertDto(dto);
-      } else {
-        return ExceptionAdapter.of(e, s);
       }
-    });
-    if (r is BaseException) throw r;
-    return r;
+      rethrow;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// 更新
@@ -163,9 +163,10 @@ class MetaDtoRepo {
   ///   如果没有对应的Record集合, 即使realtime配置了相关的监听参数,再Record集合创建之后,数据也不会被接收到
   ///   因此必须要再Meta记录创建的同时,创建对应的Record集合
   Future insertMetaDtoWithCreateRecordCollection(RecordMetaDto meta) async {
-    return await _metaAcc.insert(meta).then((value) =>
-        // 同时创建一个所有人可读写的Record集合
-        RecordDtoRepo.withDtoDI(sl, meta).createRecordCollection(null));
+    final r = await _metaAcc.insert(meta);
+    // 同时创建一个所有人可读写的Record集合
+    await RecordDtoRepo.withDtoDI(sl, meta).createRecordCollection(null);
+    return r;
   }
 
   /// 创建Meta集合(存储某个工作空间内的所有Meta记录)
