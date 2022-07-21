@@ -3,6 +3,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:dart_appwrite/dart_appwrite.dart' as server;
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/app/config/common_config.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
@@ -189,6 +190,8 @@ class MetaDtoRepo {
   /// 更新meta文档的属性
   /// 一般用于老版本数据结构升级
   updateMetaDocStructure(String attributeName) async {
+    slLogger.info(
+        "updateMetaDocStructure# 更新Meta表[$collectionId]属性 $attributeName");
     final structureCallback = metaStructure[attributeName];
     if (structureCallback == null) {
       throw '未知的RecordMeta属性名称: $attributeName';
@@ -375,8 +378,8 @@ Future _createAttr(
   String metaId,
   AttributeDto attr,
 ) async {
-  print('debug 为Record集合[$metaId]创建属性# create attr[$attr]');
-  await _db.createStringAttribute(
+  slLogger.info("_createAttr 为Record集合[$metaId]创建属性# [$attr]");
+  return await _db.createStringAttribute(
     collectionId: metaId, // MetaId即==Record集合的Id
     key: attr.propId, // Appwrite BUG,属性名称不能用纯数字
     size: 511,
