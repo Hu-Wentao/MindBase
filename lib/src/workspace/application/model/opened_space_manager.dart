@@ -101,16 +101,5 @@ class OpenedSpaceManagerModel extends ProviderSidecar {
 }
 
 extension OpenedSpaceManagerModelX on OpenedSpaceManagerModel {
-  /// 新建工作空间
-  Future<BaseException?> actCreateWorkspace(
-    String teamId,
-    String spaceName, {
-    Function(WorkspaceDto w)? onCreated,
-  }) async =>
-      await actWrapper(() async {
-        final r = await _workspaceSrv.createWorkspaceDtoBy(teamId, spaceName);
-        // _addWorkspace(r.value1, r.value2);
-        onCreated?.call(r);
-        setInitialized("创建工作空间成功");
-      });
+
 }

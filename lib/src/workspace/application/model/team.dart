@@ -43,4 +43,16 @@ extension TeamModelX on TeamModel {
         await _teamSrv.inviteMember(_team, userEmail);
         setUninitialized("邀请用户[$userEmail]加入团队[${_team.name}]");
       });
+
+  /// 新建工作空间
+  Future<BaseException?> actCreateWorkspace(
+    String spaceName, {
+    Function(WorkspaceDto w)? onCreated,
+  }) async =>
+      await actWrapper(() async {
+        final r = await _workspaceSrv.createWorkspaceDtoBy(id, spaceName);
+        workspaces.add(r);
+        setInitialized("创建工作空间成功");
+        onCreated?.call(r);
+      });
 }
