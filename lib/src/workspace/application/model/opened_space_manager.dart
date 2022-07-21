@@ -13,17 +13,22 @@ class OpenedSpaceManagerModel extends ProviderSidecar {
   final List<OpenedWorkspace> openedWorkspaces = [];
 
   /// 重新打开空间
-  Stream<BaseException?> actReopenSpace(String msg) async* {
+  Future<BaseException?> actReopenSpace(String msg) async {
     final ls = openedWorkspaces.map((e) => e.id).toList();
-    _readyOpenList.addAll(ls);
     setEmptyState(msg);
-    log('尝试重新打开空间[$_readyOpenList]');
+    _readyOpenList.addAll(ls);
+    if (ls.isEmpty) {
+      log("actReopenSpace#没有空间需要重新打开");
+      return null;
+    }
+    log('actReopenSpace#尝试重新打开空间[$_readyOpenList]');
     final len = _readyOpenList.length;
     for (var i = 0; i < len; i++) {
       // 从头部抽取id,尝试重新打开; 如果失败,则还会将失败的id插入到尾部
       final r = await actOpenWorkspaceById(_readyOpenList.removeAt(0));
-      if (r != null) yield ExceptionAdapter.of(r);
+      if (r != null) return r;
     }
+    return null;
   }
 
   /// 清理所有缓存
@@ -81,7 +86,7 @@ class OpenedSpaceManagerModel extends ProviderSidecar {
         setEmptyState("用户已登出,重置空间");
       } else {
         _cacheUser = user;
-        return await actReopenSpace("用户[${user.name}]已登录,重置空间").first;
+        return await actReopenSpace("用户[${user.name}]已登录,重置空间");
       }
     }
     return null;
