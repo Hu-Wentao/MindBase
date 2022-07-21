@@ -19,7 +19,7 @@ BaseException _adapterAppwriteException(AppwriteException e) {
   final code = e.code ?? 0;
   switch (code) {
     case 401:
-      if (e.type == 'general_unauthorized_scope') {
+      if (e.type == 'general_unauthorized_scope' || e.type == "user_unauthorized") {
         return UnLoginException("登陆后再执行操作", e.toString());
       }
   }
