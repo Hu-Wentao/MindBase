@@ -25,11 +25,10 @@ class WorkspacesScreen extends StatelessWidget {
                               origin: "${pUser.user?.name}'s Team",
                             );
                             if (name == null) return;
-                            try {
-                              sl<TeamService>().createTeam(name);
-                            } catch (e) {
-                              ExceptionAdapter.of(e).showDialog(context);
-                            }
+                            context
+                                .read<TeamManagerModel>()
+                                .actCreateTeam(name)
+                                .thenDialog(context);
                           },
                           icon: const Icon(Icons.add),
                           label: const Padding(
