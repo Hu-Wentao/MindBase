@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mind_base/src/core/infra/ui/widget/RadiusInkWell.dart';
 
 class SpaceSelectorBar extends StatelessWidget {
-  final String spaceName;
+  final Widget spaceName;
   final Widget menuBtn;
 
   const SpaceSelectorBar({
@@ -16,7 +16,7 @@ class SpaceSelectorBar extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(spaceName),
+            spaceName,
             const SizedBox(width: 8),
             menuBtn,
           ],
