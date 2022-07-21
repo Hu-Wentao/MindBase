@@ -11,9 +11,11 @@ void main() {
   MindBaseApplication(
     onBeforeAppInit: (g, c) async => WidgetsFlutterBinding.ensureInitialized(),
     onBeforeAppRun: (g) async {
+      // 配置全局Logger
       slLogger = sl<Logger>();
       // 配置 ProviderSidecar Log
-      ProviderSidecar.setLogger(slLogger.info);
+      final _sidecarLogger = Logger("sidecar");
+      ProviderSidecar.setLogger(_sidecarLogger.info);
     },
     onApplicationRun: (g, c) async => runApp(const MindBaseApp()),
   ).run(
