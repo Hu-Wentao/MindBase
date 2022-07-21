@@ -4,6 +4,7 @@ import 'package:form_builder_validators/localization/l10n.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mind_base/src/app/infra/ui/page/home/home.dart';
 import 'package:mind_base/src/app/infra/ui/page/workspace/workspace.dart';
+import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/user/application/provider/user_provider.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:provider/provider.dart';
@@ -51,11 +52,14 @@ class MindBaseApp extends StatelessWidget {
       MultiProvider(
         providers: [
           ChangeNotifierProvider<UserProvider>(
-            create: (_) => UserProvider()..actInitializing(),
+            create: (_) =>
+                UserProvider()..actInitializing().thenDialog(context),
           ),
           ChangeNotifierProxyProvider<UserProvider, OpenedSpaceManagerModel>(
-              create: (_) => OpenedSpaceManagerModel(),
-              update: (c, u, pre) => pre!..onUserUpdate(u.user)),
+            create: (_) => OpenedSpaceManagerModel(),
+            update: (c, u, pre) =>
+                pre!..actOnUserUpdate(u.user).thenDialog(context),
+          ),
           ChangeNotifierProxyProvider<UserProvider, TeamManagerModel>(
               create: (_) => TeamManagerModel(),
               update: (c, u, pre) => pre!..onUserUpdate(u.user)),
