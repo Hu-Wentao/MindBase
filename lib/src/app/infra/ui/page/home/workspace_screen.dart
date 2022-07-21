@@ -8,8 +8,39 @@ class WorkspacesScreen extends StatelessWidget {
       Consumer<UserProvider>(builder: (c, pUser, _) {
         if (pUser.isLogged) {
           return Column(
-            children: const [
-              TeamPanel(),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      ElevatedButton.icon(
+                          onPressed: () async {
+                            final name = await showTextInputDialog(
+                              context: context,
+                              title: "设置团队名称",
+                              origin: "${pUser.user?.name}'s Team",
+                            );
+                            if (name == null) return;
+                            try {
+                              sl<TeamService>().createTeam(name);
+                            } catch (e) {
+                              ExceptionAdapter.of(e).showDialog(context);
+                            }
+                          },
+                          icon: const Icon(Icons.add),
+                          label: const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text("新建团队"),
+                          ))
+                    ],
+                  ),
+                ),
+              ),
+              const TeamPanel(),
             ],
           );
         } else {
@@ -116,7 +147,7 @@ class TeamTile extends StatelessWidget {
           ),
           const PopupMenuItem(
             value: "create_space",
-            child: Text("创建工作空间"),
+            child: Text("新建工作空间"),
           ),
           const PopupMenuDivider(),
           const PopupMenuItem(

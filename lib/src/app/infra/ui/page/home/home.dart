@@ -1,13 +1,11 @@
 import 'package:adaptive_navigation/adaptive_navigation.dart';
-import 'package:appwrite/models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get_arch_core/get_arch_core_interface.dart';
+import 'package:get_arch_core/get_arch_core.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mind_base/src/app/infra/ui/page/workspace/workspace.dart';
+import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/text_input_dialog.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
-import 'package:mind_base/src/core/infra/ui/widget/RadiusInkWell.dart';
 import 'package:mind_base/src/feedback/infra/ui/widget/feedback_btn.dart';
 import 'package:mind_base/src/user/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/user/application/provider/user_provider.dart';
@@ -15,6 +13,7 @@ import 'package:mind_base/src/user/infra/ui/components/user_tile.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/constants/pubspec.yaml.g.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/confirm_dialog.dart';
+import 'package:mind_base/src/workspace/application/service/service.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/link.dart';
 
