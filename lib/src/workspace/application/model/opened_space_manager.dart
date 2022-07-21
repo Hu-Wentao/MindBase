@@ -6,15 +6,32 @@ part of 'model.dart';
 class OpenedSpaceManagerModel extends ProviderSidecar {
   final WorkspaceService _workspaceSrv = sl<WorkspaceService>();
 
+  /// 打开某个空间前,备份该空间id,以便[actReopenSpace]重试
+  final List<String> _readyOpenList = [];
+
   // 状态
-  List<OpenedWorkspace> openedWorkspaces = [];
+  final List<OpenedWorkspace> openedWorkspaces = [];
+
+  /// 重新打开空间
+  Stream<BaseException?> actReopenSpace(String msg) async* {
+    final ls = openedWorkspaces.map((e) => e.id).toList();
+    _readyOpenList.addAll(ls);
+    setEmptyState(msg);
+    log('尝试重新打开空间[$_readyOpenList]');
+    final len = _readyOpenList.length;
+    for (var i = 0; i < len; i++) {
+      // 从头部抽取id,尝试重新打开; 如果失败,则还会将失败的id插入到尾部
+      final r = await actOpenWorkspaceById(_readyOpenList.removeAt(0));
+      if (r != null) yield ExceptionAdapter.of(r);
+    }
+  }
 
   /// 清理所有缓存
-  actCleanCache(String msg) {
+  setEmptyState(String msg) {
     openedWorkspaces
       ..forEach((ws) => ws.close())
       ..clear();
-    setUninitialized("工作空间管理器已清空 [$msg]");
+    setUninitialized("[$msg] 工作空间管理器已清空");
   }
 
   /// 打开Workspace,并缓存;
@@ -41,17 +58,33 @@ class OpenedSpaceManagerModel extends ProviderSidecar {
 
   /// 打开并缓存
   Future<OpenedWorkspace> _openCacheWorkspaceById(String workspaceId) async {
+    // 先存到[_readyOpenList],防止打开失败后找不到要重开的工作空间Id
+    _readyOpenList.add(workspaceId);
     final ws = await _workspaceSrv.openWorkspaceBy(workspaceId);
     openedWorkspaces.add(ws);
+    // 打开成功后从List移除
+    _readyOpenList.remove(workspaceId);
     setInitialized("打开工作空间[$workspaceId]成功");
     return ws;
   }
 
   /// ==========================================================================
 
-  /// 当上层状态 [User] 刷新时的处理
-  onUserUpdate(User? user) {
-    // 当前"空间管理器"与登录用户状态无关, 不做处理
+  /// 当上层状态 [User] 刷新时, 重置所有工作空间
+  User? _cacheUser;
+
+  Future<BaseException?> actOnUserUpdate(User? user) async {
+    print(
+        'debug OpenedSpaceManagerModel.onUserUpdate: ${user?.name}, ${_cacheUser?.name}');
+    if (user != _cacheUser) {
+      if (user == null) {
+        setEmptyState("用户已登出,重置空间");
+      } else {
+        _cacheUser = user;
+        return await actReopenSpace("用户[${user.name}]已登录,重置空间").first;
+      }
+    }
+    return null;
   }
 
   //
