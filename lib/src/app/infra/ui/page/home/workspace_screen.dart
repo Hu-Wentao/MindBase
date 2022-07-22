@@ -86,9 +86,14 @@ class _TeamPanelState extends State<TeamPanel> {
                         return ExpansionPanel(
                             canTapOnHeader: true,
                             isExpanded: _panelExpanded[index] ??= true,
-                            headerBuilder: (c, bool isExpanded) => TeamTile(
-                                  isExpanded: isExpanded,
-                                  team: team,
+                            headerBuilder: (c, bool isExpanded) =>
+                                ChangeNotifierProvider<TeamModel>.value(
+                                  value: team,
+                                  child: Consumer<TeamModel>(
+                                      builder: (c, team, _) => TeamTile(
+                                            isExpanded: isExpanded,
+                                            team: team,
+                                          )),
                                 ),
                             body: ChangeNotifierProvider<TeamModel>.value(
                                 value: team,
