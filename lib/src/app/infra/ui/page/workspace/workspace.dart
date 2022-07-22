@@ -115,30 +115,33 @@ class _WorkspacePageState extends State<WorkspacePage> {
                   ? null
                   : space?.openedMetas
                       .firstWhereOrNull((element) => element.id == metaId),
-              child: Row(
-                children: [
-                  /// 左侧Meta List
-                  MetaTableList(
-                    openedSpace: space,
-                    metaId: metaId,
-                  ),
-
-                  /// 右侧 table
-                  if (space != null)
-                    Consumer<OpenedMeta?>(
-                      builder: (c, openedMeta, _) => (openedMeta == null)
-                          ? const Expanded(
-                              child: Center(child: Text("请选择/创建 一个Meta")),
-                            )
-                          : RecordDataGrid(
-                              openedSpace: space,
-                              openedMeta: openedMeta,
-                              view: viewId == -1 // -1代表无视图
-                                  ? null
-                                  : openedMeta.meta.views.firstWhereOrNull(
-                                      (element) => element.vId == viewId)),
+              child: Consumer<OpenedWorkspace?>(
+                builder: (c, space, _) => Row(
+                  children: [
+                    /// 左侧Meta 列表
+                    MetaTableList(
+                      key: ValueKey(space?.metas.length),
+                      openedSpace: space,
+                      metaId: metaId,
                     ),
-                ],
+
+                    /// 右侧 table
+                    if (space != null)
+                      Consumer<OpenedMeta?>(
+                        builder: (c, openedMeta, _) => (openedMeta == null)
+                            ? const Expanded(
+                                child: Center(child: Text("请选择/创建 一个Meta")),
+                              )
+                            : RecordDataGrid(
+                                openedSpace: space,
+                                openedMeta: openedMeta,
+                                view: viewId == -1 // -1代表无视图
+                                    ? null
+                                    : openedMeta.meta.views.firstWhereOrNull(
+                                        (element) => element.vId == viewId)),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
