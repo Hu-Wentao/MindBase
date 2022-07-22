@@ -46,12 +46,7 @@ class RecordDataGrid extends StatelessWidget {
         onLoaded: (loadedEvt) {
           // 为数据源绑定新的stateManager, 以便在数据源更新的时候,能够同时刷新UI
           data.stateManager = loadedEvt.stateManager
-            // ..eventManager!.listener((PlutoGridEvent plutoEvent) {
-            //   switch (plutoEvent.runtimeType) {
-            //     default:
-            //       break;
-            //   }
-            // })
+            ..setAutoEditing(false)
             // 配置列菜单项
             ..setColumnMenuDelegate(MindBaseColumnMenuDelegate(
                 // 向左/右新增列
@@ -246,71 +241,72 @@ class DataFrameTitlePluto extends StatelessWidget {
   }) : super(key: key);
 
   RecordMeta get meta => openedMeta.meta;
+
   @override
-  Widget build(BuildContext context) =>SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              TextButton.icon(
-                onPressed: () async => await onSaveRecord(
-                  await showRecordEditDialog(
-                    context: context,
-                    meta: meta,
-                    openedWorkspace: openedWorkspace,
-                    kRecordBuilder: _kRecordBuilder,
-                  ),
-                ).thenDialog(context),
-                icon: const Icon(Icons.add),
-                label: const Text("新增一行"),
-              ),
-              // 只有在 指定了视图 时，才提供"字段管理"功能
-              if (view != null)
-                TextButton.icon(
-                  onPressed: () => _fieldManager(context, meta.toDto(), view!),
-                  icon: const Icon(Icons.blur_linear_outlined),
-                  label: const Text("字段管理"),
+  Widget build(BuildContext context) => SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            TextButton.icon(
+              onPressed: () async => await onSaveRecord(
+                await showRecordEditDialog(
+                  context: context,
+                  meta: meta,
+                  openedWorkspace: openedWorkspace,
+                  kRecordBuilder: _kRecordBuilder,
                 ),
+              ).thenDialog(context),
+              icon: const Icon(Icons.add),
+              label: const Text("新增一行"),
+            ),
+            // 只有在 指定了视图 时，才提供"字段管理"功能
+            if (view != null)
               TextButton.icon(
-                onPressed: () {
-                  final checked = stateManager.checkedRows;
-                  if (checked.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("您尚未选中记录"),
-                    ));
-                  } else {
-                    showConfirmDialog(
-                      context: context,
-                      title: "确认删除选中的 ${checked.length} 条记录吗",
-                      onConfirm: () async {
-                        final recordIds = checked
-                            .map((e) => (e.key as ValueKey<String>).value);
-                        for (final recordId in recordIds) {
-                          await openedMeta.actRemoveRecord(recordId);
-                        }
-                      },
-                    );
-                  }
-                },
-                icon: const Icon(Icons.delete_outline_rounded),
-                label: const Text("删除选中"),
+                onPressed: () => _fieldManager(context, meta.toDto(), view!),
+                icon: const Icon(Icons.blur_linear_outlined),
+                label: const Text("字段管理"),
               ),
-              TextButton.icon(
-                onPressed: () async => await onSaveMeta(
-                  await showRecordMetaEditDialog(
+            TextButton.icon(
+              onPressed: () {
+                final checked = stateManager.checkedRows;
+                if (checked.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("您尚未选中记录"),
+                  ));
+                } else {
+                  showConfirmDialog(
                     context: context,
-                    originMeta: meta.toDto(),
-                    kMetaBuilder: kMetaBuilder,
-                    kAttrBuilder: kAttrBuilder,
-                    kMethodBuilder: kMethodBuilder,
-                    queryMetaFn: queryMetaFn,
-                    allMetas: allMetas,
-                  ),
+                    title: "确认删除选中的 ${checked.length} 条记录吗",
+                    onConfirm: () async {
+                      final recordIds =
+                          checked.map((e) => (e.key as ValueKey<String>).value);
+                      for (final recordId in recordIds) {
+                        await openedMeta.actRemoveRecord(recordId);
+                      }
+                    },
+                  );
+                }
+              },
+              icon: const Icon(Icons.delete_outline_rounded),
+              label: const Text("删除选中"),
+            ),
+            TextButton.icon(
+              onPressed: () async => await onSaveMeta(
+                await showRecordMetaEditDialog(
+                  context: context,
+                  originMeta: meta.toDto(),
+                  kMetaBuilder: kMetaBuilder,
+                  kAttrBuilder: kAttrBuilder,
+                  kMethodBuilder: kMethodBuilder,
+                  queryMetaFn: queryMetaFn,
+                  allMetas: allMetas,
                 ),
-                icon: const Icon(Icons.edit),
-                label: const Text("修改结构"),
               ),
-            ],
-          ),
+              icon: const Icon(Icons.edit),
+              label: const Text("修改结构"),
+            ),
+          ],
+        ),
       );
 
   // 字段管理
