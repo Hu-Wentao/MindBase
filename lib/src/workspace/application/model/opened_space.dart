@@ -2,11 +2,10 @@ part of 'model.dart';
 
 /// 管理已打开的工作空间
 /// 在这里, 将DTO组装为 Domain对象, 也是业务逻辑的一部分
-///
 class OpenedWorkspace extends ProviderSidecar {
   late final StreamSubscription<AccessorEvt<RecordMetaDto>> _metasSub;
 
-//  不能使用WorkspaceDto,必须持有RecordMeta,用于处理ref关系
+  //  不能使用WorkspaceDto,必须持有RecordMeta,用于处理ref关系
   final Workspace _workspace;
 
   final List<OpenedMeta> openedMetas = [];
@@ -51,15 +50,13 @@ class OpenedWorkspace extends ProviderSidecar {
           e.code == 404 &&
           e.type == "collection_not_found") {
         // 不存在则无需抛出异常
-        print("debug OpenedMeta.openBy: [$e], 由推测的`Meta集合`尚未创建导致的,无需抛出异常");
-      } else {
-        // print("debug OpenedMeta.openBy: 抛出未知异常 [$e]");
-        throw ExceptionAdapter.of(e, s);
+        log("debug OpenedMeta.openBy: [$e], 由推测的`Meta集合`尚未创建导致的,无需抛出异常");
       }
+      throw ExceptionAdapter.of(e, s);
     });
     // 开始监听
     _metasSub = watchAllMeta.listen((event) {
-      print("#OpenedWorkspace[$id]#开始监听Meta变更: $event");
+      log("#OpenedWorkspace[$id]#监听到Meta变更: $event");
       onWatchMetaEvt(event);
     });
   }
@@ -110,20 +107,6 @@ class OpenedWorkspace extends ProviderSidecar {
 
   Iterable<List<Record>> allRecords() =>
       openedMetas.map((element) => element.records);
-
-  @Deprecated("改用 findRecord")
-  Record queryRecordBy(String recordId, {String? metaId}) {
-    if (metaId != null) {
-      return getRecords(metaId).firstWhere((record) => record.id == recordId);
-    }
-    for (var recordList in allRecords()) {
-      final i = recordList.indexWhere((element) => element.id == recordId);
-      if (i != -1) {
-        return recordList[i];
-      }
-    }
-    throw "Workspace中找不到ID为[$recordId]的Record";
-  }
 
   int __indexByOpenedMetas(
     String metaId, {
@@ -184,12 +167,14 @@ extension OpenedSpaceX on OpenedWorkspace {
   WorkspaceService get _workspaceSrv => sl<WorkspaceService>();
 
   /// 注意,[actInsertMetaDto]与[actUpdateMeta]不能混用, Insert必须使用Meta,而不是Dto
+  /// 本地数据由stream事件触发更新
   Future<BaseException?> actInsertMetaDto(RecordMetaDto meta) async =>
       await actWrapper(() => setInitialized("新增Meta [$meta]", () async {
             await _metaService.insertMetaDto(meta);
           }));
 
   /// 同时更新Meta与数据
+  /// 本地数据由stream事件触发更新
   Future<BaseException?> actUpdateByTable(TableDto dto) async =>
       await actWrapper(
           () => setInitialized("通过Table更新Meta/record [$dto]", () async {
@@ -197,6 +182,7 @@ extension OpenedSpaceX on OpenedWorkspace {
               }));
 
   /// 移除Meta
+  /// 本地数据由stream事件触发更新
   Future<BaseException?> actRemoveOpenedMeta(OpenedMeta meta) async =>
       await actWrapper(() => setInitialized("删除Meta [${meta.id}]", () async {
             meta.close();
