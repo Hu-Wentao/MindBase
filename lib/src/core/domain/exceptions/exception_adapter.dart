@@ -3,7 +3,8 @@ part of 'exceptions.dart';
 /// 异常适配器
 abstract class ExceptionAdapter {
   static BaseException of(dynamic e, [StackTrace? s]) {
-    slLogger.info("ExceptionAdapter.of: ${e.runtimeType}# ${e?.toString()} \n${s?.toString()}");
+    slLogger.info(
+        "ExceptionAdapter.of: ${e.runtimeType}# ${e?.toString()} \n${s?.toString()}");
     switch (e.runtimeType) {
       case AppwriteException:
         return _adapterAppwriteException(e);
@@ -19,8 +20,14 @@ BaseException _adapterAppwriteException(AppwriteException e) {
   final code = e.code ?? 0;
   switch (code) {
     case 401:
-      if (e.type == 'general_unauthorized_scope' || e.type == "user_unauthorized") {
-        return UnLoginException("登陆后再执行操作", e.toString());
+      switch (e.type) {
+        case 'general_unauthorized_scope':
+        case 'user_unauthorized':
+          return UnLoginException("登陆后再执行操作", e.toString());
+        case 'user_invalid_credentials':
+          return AuthBaseException("账号或密码错误", e.toString());
+        // default:
+        //   return UnauthorizedException(e.message);
       }
   }
   return ServerAppException(code, "${e.message}", e.toString());
