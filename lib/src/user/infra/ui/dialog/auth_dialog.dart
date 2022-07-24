@@ -3,22 +3,16 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:mind_base/generated/assets.dart';
-import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/user/infra/ui/widget/rounded_button.dart';
 import 'package:mind_base/src/user/infra/ui/widget/rounded_input_field.dart';
 import 'package:mind_base/src/user/infra/ui/widget/rounded_password_field.dart';
 import 'package:mind_base/src/user/domain/value/value.dart';
 import 'dart:math' as m;
 
-Future<bool?> showAuthDialog({
+Future<AuthReq?> showAuthDialog({
   required BuildContext context,
-  required Future<BaseException?> Function(
-    bool isRegister,
-    AuthVerify authVerify,
-    String identityStr,
-    Password password,
-  )
-      actAuthWith,
+  AuthReq? origin,
+  AuthRsp? withRsp,
 }) {
   // 获取窗口宽高
   final height = m.min(MediaQuery.of(context).size.width, 720.0);
@@ -27,8 +21,7 @@ Future<bool?> showAuthDialog({
       context: context,
       builder: (c) => Dialog(
             child: SizedBox(
-              child: Body(actAuthWith: actAuthWith),
-              // width: 400, // 固定宽度, 太宽就不适配了
+              child: Body(originReq: origin, rsp: withRsp),
               height: height,
               width: width,
             ),
@@ -42,20 +35,17 @@ class Body extends StatefulWidget {
   // 登录按钮及其排序(首个元素即为首选登录项)
   final List<AuthVerify> authList;
   final bool initIsRegister;
-  final Future<BaseException?> Function(
-    bool isRegister,
-    AuthVerify authVerify,
-    String identityStr,
-    Password password,
-  ) actAuthWith;
+  final AuthReq? originReq;
+  final AuthRsp? rsp;
 
   const Body({
     Key? key,
     this.initIsRegister = false,
-    required this.actAuthWith,
     this.authList = const [
       AuthVerify.email,
     ],
+    this.originReq,
+    this.rsp,
   }) : super(key: key);
 
   @override
@@ -176,6 +166,21 @@ class _BodyState extends State<Body> {
                         Assets.authSignup,
                         height: size.height * 0.35,
                       ),
+                // 展示上次请求的错误信息
+                if (widget.rsp != null)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FutureBuilder(
+                        future: Future.delayed(const Duration(seconds: 5)),
+                        builder: (c, s) =>
+                            (s.connectionState == ConnectionState.done)
+                                ? const SizedBox()
+                                : Text(
+                                    "${widget.rsp!.msg}",
+                                    style: const TextStyle(
+                                        color: Colors.red, fontSize: 18),
+                                  )),
+                  ),
                 ..._buildInputField(context),
                 SizedBox(height: size.height * 0.03),
                 AlreadyHaveAnAccountCheck(
@@ -224,17 +229,12 @@ class _BodyState extends State<Body> {
             text: isRegister ? "注册" : "登陆",
             press: () async {
               if (_formKey.currentState!.validate()) {
-                await widget
-                    .actAuthWith(
-                      isRegister,
-                      authVerify,
-                      identityStr,
-                      Password(pwd),
-                    )
-                    .thenSnackBar(
-                      context,
-                      onNull: Navigator.of(context).pop,
-                    );
+                Navigator.of(context).pop(AuthReq(
+                  isRegister,
+                  authVerify,
+                  identityStr,
+                  Password(pwd),
+                ));
               }
             },
             color: Theme.of(context).primaryColor,
