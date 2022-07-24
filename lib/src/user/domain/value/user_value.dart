@@ -1,5 +1,30 @@
 part of 'value.dart';
 
+/// 认证请求
+class AuthReq {
+  final bool isRegister;
+  final AuthVerify authVerify;
+  final String identityStr;
+  final Password password;
+
+  AuthReq(this.isRegister, this.authVerify, this.identityStr, this.password);
+
+  @override
+  String toString() =>
+      'AuthInfo{isRegister: $isRegister, authVerify: $authVerify, identityStr: $identityStr, password: $password}';
+}
+
+/// 认证响应
+class AuthRsp {
+  final BaseException? err;
+
+  AuthRsp.err(this.err);
+
+  bool get isSuccess => err == null;
+
+  String? get msg => err?.msg;
+}
+
 enum AuthVerify {
   email, // 绑定邮箱
   phoneNumber, // 绑定手机
