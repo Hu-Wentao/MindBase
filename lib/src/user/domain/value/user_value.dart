@@ -12,7 +12,7 @@ enum AuthVerify {
 @JsonSerializable()
 class Password extends Object {
   static const validator =
-      LengthRangeValidator(min: 7, max: 64, errorMsg: '密码长度只能在7到64个字符之间');
+      LengthRangeValidator(min: 8, max: 64, errorMsg: '密码长度只能在8到64个字符之间');
 
   @JsonKey(name: 'v')
   String v;
