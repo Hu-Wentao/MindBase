@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:logging/logging.dart';
+import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/user/application/provider/user_provider.dart';
 import 'package:mind_base/src/user/domain/exceptions/exceptions.dart';
+import 'package:mind_base/src/user/domain/value/value.dart';
 import 'package:mind_base/src/user/infra/ui/dialog/auth_dialog.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:provider/provider.dart';
@@ -20,9 +22,17 @@ class DialogFactory {
         return _buildBase(exception, context);
       case UnLoginException:
         return _buildUnLogin(exception, context);
+      case AuthBaseException:
+        return _buildAuth(exception, context);
       default:
         return _buildDefault(exception, context);
     }
+  }
+
+  static _buildAuth(BaseException exc, BuildContext context) async {
+    final withRsp = (exc is AuthBaseException) ? AuthRsp.err(exc) : null;
+    final req = await showAuthDialog(context: context, withRsp: withRsp);
+    context.read<UserProvider>().actAuthWithReq(req).thenDialog(context);
   }
 
   static NDialog _buildUnLogin(BaseException exception, BuildContext context) =>
@@ -36,13 +46,9 @@ class DialogFactory {
         actions: <Widget>[
           TextButton(
             child: const Text("前往登录页"),
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(context).pop(); //关闭当前Dialog
-              showAuthDialog(
-                context: context,
-                actAuthWith: Provider.of<UserProvider>(context, listen: false)
-                    .actAuthWith,
-              );
+              _buildAuth(exception, context);
             },
           ),
           TextButton(
