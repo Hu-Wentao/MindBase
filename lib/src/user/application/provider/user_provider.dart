@@ -32,8 +32,7 @@ class UserProvider extends ProviderSidecar<BaseException?> {
       final u = await _accountService.getUser();
       _setLogged(u, "已恢复登录状态[$u]");
     } catch (e, s) {
-      // print("debug #尝试恢复用户登录状态时出错,\n[$e],\n[$s]");
-      // 如果用户已退出登录, 则抛出下面的错误提示
+      log("尝试恢复用户登录状态时出错", e, s);
       // AppwriteException: general_unauthorized_scope, User (role: guest) missing scope (account) (401)],
       if (e is AppwriteException &&
           e.code == 401 &&
@@ -63,13 +62,18 @@ class UserProvider extends ProviderSidecar<BaseException?> {
     String identityStr,
     Password password,
   ) async =>
+      actAuthWithReq(AuthReq(isRegister, authVerify, identityStr, password));
+
+  Future<BaseException?> actAuthWithReq(AuthReq? req) async =>
       await actWrapper(() async {
+        if (req == null) return;
         // 先注册
-        if (isRegister) {
-          user = await _onRegister(authVerify, identityStr, password);
+        if (req.isRegister) {
+          user =
+              await _onRegister(req.authVerify, req.identityStr, req.password);
         }
         // 注册完成后自动登录
-        await _onLogin(authVerify, identityStr, password);
+        await _onLogin(req.authVerify, req.identityStr, req.password);
       });
 
   Future<User> _onRegister(
