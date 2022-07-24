@@ -8,6 +8,7 @@ import 'package:mind_base/src/user/infra/ui/widget/rounded_button.dart';
 import 'package:mind_base/src/user/infra/ui/widget/rounded_input_field.dart';
 import 'package:mind_base/src/user/infra/ui/widget/rounded_password_field.dart';
 import 'package:mind_base/src/user/domain/value/value.dart';
+import 'dart:math' as m;
 
 Future<bool?> showAuthDialog({
   required BuildContext context,
@@ -18,15 +19,24 @@ Future<bool?> showAuthDialog({
     Password password,
   )
       actAuthWith,
-}) =>
-    showDialog(
-        context: context,
-        builder: (c) => Dialog(
+}) {
+  // 获取窗口宽高
+  final height = m.min(MediaQuery.of(context).size.width, 720.0);
+  final width = height * 0.62;
+  return showDialog(
+      context: context,
+      builder: (c) => Dialog(
+            child: SizedBox(
               child: Body(actAuthWith: actAuthWith),
-              clipBehavior: Clip.hardEdge, // 确保内容不超出Dialog之外(特指圆角部分)
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(28)),
-            ));
+              // width: 400, // 固定宽度, 太宽就不适配了
+              height: height,
+              width: width,
+            ),
+            clipBehavior: Clip.hardEdge, // 确保内容不超出Dialog之外(特指圆角部分)
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+          ));
+}
 
 class Body extends StatefulWidget {
   // 登录按钮及其排序(首个元素即为首选登录项)
@@ -144,36 +154,39 @@ class _BodyState extends State<Body> {
             ),
           )),
       child: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                isRegister ? "注册" : "登录",
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: size.height * 0.03),
-              isRegister
-                  ? SvgPicture.asset(
-                      Assets.authLogin,
-                      height: size.height * 0.35,
-                    )
-                  : SvgPicture.asset(
-                      Assets.authSignup,
-                      height: size.height * 0.35,
-                    ),
-              ..._buildInputField(context),
-              SizedBox(height: size.height * 0.03),
-              AlreadyHaveAnAccountCheck(
-                login: isRegister,
-                press: () => setState(() => isRegister = !isRegister),
-              ),
-              // 有2种以上登录方式时,展示登录选项栏
-              if (widget.authList.length >= 2)
-                ..._buildAuthOptionsRow(widget.authList),
-            ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  isRegister ? "注册" : "登录",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: size.height * 0.03),
+                isRegister
+                    ? SvgPicture.asset(
+                        Assets.authLogin,
+                        height: size.height * 0.35,
+                      )
+                    : SvgPicture.asset(
+                        Assets.authSignup,
+                        height: size.height * 0.35,
+                      ),
+                ..._buildInputField(context),
+                SizedBox(height: size.height * 0.03),
+                AlreadyHaveAnAccountCheck(
+                  login: isRegister,
+                  press: () => setState(() => isRegister = !isRegister),
+                ),
+                // 有2种以上登录方式时,展示登录选项栏
+                if (widget.authList.length >= 2)
+                  ..._buildAuthOptionsRow(widget.authList),
+              ],
+            ),
           ),
         ),
       ),
@@ -256,6 +269,7 @@ class Background extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    final widthFactor = m.min(size.width, 450);
     return SizedBox(
       height: size.height,
       width: double.infinity,
@@ -268,7 +282,7 @@ class Background extends StatelessWidget {
             left: 0,
             child: Image.asset(
               Assets.imageSignupTop,
-              width: size.width * 0.35,
+              width: widthFactor * 0.35,
             ),
           ),
           Positioned(
@@ -276,7 +290,7 @@ class Background extends StatelessWidget {
             left: 0,
             child: Image.asset(
               Assets.imageMainBottom,
-              width: size.width * 0.25,
+              width: widthFactor * 0.25,
             ),
           ),
           child,
