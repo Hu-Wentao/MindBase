@@ -9,6 +9,15 @@ import 'package:mind_base/src/user/application/provider/user_provider.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:provider/provider.dart';
 
+_workspaceRouterPathBuilder({
+  String? workspaceId,
+  String? metaId,
+  int? viewId,
+}) =>
+    workspaceId == null
+        ? '/'
+        : '/workspace/$workspaceId/meta/${metaId ?? ""}/view/${viewId ?? -1}';
+
 final _router = GoRouter(
     // 必须打开,否则全局logging都将被取消
     debugLogDiagnostics: true,
@@ -22,16 +31,29 @@ final _router = GoRouter(
           screenType: ScreenType.values.byName(s.params['homeScreen']!),
         ),
       ),
+      GoRoute(path: '/workspace', redirect: (_) => '/'),
       GoRoute(
           path: '/workspace/:workspaceId',
           redirect: (_) =>
-              '/workspace/${_.params['workspaceId']}/meta/""/view/-1',
+              _workspaceRouterPathBuilder(workspaceId: _.params['workspaceId']),
           routes: [
             GoRoute(
+                path: 'meta',
+                redirect: (_) => _workspaceRouterPathBuilder(
+                    workspaceId: _.params['workspaceId'])),
+            GoRoute(
                 path: 'meta/:metaId',
-                redirect: (_) =>
-                    '/workspace/${_.params['workspaceId']}/meta/${_.params['metaId']}/view/-1',
+                redirect: (_) => _workspaceRouterPathBuilder(
+                      workspaceId: _.params['workspaceId'],
+                      metaId: _.params['metaId'],
+                    ),
                 routes: [
+                  GoRoute(
+                      path: 'view',
+                      redirect: (_) => _workspaceRouterPathBuilder(
+                            workspaceId: _.params['workspaceId'],
+                            metaId: _.params['metaId'],
+                          )),
                   GoRoute(
                       path: 'view/:viewId',
                       builder: (c, s) => WorkspacePage(
