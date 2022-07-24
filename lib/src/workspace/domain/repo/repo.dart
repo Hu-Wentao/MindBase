@@ -310,7 +310,15 @@ class RecordDtoRepo {
         // fixme 新建的集合为"所有人可读写"
         await createRecordCollection(null);
         // 再次尝试
-        await _recordAcc.insert(dto);
+        await insert(dto);
+      } else if (e.type == 'document_invalid_structure') {
+        // 文档结构错误（老版本创建导致），更新文档结构
+        // Invalid document structure: Unknown attribute: "a5"
+        final reg = RegExp('Unknown attribute: "(.+)"');
+        final attrName = reg.firstMatch("${e.message}")!.group(1) ?? '';
+        await updateRecordDocStructure(attrName);
+        // 再次尝试
+        return await insert(dto);
       } else {
         rethrow;
       }
@@ -371,6 +379,29 @@ class RecordDtoRepo {
   findAll() => _recordAcc.findAll();
 
   deleteBy(String metaId) => _recordAcc.deleteBy(metaId);
+
+  // #506 当前版本存在缺陷, 仅凭attrName无法判断要新增的属性size,等
+  updateRecordDocStructure(String attrName) async {
+    slLogger
+        .info("updateMetaDocStructure# 更新Record表[$collectionId]属性 $attrName");
+    try {
+      await _createCollectionAttr(
+        _serverDb,
+        collectionId: collectionId,
+        attrKey: attrName,
+        size: 511,
+      );
+    } on AppwriteException catch (e) {
+      if (e.type == 'attribute_already_exists' && e.code == 409) {
+        // 属性已存在,忽略
+        return;
+      } else {
+        rethrow;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
 
 /// 为Record集合新增属性
@@ -378,12 +409,26 @@ Future _createAttr(
   server.Database _db,
   String metaId,
   AttributeDto attr,
-) async {
-  slLogger.info("_createAttr 为Record集合[$metaId]创建属性# [$attr]");
+) =>
+    _createCollectionAttr(
+      _db,
+      collectionId: metaId,
+      attrKey: attr.propId,
+      size: 511,
+    );
+
+Future _createCollectionAttr(
+  server.Database _db, {
+  required String collectionId,
+  required String attrKey,
+  int size = 511,
+  bool required = false,
+}) async {
+  slLogger.info("_createCollectionAttr 集合[$collectionId]创建属性# [$attrKey]");
   return await _db.createStringAttribute(
-    collectionId: metaId, // MetaId即==Record集合的Id
-    key: attr.propId, // Appwrite BUG,属性名称不能用纯数字
-    size: 511,
-    xrequired: false,
+    collectionId: collectionId, // MetaId即==Record集合的Id
+    key: attrKey, // Appwrite BUG,属性名称不能用纯数字
+    size: size,
+    xrequired: required,
   );
 }
