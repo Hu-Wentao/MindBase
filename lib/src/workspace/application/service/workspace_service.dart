@@ -129,20 +129,18 @@ class WorkspaceService {
 
   /// 同时创建Meta与数据
   Future insertTable(MetaService _metaSrv, TableDto table) async {
-    // 更新Meta
+    // 创建或更新Meta
     if (table.isCreate) {
       await _metaSrv.insertMetaDto(table.meta);
     } else {
       final origin = _metaSrv.findById(table.meta.id);
       await _metaSrv.updateWithRecordCollection(origin, table.meta);
     }
-    await Future.delayed(const Duration(milliseconds: 100));
-    final RecordDtoRepo rcdRepo = RecordDtoRepo.withDtoDI(sl, table.meta);
     // 插入数据
+    final RecordDtoRepo rcdRepo = RecordDtoRepo.withDtoDI(sl, table.meta);
+    await Future.delayed(const Duration(milliseconds: 1000));
     for (final rcd in table.data) {
-      // print("debug 插入记录 #$rcd");
       await rcdRepo.insert(rcd);
-      await Future.delayed(const Duration(milliseconds: 50));
     }
   }
 
