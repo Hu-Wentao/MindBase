@@ -6,3 +6,7 @@ class UnLoginException extends BaseException {
   UnLoginException(String msg, String debugInfo)
       : super(msg, debugInfo: debugInfo);
 }
+
+class AuthBaseException extends BaseException {
+  AuthBaseException(super.msg, String debugInfo) : super(debugInfo: debugInfo);
+}
