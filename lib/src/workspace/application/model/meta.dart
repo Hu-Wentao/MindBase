@@ -27,12 +27,14 @@ extension MetaModelBizX on MetaModel {
           {Value Function(int k)? orElse}) =>
       record.data.fields[attrKey] ?? orElse?.call(attrKey);
 
-  MethodDto tryGetMethodBy(int methodKey,
-          {MethodDto Function(int k)? orElse}) =>
-      methods.firstWhere((mth) => mth.k == methodKey,
-          orElse: () =>
-              orElse?.call(methodKey) ??
-              (throw "找不到attrKey: [$methods] 对应的Method"));
+  MethodDto? tryGetMethodBy(
+    int methodKey, {
+    MethodDto Function(int k)? orElse,
+  }) =>
+      methods.firstWhereOrNull(
+        (mth) => mth.k == methodKey,
+      ) ??
+      orElse?.call(methodKey);
 
   /// 根据属性名称获取属性值(同时调用表达式进行计算)
   Value getValueBy(RecordModel record, PropertyDto prop, FindRecordFn find) =>
