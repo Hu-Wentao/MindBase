@@ -1,3 +1,5 @@
+import 'package:mind_base/src/workspace/domain/value/value.dart';
+
 import '../../../domain/entity/entity.dart';
 import '../../model/model.dart';
 import 'expr_evaluator.dart';
@@ -16,13 +18,14 @@ class MetaMemberAccessor implements MemberAccessor<RecordMeta> {
   }
 
   /// 将成员名称-> 成员prop
+  /// fixme 逻辑需要优化
   @override
   ExprValue getMember(RecordMeta meta, String member) {
     final prop = meta.properties.firstWhere(
       (element) => element.name == member,
       orElse: () => throw "在Record[${meta.id}]找不到名称为[$member]的成员方法或变量",
     );
-    return ExprValue.build(type: prop.type, ag: [prop.propId]);
+    return ExprValue.build(type: prop.type.toDomain(meta.at.queryMeta), ag: [prop.propId]);
     // return prop;
     // if (prop.type.tp == AttrTp.ref) {
     //   // 引用类型, 同时返回类型信息, 以便推断表达式返回值类型
@@ -55,13 +58,14 @@ class RecordMemberAccessor implements MemberAccessor<Record> {
   /// 成员可以是值, 也可是函数[Function]
   /// todo 在新增/修改变量/方法名称时,没有检查名称唯一性
   /// 考虑允许方法与变量重名,用于表达"get"方法
+  /// fixme 逻辑需要优化
   @override
   IExpr getMember(Record record, String member) {
-    final method = record.at.tryGetMethodBy(member);
+    final method = record.at.tryGetMethodBy(member.parsePropK);
     if (method != null) {
-      return method.expr.callee as ExprValue; // 可以被调用
+      return method.expr.toDomain(record.at.at.queryMeta).callee as ExprValue; // 可以被调用
     }
-    final field = record.at.getFieldByAttrName(member);
+    final field = record.at.getFieldByAttrName(record,member);
     if (field.value != null) {
       return field; // Expr值, 如果是ref,则直接返回,如果是原始类型, 则要返回value
     }
