@@ -840,12 +840,10 @@ packages:
   provider_sidecar:
     dependency: "direct main"
     description:
-      path: "."
-      ref: "v1.1"
-      resolved-ref: "88d15751faa081d3a92d74f315f7b0bc7ee298ef"
-      url: "https://e.coding.net/shuttlecloud/company/provider_sidecar.git"
-    source: git
-    version: "1.0.0"
+      path: "../provider_sidecar"
+      relative: true
+    source: path
+    version: "1.2.0"
   pub_semver:
     dependency: transitive
     description:

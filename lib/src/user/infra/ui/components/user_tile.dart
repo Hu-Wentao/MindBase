@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/confirm_dialog.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/core/infra/ui/widget/RadiusInkWell.dart';
-import 'package:mind_base/src/user/application/provider/user_provider.dart';
+import 'package:mind_base/src/user/application/model/model.dart';
 import 'package:mind_base/src/user/infra/ui/dialog/auth_dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -22,7 +22,7 @@ class UserInfoTile extends StatelessWidget {
               const SizedBox(width: 4),
               // 手机竖屏模式不展示用户名
               if (getWindowType(c) != AdaptiveWindowType.xsmall)
-                Text(p.user?.name ?? "未登录"),
+                Text(p.name ?? "未登录"),
             ],
           ),
           onTap: () async {

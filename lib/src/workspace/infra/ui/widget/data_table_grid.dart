@@ -240,7 +240,7 @@ class DataFrameTitlePluto extends StatelessWidget {
     required this.onUpdateView,
   }) : super(key: key);
 
-  RecordMeta get meta => openedMeta.meta;
+  RecordMeta get meta => openedMeta;
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(

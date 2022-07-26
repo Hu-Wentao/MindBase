@@ -287,11 +287,11 @@ class RecordMemberAccessor implements MemberAccessor<Record> {
   /// 考虑允许方法与变量重名,用于表达"get"方法
   @override
   IExpr getMember(Record record, String member) {
-    final method = record.meta.tryGetMethodBy(member);
+    final method = record.at.tryGetMethodBy(member);
     if (method != null) {
       return method.expr.callee as ExprValue; // 可以被调用
     }
-    final field = record.getFieldByAttrName(member);
+    final field = record.at.getFieldByAttrName(member);
     if (field.value != null) {
       return field; // Expr值, 如果是ref,则直接返回,如果是原始类型, 则要返回value
     }

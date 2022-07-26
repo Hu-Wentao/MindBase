@@ -63,22 +63,24 @@ class OpenedSpaceManagerModel extends ProviderSidecar {
 
   /// 打开并缓存
   Future<OpenedWorkspace> _openCacheWorkspaceById(String workspaceId) async {
-    // 先存到[_readyOpenList],防止打开失败后找不到要重开的工作空间Id
-    _readyOpenList.add(workspaceId);
-    final ws = await _workspaceSrv.openWorkspaceBy(workspaceId);
-    openedWorkspaces.add(ws);
-    // 打开成功后从List移除
-    _readyOpenList.remove(workspaceId);
-    setInitialized("打开工作空间[$workspaceId]成功");
-    return ws;
+    throw UnimplementedError(
+        "_openCacheWorkspaceById# _workspaceSrv.openWorkspaceBy");
+    // // 先存到[_readyOpenList],防止打开失败后找不到要重开的工作空间Id
+    // _readyOpenList.add(workspaceId);
+    // final ws = await _workspaceSrv.openWorkspaceBy(workspaceId);
+    // openedWorkspaces.add(ws);
+    // // 打开成功后从List移除
+    // _readyOpenList.remove(workspaceId);
+    // setInitialized("打开工作空间[$workspaceId]成功");
+    // return ws;
   }
 
   /// ==========================================================================
 
   /// 当上层状态 [User] 刷新时, 重置所有工作空间
-  User? _cacheUser;
+  aw.User? _cacheUser;
 
-  Future<BaseException?> actOnUserUpdate(User? user) async {
+  Future<BaseException?> actOnUserUpdate(aw.User? user) async {
     print(
         'debug OpenedSpaceManagerModel.onUserUpdate: ${user?.name}, ${_cacheUser?.name}');
     if (user != _cacheUser) {
@@ -100,6 +102,4 @@ class OpenedSpaceManagerModel extends ProviderSidecar {
   OpenedSpaceManagerModel() : super(onCatch: ExceptionAdapter.of);
 }
 
-extension OpenedSpaceManagerModelX on OpenedSpaceManagerModel {
-
-}
+extension OpenedSpaceManagerModelX on OpenedSpaceManagerModel {}

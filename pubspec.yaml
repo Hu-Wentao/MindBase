@@ -97,8 +97,8 @@ dependency_overrides:
 #    path: D:\_proj\pluto_grid
 #  get_arch_core:
 #    path: ../get_arch/get_arch_core
-#  provider_sidecar:
-#    path: ../provider_sidecar
+  provider_sidecar:
+    path: ../provider_sidecar
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

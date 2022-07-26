@@ -9,6 +9,11 @@ import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/application/service/service.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
+@Deprecated('UserModel')
+typedef UserProvider = UserModel;
+@Deprecated('UserModel')
+typedef TeamManagerModel = UserModel;
+
 class UserModel extends ProviderSidecar<BaseException?> {
   String? get id => _user?.$id;
 
@@ -26,7 +31,7 @@ class UserModel extends ProviderSidecar<BaseException?> {
   @Deprecated("避免使用")
   aw.User loggedUser() => _user!;
 
-  UserModel(this._user) : super(onCatch: ExceptionAdapter.of);
+  UserModel([this._user]) : super(onCatch: ExceptionAdapter.of);
 
   @override
   onInitializing() {}

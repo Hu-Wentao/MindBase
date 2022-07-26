@@ -1,23 +1,23 @@
 part of 'model.dart';
 
+// typedef OpenedSpaceManagerModel = TeamModel;
+
 /// Team
 /// todo 实时刷新用户数据
-class TeamModel extends ProviderSidecar {
-  String get id => _team.$id;
+class TeamModel extends ModelSidecar<aw.Team, BaseException?> {
+  String get id => data.$id;
 
-  String get name => _team.name;
-  aw.Team _team;
-  List<WorkspaceDto> workspaces = [];
+  String get name => data.name;
 
-  int get createAt => _team.dateCreated;
+  int get createAt => data.dateCreated;
 
   // todo 人员列表
-  int get total => _team.total;
+  int get total => data.total;
 
-  @override
-  onInitializing() {}
+  // 子状态Model
+  List<WorkspaceModel> workspaces = [];
 
-  TeamModel(this._team) : super(onCatch: ExceptionAdapter.of);
+  TeamModel(aw.Team data) : super(data, ExceptionAdapter.of);
 }
 
 extension TeamModelX on TeamModel {
@@ -25,23 +25,34 @@ extension TeamModelX on TeamModel {
 
   WorkspaceService get _workspaceSrv => sl<WorkspaceService>();
 
+  /// 通过REST 刷新, 因此最后调用 [setDone]
   actRefreshSpace() async => await actWrapper(() async {
-        workspaces = await _workspaceSrv.queryWorkspaceDto(_team.$id);
-        setInitialized("刷新[${_team.name}]团队的工作空间列表");
+        workspaces = (await _workspaceSrv.queryWorkspaceDto(id))
+            .map((e) =>
+                workspaces.firstWhereOrNull((element) {
+                  if (element.id == e.id) {
+                    element.updateData(e);
+                    return true;
+                  }
+                  return false;
+                }) ??
+                WorkspaceModel(e))
+            .toList();
+        setDone("刷新[$name]团队的工作空间列表");
       });
 
-  Future<Team?> actRenameTeam(String? newName) async =>
+  Future<BaseException?> actRenameTeam(String? newName) async =>
       await actWrapper(() async {
         if (newName == null) return null;
-        _team = await _teamSrv.updateName(_team, newName);
-        setInitialized("重命名团队[${_team.name}]");
+        data = await _teamSrv.updateName(data, newName);
+        setDone("重命名团队[$name]");
       });
 
   Future<BaseException?> actInviteMember(String? userEmail) async =>
       await actWrapper(() async {
         if (userEmail == null) return;
-        await _teamSrv.inviteMember(_team, userEmail);
-        setUninitialized("邀请用户[$userEmail]加入团队[${_team.name}]");
+        await _teamSrv.inviteMember(data, userEmail);
+        setDone("邀请用户[$userEmail]加入团队[$name]");
       });
 
   /// 新建工作空间
@@ -51,8 +62,8 @@ extension TeamModelX on TeamModel {
   }) async =>
       await actWrapper(() async {
         final r = await _workspaceSrv.createWorkspaceDtoBy(id, spaceName);
-        workspaces.add(r);
-        setInitialized("创建工作空间成功");
+        workspaces.add(WorkspaceModel(r));
+        setDone("创建工作空间成功");
         onCreated?.call(r);
       });
 
@@ -70,4 +81,11 @@ extension TeamModelX on TeamModel {
         workspaces.removeWhere((w) => w.id == spaceId);
         setInitialized("删除工作空间[$spaceId]完成");
       });
+
+  // 打开一个空间
+  Future<BaseException?> actOpenWorkspaceById(String workspaceId) async => await actWrapper((){
+      // 在team中查询是否存在该空间
+
+    });
+
 }

@@ -54,7 +54,7 @@ class _RecordFormState extends State<RecordForm> {
   /// <propId,ValueKey>
   late final Map<String, TextEditingController> _refFieldCtrl;
 
-  Widget _buildFormField(Attribute attr) {
+  Widget _buildFormField(AttributeDto attr) {
     final initFieldValue = _origin.fields[attr.k];
     switch (attr.type.tp) {
       case AttrTp.ref:
@@ -67,7 +67,7 @@ class _RecordFormState extends State<RecordForm> {
           controller: ctrl,
           decoration: InputDecoration(
             // 字段名称与类型名称
-            labelText: "${attr.name} (${attr.type.meta!.name})",
+            labelText: "${attr.name} (${attr.type.fetchMeta(widget.openedWorkspace).name})",
             hintText: attr.type.name,
           ),
           validator: FormBuilderValidators.compose([

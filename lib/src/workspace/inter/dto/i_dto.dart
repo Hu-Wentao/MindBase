@@ -25,7 +25,8 @@ class ValueDto {
 }
 
 extension RecordX on Record {
-  RecordDto toDto() => RecordDto.fromDomain(this);
+  RecordDto toDto() => data;
+      // RecordDto.fromDomain(this);
 }
 
 ///
@@ -45,9 +46,9 @@ class RecordDto extends IEntityDto {
 
   const RecordDto({this.fields = const {}});
 
-  factory RecordDto.fromDomain(Record record) => RecordDto(
-        fields: record.fields,
-      );
+  // factory RecordDto.fromDomain(Record record) => RecordDto(
+  //       fields: record.fields,
+  //     );
 
   factory RecordDto.builder({
     String? id,
@@ -71,16 +72,16 @@ class RecordDto extends IEntityDto {
     );
   }
 
-  Record toDm(RecordMeta Function(String metaId) getMeta) =>
-      toDomain(getMeta(metaId));
+  // Record toDm(RecordMeta Function(String metaId) getMeta) =>
+  //     toDomain(getMeta(metaId));
 
-  Record toDomain(RecordMeta m) => Record(
-        id: idHex,
-        meta: m,
-        fields: fields,
-      );
+  // Record toDomain(RecordMeta m) => Record(
+  //       id: idHex,
+  //       meta: m,
+  //       fields: fields,
+  //     );
 
-  Record? toDomainOr(RecordMeta? m) => m == null ? null : toDomain(m);
+  // Record? toDomainOr(RecordMeta? m) => m == null ? null : toDomain(m);
 
   @override
   Map<String, dynamic> toJson() =>
@@ -91,7 +92,8 @@ class RecordDto extends IEntityDto {
 }
 
 extension RecordMetaX on RecordMeta {
-  RecordMetaDto toDto() => RecordMetaDto.fromDomain(this);
+  RecordMetaDto toDto() =>data;
+  // RecordMetaDto.fromDomain(this);
 }
 
 /// attributes固定 0:表示Record的ID, 1:表示Record的metaId
@@ -201,37 +203,37 @@ class RecordMetaDto extends IEntityDto {
         methods: methods,
       );
 
-  factory RecordMetaDto.fromDomain(RecordMeta meta) => RecordMetaDto(
-        id: meta.id,
-        name: meta.name,
-        memo: meta.memo,
-        maxKey: meta.maxKey,
-        attrs: meta.attrs.map((e) => e.toDto()).toList(),
-        methods: meta.methods.map((e) => e.toDto()).toList(),
-        views: meta.views,
-      );
+  // factory RecordMetaDto.fromDomain(RecordMeta meta) => RecordMetaDto(
+  //       id: meta.id,
+  //       name: meta.name,
+  //       memo: meta.memo,
+  //       maxKey: meta.maxKey,
+  //       attrs: meta.attrs.map((e) => e.toDto()).toList(),
+  //       methods: meta.methods.map((e) => e.toDto()).toList(),
+  //       views: meta.views,
+  //     );
 
   @override
   Map<String, dynamic> toJson() =>
       throw UnimplementedError("使用[$runtimeType]相关Extension的方法");
 
-  RecordMeta toDm(QueryMetaFn toMeta) => toDomain(
-        attrs.map((a) => a.toDomain(toMeta)).toList(),
-        methods.map((e) => e.toDomain(toMeta)).toList(),
-        views,
-      );
+  // RecordMeta toDm(QueryMetaFn toMeta) => toDomain(
+  //       attrs.map((a) => a.toDomain(toMeta)).toList(),
+  //       methods.map((e) => e.toDomain(toMeta)).toList(),
+  //       views,
+  //     );
 
-  RecordMeta toDomain(
-          List<Attribute> attrs, List<Method> methods, List<TableView> views) =>
-      RecordMeta(
-        id: id,
-        name: name,
-        memo: memo,
-        maxKey: maxKey,
-        attrs: attrs,
-        methods: methods,
-        views: views,
-      );
+  // RecordMeta toDomain(
+  //         List<Attribute> attrs, List<Method> methods, List<TableView> views) =>
+  //     RecordMeta(
+  //       id: id,
+  //       name: name,
+  //       memo: memo,
+  //       maxKey: maxKey,
+  //       attrs: attrs,
+  //       methods: methods,
+  //       views: views,
+  //     );
 
   @override
   String toString() {
@@ -258,20 +260,33 @@ class RecordMetaDto extends IEntityDto {
   }
 }
 
+
+abstract class PropertyDto extends IDto {
+  int k; // 表头key,对应Field:k,需要从所在的TableMeta中获取
+  String name; // 表头名称
+  String memo; // 表头备注
+  AttrTypeDto get type; // 最终返回值类型
+  PropertyDto({
+    required this.k,
+    required this.name,
+    required this.memo,
+  });
+  String get propId => '$k';
+}
+
 extension MethodX on Method {
   MethodDto toDto() => MethodDto.ofDomain(this);
 }
 
-class MethodDto extends IDto {
-  int k;
-  String name;
-  String memo;
+class MethodDto extends PropertyDto {
   IExprNodeDto expr;
+  @override
+  AttrTypeDto get type => expr.type!;
 
   MethodDto({
-    required this.k,
-    required this.name,
-    required this.memo,
+    required super.k,
+    required super.name,
+    required super.memo,
     required this.expr,
   });
 
@@ -340,20 +355,23 @@ extension AttrbuteX on Attribute {
   AttributeDto toDto() => AttributeDto.ofDomain(this);
 }
 
+extension AttrTypeDtoX on AttrTypeDto{
+  // 请确保type是ref类型,否则报错
+  MetaModel fetchMeta(WorkspaceModel space) => space.queryMeta(r!);
+}
 /// 表头/属性: 关系/表的一列叫属性
-class AttributeDto extends IDto {
-  int k;
-  String name;
-  String memo;
+class AttributeDto extends PropertyDto {
+  @override
   AttrTypeDto type;
 
   AttributeDto({
-    required this.k,
-    required this.name,
-    required this.memo,
+    required super.k,
+    required super.name,
+    required super.memo,
     required this.type,
   });
 
+  @override
   String get propId => PropertyX.getPropId(true, k);
 
   /// 供Form初始化
@@ -438,8 +456,8 @@ class WorkspaceDto extends IEntityDto {
     this.metas = const [],
   });
 
-  Workspace toDomain(RecordMeta Function(String metaId) toMeta) => Workspace(
-      id: id, name: name, metas: metas.map((e) => toMeta(e)).toList());
+  // Workspace toDomain(RecordMeta Function(String metaId) toMeta) => Workspace(
+  //     id: id, name: name, metas: metas.map((e) => toMeta(e)).toList());
 
   @override
   toJson() => throw UnimplementedError("使用[$runtimeType]相关Extension的方法");
@@ -447,6 +465,9 @@ class WorkspaceDto extends IEntityDto {
 
 extension AttrTypeX on AttrType {
   AttrTypeDto toDto() => AttrTypeDto(tp, meta?.id);
+
+  // 请确保type是ref类型,否则报错
+  MetaModel fetchMeta(WorkspaceModel space) => space.queryMeta(r!);
 }
 
 /// 如果[tp]为[AttrTp.ref],则[r]不能为空
@@ -455,6 +476,7 @@ class AttrTypeDto {
 
   final String? r;
 
+  @Deprecated("考虑移除any类型, 默认用string")
   static const AttrTypeDto any = AttrTypeDto(AttrTp.any, null);
   static const AttrTypeDto num = AttrTypeDto(AttrTp.num, null);
   static const AttrTypeDto string = AttrTypeDto(AttrTp.string, null);

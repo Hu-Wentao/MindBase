@@ -22,7 +22,7 @@ class WorkspacesScreen extends StatelessWidget {
                             final name = await showTextInputDialog(
                               context: context,
                               title: "设置团队名称",
-                              origin: "${pUser.user?.name}'s Team",
+                              origin: "${pUser.name}'s Team",
                             );
                             if (name == null) return;
                             context
@@ -104,7 +104,7 @@ class _TeamPanelState extends State<TeamPanel> {
                                         (BuildContext context, int i) =>
                                             WorkspaceTile(
                                       team: team,
-                                      space: team.workspaces[i],
+                                      space: team.workspaces[i].data,
                                     ),
                                     separatorBuilder: (context, int index) =>
                                         const Divider(),

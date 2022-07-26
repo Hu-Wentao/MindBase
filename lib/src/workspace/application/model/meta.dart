@@ -1,18 +1,79 @@
 part of 'model.dart';
 
-class OpenedMeta extends ProviderSidecar {
+@Deprecated("MetaModel")
+typedef OpenedMeta = MetaModel;
+@Deprecated("MetaModel")
+typedef RecordMeta = MetaModel;
+
+extension MetaModelBizX on MetaModel {
+  ExprValue getFieldByAttrName(RecordModel record, String name) =>
+      getField(record, name.parsePropK);
+
+  ExprValue getField(RecordModel record, int attrKey) {
+    final pIndex = meta.attrs.indexWhere((attr) => attr.k == attrKey);
+    if (pIndex == -1) {
+      // 找不到属性，通常是因为新增列，但没有填充值导致的
+      return ExprValue.build(
+          type: AttrType.string, ag: [null, "Error#找不到Prop[$attrKey]"]);
+    }
+    final prop = meta.attrs[pIndex];
+    final value = record.data.fields[attrKey];
+    return ExprValue.build(
+        type: prop.type.toDomain(at.queryMeta),
+        ag: [value?.value, value == null ? "Error#找不到Value值" : null]);
+  }
+
+  Value? getFieldValue(RecordModel record, int attrKey,
+          {Value Function(int k)? orElse}) =>
+      record.data.fields[attrKey] ?? orElse?.call(attrKey);
+
+  MethodDto tryGetMethodBy(int methodKey,
+          {MethodDto Function(int k)? orElse}) =>
+      methods.firstWhere((mth) => mth.k == methodKey,
+          orElse: () =>
+              orElse?.call(methodKey) ??
+              (throw "找不到attrKey: [$methods] 对应的Method"));
+
+  /// 根据属性名称获取属性值(同时调用表达式进行计算)
+  Value getValueBy(RecordModel record, PropertyDto prop, FindRecordFn find) =>
+      Value.of(record.eval(prop,find));
+
+  PropertyDto getPropBy(String propId) =>
+      properties.firstWhere((prop) => prop.propId == propId);
+}
+
+abstract class IMetaModel extends ModelSidecar<RecordMetaDto, BaseException?> {
+  IMetaModel(RecordMetaDto data) : super(data, ExceptionAdapter.of);
+
+  String get id;
+
+// RecordMeta onMetaAdd(RecordMetaDto meta);
+//
+// Future<void> onWatchMetaEvt(AccessorEvt<RecordMetaDto> event);
+}
+
+class MetaModel extends ModelSidecar<RecordMetaDto, BaseException?> {
+  MetaModel(RecordMetaDto meta, this.at) : super(meta, ExceptionAdapter.of);
+
   late final StreamSubscription<AccessorEvt<RecordDto>> _cachedRecordSubs;
 
   // 附加状态
-  final OpenedWorkspace at;
-  final List<Record> records = [];
-  final RecordMeta meta;
+  final WorkspaceModel at;
+  final List<RecordModel> records = [];
+
+  RecordMetaDto get meta => data;
 
   String get id => meta.id;
 
   String get name => meta.name;
 
-  OpenedMeta(this.meta, this.at);
+  List<AttributeDto> get attrs => meta.attrs;
+
+  List<MethodDto> get methods => meta.methods;
+
+  List<PropertyDto> get properties => [...attrs, ...methods];
+
+  // get properties => [...meta.attrs, ...meta.methods];
 
   _safeFetchAllRecord(
     Stream<RecordDto> Function() fetchAllRecordsFn, {
@@ -22,13 +83,13 @@ class OpenedMeta extends ProviderSidecar {
     try {
       // 出现异常,steam会自动关闭
       await for (final dto in fetchAllRecordsFn()) {
-        _onEvtInsertRecord(dto.toDomain(meta));
+        _onEvtInsertRecord(dto);
       }
     } catch (e, s) {
       if (e is AppwriteException) {
         if (e.code == 404 && e.type == "collection_not_found") {
           // 不存在则无需抛出异常
-          print("debug OpenedMeta.openBy: [$e], 由推测的`Record集合`尚未创建导致的,无需抛出异常");
+          print("debug MetaModel.openBy: [$e], 由推测的`Record集合`尚未创建导致的,无需抛出异常");
           return;
           // 在新建表的时候,首次执行findAll被抛出, 可能是操作太频繁导致, 可以wait一会再重试
           // AppwriteException: null, {"message":"Error: Server Error","code":500,"version":"0.13.4"} (0)
@@ -50,36 +111,36 @@ class OpenedMeta extends ProviderSidecar {
               "未处理的Appwrite异常 type# ${e.type}, code# ${e.code}, message# ${e.message}, rsp# ${e.response}");
         }
       }
-      print("debug OpenedMeta.open: retry#[$reRryCount] 抛出未知异常 [$e], ");
+      print("debug MetaModel.open: retry#[$reRryCount] 抛出未知异常 [$e], ");
       throw ExceptionAdapter.of(e, s);
     }
   }
 
-  OpenedMeta.open({
-    required this.at,
-    required this.meta,
-    required Stream<RecordDto> Function() fetchAllRecordsFn,
-    required Stream<AccessorEvt<RecordDto>> watchAllRecords,
-  }) : super(onCatch: ExceptionAdapter.of) {
-    _safeFetchAllRecord(
-      fetchAllRecordsFn,
-      onDto: (dto) => _onEvtInsertRecord(dto.toDomain(meta)),
-    );
-
-    _cachedRecordSubs = watchAllRecords.listen((event) {
-      _onWatchRecord(event);
-    }, onError: (e, s) {
-      if (e is AppwriteException &&
-          e.code == 404 &&
-          e.type == "collection_not_found") {
-        // 不存在则无需抛出异常
-        print("debug OpenedMeta.openBy: [$e], 由推测的`Record集合`尚未创建导致的,无需抛出异常");
-      } else {
-        // print("debug OpenedMeta.openBy: 抛出未知异常 [$e]");
-        throw ExceptionAdapter.of(e, s);
-      }
-    });
-  }
+  // MetaModel.open({
+  //   required this.at,
+  //   required this.meta,
+  //   required Stream<RecordDto> Function() fetchAllRecordsFn,
+  //   required Stream<AccessorEvt<RecordDto>> watchAllRecords,
+  // }) : super(onCatch: ExceptionAdapter.of) {
+  //   _safeFetchAllRecord(
+  //     fetchAllRecordsFn,
+  //     onDto: (dto) => _onEvtInsertRecord(dto.toDomain(meta)),
+  //   );
+  //
+  //   _cachedRecordSubs = watchAllRecords.listen((event) {
+  //     _onWatchRecord(event);
+  //   }, onError: (e, s) {
+  //     if (e is AppwriteException &&
+  //         e.code == 404 &&
+  //         e.type == "collection_not_found") {
+  //       // 不存在则无需抛出异常
+  //       print("debug MetaModel.openBy: [$e], 由推测的`Record集合`尚未创建导致的,无需抛出异常");
+  //     } else {
+  //       // print("debug MetaModel.openBy: 抛出未知异常 [$e]");
+  //       throw ExceptionAdapter.of(e, s);
+  //     }
+  //   });
+  // }
 
   /// 内部缓存表格数据
   RecordDataGridSourcePluto? _cachedDataSource;
@@ -87,10 +148,12 @@ class OpenedMeta extends ProviderSidecar {
   RecordDataGridSourcePluto get dataSource {
     // print("当前是否为缓存DataSource# ${_cachedDataSource == null}");
     return _cachedDataSource ??= RecordDataGridSourcePluto(
-      meta: meta,
+      meta: this,
       findRecord: at.findRecord,
-      cachedColumns: meta.toPlutoCols(this),
-      cachedRows: records.map((e) => e.toPlutoRow(at.findRecord)).toList(),
+      cachedColumns: PlutoMetaModelX(this).toPlutoCols(),
+      // cachedColumns: meta.toPlutoCols(this),
+      cachedRows: records.map((e) => toPlutoRow(e)).toList(),
+      // cachedRows: records.map((e) => e.toPlutoRow(at.findRecord)).toList(),
     );
   }
 
@@ -109,11 +172,11 @@ class OpenedMeta extends ProviderSidecar {
     print("debug #监听WatchRecord # $event");
     switch (event.type) {
       case AccessorEvtTp.insert:
-        _onEvtInsertRecord(event.dto!.toDomain(meta));
+        _onEvtInsertRecord(event.dto!);
         break;
       case AccessorEvtTp.replace:
       case AccessorEvtTp.update:
-        _onEvtUpdateRecord(event.dto!.toDomain(meta));
+        _onEvtUpdateRecord(event.dto!);
         break;
       case AccessorEvtTp.delete:
         _onEvtRemoveRecord(event.ettId);
@@ -122,20 +185,21 @@ class OpenedMeta extends ProviderSidecar {
     notifyListeners();
   }
 
-  Record _onEvtInsertRecord(Record record) {
-    records.add(record);
-    _cachedDataSource?.onInsertEvt(record);
+  RecordDto _onEvtInsertRecord(RecordDto record) {
+    final model = RecordModel(this, record);
+    records.add(model);
+    _cachedDataSource?.onInsertEvt(model);
     return record;
   }
 
   // 返回被更新的元素index
-  int _onEvtUpdateRecord(Record record) {
+  int _onEvtUpdateRecord(RecordDto record) {
     final index = records.indexWhere((element) => element.id == record.id);
     if (index == -1) {
       _onEvtInsertRecord(record);
     } else {
-      records[index].update(record);
-      _cachedDataSource?.onUpdateEvt(record, index);
+      final m = records[index]..updateData(record);
+      _cachedDataSource?.onUpdateEvt(m, index);
     }
     return index;
   }
@@ -159,15 +223,12 @@ class OpenedMeta extends ProviderSidecar {
     _refreshDataVer();
     print("debug 已清除DataSource缓存");
   }
-
-  @override
-  onInitializing() {}
 }
 
-extension OpenedMetaX on OpenedMeta {
+extension MetaModelX on MetaModel {
   MetaService get _metaService => MetaService.withDI(sl, at.id)!;
 
-  RecordDtoRepo get _recordDtoRepo => RecordDtoRepo.withDI(sl, meta);
+  RecordDtoRepo get _recordDtoRepo => RecordDtoRepo.withDI(sl, this);
 
   /// Meta
   Future<BaseException?> actUpdateMeta(
@@ -175,12 +236,12 @@ extension OpenedMetaX on OpenedMeta {
   ) async =>
       await actWrapper(() => setInitialized("保存元素 [$dto]", () async {
             if (dto == null) return null;
-            await _metaService.updateWithRecordCollection(meta.toDto(), dto);
+            await _metaService.updateWithRecordCollection(meta, dto);
           }));
 
   Future<BaseException?> actUpdateMetaName(String? nName) async {
     if (nName == null) return null;
-    final nDto = meta.toDto()..name = nName;
+    final nDto = meta..name = nName;
     return await actUpdateMeta(nDto);
   }
 
@@ -191,24 +252,24 @@ extension OpenedMetaX on OpenedMeta {
   ) async =>
       await actWrapper(() => setInitialized("更新属性 [$dto]", () async {
             if (dto == null) return null;
-            await _metaService.updateAttribute(meta.toDto(), dto);
+            await _metaService.updateAttribute(meta, dto);
           }));
 
   /// View
   Future<BaseException?> actNewTableView(ViewType type) async =>
       await actWrapper(() async => await _metaService.updateTableView(
-            meta.toDto(),
+            meta,
             TableView.builder(
                 name: "未命名[${type.name}]视图",
                 type: type,
-                cols: meta.properties
+                cols: properties
                     .map((e) => ColViewInfo.build(propId: e.propId))
                     .toList()),
           ));
 
   Future<BaseException?> actUpdateView(TableView v) async =>
       await actWrapper(() async {
-        await _metaService.updateTableView(meta.toDto(), v);
+        await _metaService.updateTableView(meta, v);
       });
 
   Future<BaseException?> actUpdateViewName(
@@ -220,7 +281,7 @@ extension OpenedMetaX on OpenedMeta {
 
   Future<BaseException?> actDeleteView(int vId) async =>
       await actWrapper(() async {
-        await _metaService.deleteTableView(meta.toDto(), vId);
+        await _metaService.deleteTableView(meta, vId);
       });
 
   /// Record
