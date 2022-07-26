@@ -4,47 +4,11 @@ import 'package:appwrite/appwrite.dart';
 import 'package:dart_appwrite/dart_appwrite.dart' as server;
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/app/config/common_config.dart';
-import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
-import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 
-@lazySingleton
-class WorkspaceRepo {
-// class WorkspaceRepo implements IAsyncCrudRepo<Workspace, String> {
-  final Database _db;
-  final WorkspaceEttAccessor _workspaceAcc;
-
-  const WorkspaceRepo(this._db, this._workspaceAcc);
-
-  Future<Workspace?> findById(String id) async {
-    final dto = (await _workspaceAcc.findById(id));
-    if (dto == null) return null;
-    dto.id = id; // 直接Find返回的Dto没有注入 ::id 属性, 必须手动填充
-    return await dtoToDomain(dto);
-  }
-
-  Future<Workspace> dtoToDomain(WorkspaceDto dto) async {
-    final _metaAccessor = RecordMetaEttAccessor(_db, dto.id);
-    final metaList = <RecordMeta>[];
-    final workspace = Workspace(id: dto.id, name: dto.name, metas: metaList);
-    for (final metaId in dto.metas) {
-      metaList.add(
-        (await _metaAccessor.findById(metaId))!.toDm(workspace.queryMeta),
-      );
-    }
-    return workspace;
-  }
-
-  // @override
-  Future<void> deleteById(String id) async => _workspaceAcc.deleteBy(id);
-
-  Stream<Workspace> findAllByTeam(String teamId) =>
-      _workspaceAcc.findAllByTeam(teamId).asyncMap(dtoToDomain);
-
-  Future<void> update(WorkspaceDto dto) => _workspaceAcc.update(dto);
-}
+import '../../application/model/model.dart';
 
 // 需要传入指定集合ID, 因此无法注入
 class MetaDtoRepo {

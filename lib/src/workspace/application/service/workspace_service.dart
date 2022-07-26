@@ -15,14 +15,10 @@ import 'meta_service.dart';
 @lazySingleton
 class WorkspaceService {
   final Database _db;
-  final WorkspaceRepo _workspaceRepo;
-
-  // 全局唯一的集合,已经注入在容器中,可以直接依赖
   final WorkspaceEttAccessor _workspaceEttAcc;
 
   const WorkspaceService(
     this._db,
-    this._workspaceRepo,
     this._workspaceEttAcc,
   );
 
@@ -43,21 +39,21 @@ class WorkspaceService {
       _getRecordAcc(workspace, metaId).findAll();
 
   // 查询用户名下所有team,以及team对应的工作空间列表
-  Future<Map<Team, List<Workspace>>> queryWorkspacesBy(List<Team> teams) async {
-    final r = Map.fromIterables(
-      teams,
-      List.generate(teams.length, (index) => <Workspace>[]),
-    );
-    for (final t in teams) {
-      final w = await _workspaceRepo.findAllByTeam(t.$id).toList();
-      // print("debug workspaceList $w");
-      if (w.isNotEmpty) {
-        r[t] ??= <Workspace>[];
-        r[t]!.addAll(w);
-      }
-    }
-    return r;
-  }
+  // Future<Map<Team, List<Workspace>>> queryWorkspacesBy(List<Team> teams) async {
+  //   final r = Map.fromIterables(
+  //     teams,
+  //     List.generate(teams.length, (index) => <Workspace>[]),
+  //   );
+  //   for (final t in teams) {
+  //     final w = await _workspaceRepo.findAllByTeam(t.$id).toList();
+  //     // print("debug workspaceList $w");
+  //     if (w.isNotEmpty) {
+  //       r[t] ??= <Workspace>[];
+  //       r[t]!.addAll(w);
+  //     }
+  //   }
+  //   return r;
+  // }
 
   Future<Map<Team, List<WorkspaceDto>>> queryWorkspaceDtoBy(
       List<Team> teams) async {
@@ -102,30 +98,30 @@ class WorkspaceService {
     return dto;
   }
 
-  /// 打开工作空间 (workspaceId)
-  Future<OpenedWorkspace> openWorkspaceBy(String workspaceId) async {
-    final dm = await _workspaceRepo.findById(workspaceId);
-    if (dm == null) throw "找不到工作空间";
-    return openWorkspaceDm(dm);
-  }
-
-  /// 打开工作空间 (DTO)
-  Future<OpenedWorkspace> openWorkspace(WorkspaceDto dto) async {
-    final workspace = await _workspaceRepo.dtoToDomain(dto);
-    return openWorkspaceDm(workspace);
-  }
-
-  /// 打开工作空间 (Domain)
-  Future<OpenedWorkspace> openWorkspaceDm(Workspace workspace) async =>
-      OpenedWorkspace.openBy(
-        workspace: workspace,
-        fetchAllMeta: _getMetaAcc(workspace.id).findAll,
-        watchAllMeta: _getMetaAcc(workspace.id).watchAll(),
-        getFetchAllRecords: (String metaId) =>
-            _getRecordAcc(workspace, metaId).findAll(),
-        getWatchAllRecords: (String metaId) =>
-            _getRecordAcc(workspace, metaId).watchAll(),
-      );
+  // /// 打开工作空间 (workspaceId)
+  // Future<OpenedWorkspace> openWorkspaceBy(String workspaceId) async {
+  //   final dm = await _workspaceRepo.findById(workspaceId);
+  //   if (dm == null) throw "找不到工作空间";
+  //   return openWorkspaceDm(dm);
+  // }
+  //
+  // /// 打开工作空间 (DTO)
+  // Future<OpenedWorkspace> openWorkspace(WorkspaceDto dto) async {
+  //   final workspace = await _workspaceRepo.dtoToDomain(dto);
+  //   return openWorkspaceDm(workspace);
+  // }
+  //
+  // /// 打开工作空间 (Domain)
+  // Future<OpenedWorkspace> openWorkspaceDm(Workspace workspace) async =>
+  //     OpenedWorkspace.openBy(
+  //       workspace: workspace,
+  //       fetchAllMeta: _getMetaAcc(workspace.id).findAll,
+  //       watchAllMeta: _getMetaAcc(workspace.id).watchAll(),
+  //       getFetchAllRecords: (String metaId) =>
+  //           _getRecordAcc(workspace, metaId).findAll(),
+  //       getWatchAllRecords: (String metaId) =>
+  //           _getRecordAcc(workspace, metaId).watchAll(),
+  //     );
 
   /// 同时创建Meta与数据
   Future insertTable(MetaService _metaSrv, TableDto table) async {
@@ -149,8 +145,8 @@ class WorkspaceService {
     String nName,
   ) {
     final dto = space..name = nName;
-    return _workspaceRepo.update(dto);
+    return _workspaceEttAcc.update(dto);
   }
 
-  Future<void> deleteSpace(String id) => _workspaceRepo.deleteById(id);
+  Future<void> deleteSpace(String id) => _workspaceEttAcc.deleteBy(id);
 }
