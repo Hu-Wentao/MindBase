@@ -3,6 +3,8 @@ import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/inter/dto/expr_token_dto.dart';
 
+import 'member_accessor.dart';
+
 const exprEvaluator = ExprEvaluator(memberAccessors: [RecordMemberAccessor()]);
 
 /// 表达式(Domain)求值器
@@ -267,34 +269,4 @@ class _MemberAccessor<T> implements MemberAccessor<T> {
   }
 }
 
-/// 记录值访问器
-class RecordMemberAccessor implements MemberAccessor<Record> {
-  // final WorkspaceDataHolder workspace;
 
-  const RecordMemberAccessor();
-
-  @override
-  bool canHandle(object, String member) {
-    return object is Record; // 不再检查是否有成员, 如果真的不存在,则交给eval去处理
-    // 只允许访问Record类型
-    // if (object is! Record) return false;
-    // // 是否存在对应的成员
-    // return object.meta.hasPropBy(member);
-  }
-
-  /// 成员可以是值, 也可是函数[Function]
-  /// todo 在新增/修改变量/方法名称时,没有检查名称唯一性
-  /// 考虑允许方法与变量重名,用于表达"get"方法
-  @override
-  IExpr getMember(Record record, String member) {
-    final method = record.at.tryGetMethodBy(member);
-    if (method != null) {
-      return method.expr.callee as ExprValue; // 可以被调用
-    }
-    final field = record.at.getFieldByAttrName(member);
-    if (field.value != null) {
-      return field; // Expr值, 如果是ref,则直接返回,如果是原始类型, 则要返回value
-    }
-    return ExprValue.err("在Record[${record.id}]找不到名称为[$member]的成员方法或变量"); // 可以被调用,但是没有值
-  }
-}

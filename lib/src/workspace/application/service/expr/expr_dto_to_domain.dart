@@ -5,6 +5,8 @@ import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/inter/dto/expr_token_dto.dart';
 
+import 'member_accessor.dart';
+
 const exprToDomain = ExprDtoToDomain(
   memberAccessors: [MetaMemberAccessor()],
 );
@@ -212,39 +214,4 @@ class ExpressionConvertException implements Exception {
 
   @override
   String toString() => 'ExpressionConvertException{message: $message}';
-}
-
-/// 传入 (Meta, propName), 返回 Prop
-/// 将对象名改成转换成 prop, 以便持久化和类型推断
-class MetaMemberAccessor implements MemberAccessor<RecordMeta> {
-  const MetaMemberAccessor();
-
-  @override
-  bool canHandle(meta, String member) {
-    // 只允许访问Record类型
-    if (meta is! RecordMeta) return false;
-    // 是否存在对应的成员
-    return meta.properties.any((element) => element.name == member);
-  }
-
-  /// 将成员名称-> 成员prop
-  @override
-  ExprValue getMember(RecordMeta meta, String member) {
-    final prop = meta.properties.firstWhere(
-      (element) => element.name == member,
-      orElse: () => throw "在Record[${meta.id}]找不到名称为[$member]的成员方法或变量",
-    );
-    return ExprValue.build(type: prop.type, ag: [prop.propId]);
-    // return prop;
-    // if (prop.type.tp == AttrTp.ref) {
-    //   // 引用类型, 同时返回类型信息, 以便推断表达式返回值类型
-    //   return Value(
-    //       fn: AsFuncRef(prop.type),
-    //       ag: [prop.propId]); // 返回一个Value,同时通过 asRef将string转换成Meta
-    //   // return Expression(const AsFuncRecordMeta(), [prop.type, prop.propId]); // 返回一个Expr, 通过AsFuncMeta 将 prop转换为Meta, 此时就与propId无关了,
-    // } else {
-    //   // 原始类型, 同时返回类型信息, 以便推断表达式返回值类型
-    //   return Value.of(prop.propId);
-    // }
-  }
 }
