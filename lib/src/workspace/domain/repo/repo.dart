@@ -239,6 +239,7 @@ class RecordDtoRepo {
   final RecordMetaDto meta;
   final RecordEttAccessor _recordAcc;
 
+  RecordEttAccessor get acc => _recordAcc;
   RecordDtoRepo(
     this._serverDb,
     this._recordAcc,
