@@ -1,5 +1,6 @@
 part of 'model.dart';
 
+@Deprecated('TeamModel')
 typedef OpenedSpaceManagerModel = TeamModel;
 
 abstract class ITeamModel extends ModelSidecar<aw.Team, BaseException?>
@@ -58,11 +59,18 @@ class TeamModel extends ITeamModel with TeamStateChangeMx {
 
   int get total => data.total;
 
+  // todo
+  @Deprecated('后期实现人员列表后更新为纯getter,目前通过手动配置')
+  bool tmpIsMember = true;
+
+  bool get isMember => tmpIsMember;
+
   // 子状态Model // todo 人员列表
+  final UserModel at;
   @override
   List<WorkspaceModel> workspaces = [];
 
-  TeamModel(super.data);
+  TeamModel(super.data, this.at);
 
   @Deprecated("workspaces")
   List<WorkspaceModel> get openedWorkspaces => workspaces;
