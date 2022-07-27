@@ -13,7 +13,7 @@ class _TeamScreenState extends State<TeamScreen> {
 
   @override
   Widget build(BuildContext context) =>
-      Consumer<UserProvider>(builder: (c, pUser, _) {
+      Consumer<UserModel>(builder: (c, pUser, _) {
         if (pUser.isLogged) {
           return _buildTeamPanel(c);
         } else {
@@ -31,22 +31,20 @@ class _TeamScreenState extends State<TeamScreen> {
   Widget _buildTeamPanel(BuildContext c) => Column(
         children: [
           _buildTitleBar(c),
-          Consumer<TeamManagerModel>(
-              builder: (c, pManger, _) => Expanded(
+          Consumer<UserModel>(
+              builder: (c, model, _) => Expanded(
                     child: SingleChildScrollView(
                       controller: ScrollController(),
                       child: ExpansionPanelList(
                         expansionCallback: _switchExpanded,
-                        children: List.generate(pManger.teams.length, (index) {
-                          final team = pManger.teams[index];
+                        children: List.generate(model.teams.length, (index) {
+                          final team = model.teams[index];
                           return ExpansionPanel(
                             canTapOnHeader: true,
                             isExpanded: _panelExpanded[index] ??= false,
                             headerBuilder:
-                                (BuildContext context, bool isExpanded) {
-                              return _buildTeamTile(
-                                  context, isExpanded, team, pManger);
-                            },
+                                (BuildContext context, bool isExpanded) =>
+                                    _buildTeamTile(context, isExpanded, team),
                             body: ListView.separated(
                               itemCount: team.workspaces.length,
                               itemBuilder: (BuildContext context, int i) {
@@ -99,7 +97,6 @@ class _TeamScreenState extends State<TeamScreen> {
     BuildContext c,
     bool isExpanded,
     TeamModel team,
-    TeamManagerModel pManger,
   ) =>
       ListTile(
         leading: Icon(Icons.group, color: (isExpanded ? Colors.blue : null)),
@@ -152,9 +149,8 @@ class _TeamScreenState extends State<TeamScreen> {
                 await showConfirmDialog(
                     context: context,
                     title: "确认删除团队[${team.name}]吗?",
-                    onConfirm: () {
-                      pManger.actDeleteTeam(team.id);
-                    });
+                    onConfirm: () =>
+                        context.read<UserModel>().actDeleteTeam(team.id));
                 break;
               default:
                 throw "error 未知的 key[$key]";
