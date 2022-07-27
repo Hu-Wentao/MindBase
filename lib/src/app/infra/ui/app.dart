@@ -7,14 +7,16 @@ import 'package:mind_base/src/app/infra/ui/page/workspace/workspace.dart';
 import 'package:mind_base/src/user/application/model/model.dart';
 import 'package:provider/provider.dart';
 
-_workspaceRouterPathBuilder({
+/// 由于路由参数可能从 地址栏 直接传入,因此入参必须是 String? 类型
+workspaceRouterPathBuilder({
+  String? teamId,
   String? workspaceId,
   String? metaId,
   int? viewId,
 }) =>
-    workspaceId == null
-        ? '/'
-        : '/workspace/$workspaceId/meta/${metaId ?? ""}/view/${viewId ?? -1}';
+    (teamId == null || workspaceId == null)
+        ? "/"
+        : '/team/$teamId/workspace/$workspaceId/meta/${metaId ?? ""}/view/${viewId ?? -1}';
 
 final _router = GoRouter(
     // 必须打开,否则全局logging都将被取消
@@ -29,36 +31,49 @@ final _router = GoRouter(
           screenType: ScreenType.values.byName(s.params['homeScreen']!),
         ),
       ),
-      GoRoute(path: '/workspace', redirect: (_) => '/'),
+      GoRoute(path: '/team', redirect: (_) => '/${ScreenType.teams.name}'),
       GoRoute(
-          path: '/workspace/:workspaceId',
-          redirect: (_) =>
-              _workspaceRouterPathBuilder(workspaceId: _.params['workspaceId']),
+          path: '/team/:teamId',
+          redirect: (_) => '/team', // todo 尚未完成独立Team页面
           routes: [
+            GoRoute(path: 'workspace', redirect: (_) => '/'),
             GoRoute(
-                path: 'meta',
-                redirect: (_) => _workspaceRouterPathBuilder(
-                    workspaceId: _.params['workspaceId'])),
-            GoRoute(
-                path: 'meta/:metaId',
-                redirect: (_) => _workspaceRouterPathBuilder(
-                      workspaceId: _.params['workspaceId'],
-                      metaId: _.params['metaId'],
-                    ),
+                // 新路由规则: /workspace/:teamId/space/:workspaceId/meta/:metaId/view/:viewId
+                path: 'workspace/:workspaceId',
+                redirect: (_) => workspaceRouterPathBuilder(
+                    teamId: _.params['teamId'],
+                    workspaceId: _.params['workspaceId']),
                 routes: [
                   GoRoute(
-                      path: 'view',
-                      redirect: (_) => _workspaceRouterPathBuilder(
-                            workspaceId: _.params['workspaceId'],
-                            metaId: _.params['metaId'],
-                          )),
+                      path: 'meta',
+                      redirect: (_) => workspaceRouterPathBuilder(
+                          teamId: _.params['teamId'],
+                          workspaceId: _.params['workspaceId'])),
                   GoRoute(
-                      path: 'view/:viewId',
-                      builder: (c, s) => WorkspacePage(
-                          key: ValueKey(s.params['workspaceId']),
-                          workspaceId: s.params['workspaceId'],
-                          metaId: s.params['metaId'],
-                          viewId: int.tryParse(s.params['viewId']!))),
+                      path: 'meta/:metaId',
+                      redirect: (_) => workspaceRouterPathBuilder(
+                        teamId: _.params['teamId'],
+                        workspaceId: _.params['workspaceId'],
+                        metaId: _.params['metaId'],
+                      ),
+                      routes: [
+                        GoRoute(
+                            path: 'view',
+                            redirect: (_) => workspaceRouterPathBuilder(
+                              teamId: _.params['teamId'],
+                              workspaceId: _.params['workspaceId'],
+                              metaId: _.params['metaId'],
+                            )),
+                        GoRoute(
+                            path: 'view/:viewId',
+                            builder: (c, s) => WorkspacePage(
+                                key: ValueKey(s.params['workspaceId']),
+                                teamId: s.params['teamId']!,
+                                workspaceId: s.params['workspaceId'],
+                                metaId: s.params['metaId'],
+                                viewId:
+                                int.tryParse(s.params['viewId']!))),
+                      ]),
                 ]),
           ]),
     ]);
@@ -71,9 +86,8 @@ class MindBaseApp extends StatelessWidget {
       // 配置Provider
       MultiProvider(
         providers: [
-          ChangeNotifierProvider<UserProvider>(
-            create: (_) =>
-                UserProvider()..actOnCreate().thenDialog(context),
+          ChangeNotifierProvider<UserModel>(
+            create: (_) => UserModel()..actInitSubscription(),
           ),
         ],
         child:
