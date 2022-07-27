@@ -144,7 +144,7 @@ class WorkspaceModel extends IWorkspaceModel with SpaceStateChangeMx {
   @Deprecated("转移位置..")
   static const ctxFindRecordFnSign = ">>_ctxFindRecordFnSign";
 
-  WorkspaceModel(super.data);
+  WorkspaceModel(super.data, this.at);
 
   @Deprecated('使用openedMetas代替')
   List<MetaModel> get openedMetas => metas;
@@ -155,6 +155,7 @@ class WorkspaceModel extends IWorkspaceModel with SpaceStateChangeMx {
   String get name => data.name;
 
   // 子状态
+  final TeamModel at;
   @override
   List<MetaModel> metas = [];
 
