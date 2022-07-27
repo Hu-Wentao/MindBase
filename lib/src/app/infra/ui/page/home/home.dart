@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mind_base/src/app/infra/ui/app.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/text_input_dialog.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/feedback/infra/ui/widget/feedback_btn.dart';

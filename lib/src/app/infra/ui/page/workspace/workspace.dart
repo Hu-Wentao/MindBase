@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mind_base/src/app/infra/ui/app.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/feedback/infra/ui/widget/feedback_btn.dart';
@@ -112,7 +113,8 @@ class _WorkspacePageState extends State<WorkspacePage> {
                                 if (value.startsWith('selectWorkspaceEvt')) {
                                   final wsId = value
                                       .substring('selectWorkspaceEvt'.length);
-                                  context.go('/workspace/$wsId');
+                                  context.go(workspaceRouterPathBuilder(
+                                      teamId: model.id, workspaceId: wsId));
                                   return;
                                 }
                                 print("debug#未知的value#$value");
