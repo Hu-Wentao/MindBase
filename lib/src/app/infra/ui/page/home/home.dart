@@ -26,7 +26,7 @@ part 'settings_screen.dart';
 
 enum ScreenType {
   workspaces,
-  team,
+  teams,
   discover,
   settings,
 }
