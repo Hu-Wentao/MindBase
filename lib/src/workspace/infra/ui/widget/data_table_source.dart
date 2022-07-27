@@ -161,7 +161,7 @@ class _GridRefCellWidgetState extends State<GridRefCellWidget> {
 
 /// Pluto 表格数据源实现
 extension PlutoMetaModelX on MetaModel {
-  List<PlutoColumn> toPlutoCols() => attrs
+  List<PlutoColumn> toPlutoCols() => properties
       .map((attr) => PlutoColumn(
             title: attr.name,
             // 展示在UI的列标题
