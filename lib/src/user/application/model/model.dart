@@ -33,9 +33,7 @@ mixin UserStateChangeMx on IUserModel {
     // team
     final tms = await _teamSrv.getTeams();
     for (final t in tms) {
-      final m = _newTeamModel(t)..actInitSubscription();
-      teams.add(m);
-      setDone("刷新Team信息");
+      addNewTeamModel(t);
     }
   }
 
@@ -92,7 +90,7 @@ abstract class IUserModel extends ModelSidecar<aw.User?, BaseException?>
 
   List<TeamModel> get teams;
 
-  TeamModel _newTeamModel(aw.Team data);
+  TeamModel addNewTeamModel(aw.Team data);
 }
 
 class UserModel extends IUserModel with UserStateChangeMx {
@@ -113,7 +111,14 @@ class UserModel extends IUserModel with UserStateChangeMx {
   List<TeamModel> teams = [];
 
   @override
-  TeamModel _newTeamModel(aw.Team data) => TeamModel(data, this);
+  TeamModel addNewTeamModel(aw.Team data, [bool isMember = true]) {
+    final m = TeamModel(data, this)..tmpIsMember = isMember;
+    teams.add(m
+      // 必须在此处初始化,否则Team列表无法显示Team内的工作空间信息
+      ..actInitSubscription());
+    setDoneKeepState("新增TeamModel[${m.id}]");
+    return m;
+  }
 
   @Deprecated("避免使用")
   aw.User loggedUser() => data!;
@@ -133,8 +138,7 @@ extension UserModelX on UserModel {
         final any = teams.any((tm) => tm.id == teamId);
         if (!any) {
           final tm = await _teamSrv.getTeam(teamId);
-          teams.add(_newTeamModel(tm)..actInitSubscription());
-          setDone("已加载TeamModel[$teamId]");
+          addNewTeamModel(tm);
         }
         return;
       });
@@ -227,50 +231,18 @@ extension UserModelX on UserModel {
       });
 }
 
-extension TeamManagerX on UserModel {
-  TeamService get _teamSrv => sl<TeamService>();
-
-  // Future<BaseException?> actUpdateUser(aw.User? nUser) async {
-  //   if (_user != nUser) {
-  //     _user = nUser;
-  //     if (_user != null) {
-  //       setInitialized("新用户已登录[${_user!.name}]");
-  //       return actRefreshTeams();
-  //     } else {
-  //       setUninitialized("用户退出登录");
-  //       return null;
-  //     }
-  //   }
-  //   return null;
-  // }
-
-  /// 在用户切换时,刷新用户名下Team数据
-  @Deprecated('actRefresh')
-  Future<BaseException?> actRefreshTeams() async => await actWrapper(() async {
-        final tms = await _teamSrv.getTeams();
-        for (final t in tms) {
-          final m = _newTeamModel(t);
-          await m.actRefreshSpace();
-          teams.add(m);
-          setInitialized("刷新Team信息");
-        }
-        setInitialized("Team信息刷新完成");
-      });
-}
-
 extension WorkspaceModelX on UserModel {
   Future<BaseException?> actDeleteTeam(String teamId) async =>
       await actWrapper(() async {
         await _teamSrv.deleteTeam(teamId);
         teams.removeWhere((tm) => tm.id == teamId);
-        setInitialized("删除Team[$teamId]");
+        setDoneKeepState("删除Team[$teamId]");
       });
 
   Future<BaseException?> actCreateTeam(String name) async =>
       await actWrapper(() async {
         final tm = await _teamSrv.createTeam(name);
-        teams.add(_newTeamModel(tm));
-        setDone("创建Team[${tm.$id}]");
+        addNewTeamModel(tm);
       });
 
   // 打开一个空间
