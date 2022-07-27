@@ -16,7 +16,7 @@ workspaceRouterPathBuilder({
 }) =>
     (teamId == null || workspaceId == null)
         ? "/"
-        : '/team/$teamId/workspace/$workspaceId/meta/${metaId ?? ""}/view/${viewId ?? -1}';
+        : '/team/$teamId/workspace/$workspaceId/meta/${metaId ?? "-"}/view/${viewId ?? -1}';
 
 final _router = GoRouter(
     // 必须打开,否则全局logging都将被取消
@@ -33,12 +33,13 @@ final _router = GoRouter(
       ),
       GoRoute(path: '/team', redirect: (_) => '/${ScreenType.teams.name}'),
       GoRoute(
+          //      /team/:teamId/workspace/:workspaceId/meta/:metaId/view/:viewId
+          // /team/628895eb97858942e1ddb007/workspace/629393c8ebbbf5094df3e564/meta//view/-1
           path: '/team/:teamId',
-          redirect: (_) => '/team', // todo 尚未完成独立Team页面
+          redirect: (_) => '/${ScreenType.teams.name}', // todo 尚未完成独立Team页面
           routes: [
             GoRoute(path: 'workspace', redirect: (_) => '/'),
             GoRoute(
-                // 新路由规则: /workspace/:teamId/space/:workspaceId/meta/:metaId/view/:viewId
                 path: 'workspace/:workspaceId',
                 redirect: (_) => workspaceRouterPathBuilder(
                     teamId: _.params['teamId'],
@@ -52,27 +53,39 @@ final _router = GoRouter(
                   GoRoute(
                       path: 'meta/:metaId',
                       redirect: (_) => workspaceRouterPathBuilder(
-                        teamId: _.params['teamId'],
-                        workspaceId: _.params['workspaceId'],
-                        metaId: _.params['metaId'],
-                      ),
+                            teamId: _.params['teamId'],
+                            workspaceId: _.params['workspaceId'],
+                            metaId: _.params['metaId'],
+                          ),
                       routes: [
                         GoRoute(
                             path: 'view',
                             redirect: (_) => workspaceRouterPathBuilder(
-                              teamId: _.params['teamId'],
-                              workspaceId: _.params['workspaceId'],
-                              metaId: _.params['metaId'],
-                            )),
+                                  teamId: _.params['teamId'],
+                                  workspaceId: _.params['workspaceId'],
+                                  metaId: _.params['metaId'],
+                                )),
                         GoRoute(
                             path: 'view/:viewId',
-                            builder: (c, s) => WorkspacePage(
-                                key: ValueKey(s.params['workspaceId']),
-                                teamId: s.params['teamId']!,
-                                workspaceId: s.params['workspaceId'],
-                                metaId: s.params['metaId'],
-                                viewId:
-                                int.tryParse(s.params['viewId']!))),
+                            builder: (c, s) {
+                              var metaId = s.params['metaId'];
+                              if (metaId == null || metaId.length < 24) {
+                                metaId = null;
+                              }
+                              var viewId = s.params['viewId'] == null
+                                  ? null
+                                  : int.tryParse(s.params['viewId']!);
+                              if (viewId == null || viewId == -1) {
+                                viewId = null;
+                              }
+                              return WorkspacePage(
+                                  // key 必须是 workspaceId,因为页面以单个工作空间刷新
+                                  key: ValueKey(s.params['workspaceId']),
+                                  teamId: s.params['teamId']!,
+                                  workspaceId: s.params['workspaceId'],
+                                  metaId: metaId,
+                                  viewId: viewId);
+                            }),
                       ]),
                 ]),
           ]),
