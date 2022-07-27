@@ -16,6 +16,7 @@ void main() {
       // 配置 ProviderSidecar Log
       final _sidecarLogger = Logger("sidecar");
       ProviderSidecar.setLogger(_sidecarLogger.info);
+      ModelSidecar.setLogger(_sidecarLogger.info);
     },
     onApplicationRun: (g, c) async => runApp(const MindBaseApp()),
   ).run(
