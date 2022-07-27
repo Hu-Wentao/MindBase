@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:appwrite/appwrite.dart' as cli;
 import 'package:appwrite/models.dart' as aw;
 import 'package:get_arch_core/get_arch_core.dart';
@@ -14,35 +16,41 @@ typedef UserProvider = UserModel;
 @Deprecated('UserModel')
 typedef TeamManagerModel = UserModel;
 
-class UserModel extends ProviderSidecar<BaseException?> {
-  String? get id => _user?.$id;
-
-  String? get name => _user?.name;
-
-  String? get email => _user?.email;
-
-  bool get isLogged => _user != null;
-
-  /// 核心状态
-  aw.User? _user;
-  aw.Session? _cachedSession;
-  List<TeamModel> teams = [];
-
-  @Deprecated("避免使用")
-  aw.User loggedUser() => _user!;
-
-  UserModel([this._user]) : super(onCatch: ExceptionAdapter.of);
+mixin UserStateChangeMx on IUserModel {
+  final AccountService _accountService = sl<AccountService>();
+  final TeamService _teamSrv = sl<TeamService>();
 
   @override
-  onInitializing() {}
-}
+  FutureOr<void> onCloseSubs() {
+    log('onCloseSubs 尚未实现...');
+  }
 
-extension UserModelX on UserModel {
-  AccountService get _accountService => sl<AccountService>();
+  @override
+  Future<FutureOr<void>> onFetch({bool isActive = false}) async {
+    // user
+    await _tryRecoveryUser();
 
-  actOnCreate() => actWrapper(() {
-        _tryRecoveryUser();
-      });
+    // team
+    final tms = await _teamSrv.getTeams();
+    for (final t in tms) {
+      final m = _newTeamModel(t)..actInitSubscription();
+      teams.add(m);
+      setDone("刷新Team信息");
+    }
+  }
+
+  @override
+  FutureOr<void> onReset() {
+    _cachedSession = null;
+    teams.clear();
+  }
+
+  @override
+  FutureOr<void> onSubscription() {
+    log('onSubscription 尚未实现...');
+  }
+
+  /// =====
 
   // 尝试恢复用户登录状态, 如果之前的session还有效,在这里可以直接自动登录
   _tryRecoveryUser() async {
@@ -57,23 +65,79 @@ extension UserModelX on UserModel {
           e.type == 'general_unauthorized_scope') {
         _setLogout("尚未登录");
       }
-      setInitialized("初始化出错,$e");
-      rethrow;
+      setDone("初始化出错,$e");
+      // rethrow;
     }
   }
 
   _setLogout([String m = '已退出登录']) {
-    _user = null;
+    data = null;
     _cachedSession = null;
-    setInitialized(m);
+    setDone(m);
   }
 
   _setLogged(aw.User u, [String m = '已登陆']) {
-    _user = u;
-    setInitialized(m);
-    // 后续调用
-    actRefreshTeams();
+    data = u;
+    setDone(m);
   }
+}
+
+abstract class IUserModel extends ModelSidecar<aw.User?, BaseException?>
+    with ModelStateChangeMx<aw.User?, BaseException?> {
+  IUserModel(aw.User? data) : super(data, ExceptionAdapter.of);
+
+  aw.Session? get _cachedSession;
+
+  set _cachedSession(aw.Session? value);
+
+  List<TeamModel> get teams;
+
+  TeamModel _newTeamModel(aw.Team data);
+}
+
+class UserModel extends IUserModel with UserStateChangeMx {
+  UserModel([super.data]);
+
+  String? get id => data?.$id;
+
+  String? get name => data?.name;
+
+  String? get email => data?.email;
+
+  bool get isLogged => data != null;
+
+  /// 核心状态
+  @override
+  aw.Session? _cachedSession;
+  @override
+  List<TeamModel> teams = [];
+
+  @override
+  TeamModel _newTeamModel(aw.Team data) => TeamModel(data, this);
+
+  @Deprecated("避免使用")
+  aw.User loggedUser() => data!;
+}
+
+extension UserModelX on UserModel {
+  AccountService get _accountService => sl<AccountService>();
+
+  TeamService get _teamSrv => sl<TeamService>();
+
+  /// 尝试加载指定[TeamModel]
+  /// 1. 查询当前用户名下是否存在team
+  ///   1.1 如果存在, 则加载该team; 结束;
+  ///   1.2 如果不存在, 则尝试以访客身份加入team; 结束;
+  Future<BaseException?> actLoadTeam(String teamId) async =>
+      await actWrapper(() async {
+        final any = teams.any((tm) => tm.id == teamId);
+        if (!any) {
+          final tm = await _teamSrv.getTeam(teamId);
+          teams.add(_newTeamModel(tm)..actInitSubscription());
+          setDone("已加载TeamModel[$teamId]");
+        }
+        return;
+      });
 
   // 注册/登录
   Future<BaseException?> actAuthWith(
@@ -89,7 +153,7 @@ extension UserModelX on UserModel {
         if (req == null) return;
         // 先注册
         if (req.isRegister) {
-          _user =
+          data =
               await _onRegister(req.authVerify, req.identityStr, req.password);
         }
         // 注册完成后自动登录
@@ -102,7 +166,7 @@ extension UserModelX on UserModel {
     Password password, {
     String m = "正在注册...",
   }) async {
-    setInitializing(m);
+    setDoneKeepState(m);
     switch (authVerify) {
       case AuthVerify.email:
         return await _accountService.signup(
@@ -127,7 +191,7 @@ extension UserModelX on UserModel {
     String m = "正在登录...",
     // Session? oldSession,
   }) async {
-    setInitializing(m);
+    setDone(m);
     //
     aw.Session nSession;
     switch (authVerify) {
@@ -145,10 +209,10 @@ extension UserModelX on UserModel {
         throw BaseException('尚未支持的登录方式[$authVerify]');
     }
     _cachedSession = nSession;
-    if (_user == null || _user!.$id != _cachedSession!.userId) {
-      _user = await _accountService.getUser();
+    if (data == null || data!.$id != _cachedSession!.userId) {
+      data = await _accountService.getUser();
     }
-    _setLogged(_user!, "已登陆");
+    _setLogged(data!, "已登陆");
     return null;
   }
 
@@ -181,10 +245,11 @@ extension TeamManagerX on UserModel {
   // }
 
   /// 在用户切换时,刷新用户名下Team数据
+  @Deprecated('actRefresh')
   Future<BaseException?> actRefreshTeams() async => await actWrapper(() async {
         final tms = await _teamSrv.getTeams();
         for (final t in tms) {
-          final m = TeamModel(t);
+          final m = _newTeamModel(t);
           await m.actRefreshSpace();
           teams.add(m);
           setInitialized("刷新Team信息");
@@ -204,7 +269,13 @@ extension WorkspaceModelX on UserModel {
   Future<BaseException?> actCreateTeam(String name) async =>
       await actWrapper(() async {
         final tm = await _teamSrv.createTeam(name);
-        teams.add(TeamModel(tm));
-        setInitialized("创建Team[${tm.$id}]");
+        teams.add(_newTeamModel(tm));
+        setDone("创建Team[${tm.$id}]");
+      });
+
+  // 打开一个空间
+  Future<BaseException?> actOpenWorkspaceById(String workspaceId) async =>
+      await actWrapper(() {
+        // todo 在team中查询是否存在该空间
       });
 }

@@ -38,4 +38,7 @@ class TeamService {
     final r = await _teams.create(teamId: ObjectIdX.createHex, name: name);
     return r;
   }
+
+  /// 获取团队
+  Future<aw.Team> getTeam(String teamId) async => _teams.get(teamId: teamId);
 }
