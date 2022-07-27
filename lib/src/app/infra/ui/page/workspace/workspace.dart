@@ -1,8 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/feedback/infra/ui/widget/feedback_btn.dart';
+import 'package:mind_base/src/user/application/model/model.dart';
 import 'package:mind_base/src/user/infra/ui/components/user_tile.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/infra/ui/widget/data_table_grid.dart';
@@ -14,11 +16,12 @@ import 'package:provider/provider.dart';
 class WorkspacePage extends StatefulWidget {
   const WorkspacePage({
     Key? key,
+    required this.teamId,
     this.workspaceId,
     this.metaId,
     this.viewId,
   }) : super(key: key);
-
+  final String teamId;
   final String? workspaceId;
   final String? metaId;
   final int? viewId;
@@ -28,28 +31,36 @@ class WorkspacePage extends StatefulWidget {
 }
 
 class _WorkspacePageState extends State<WorkspacePage> {
+  String? teamId;
   String? workspaceId;
-
   String? metaId;
-
   int? viewId;
+
+  late Future<TeamModel?> _futureTeamModel;
 
   @override
   void initState() {
     super.initState();
     workspaceId = widget.workspaceId;
+    teamId = widget.teamId;
     metaId = widget.metaId;
     viewId = widget.viewId;
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      Provider.of<OpenedSpaceManagerModel>(context, listen: false)
-          .actOpenWorkspaceById(workspaceId!)
-          .then((value) {
-        if (value != null) {
-          value.showDialog(context);
-        }
-        return Future.delayed(
-            const Duration(milliseconds: 500), () => setState(() {}));
-      });
+    Future.microtask(() {
+      try {
+        _futureTeamModel =
+            context.read<UserModel>().actLoadTeam(teamId!).then((value) {
+          if (value != null) throw value;
+          return context
+              .read<UserModel>()
+              .teams
+              .firstWhere((t) => t.id == teamId);
+        }).onError((error, stackTrace) {
+          throw ExceptionAdapter.of(error, stackTrace);
+        });
+      } catch (e, s) {
+        final err = ExceptionAdapter.of(e, s);
+        err.showDialog(context);
+      }
     });
   }
 
@@ -62,89 +73,101 @@ class _WorkspacePageState extends State<WorkspacePage> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      Consumer<OpenedSpaceManagerModel>(builder: (c, model, _) {
-        final space = model.openedWorkspaces
-            .firstWhereOrNull((element) => element.id == workspaceId);
-        return Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.home_rounded),
-              onPressed: () => context.go('/'),
-            ),
-            title: SpaceSelectorBar(
-              spaceName: Text(space?.name ?? 'loading ...'),
-              menuBtn: PopupMenuButton<String>(
-                itemBuilder: (ctx) => [
-                  ...model.openedWorkspaces.map(
-                    (e) => PopupMenuItem<String>(
-                      value: 'selectWorkspaceEvt${e.id}',
-                      child: ListTile(
-                        leading: const Icon(Icons.space_dashboard_rounded),
-                        title: Text(e.name),
+  Widget build(BuildContext context) => FutureBuilder<TeamModel?>(
+        future: _futureTeamModel,
+        builder: (c, s) => (s.data == null)
+            ? (s.connectionState != ConnectionState.done)
+                ? const CircularProgressIndicator()
+                : Center(child: Text('${s.error}'))
+            : ChangeNotifierProvider<TeamModel>.value(
+                value: s.data!,
+                child: Consumer<TeamModel>(builder: (c, model, _) {
+                  final space = model.workspaces
+                      .firstWhereOrNull((element) => element.id == workspaceId);
+                  return Scaffold(
+                    appBar: AppBar(
+                      leading: IconButton(
+                        icon: const Icon(Icons.home_rounded),
+                        onPressed: () => context.go('/'),
                       ),
+                      title: SpaceSelectorBar(
+                        spaceName: Text(space?.name ?? 'loading ...'),
+                        menuBtn: PopupMenuButton<String>(
+                          itemBuilder: (ctx) => [
+                            ...model.workspaces.map(
+                              (e) => PopupMenuItem<String>(
+                                value: 'selectWorkspaceEvt${e.id}',
+                                child: ListTile(
+                                  leading:
+                                      const Icon(Icons.space_dashboard_rounded),
+                                  title: Text(e.name),
+                                ),
+                              ),
+                            ),
+                          ],
+                          onSelected: (value) {
+                            // 选中Item后,在这里会被二次调用
+                            switch (value) {
+                              default:
+                                if (value.startsWith('selectWorkspaceEvt')) {
+                                  final wsId = value
+                                      .substring('selectWorkspaceEvt'.length);
+                                  context.go('/workspace/$wsId');
+                                  return;
+                                }
+                                print("debug#未知的value#$value");
+                                break;
+                            }
+                          },
+                        ),
+                      ),
+                      // title: const WorkspaceSelectorTitle(),
+                      actions: const [
+                        UserInfoTile(),
+                        FeedbackBtn(),
+                      ],
                     ),
-                  ),
-                ],
-                onSelected: (value) {
-                  // 选中Item后,在这里会被二次调用
-                  switch (value) {
-                    default:
-                      if (value.startsWith('selectWorkspaceEvt')) {
-                        final wsId =
-                            value.substring('selectWorkspaceEvt'.length);
-                        context.go('/workspace/$wsId');
-                        return;
-                      }
-                      print("debug#未知的value#$value");
-                      break;
-                  }
-                },
-              ),
-            ),
-            // title: const WorkspaceSelectorTitle(),
-            actions: const [
-              UserInfoTile(),
-              FeedbackBtn(),
-            ],
-          ),
-          body: ChangeNotifierProvider<OpenedWorkspace?>.value(
-            value: space,
-            child: ChangeNotifierProvider<OpenedMeta?>.value(
-              value: metaId == ''
-                  ? null
-                  : space?.openedMetas
-                      .firstWhereOrNull((element) => element.id == metaId),
-              child: Consumer<OpenedWorkspace?>(
-                builder: (c, space, _) => Row(
-                  children: [
-                    /// 左侧Meta 列表
-                    MetaTableList(
-                      key: ValueKey(space?.metas.length),
-                      openedSpace: space,
-                      metaId: metaId,
-                    ),
-
-                    /// 右侧 table
-                    if (space != null)
-                      Consumer<OpenedMeta?>(
-                        builder: (c, openedMeta, _) => (openedMeta == null)
-                            ? const Expanded(
-                                child: Center(child: Text("请选择/创建 一个Meta")),
-                              )
-                            : RecordDataGrid(
+                    body: ChangeNotifierProvider<WorkspaceModel?>.value(
+                      value: space,
+                      child: ChangeNotifierProvider<MetaModel?>.value(
+                        value: metaId == ''
+                            ? null
+                            : space?.metas
+                                .firstWhereOrNull((m) => m.id == metaId),
+                        child: Consumer<WorkspaceModel?>(
+                          builder: (c, space, _) => Row(
+                            children: [
+                              /// 左侧Meta 列表
+                              MetaTableList(
+                                key: ValueKey(space?.metas.length),
                                 openedSpace: space,
-                                openedMeta: openedMeta,
-                                view: viewId == -1 // -1代表无视图
-                                    ? null
-                                    : openedMeta.meta.views.firstWhereOrNull(
-                                        (element) => element.vId == viewId)),
+                                metaId: metaId,
+                              ),
+
+                              /// 右侧 table
+                              if (space != null)
+                                Consumer<MetaModel?>(
+                                  builder: (c, meta, _) => (meta == null)
+                                      ? const Expanded(
+                                          child: Center(
+                                              child: Text("请选择/创建 一个Meta")),
+                                        )
+                                      : RecordDataGrid(
+                                          openedSpace: space,
+                                          openedMeta: meta,
+                                          view: viewId == -1 // -1代表无视图
+                                              ? null
+                                              : meta.data.views
+                                                  .firstWhereOrNull((element) =>
+                                                      element.vId == viewId)),
+                                ),
+                            ],
+                          ),
+                        ),
                       ),
-                  ],
-                ),
+                    ),
+                  );
+                }),
               ),
-            ),
-          ),
-        );
-      });
+      );
 }
