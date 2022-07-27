@@ -108,7 +108,7 @@ mixin MetaStateChangeMx on IMetaModel {
   /// 单次刷新数据
   @override
   FutureOr<void> onFetch({bool isActive = false}) {
-    _safeFetchAllRecord(_recordDtoRepo.findAll(), onDto: _onEvtInsertRecord);
+    _safeFetchAllRecord(_recordDtoRepo.findAll, onDto: _onEvtInsertRecord);
   }
 
   /// 重置充血数据
