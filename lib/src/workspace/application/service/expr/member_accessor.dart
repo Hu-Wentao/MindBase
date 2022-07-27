@@ -50,18 +50,18 @@ class RecordMemberAccessor implements MemberAccessor<Record> {
   /// 考虑允许方法与变量重名,用于表达"get"方法
   /// fixme 逻辑需要优化
   @override
-  IExpr getMember(RecordModel record, String member) {
-    final method = record.at.tryGetMethodBy(member.parsePropK);
+  IExpr getMember(RecordModel record, String propId) {
+    final method = record.at.tryGetMethodBy(propId.parsePropK);
     if (method != null) {
       return method.expr.toDomain(record.at.at.queryMeta).callee
           as ExprValue; // 可以被调用
     } else {
-      final field = record.getFieldByAttrName(member);
+      final field = record.getField(propId.parsePropK);
       if (field.value != null) {
         return field; // Expr值, 如果是ref,则直接返回,如果是原始类型, 则要返回value
       } else {
         return ExprValue.err(
-            "在Record[${record.id}]找不到名称为[$member]的成员方法或变量"); // 可以被调用,但是没有值
+            "在Record[${record.id}]找不到名称为[$propId]的成员方法或变量"); // 可以被调用,但是没有值
       }
     }
   }
