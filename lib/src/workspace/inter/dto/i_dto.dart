@@ -4,29 +4,42 @@ import 'package:get_arch_core/get_arch_core.dart';
 import 'package:json_editor/json_editor.dart';
 import 'package:mind_base/src/core/infra/dto/dto_json_impl.dart';
 import 'package:mind_base/src/core/inter/i_dto.dart';
-import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:quiver/core.dart';
 
+import '../../application/model/model.dart';
+
 part 'expr_node_dto.dart';
+
+@Deprecated('ValueDto')
+typedef Value = ValueDto;
 
 class ValueDto {
   dynamic v;
 
+  get value => v;
+
+  ValueDto.of(this.v);
+
   ValueDto.builder({this.v = ''});
 
-  static fromDomain(Value value) => ValueDto.builder(v: value.value);
+  @Deprecated('无效')
+  static fromDomain(Value value) => ValueDto.builder(v: value);
 
+  @Deprecated('无效')
   Value toDomain() {
     // print("RcdValueDto.toDomain: $v, type: ${v.runtimeType}");
     return Value.of(v);
   }
+
+  @override
+  String toString() => 'ValueDto{v: $v}';
 }
 
-extension RecordX on Record {
+extension RecordX on RecordModel {
   RecordDto toDto() => data;
-      // RecordDto.fromDomain(this);
+// RecordDto.fromDomain(this);
 }
 
 ///
@@ -92,8 +105,8 @@ class RecordDto extends IEntityDto {
 }
 
 extension RecordMetaX on RecordMeta {
-  RecordMetaDto toDto() =>data;
-  // RecordMetaDto.fromDomain(this);
+  RecordMetaDto toDto() => data;
+// RecordMetaDto.fromDomain(this);
 }
 
 /// attributes固定 0:表示Record的ID, 1:表示Record的metaId
@@ -260,7 +273,6 @@ class RecordMetaDto extends IEntityDto {
   }
 }
 
-
 abstract class PropertyDto extends IDto {
   int k; // 表头key,对应Field:k,需要从所在的TableMeta中获取
   String name; // 表头名称
@@ -271,6 +283,7 @@ abstract class PropertyDto extends IDto {
     required this.name,
     required this.memo,
   });
+
   String get propId => '$k';
 }
 
@@ -280,6 +293,7 @@ extension MethodX on Method {
 
 class MethodDto extends PropertyDto {
   IExprNodeDto expr;
+
   @override
   AttrTypeDto get type => expr.type!;
 
@@ -355,10 +369,11 @@ extension AttrbuteX on Attribute {
   AttributeDto toDto() => AttributeDto.ofDomain(this);
 }
 
-extension AttrTypeDtoX on AttrTypeDto{
+extension AttrTypeDtoX on AttrTypeDto {
   // 请确保type是ref类型,否则报错
   MetaModel fetchMeta(WorkspaceModel space) => space.queryMeta(r!);
 }
+
 /// 表头/属性: 关系/表的一列叫属性
 class AttributeDto extends PropertyDto {
   @override

@@ -69,22 +69,6 @@ mixin IFunctor {
 // IFunctor fMap(Func fn);
 }
 
-/// Record中的字段值，IExpr_v20B2C
-/// 可能更像是[ExprValue]的Dto
-class Value<T> extends Equatable implements IFunctor {
-  @override
-  final T value;
-
-  const Value.build(this.value);
-
-  @override
-  List<Object?> get props => [value];
-
-  get v => value;
-
-  static of(dynamic value) => Value.build(value);
-}
-
 /// 用于返回某个Meta的Prop时的包装
 /// type: 字段的类型,
 /// value: 字段的名称(而不是字段的值,如果时值,则应当时访问Record的结果)
