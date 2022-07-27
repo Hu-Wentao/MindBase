@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -37,7 +39,10 @@ class _WorkspacePageState extends State<WorkspacePage> {
   String? metaId;
   int? viewId;
 
-  late Future<TeamModel?> _futureTeamModel;
+  final StreamController<TeamModel?> __modelStreamController =
+      StreamController<TeamModel?>();
+  late final Future<TeamModel?> _futureTeamModel =
+      __modelStreamController.stream.first;
 
   @override
   void initState() {
@@ -46,18 +51,21 @@ class _WorkspacePageState extends State<WorkspacePage> {
     teamId = widget.teamId;
     metaId = widget.metaId;
     viewId = widget.viewId;
-    Future.microtask(() {
+    Future.microtask(() async {
       try {
-        _futureTeamModel =
-            context.read<UserModel>().actLoadTeam(teamId!).then((value) {
+        final model = context.read<UserModel>();
+        // 加载并返回Team
+        final team = await model.actLoadTeam(teamId!).then((value) {
           if (value != null) throw value;
-          return context
-              .read<UserModel>()
-              .teams
-              .firstWhere((t) => t.id == teamId);
+          return model.teams.firstWhere((t) => t.id == teamId);
         }).onError((error, stackTrace) {
           throw ExceptionAdapter.of(error, stackTrace);
         });
+        __modelStreamController.add(team);
+        // 加载 Workspace
+        team.workspaces
+            .firstWhere((space) => space.id == workspaceId)
+            .actInitSubscription();
       } catch (e, s) {
         final err = ExceptionAdapter.of(e, s);
         err.showDialog(context);
@@ -84,7 +92,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
                 value: s.data!,
                 child: Consumer<TeamModel>(builder: (c, model, _) {
                   final space = model.workspaces
-                      .firstWhereOrNull((element) => element.id == workspaceId);
+                      .firstWhereOrNull((sp) => sp.id == workspaceId);
                   return Scaffold(
                     appBar: AppBar(
                       leading: IconButton(
@@ -142,7 +150,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
                               /// 左侧Meta 列表
                               MetaTableList(
                                 key: ValueKey(space?.metas.length),
-                                openedSpace: space,
+                                space: space,
                                 metaId: metaId,
                               ),
 
