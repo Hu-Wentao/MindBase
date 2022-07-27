@@ -240,6 +240,7 @@ class RecordDtoRepo {
   final RecordEttAccessor _recordAcc;
 
   RecordEttAccessor get acc => _recordAcc;
+
   RecordDtoRepo(
     this._serverDb,
     this._recordAcc,
@@ -339,11 +340,11 @@ class RecordDtoRepo {
     }
   }
 
-  findById(String metaId) => _recordAcc.findById(metaId);
+  Future<RecordDto?> findById(String metaId) => _recordAcc.findById(metaId);
 
-  findAll() => _recordAcc.findAll();
+  Stream<RecordDto> findAll() => _recordAcc.findAll();
 
-  deleteBy(String metaId) => _recordAcc.deleteBy(metaId);
+  Future deleteBy(String metaId) => _recordAcc.deleteBy(metaId);
 
   // #506 当前版本存在缺陷, 仅凭attrName无法判断要新增的属性size,等
   updateRecordDocStructure(String attrName) async {
