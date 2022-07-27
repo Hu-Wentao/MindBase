@@ -4,6 +4,7 @@ import 'package:dart_appwrite/dart_appwrite.dart' as srv;
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/core/inter/i_dao.dart';
+import 'package:mind_base/src/user/application/model/model.dart';
 import 'package:mind_base/src/workspace/application/service/expr/expr_evaluator.dart';
 import 'package:mind_base/src/workspace/application/service/meta_service.dart';
 import 'package:mind_base/src/workspace/domain/repo/repo.dart';
@@ -30,7 +31,5 @@ part 'meta.dart';
 part 'record.dart';
 
 part 'propery.dart';
-
-part 'opened_space_manager.dart';
 
 part 'team.dart';
