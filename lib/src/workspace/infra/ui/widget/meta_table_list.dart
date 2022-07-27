@@ -1,12 +1,12 @@
 part of 'widget.dart';
 
 class MetaTableList extends StatefulWidget {
-  final OpenedWorkspace? openedSpace;
+  final WorkspaceModel? space;
   final String? metaId;
 
   const MetaTableList({
     Key? key,
-    required this.openedSpace,
+    required this.space,
     required this.metaId,
   }) : super(key: key);
 
@@ -19,7 +19,7 @@ class _MetaTableListState extends State<MetaTableList> {
   final _kAttrBuilder = GlobalKey<FormBuilderState>();
   final _kMethodBuilder = GlobalKey<FormBuilderState>();
 
-  OpenedWorkspace? get space => widget.openedSpace;
+  WorkspaceModel? get space => widget.space;
 
   final _panelExpanded = <int, bool>{};
 
@@ -47,33 +47,38 @@ class _MetaTableListState extends State<MetaTableList> {
                       child: ExpansionPanelList(
                         expansionCallback: _onExpandedCall,
                         children: List.generate(
-                          space!.openedMetas.length,
+                          space!.metas.length,
                           (i) {
-                            final openedMeta = space!.openedMetas[i];
-                            final meta = openedMeta.meta;
+                            final meta = space!.metas[i];
+                            final metaDto = meta.data;
                             return ExpansionPanel(
                               canTapOnHeader: true,
                               isExpanded: _panelExpanded[i] ??= false,
                               headerBuilder: (c, ex) => TableTile(
                                 openedSpace: space!,
-                                openedMeta: openedMeta,
-                                selected: openedMeta.id == widget.metaId,
+                                openedMeta: meta,
+                                selected: meta.id == widget.metaId,
                                 onTap: () {
-                                  context.go(
-                                      '/workspace/${space!.id}/meta/${meta.id}');
+                                  context.go(workspaceRouterPathBuilder(
+                                      teamId: space!.at.id,
+                                      workspaceId: space!.id,
+                                      metaId: meta.id));
                                 },
                               ),
 
                               /// 构建视图列表
                               body: ListView.separated(
                                 shrinkWrap: true,
-                                itemCount: meta.views.length,
+                                itemCount: metaDto.views.length,
                                 itemBuilder: (context, int index) =>
                                     TableViewTile(
-                                  openedMeta: openedMeta,
-                                  view: meta.views[index],
-                                  viewUri: Uri.parse(
-                                      '/workspace/${space!.id}/meta/${openedMeta.meta.id}/view/${meta.views[index].vId}'),
+                                  openedMeta: meta,
+                                  view: metaDto.views[index],
+                                  viewUri: Uri.parse(workspaceRouterPathBuilder(
+                                      teamId: space!.at.id,
+                                      workspaceId: space!.id,
+                                      metaId: meta.id,
+                                      viewId: metaDto.views[index].vId)),
                                 ),
                                 separatorBuilder: (ctx, i) => const Divider(),
                               ),
