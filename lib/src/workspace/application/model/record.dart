@@ -30,7 +30,7 @@ extension PropertyBizX on RecordModel {
       });
       return r.value;
     } else {
-      return data.fields[prop.k];
+      return data.fields[prop.k]!.v;
       // fixme #332
       // return data.fields[prop.propId];
     }
