@@ -10,6 +10,8 @@ abstract class ITeamModel extends ModelSidecar<aw.Team, BaseException?>
   String get id;
 
   List<WorkspaceModel> get workspaces;
+
+  WorkspaceModel addNewWorkspaceModel(WorkspaceDto data);
 }
 
 mixin TeamStateChangeMx on ITeamModel {
@@ -22,18 +24,10 @@ mixin TeamStateChangeMx on ITeamModel {
 
   @override
   Future<FutureOr<void>> onFetch({bool isActive = false}) async {
-    final wsList = (await _workspaceSrv.queryWorkspaceDto(id))
-        .map((e) =>
-            workspaces.firstWhereOrNull((element) {
-              if (element.id == e.id) {
-                element.updateData(e);
-                return true;
-              }
-              return false;
-            }) ??
-            WorkspaceModel(e))
-        .toList();
-    workspaces.addAll(wsList);
+    // 全量拉取数据,原有数据将在 onReset方法中被清除
+    for (var data in (await _workspaceSrv.queryWorkspaceDto(id))) {
+      addNewWorkspaceModel(data);
+    }
   }
 
   @override
@@ -74,29 +68,21 @@ class TeamModel extends ITeamModel with TeamStateChangeMx {
 
   @Deprecated("workspaces")
   List<WorkspaceModel> get openedWorkspaces => workspaces;
+
+  @override
+  WorkspaceModel addNewWorkspaceModel(WorkspaceDto data) {
+    final m = WorkspaceModel(data, this);
+    // 没有必要立即初始化工作空间, 打开空间比较昂贵, 在Page中手动调用比较合适
+    workspaces.add(m);
+    setDoneKeepState("新增 WorkspaceModel[${m.id}]");
+    return m;
+  }
 }
 
 extension TeamModelX on TeamModel {
   TeamService get _teamSrv => sl<TeamService>();
 
   WorkspaceService get _workspaceSrv => sl<WorkspaceService>();
-
-  /// 通过REST 刷新, 因此最后调用 [setDone]
-  @Deprecated('actRefresh')
-  actRefreshSpace() async => await actWrapper(() async {
-        workspaces = (await _workspaceSrv.queryWorkspaceDto(id))
-            .map((e) =>
-                workspaces.firstWhereOrNull((element) {
-                  if (element.id == e.id) {
-                    element.updateData(e);
-                    return true;
-                  }
-                  return false;
-                }) ??
-                WorkspaceModel(e))
-            .toList();
-        setDone("刷新[$name]团队的工作空间列表", null, false);
-      });
 
   Future<BaseException?> actRenameTeam(String? newName) async =>
       await actWrapper(() async {
@@ -118,10 +104,9 @@ extension TeamModelX on TeamModel {
     Function(WorkspaceDto w)? onCreated,
   }) async =>
       await actWrapper(() async {
-        final r = await _workspaceSrv.createWorkspaceDtoBy(id, spaceName);
-        workspaces.add(WorkspaceModel(r));
-        setDone("创建工作空间成功", null, false);
-        onCreated?.call(r);
+        final data = await _workspaceSrv.createWorkspaceDtoBy(id, spaceName);
+        addNewWorkspaceModel(data);
+        onCreated?.call(data);
       });
 
   Future<BaseException?> actRenameSpaceName(
