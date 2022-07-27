@@ -4,17 +4,12 @@ part of 'model.dart';
 typedef Record = RecordModel;
 
 extension PropertyBizX on RecordModel {
-  ExprValue getFieldByAttrName(String attrName) {
-    final propId = at.properties.firstWhere((p) => p.name == attrName).propId;
-    return getField(propId.parsePropK);
-  }
-
   ExprValue getField(int attrKey) {
     final pIndex = at.attrs.indexWhere((attr) => attr.k == attrKey);
     if (pIndex == -1) {
       // 找不到属性，通常是因为新增列，但没有填充值导致的
       return ExprValue.build(
-          type: AttrType.string, ag: [null, "Error#找不到Prop[$attrKey]"]);
+          type: AttrType.string, ag: [null, "Error#找不到k为[$attrKey]的Prop"]);
     }
     final prop = at.attrs[pIndex];
     final value = data.fields[attrKey];
