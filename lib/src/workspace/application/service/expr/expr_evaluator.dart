@@ -1,8 +1,8 @@
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/inter/dto/expr_token_dto.dart';
 
+import '../../model/model.dart';
 import 'member_accessor.dart';
 
 const exprEvaluator = ExprEvaluator(memberAccessors: [RecordMemberAccessor()]);
@@ -46,8 +46,10 @@ class ExprEvaluator {
     assert(expr is Expression);
     // 读取参数
     ExprValue exprV = eval(expr.ag[0], ctx);
+    if(!exprV.type.isRef){
+      return ExprValue.err('只有RefExprValue对象才能调用member函数');
+    }
     // 如果obj不是Record,而是RecordId(是一个引用对象),则需要从工作空间中查询,
-    assert(exprV.type.isRef, "只有RefExprValue才能作为FindRecordFn的参数");
 
     late Record rcd;
     if (exprV.value == null || (exprV.value as String).isEmpty) {
