@@ -25,18 +25,8 @@ class MetaMemberAccessor implements MemberAccessor<RecordMeta> {
       (element) => element.name == member,
       orElse: () => throw "在Record[${meta.id}]找不到名称为[$member]的成员方法或变量",
     );
-    return ExprValue.build(type: prop.type.toDomain(meta.at.queryMeta), ag: [prop.propId]);
-    // return prop;
-    // if (prop.type.tp == AttrTp.ref) {
-    //   // 引用类型, 同时返回类型信息, 以便推断表达式返回值类型
-    //   return Value(
-    //       fn: AsFuncRef(prop.type),
-    //       ag: [prop.propId]); // 返回一个Value,同时通过 asRef将string转换成Meta
-    //   // return Expression(const AsFuncRecordMeta(), [prop.type, prop.propId]); // 返回一个Expr, 通过AsFuncMeta 将 prop转换为Meta, 此时就与propId无关了,
-    // } else {
-    //   // 原始类型, 同时返回类型信息, 以便推断表达式返回值类型
-    //   return Value.of(prop.propId);
-    // }
+    return ExprValue.build(
+        type: prop.type.toDomain(meta.at.queryMeta), ag: [prop.propId]);
   }
 }
 
@@ -60,16 +50,19 @@ class RecordMemberAccessor implements MemberAccessor<Record> {
   /// 考虑允许方法与变量重名,用于表达"get"方法
   /// fixme 逻辑需要优化
   @override
-  IExpr getMember(Record record, String member) {
+  IExpr getMember(RecordModel record, String member) {
     final method = record.at.tryGetMethodBy(member.parsePropK);
     if (method != null) {
-      return method.expr.toDomain(record.at.at.queryMeta).callee as ExprValue; // 可以被调用
+      return method.expr.toDomain(record.at.at.queryMeta).callee
+          as ExprValue; // 可以被调用
+    } else {
+      final field = record.getFieldByAttrName(member);
+      if (field.value != null) {
+        return field; // Expr值, 如果是ref,则直接返回,如果是原始类型, 则要返回value
+      } else {
+        return ExprValue.err(
+            "在Record[${record.id}]找不到名称为[$member]的成员方法或变量"); // 可以被调用,但是没有值
+      }
     }
-    final field = record.at.getFieldByAttrName(record,member);
-    if (field.value != null) {
-      return field; // Expr值, 如果是ref,则直接返回,如果是原始类型, 则要返回value
-    }
-    return ExprValue.err(
-        "在Record[${record.id}]找不到名称为[$member]的成员方法或变量"); // 可以被调用,但是没有值
   }
 }

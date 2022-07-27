@@ -105,113 +105,96 @@ class _GridRefCellWidgetState extends State<GridRefCellWidget> {
     final refMetaId = (widget.type.r!);
     return Consumer<OpenedWorkspace>(
         builder: (context, spaceX, child) => TextButton(
-          onPressed: () {
-            final refDataSource = widget.meta.at.openedMetas
-                .firstWhere((m) => m.meta.id == refMetaId)
-                .dataSource;
+              onPressed: () {
+                final refDataSource = widget.meta.at.openedMetas
+                    .firstWhere((m) => m.meta.id == refMetaId)
+                    .dataSource;
 
-            /// pop菜单
-            PlutoGridPopup(
-              context: context,
-              columns: refDataSource.cachedColumns,
-              rows: refDataSource.cachedRows,
-              width: 600,
-              mode: PlutoGridMode.select,
-              // onLoaded: (PlutoGridOnLoadedEvent event) {
-              //   // rows
-              //   //     .asMap()
-              //   //     .entries
-              //   //     .forEach((element) {
-              //   //   final cell = element.value.cells[selectFieldName]!;
-              //   //
-              //   //   if (cell.value.toString() == controller.text) {
-              //   //     event.stateManager.setCurrentCell(cell, element.key);
-              //   //     event.stateManager
-              //   //         .moveScrollByRow(PlutoMoveDirection.up, element.key + 1);
-              //   //   }
-              //   // });
-              //   // event.stateManager.setShowColumnFilter(true);
-              // },
-              onSelected: (PlutoGridOnSelectedEvent event) {
-                // 选择记录之后..
-                print("onSelected $event, ${event.row!.cells}");
-                // 选中记录的Id
-                final selectRefRecordId =
-                    (event.row!.key as ValueKey<String>).value;
-                final originRecordId = rdCtx.row.key as ValueKey<String>;
+                /// pop菜单
+                PlutoGridPopup(
+                  context: context,
+                  columns: refDataSource.cachedColumns,
+                  rows: refDataSource.cachedRows,
+                  width: 600,
+                  mode: PlutoGridMode.select,
+                  // onLoaded: (PlutoGridOnLoadedEvent event) {
+                  //   // rows
+                  //   //     .asMap()
+                  //   //     .entries
+                  //   //     .forEach((element) {
+                  //   //   final cell = element.value.cells[selectFieldName]!;
+                  //   //
+                  //   //   if (cell.value.toString() == controller.text) {
+                  //   //     event.stateManager.setCurrentCell(cell, element.key);
+                  //   //     event.stateManager
+                  //   //         .moveScrollByRow(PlutoMoveDirection.up, element.key + 1);
+                  //   //   }
+                  //   // });
+                  //   // event.stateManager.setShowColumnFilter(true);
+                  // },
+                  onSelected: (PlutoGridOnSelectedEvent event) {
+                    // 选择记录之后..
+                    print("onSelected $event, ${event.row!.cells}");
+                    // 选中记录的Id
+                    final selectRefRecordId =
+                        (event.row!.key as ValueKey<String>).value;
+                    final originRecordId = rdCtx.row.key as ValueKey<String>;
 
-                // 更新的Record(todo 考虑改为只更新单个字段)
-                final dto = widget.meta.records
-                    .firstWhere((rcd) => rcd.id == originRecordId.value)
-                    .toDto()
-                    .updateOnlyBy(rdCtx.column, selectRefRecordId);
-                widget.meta.actSaveRecord(dto);
+                    // 更新的Record(todo 考虑改为只更新单个字段)
+                    final dto = widget.meta.records
+                        .firstWhere((rcd) => rcd.id == originRecordId.value)
+                        .toDto()
+                        .updateOnlyBy(rdCtx.column, selectRefRecordId);
+                    widget.meta.actSaveRecord(dto);
+                  },
+                );
               },
-            );
-          },
-          child: Text(
-            // 展示RecordId
-            '${rdCtx.row.cells[rdCtx.column.field]!.value}',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ));
+              child: Text(
+                // 展示RecordId
+                '${rdCtx.row.cells[rdCtx.column.field]!.value}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ));
   }
 }
-
-// extension PlutoRecordX on Record {
-//   PlutoRow toPlutoRow(FindRecordFn find) => PlutoRow(
-//         key: ValueKey<String>(id), // 将id作为key,以便接收更新事件时,查询是哪一个record
-//         cells: Map.fromEntries(meta.properties.map((prop) => MapEntry(
-//               prop.propId,
-//               PlutoCell(value: getValueBy(prop, find).v),
-//             ))),
-//       );
-// }
-
-
 
 /// Pluto 表格数据源实现
 extension PlutoMetaModelX on MetaModel {
   List<PlutoColumn> toPlutoCols() => attrs
       .map((attr) => PlutoColumn(
-    title: attr.name,
-    // 展示在UI的列标题
-    // titleSpan:  // 会覆盖 title参数的效果
-    field: attr.propId,
-    // 字段propId
-    type: _buildColumnTypeBy(attr.type),
-    // readOnly: // 某些字段需要标记为只读
-    // frozen:  // 冻结列
-    //  sort:  // 排序
-    //   renderer // 渲染为自定义Widget
-    enableColumnDrag: true,
-    enableAutoEditing: true,
-    // 自动切换编辑
-    enableEditingMode: true,
-    // 允许编辑
-    // this.hide = false,// 隐藏列
-    renderer: attr.type.isRef
-        ? (rdCtx) => GridRefCellWidget(attr.type, rdCtx, this)
-        : null,
-  ))
+            title: attr.name,
+            // 展示在UI的列标题
+            // titleSpan:  // 会覆盖 title参数的效果
+            field: attr.propId,
+            // 字段propId
+            type: _buildColumnTypeBy(attr.type),
+            // readOnly: // 某些字段需要标记为只读
+            // frozen:  // 冻结列
+            //  sort:  // 排序
+            //   renderer // 渲染为自定义Widget
+            enableColumnDrag: true,
+            enableAutoEditing: true,
+            // 自动切换编辑
+            enableEditingMode: true,
+            // 允许编辑
+            // this.hide = false,// 隐藏列
+            renderer: attr.type.isRef
+                ? (rdCtx) => GridRefCellWidget(attr.type, rdCtx, this)
+                : null,
+          ))
       .toList()
     ..[0].enableRowDrag = true
-  ..[0].enableRowChecked = true;
+    ..[0].enableRowChecked = true;
 
   PlutoRow toPlutoRow(RecordModel record) => PlutoRow(
-    key: ValueKey<String>(record.id),
-    // 将id作为key,以便接收更新事件时,查询是哪一个record
-    // cells: {}, // fixme
-    // cells: Map.fromEntries(
-    //     // data.fields.entries.map((e)=>MapEntry("${e.key}", PlutoCell(value: e.value)))))
-    //
-    // ),
-    cells: Map.fromEntries(properties.map((prop) => MapEntry(
-      prop.propId,
-      PlutoCell(value: getValueBy(record,prop, at.findRecord).v),
-    ))),
-  );
+        // 将id作为key,以便接收更新事件时,查询是哪一个record
+        key: ValueKey<String>(record.id),
+        cells: Map.fromEntries(properties.map((prop) => MapEntry(
+              prop.propId,
+              PlutoCell(value: record.eval(prop, at.findRecord)),
+            ))),
+      );
 
   PlutoColumnType _buildColumnTypeBy(AttrTypeDto type) {
     switch (type.tp) {
@@ -224,13 +207,12 @@ extension PlutoMetaModelX on MetaModel {
       case AttrTp.bool:
         return PlutoColumnType.select([true, false]);
       case AttrTp.ref:
-      // todo 关系型怎么展示 ?
+        // todo 关系型怎么展示 ?
         return PlutoColumnType.text();
-    // return PlutoColumnType.select(prop.type.ref.map((ref)=>ref.name).toList());
+      // return PlutoColumnType.select(prop.type.ref.map((ref)=>ref.name).toList());
     }
   }
 }
-
 
 extension PlutoRecordDtoX on RecordDto {
   // 更新全部,(其实可以只更新一个字段)
@@ -285,9 +267,9 @@ class RecordDataGridSourcePluto extends IRecordDataGridSource {
 
   @override
   onUpdateEvt(
-      Record record,
-      @Deprecated("已更新为通过record::id查询对应row,不再需要index") int index,
-      ) {
+    Record record,
+    @Deprecated("已更新为通过record::id查询对应row,不再需要index") int index,
+  ) {
     final rowKey = ValueKey<String>(record.id);
     // 通过key找到指定的row
     final originRow = stateManager!.refRows.originalList
@@ -297,12 +279,10 @@ class RecordDataGridSourcePluto extends IRecordDataGridSource {
     originRow.cells.forEach((propId, cell) {
       final pId = propId.parsePropId();
       if (pId.isField) {
-        final v = meta.getField(record, propId.parsePropK).value;
-        // final v = record.getField(propId.parsePropK).value;
+        final v = record.getField(propId.parsePropK).value;
         stateManager!.changeCellValue(cell, v);
       } else if (pId.isMethod) {
-        final v = meta.getValueBy(record, meta.getPropBy(propId), findRecord).v;
-        // final v = record.getValueBy(meta.getPropBy(propId), findRecord).v;
+        final v = record.eval(meta.getPropBy(propId));
         stateManager!.changeCellValue(cell, v);
       }
     });
