@@ -5,18 +5,6 @@ typedef OpenedWorkspace = WorkspaceModel;
 @Deprecated('use WorkspaceModel')
 typedef Workspace = WorkspaceModel;
 
-abstract class IWorkspaceModel
-    extends ModelSidecar<WorkspaceDto, BaseException?>
-    with ModelStateChangeMx<WorkspaceDto, BaseException?> {
-  IWorkspaceModel(WorkspaceDto data) : super(data, ExceptionAdapter.of);
-
-  String get id;
-
-  List<MetaModel> get metas;
-
-  MetaModel _addNewMetaModel(RecordMetaDto data);
-}
-
 mixin SpaceStateChangeMx on IWorkspaceModel {
   RecordMetaEttAccessor? __metaAcc;
 
@@ -32,18 +20,7 @@ mixin SpaceStateChangeMx on IWorkspaceModel {
 
   @override
   FutureOr<void> onFetch({bool isActive = false}) {
-    _metaAcc.findAll().listen((e) {
-      onMetaAdd(e);
-      notifyListeners();
-    }, onError: (e, s) {
-      if (e is AppwriteException &&
-          e.code == 404 &&
-          e.type == "collection_not_found") {
-        // 不存在则无需抛出异常
-        log("debug MetaModel.openBy: [$e], 由推测的`Meta集合`尚未创建导致的,无需抛出异常");
-      }
-      throw ExceptionAdapter.of(e, s);
-    });
+    _fetchAllMetas();
   }
 
   @override
@@ -128,6 +105,31 @@ mixin SpaceStateChangeMx on IWorkspaceModel {
     }
     notifyListeners();
   }
+
+  _fetchAllMetas() => _metaAcc.findAll().listen((e) {
+        onMetaAdd(e);
+        notifyListeners();
+      }, onError: (e, s) {
+        if (e is AppwriteException &&
+            e.code == 404 &&
+            e.type == "collection_not_found") {
+          // 不存在则无需抛出异常
+          log("debug MetaModel.openBy: [$e], 由推测的`Meta集合`尚未创建导致的,无需抛出异常");
+        }
+        throw ExceptionAdapter.of(e, s);
+      });
+}
+
+abstract class IWorkspaceModel
+    extends ModelSidecar<WorkspaceDto, BaseException?>
+    with ModelStateChangeMx<WorkspaceDto, BaseException?> {
+  IWorkspaceModel(WorkspaceDto data) : super(data, ExceptionAdapter.of);
+
+  String get id;
+
+  List<MetaModel> get metas;
+
+  MetaModel _addNewMetaModel(RecordMetaDto data);
 }
 
 class WorkspaceModel extends IWorkspaceModel with SpaceStateChangeMx {
@@ -142,6 +144,12 @@ class WorkspaceModel extends IWorkspaceModel with SpaceStateChangeMx {
 
   WorkspaceModel(super.data, this.at);
 
+  // 父状态
+  final TeamModel at;
+
+  @override
+  List<MetaModel> metas = [];
+
   @Deprecated('使用openedMetas代替')
   List<MetaModel> get openedMetas => metas;
 
@@ -149,11 +157,6 @@ class WorkspaceModel extends IWorkspaceModel with SpaceStateChangeMx {
   String get id => data.id;
 
   String get name => data.name;
-
-  // 子状态
-  final TeamModel at;
-  @override
-  List<MetaModel> metas = [];
 
   QueryMetaFn get queryMeta =>
       (metaId) => metas.firstWhereOrNull((element) => element.id == metaId)!;
