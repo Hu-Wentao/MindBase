@@ -140,6 +140,55 @@ class TableView {
       'TableView{vId: $vId, name: $name, type: $type, cols: $cols}';
 }
 
+
+class Role {
+  final String value;
+
+  const Role(this.value);
+
+  const Role.owner() : this('owner');
+}
+
+class Permissions {
+  final List<String> value;
+
+  bool get isEmpty => value.isEmpty;
+
+  const Permissions(this.value);
+
+  Permissions.init({List<String>? origin}) : this(origin ?? []);
+
+  Permissions add(Permissions value) => value.isEmpty ? this : this
+    ..value.addAll(value.value);
+
+  /// 以 全局角色 为单位授权权限
+  // 给予任意角色权限
+  static const all = Permissions(['role:all']);
+
+  // 给予未登录用户权限
+  static const onlyGuest = Permissions(['role:guest']);
+  // 给予已登录用户权限
+  static const onlyMember = Permissions(['role:member']);
+
+  /// 以 用户 为单位授权权限
+  /// 给予特定用户[userId]权限
+  Permissions.user({required String userId}) : this(['user:$userId']);
+
+  /// 以 团队 为单位授权权限
+  /// 给予特定团队[teamId]内指定角色[role]成员权限;
+  /// [role] 为empty表示 团队内全部成员
+  Permissions.team({required String teamId, List<Role> roles = const []})
+      : this(roles.isEmpty
+      ? ['team:$teamId']
+      : roles.map((role) => 'team:$teamId/${role.value}').toList());
+
+  /// 以 成员 为单位授权权限
+  /// 给予特定团队成员[memberId]权限
+  /// 这样可以控制用户在离开团队后自动失去权限
+  Permissions.member({required String memberId}) : this(['member:$memberId']);
+}
+
+
 /// === AttrType （属性类型）相关值对象 ===
 
 enum AttrTp {
