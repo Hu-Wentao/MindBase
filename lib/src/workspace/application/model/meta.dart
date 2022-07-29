@@ -6,27 +6,6 @@ typedef OpenedMeta = MetaModel;
 typedef RecordMeta = MetaModel;
 
 extension MetaModelBizX on MetaModel {
-  ExprValue getFieldByAttrName(RecordModel record, String name) =>
-      getField(record, name.parsePropK);
-
-  ExprValue getField(RecordModel record, int attrKey) {
-    final pIndex = data.attrs.indexWhere((attr) => attr.k == attrKey);
-    if (pIndex == -1) {
-      // 找不到属性，通常是因为新增列，但没有填充值导致的
-      return ExprValue.build(
-          type: AttrType.string, ag: [null, "Error#找不到Prop[$attrKey]"]);
-    }
-    final prop = data.attrs[pIndex];
-    final value = record.data.fields[attrKey];
-    return ExprValue.build(
-        type: prop.type.toDomain(at.queryMeta),
-        ag: [value?.value, value == null ? "Error#找不到Value值" : null]);
-  }
-
-  Value? getFieldValue(RecordModel record, int attrKey,
-          {Value Function(int k)? orElse}) =>
-      record.data.fields[attrKey] ?? orElse?.call(attrKey);
-
   MethodDto? tryGetMethodBy(
     int methodKey, {
     MethodDto Function(int k)? orElse,
@@ -36,30 +15,8 @@ extension MetaModelBizX on MetaModel {
       ) ??
       orElse?.call(methodKey);
 
-  /// 根据属性名称获取属性值(同时调用表达式进行计算)
-  Value getValueBy(RecordModel record, PropertyDto prop, FindRecordFn find) =>
-      Value.of(record.eval(prop, find));
-
   PropertyDto getPropBy(String propId) =>
       properties.firstWhere((prop) => prop.propId == propId);
-}
-
-abstract class IMetaModel extends ModelSidecar<RecordMetaDto, BaseException?>
-    with ModelStateChangeMx<RecordMetaDto, BaseException?> {
-  IMetaModel(RecordMetaDto data) : super(data, ExceptionAdapter.of);
-
-  String get id;
-
-  List<RecordModel> get records;
-
-  // 内部缓存表格数据
-  RecordDataGridSourcePluto? get _cachedDataSource;
-
-  set _cachedDataSource(RecordDataGridSourcePluto? value);
-
-  cleanDataSourceCache();
-
-  RecordModel _newRecordModel(RecordDto data);
 }
 
 mixin MetaStateChangeMx on IMetaModel {
@@ -108,28 +65,36 @@ mixin MetaStateChangeMx on IMetaModel {
   /// 单次刷新数据
   @override
   FutureOr<void> onFetch({bool isActive = false}) {
-    _safeFetchAllRecord(_recordDtoRepo.findAll, onDto: _onEvtInsertRecord);
+    _fetchAllRecord();
   }
 
   /// 重置充血数据
   @override
-  FutureOr<void> onReset() {}
-
-  _safeFetchAllRecord(
-    Stream<RecordDto> Function() fetchAllRecordsFn, {
-    required Function(RecordDto dto) onDto,
+  FutureOr<void> onReset() {
+    records.clear();
+    cleanDataSourceCache();
+  }
+  /// 用于Meta属性被更新时
+  /// 删除缓存后会自动根据最新的Meta重建UI
+  @override
+  void cleanDataSourceCache() {
+    _cachedDataSource = null;
+    _refreshDataVer();
+    log("debug cleanDataSourceCache# 已清除DataSource缓存");
+  }
+  _fetchAllRecord({
     int reRryCount = 0,
   }) async {
     try {
       // 出现异常,steam会自动关闭
-      await for (final dto in fetchAllRecordsFn()) {
+      await for (final dto in _recordDtoRepo.findAll()) {
         _onEvtInsertRecord(dto);
       }
     } catch (e, s) {
       if (e is AppwriteException) {
         if (e.code == 404 && e.type == "collection_not_found") {
           // 不存在则无需抛出异常
-          print("debug MetaModel.openBy: [$e], 由推测的`Record集合`尚未创建导致的,无需抛出异常");
+          log("debug MetaModel.openBy: [$e], 由推测的`Record集合`尚未创建导致的,无需抛出异常");
           return;
           // 在新建表的时候,首次执行findAll被抛出, 可能是操作太频繁导致, 可以wait一会再重试
           // AppwriteException: null, {"message":"Error: Server Error","code":500,"version":"0.13.4"} (0)
@@ -140,24 +105,19 @@ mixin MetaStateChangeMx on IMetaModel {
                     '{"message":"Error: Server Error","code":500,')) &&
             // 重试次数<5 则继续重试
             (reRryCount < 5)) {
-          print("debug 500异常, 重试#[$reRryCount]");
-          return _safeFetchAllRecord(
-            fetchAllRecordsFn,
-            onDto: onDto,
-            reRryCount: reRryCount + 1,
-          );
+          log("debug 500异常, 重试#[$reRryCount]");
+          return _fetchAllRecord(reRryCount: reRryCount + 1);
         } else {
-          print(
-              "未处理的Appwrite异常 type# ${e.type}, code# ${e.code}, message# ${e.message}, rsp# ${e.response}");
+          log("未处理的Appwrite异常 type# ${e.type}, code# ${e.code}, message# ${e.message}, rsp# ${e.response}");
         }
       }
-      print("debug MetaModel.open: retry#[$reRryCount] 抛出未知异常 [$e], ");
+      log("debug MetaModel.open: retry#[$reRryCount] 抛出未知异常 [$e], ");
       throw ExceptionAdapter.of(e, s);
     }
   }
 
   void _onWatchRecord(AccessorEvt<RecordDto> event) {
-    print("debug #监听WatchRecord # $event");
+    log("debug #监听WatchRecord # $event");
     switch (event.type) {
       case AccessorEvtTp.insert:
         _onEvtInsertRecord(event.dto!);
@@ -199,14 +159,24 @@ mixin MetaStateChangeMx on IMetaModel {
     _cachedDataSource?.onRemoveEvt(ettId, 0);
   }
 
-  /// 用于Meta属性被更新时
-  /// 删除缓存后会自动根据最新的Meta重建UI
-  @override
-  void cleanDataSourceCache() {
-    _cachedDataSource = null;
-    _refreshDataVer();
-    print("debug 已清除DataSource缓存");
-  }
+}
+
+abstract class IMetaModel extends ModelSidecar<RecordMetaDto, BaseException?>
+    with ModelStateChangeMx<RecordMetaDto, BaseException?> {
+  IMetaModel(RecordMetaDto data) : super(data, ExceptionAdapter.of);
+
+  String get id;
+
+  List<RecordModel> get records;
+
+  // 内部缓存表格数据
+  RecordDataGridSourcePluto? get _cachedDataSource;
+
+  set _cachedDataSource(RecordDataGridSourcePluto? value);
+
+  cleanDataSourceCache();
+
+  RecordModel _newRecordModel(RecordDto data);
 }
 
 class MetaModel extends IMetaModel with MetaStateChangeMx {
@@ -233,17 +203,13 @@ class MetaModel extends IMetaModel with MetaStateChangeMx {
 
   List<PropertyDto> get properties => [...attrs, ...methods];
 
-  RecordDataGridSourcePluto get dataSource {
-    // print("当前是否为缓存DataSource# ${_cachedDataSource == null}");
-    return _cachedDataSource ??= RecordDataGridSourcePluto(
-      meta: this,
-      findRecord: at.findRecord,
-      cachedColumns: PlutoMetaModelX(this).toPlutoCols(),
-      // cachedColumns: data.toPlutoCols(this),
-      cachedRows: records.map((e) => toPlutoRow(e)).toList(),
-      // cachedRows: records.map((e) => e.toPlutoRow(at.findRecord)).toList(),
-    );
-  }
+  RecordDataGridSourcePluto get dataSource =>
+      _cachedDataSource ??= RecordDataGridSourcePluto(
+        meta: this,
+        findRecord: at.findRecord,
+        cachedColumns: PlutoMetaModelX(this).toPlutoCols(),
+        cachedRows: records.map((e) => toPlutoRow(e)).toList(),
+      );
 
   @override
   RecordModel _newRecordModel(RecordDto data) => RecordModel(this, data);
