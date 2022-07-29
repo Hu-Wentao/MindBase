@@ -151,15 +151,18 @@ mixin AppwriteAccessorWatchableMx<T extends IEntityDto>
         .where(
           (event) =>
               // todo 转换操作需要转移到其他类中, 例如[RealTimeEvtFactory]
-              event.events.contains(documentsEvtTag) &&
+              //这里的events是各种可能性的排列组合, 这里假定[0]是最完整的事件, 仅限 appwrite 0.15.3
+              //如 databases.default.collections.62b88cd71859252c4816ed21.documents.62e41fa03d7387d4cc67b5bd.create,
+              event.events[0].split('.').contains(documentsEvtTag) &&
                       event.payload['\$collection'] == collectionId &&
                       (documentId == null)
                   ? true
                   : event.payload['\$id'] == documentId,
         )
         .map((event) => AccessorEvt<T>(
-              _collectionEvt2AccessorEvtTp(event.events),
-              documentId!,
+              //这里的events是各种可能性的排列组合, 这里假定[0]是最完整的事件, 仅限 appwrite 0.15.3
+              _collectionEvt2AccessorEvtTp(event.events[0].split('.')),
+              documentId ??= event.payload['\$id'] as String, // 如果是监听整个集合,则这里需要从payload中获取
               collectionId,
               jsonToDtoOr(event.payload..['id'] = documentId),
             ))

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:appwrite/appwrite.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/app/config/common_config.dart';
 
 /// 统一管理Appwrite-Realtime的Channel
 /// 由于Realtime是基于单个websocket的, 因此需要统一管理订阅channel
@@ -126,6 +127,7 @@ abstract class RealTimeEvtFactory {
 
 class SubChannel {
   // https://appwrite.io/docs/realtime#channels
+  static const _databasesL0 = 'databases';
   static const _collectionsL1 = "collections";
   static const _accountL1 = "account";
   static const _filesL1 = "files";
@@ -137,27 +139,52 @@ class SubChannel {
   static const _documentsL2 = "documents";
   static const _filesL2 = "files";
 
+  @Deprecated('应当从AppClientConfig中读取')
+  static const mainDataBaseId = 'default';
+
   final String tag; // 自定义标签
   final String channel; // 用于订阅的channel字符串
 
   const SubChannel(this.channel, this.tag);
 
   // 监听某个文档(记录)的删改事件
-  const SubChannel.document(String collectionId, String documentId,
-      {String tag = ''})
-      : this("$_collectionsL1.$collectionId.$_documentsL2.$documentId", tag);
+  const SubChannel.document(
+    String collectionId,
+    String documentId, {
+    String tag = '',
+    String databaseId = mainDataBaseId, // 默认的主数据库Id
+  }) : this("$_databasesL0.$databaseId.$_collectionsL1.$collectionId.$_documentsL2.$documentId",
+            tag);
 
   // 监听某个集合(表)中所有记录的 增删改事件
-  const SubChannel.collection(String collectionId, {String tag = ''})
-      : this("$_collectionsL1.$collectionId.$_documentsL2", tag);
+  const SubChannel.collection(
+    String collectionId, {
+    String tag = '',
+    String databaseId = mainDataBaseId, // 默认的主数据库Id
+  }) : this("$_databasesL0.$databaseId.$_collectionsL1.$collectionId.$_documentsL2",
+            tag);
 
   /// 监听一个工作空间内所有Meta的`增删改`事件
-  const SubChannel.watchMeta(String workspaceId, {String tag = ''})
-      : this.collection(workspaceId, tag: tag);
+  const SubChannel.watchMeta(
+    String workspaceId, {
+    String tag = '',
+    String databaseId = mainDataBaseId, // 默认的主数据库Id
+  }) : this.collection(
+          workspaceId,
+          databaseId: databaseId,
+          tag: tag,
+        );
 
   /// 监听一个Meta下所有Record的`增删改`事件
-  const SubChannel.watchRecord(String metaId, {String tag = ''})
-      : this.collection(metaId, tag: tag);
+  const SubChannel.watchRecord(
+    String metaId, {
+    String tag = '',
+    String databaseId = mainDataBaseId, // 默认的主数据库Id
+  }) : this.collection(
+          metaId,
+          databaseId: databaseId,
+          tag: tag,
+        );
 
   //
   const SubChannel.team(String teamId, {String tag = ''})
