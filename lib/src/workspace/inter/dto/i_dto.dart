@@ -25,7 +25,7 @@ class ValueDto {
   ValueDto.builder({this.v = ''});
 
   @Deprecated('无效')
-  static fromDomain(Value value) => ValueDto.builder(v: value);
+  static fromDomain(Value value) => ValueDto.builder(v: value.v);
 
   @Deprecated('无效')
   Value toDomain() {
