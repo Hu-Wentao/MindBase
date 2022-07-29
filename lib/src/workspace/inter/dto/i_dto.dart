@@ -93,7 +93,46 @@ extension RecordMetaX on MetaModel {
 // RecordMetaDto.fromDomain(this);
 }
 
-/// attributes固定 0:表示Record的ID, 1:表示Record的metaId
+///
+/// 表信息, 控制读写权限与逻辑删除
+/// 参见 https://appwrite.io/docs/permissions
+class CollectionDto extends IDto {
+  // 表级别权限控制
+  static const levelCollection = 'collection';
+
+  // 记录级别权限控制
+  static const levelDocument = 'document';
+
+  final List<String> reads;
+  final List<String> writes;
+  final bool enabled;
+
+  CollectionDto(
+      {required this.reads, required this.writes, this.enabled = true});
+
+  /// Record表 权限信息, 存放于Meta记录中
+  CollectionDto.builder({Permissions? reads, Permissions? writes})
+      : this(
+          reads: reads?.value ?? const [],
+          writes: writes?.value ?? const [],
+        );
+
+  /// add
+  CollectionDto add({Permissions? reads, Permissions? writes}) => this
+    ..reads.addAll(reads?.value ?? const [])
+    ..writes.addAll(writes?.value ?? const []);
+
+  //
+  @override
+  Map<String, dynamic> toJson() => {
+        'reads': reads,
+        'writes': writes,
+        'enabled': enabled,
+      };
+}
+
+///
+/// [attrs]固定 0:表示Record的ID
 class RecordMetaDto extends IEntityDto {
   @override
   String id;
