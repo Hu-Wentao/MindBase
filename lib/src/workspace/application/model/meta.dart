@@ -310,7 +310,8 @@ extension MetaModelX on MetaModel {
         await _recordDtoRepo.update(dto);
       });
 
-  Future<void> actRemoveRecord(String ettId) => actWrapper(() async {
+  Future<BaseException?> actRemoveRecord(String ettId) async =>
+      await actWrapper(() async {
         log("actRemoveRecord $ettId");
         await _recordDtoRepo.deleteBy(ettId);
       });
