@@ -40,7 +40,7 @@ _i1.GetIt $initGetIt(_i1.GetIt get,
   gh.lazySingleton<_i4.Avatars>(() => appServerConfig.avatars);
   gh.lazySingleton<_i3.Client>(() => appClientConfig.client);
   gh.lazySingleton<_i4.Client>(() => appServerConfig.client);
-  gh.lazySingleton<_i3.Database>(() => appClientConfig.database);
+  gh.lazySingleton<_i3.Databases>(() => appClientConfig.database);
   gh.lazySingleton<_i4.Database>(() => appServerConfig.database);
   gh.lazySingleton<_i6.EventBus>(() => eventBusConfig.eventBus);
   gh.lazySingleton<_i7.Logger>(
@@ -54,7 +54,7 @@ _i1.GetIt $initGetIt(_i1.GetIt get,
   gh.lazySingleton<_i4.Teams>(() => appServerConfig.teams);
   gh.lazySingleton<_i10.WorkspaceEttAccessor>(() => appClientConfig.wsEttAcc);
   gh.lazySingleton<_i11.WorkspaceService>(() => _i11.WorkspaceService(
-      get<_i3.Database>(), get<_i10.WorkspaceEttAccessor>()));
+      get<_i3.Databases>(), get<_i10.WorkspaceEttAccessor>()));
   gh.lazySingleton<_i12.TeamService>(
       () => _i12.TeamService(get<_i3.Teams>(), get<_i4.Teams>()));
   return get;

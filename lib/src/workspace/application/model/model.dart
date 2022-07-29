@@ -14,13 +14,13 @@ import 'package:mind_base/src/workspace/infra/ui/widget/data_table_source.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
-import 'package:appwrite/appwrite.dart';
 import 'package:mind_base/src/workspace/application/service/workspace_service.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 
 import '../../infra/ui/dialog/import_data_dialog.dart';
 import '../service/meta_service.dart';
 import 'package:collection/collection.dart';
+import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart' as aw;
 import 'package:mind_base/src/workspace/application/service/service.dart';
 

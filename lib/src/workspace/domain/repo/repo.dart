@@ -24,7 +24,7 @@ class MetaDtoRepo {
 
   static MetaDtoRepo withDI(GetIt get, String workspaceId) => MetaDtoRepo(
         get<server.Database>(),
-        RecordMetaEttAccessor(get<Database>(), workspaceId),
+        RecordMetaEttAccessor(get<Databases>(), workspaceId),
         workspaceId,
       );
 
@@ -255,7 +255,7 @@ class RecordDtoRepo {
   static RecordDtoRepo withDtoDI(GetIt get, RecordMetaDto meta) =>
       RecordDtoRepo(
         get<server.Database>(),
-        RecordEttAccessor(get<Database>(), meta.id),
+        RecordEttAccessor(get<Databases>(), meta.id),
         meta,
       );
 

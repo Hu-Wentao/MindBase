@@ -5,6 +5,7 @@ import 'package:mind_base/src/workspace/infra/dao/realtime_hub.dart';
 
 @module
 abstract class AppClientConfig {
+  static const mainDataBaseId = 'default';
   @lazySingleton
   Client get client => Client()
     ..setEndpoint("http://app.shuttlecloud.cn/v1")
@@ -12,7 +13,7 @@ abstract class AppClientConfig {
     ..setSelfSigned(status: true); // 可能只适用于dev环境
   @lazySingleton
   WorkspaceEttAccessor get wsEttAcc => WorkspaceEttAccessor(
-        sl<Database>(),
+        sl<Databases>(),
         "627faa18b854b07aa9a8",
         sl<RealtimeChannelHub>(),
       );
@@ -29,7 +30,7 @@ abstract class AppClientConfig {
   Teams get teams => Teams(sl<Client>());
 
   @lazySingleton
-  Database get database => Database(sl<Client>());
+  Databases get database => Databases(sl<Client>(), databaseId: mainDataBaseId);
 
   @lazySingleton
   Storage get storage => Storage(sl<Client>());

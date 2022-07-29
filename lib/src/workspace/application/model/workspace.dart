@@ -21,7 +21,7 @@ mixin SpaceStateChangeMx on IWorkspaceModel {
   RecordMetaEttAccessor? __metaAcc;
 
   RecordMetaEttAccessor get _metaAcc =>
-      __metaAcc ??= RecordMetaEttAccessor(sl<Database>(), data.id);
+      __metaAcc ??= RecordMetaEttAccessor(sl<Databases>(), data.id);
   StreamSubscription<AccessorEvt<RecordMetaDto>>? _metasSub;
 
   @override

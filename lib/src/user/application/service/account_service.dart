@@ -12,7 +12,7 @@ class AccountService {
     required String email,
     required String password,
   }) {
-    return account.createSession(email: email, password: password);
+    return account.createEmailSession(email: email, password: password);
   }
 
   Future<User> signup({

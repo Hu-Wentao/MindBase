@@ -60,7 +60,7 @@ class TeamModel extends ITeamModel with TeamStateChangeMx {
 
   String get name => data.name;
 
-  int get createAt => data.dateCreated;
+  int get createAt => data.$createdAt;
 
   int get total => data.total;
 
@@ -162,11 +162,12 @@ class MemberModel extends IMemberModel {
   String get id => data.$id;
 
   String get userId => data.userId;
+  String get userName => data.userName;
 
   // String get teamId => data.teamId;
-  String get name => data.name;
+  String get name => data.teamName;
 
-  String get email => data.email;
+  String get email => data.userEmail;
 
   int get invited => data.invited; // ts
   int get joined => data.joined; // ts

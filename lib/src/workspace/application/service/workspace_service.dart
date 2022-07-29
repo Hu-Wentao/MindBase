@@ -12,7 +12,7 @@ import 'meta_service.dart';
 
 @lazySingleton
 class WorkspaceService {
-  final Database _db;
+  final Databases _db;
   final WorkspaceEttAccessor _workspaceEttAcc;
 
   const WorkspaceService(

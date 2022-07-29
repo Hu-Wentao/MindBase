@@ -60,7 +60,7 @@ dependencies:
   json_annotation: ">=4.4.0" # json_serializable 要求
   pluto_grid: "5.0.3"
   linked_scroll_controller: # pluto_grid 需要使用
-  appwrite: 4.0.2
+  appwrite: 6.0.0
   flutter_svg:
   bson:
   easy_debounce:

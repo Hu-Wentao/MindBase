@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:appwrite/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/user/application/model/model.dart';
+import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/application/service/expr/expression_parser.dart';
-import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/infra/dto/dto_aw_impl.dart';
 import 'package:mind_base/src/workspace/inter/dto/expr_token_dto.dart';
@@ -26,7 +26,7 @@ const pRcdStudentZsId = ('6262e3b0118f5894993d4533');
 
 final us = UserModel(null);
 final tm =
-    TeamModel(Team($id: 'id', name: "name", dateCreated: 123, total: 1), us);
+    TeamModel(Team($id: 'id', name: "name", $createdAt: 124,$updatedAt:1234, total: 1), us);
 final sp = WorkspaceModel(WorkspaceDto.builder(), tm)..metas.addAll([pMetaSchool, pMetaStudent]);
 
 // Meta 2个
