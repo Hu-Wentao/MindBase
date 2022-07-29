@@ -11,33 +11,44 @@ abstract class ITeamModel extends ModelSidecar<aw.Team, BaseException?>
 
   List<WorkspaceModel> get workspaces;
 
+  List<MemberModel> get members;
+
   WorkspaceModel addNewWorkspaceModel(WorkspaceDto data);
+
+  MemberModel addNewMemberModel(aw.Membership data);
 }
 
 mixin TeamStateChangeMx on ITeamModel {
   final WorkspaceService _workspaceSrv = sl<WorkspaceService>();
-
-  @override
-  FutureOr<void> onCloseSubs() {
-    log('onCloseSubs 尚未实现...');
-  }
+  final _tmSrv = sl<Teams>();
 
   @override
   Future<FutureOr<void>> onFetch({bool isActive = false}) async {
     // 全量拉取数据,原有数据将在 onReset方法中被清除
+    // workspace
     for (var data in (await _workspaceSrv.queryWorkspaceDto(id))) {
       addNewWorkspaceModel(data);
+    }
+    // member
+    for (var data in (await _tmSrv.getMemberships(teamId: id)).memberships) {
+      addNewMemberModel(data);
     }
   }
 
   @override
   FutureOr<void> onReset() {
     workspaces.clear();
+    members.clear();
   }
 
   @override
   FutureOr<void> onSubscription() {
     log('onSubscription 尚未实现...');
+  }
+
+  @override
+  FutureOr<void> onCloseSubs() {
+    log('onCloseSubs 尚未实现...');
   }
 }
 
@@ -59,10 +70,15 @@ class TeamModel extends ITeamModel with TeamStateChangeMx {
 
   bool get isMember => tmpIsMember;
 
-  // 子状态Model // todo 人员列表
+  /// 上层状态引用
   final UserModel at;
+
+  /// 子状态Model
+  // 懒初始化 (初始化一个工作空间比较昂贵)
   @override
   List<WorkspaceModel> workspaces = [];
+  @override
+  List<MemberModel> members = [];
 
   TeamModel(super.data, this.at);
 
@@ -75,6 +91,14 @@ class TeamModel extends ITeamModel with TeamStateChangeMx {
     // 没有必要立即初始化工作空间, 打开空间比较昂贵, 在Page中手动调用比较合适
     workspaces.add(m);
     setDoneKeepState("新增 WorkspaceModel[${m.id}]");
+    return m;
+  }
+
+  @override
+  MemberModel addNewMemberModel(aw.Membership data) {
+    final m = MemberModel(data, this);
+    members.add(m);
+    setDoneKeepState("新增 MemberModel[${m.id}]");
     return m;
   }
 }
@@ -123,4 +147,33 @@ extension TeamModelX on TeamModel {
         workspaces.removeWhere((w) => w.id == spaceId);
         setDone("删除工作空间[$spaceId]完成", null, false);
       });
+}
+
+/// ============================================================================
+
+abstract class IMemberModel
+    extends ModelSidecar<aw.Membership, BaseException?> {
+  IMemberModel(aw.Membership data) : super(data, ExceptionAdapter.of);
+}
+
+class MemberModel extends IMemberModel {
+  MemberModel(super.data, this.at);
+
+  String get id => data.$id;
+
+  String get userId => data.userId;
+
+  // String get teamId => data.teamId;
+  String get name => data.name;
+
+  String get email => data.email;
+
+  int get invited => data.invited; // ts
+  int get joined => data.joined; // ts
+  bool get confirm => data.confirm;
+
+  List get roles => data.roles;
+
+  // 上层状态
+  final TeamModel at;
 }
