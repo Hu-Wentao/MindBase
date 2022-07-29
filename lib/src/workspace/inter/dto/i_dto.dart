@@ -39,7 +39,6 @@ class ValueDto {
 
 extension RecordX on RecordModel {
   RecordDto toDto() => data;
-// RecordDto.fromDomain(this);
 }
 
 ///
@@ -55,46 +54,31 @@ class RecordDto extends IEntityDto {
 
   String get metaIdHex => fields[1]!.value;
 
-  final Map<int, Value> fields;
+  final Map<int, ValueDto> fields;
 
   const RecordDto({this.fields = const {}});
-
-  // factory RecordDto.fromDomain(Record record) => RecordDto(
-  //       fields: record.fields,
-  //     );
 
   factory RecordDto.builder({
     String? id,
     String? metaId,
-    Map<int, Value> fields = const {},
+    Map<int, ValueDto> fields = const {},
   }) =>
       RecordDto(
           fields: {
         //      填入默认值
-        0: Value.of(id ??= ObjectIdX.createHex),
-        1: Value.of(metaId),
+        0: ValueDto.of(id ??= ObjectIdX.createHex),
+        1: ValueDto.of(metaId),
       }..addAll(fields));
 
   /// 从表单输入
-  factory RecordDto.fromForm(RecordMeta meta, Map<String, dynamic> formMap) {
+  factory RecordDto.fromForm(MetaModel meta, Map<String, dynamic> formMap) {
     return RecordDto(
       fields: Map.fromEntries(meta.properties.map((attr) {
         final value = formMap[attr.propId];
-        return MapEntry(attr.k, Value.of(value));
+        return MapEntry(attr.k, ValueDto.of(value));
       })),
     );
   }
-
-  // Record toDm(RecordMeta Function(String metaId) getMeta) =>
-  //     toDomain(getMeta(metaId));
-
-  // Record toDomain(RecordMeta m) => Record(
-  //       id: idHex,
-  //       meta: m,
-  //       fields: fields,
-  //     );
-
-  // Record? toDomainOr(RecordMeta? m) => m == null ? null : toDomain(m);
 
   @override
   Map<String, dynamic> toJson() =>
@@ -104,7 +88,7 @@ class RecordDto extends IEntityDto {
   String toString() => 'RecordDto{fields: $fields}';
 }
 
-extension RecordMetaX on RecordMeta {
+extension RecordMetaX on MetaModel {
   RecordMetaDto toDto() => data;
 // RecordMetaDto.fromDomain(this);
 }
@@ -216,37 +200,9 @@ class RecordMetaDto extends IEntityDto {
         methods: methods,
       );
 
-  // factory RecordMetaDto.fromDomain(RecordMeta meta) => RecordMetaDto(
-  //       id: meta.id,
-  //       name: meta.name,
-  //       memo: meta.memo,
-  //       maxKey: meta.maxKey,
-  //       attrs: meta.attrs.map((e) => e.toDto()).toList(),
-  //       methods: meta.methods.map((e) => e.toDto()).toList(),
-  //       views: meta.views,
-  //     );
-
   @override
   Map<String, dynamic> toJson() =>
       throw UnimplementedError("使用[$runtimeType]相关Extension的方法");
-
-  // RecordMeta toDm(QueryMetaFn toMeta) => toDomain(
-  //       attrs.map((a) => a.toDomain(toMeta)).toList(),
-  //       methods.map((e) => e.toDomain(toMeta)).toList(),
-  //       views,
-  //     );
-
-  // RecordMeta toDomain(
-  //         List<Attribute> attrs, List<Method> methods, List<TableView> views) =>
-  //     RecordMeta(
-  //       id: id,
-  //       name: name,
-  //       memo: memo,
-  //       maxKey: maxKey,
-  //       attrs: attrs,
-  //       methods: methods,
-  //       views: views,
-  //     );
 
   @override
   String toString() {
@@ -395,7 +351,7 @@ class AttributeDto extends PropertyDto {
     int k = 0,
     String name = "",
     String memo = "",
-    AttrTypeDto type = AttrTypeDto.any,
+    AttrTypeDto type = AttrTypeDto.string,
   }) : this(
           k: k,
           name: name,
