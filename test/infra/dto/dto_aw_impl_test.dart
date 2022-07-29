@@ -89,7 +89,7 @@ main() {
     // print("valueDto = ${ValueJsonDtoAppwriteX(valueDto).toJson()}");
     final expr = Expression(
         fn: IFunc.findBy("add"),
-        ag: [Value.of(1), Value.of(2)],
+        ag: [ExprValue.of(1), ExprValue.of(2)],
         type: AttrType.string);
     final exprDto = ExprNodeDto.fromDomain(expr);
     // print("exprDto = $exprDto");

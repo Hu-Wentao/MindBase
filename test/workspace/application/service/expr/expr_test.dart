@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:appwrite/models.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mind_base/src/user/application/model/model.dart';
 import 'package:mind_base/src/workspace/application/service/expr/expression_parser.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
@@ -22,23 +24,35 @@ const pMetaSchoolId = ('626a109fd90369d16c2fbe0e');
 const pRcdSchoolHfuId = ("626a98b14a034567ff06f2f4");
 const pRcdStudentZsId = ('6262e3b0118f5894993d4533');
 
+final us = UserModel(null);
+final tm =
+    TeamModel(Team($id: 'id', name: "name", dateCreated: 123, total: 1), us);
+final sp = WorkspaceModel(WorkspaceDto.builder(), tm)..metas.addAll([pMetaSchool, pMetaStudent]);
+
 // Meta 2个
 /// 学校meta
-final pMetaSchool = RecordMeta(
-    id: pMetaSchoolId,
-    name: '学校表',
-    memo: '学校信息',
-    maxKey: 3,
-    attrs: const [
-      Attribute(k: 0, name: 'id', memo: 'memo', type: AttrType.string),
-      Attribute(k: 1, name: 'metaId', memo: 'memo', type: AttrType.string),
-      Attribute(k: 2, name: 'name', memo: '学校的中文名称', type: AttrType.string),
-      Attribute(k: 3, name: 'sign', memo: '学校的英文简称', type: AttrType.string),
-    ],
-    methods: []);
+final pMetaSchool = MetaModel(
+    RecordMetaDto(
+        id: pMetaSchoolId,
+        name: '学校表',
+        memo: '学校信息',
+        maxKey: 3,
+        attrs: [
+          AttributeDto.builder(
+              k: 0, name: 'id', memo: 'memo', type: AttrTypeDto.string),
+          AttributeDto.builder(
+              k: 1, name: 'metaId', memo: 'memo', type: AttrTypeDto.string),
+          AttributeDto.builder(
+              k: 2, name: 'name', memo: '学校的中文名称', type: AttrTypeDto.string),
+          AttributeDto.builder(
+              k: 3, name: 'sign', memo: '学校的英文简称', type: AttrTypeDto.string),
+        ],
+        methods: []),
+    sp);
 
 /// 学校对应的记录 (HFUU)
-final pRcdHfu = Record(id: pRcdSchoolHfuId, meta: pMetaSchool, fields: {
+final pRcdHfu =
+    RecordDto.builder(id: pRcdSchoolHfuId, metaId: pMetaSchool.id, fields: {
   0: Value.of(pRcdSchoolHfuId),
   1: Value.of(pMetaSchool.id),
   2: Value.of("合肥学院"),
@@ -46,41 +60,46 @@ final pRcdHfu = Record(id: pRcdSchoolHfuId, meta: pMetaSchool, fields: {
 });
 
 /// 学生表
-final pMetaStudent = RecordMeta(
+final pMetaStudent = MetaModel(RecordMetaDto(
     id: pMetaStudentId,
     name: '学生表',
     memo: '记录一个学生的信息',
     maxKey: 4,
     attrs: [
-      const Attribute(k: 0, name: 'id', memo: '', type: AttrType.string),
-      const Attribute(k: 1, name: 'metaId', memo: '', type: AttrType.string),
-      const Attribute(k: 2, name: 'name', memo: '', type: AttrType.string),
-      const Attribute(k: 3, name: 'age', memo: '年龄', type: AttrType.string),
-      const Attribute(k: 4, name: '备注', memo: '备注', type: AttrType.string),
-      Attribute(
+      AttributeDto.builder(
+          k: 0, name: 'id', memo: '', type: AttrTypeDto.string),
+      AttributeDto.builder(
+          k: 1, name: 'metaId', memo: '', type: AttrTypeDto.string),
+      AttributeDto.builder(
+          k: 2, name: 'name', memo: '', type: AttrTypeDto.string),
+      AttributeDto.builder(
+          k: 3, name: 'age', memo: '年龄', type: AttrTypeDto.string),
+      AttributeDto.builder(
+          k: 4, name: '备注', memo: '备注', type: AttrTypeDto.string),
+      AttributeDto.builder(
           k: 5,
           name: '学校',
           memo: '学校引用',
-          type: AttrType.ref(pMetaSchool.id, (_) => pMetaSchool)),
+          type: AttrTypeDto.ref(pMetaSchool.id)),
     ],
     methods: [
-      Method(
+      MethodDto(
           k: 0,
           name: 'getName',
           memo: 'memo2',
-          expr: Expression(
+          expr: ExprNodeDto.fromDomain(Expression(
             fn: IFunc.findBy("member"),
             ag: [
               ExprValue.of("a2"), // 表示attribute 0
             ],
             type: AttrType.string,
-          )),
-      Method(
+          ))),
+      MethodDto(
           k: 1,
           name: 'sayHello',
           memo: 'memo',
           // ("'Hello every one! My name is'+this.name")
-          expr: Expression(
+          expr: ExprNodeDto.fromDomain(Expression(
             fn: IFunc.findBy("add"),
             ag: [
               ExprValue.of("Hello everyone! My name is "),
@@ -96,8 +115,8 @@ final pMetaStudent = RecordMeta(
               )
             ],
             type: AttrType.string,
-          )),
-      Method(
+          ))),
+      MethodDto(
         k: 2,
         name: 'say学校',
         memo: 'memo',
@@ -115,10 +134,10 @@ final pMetaStudent = RecordMeta(
               'ag': jsonEncode(['"a3"']),
             }
           ]),
-        }).toDomain((_) => throw "none getMeta fun"),
+        }),
         // expr: ExpressionDto.of(parser, '"我的学校是: "+ this.学校.name').toDomain(),
       )
-    ]);
+    ]), sp);
 
 // // ([{fn: member, ag: [{"type":"ref_629393f8ff13cb4dbbf5a09a","ag":"[]"},{"type":"any","ag":"[\"a3\"]"}], type: any}, {type: string, ag: ["~~",null]}])
 // final expr = Expression(fn: IFunc.findBy("+"), type: AttrType.any, ag: [
@@ -129,11 +148,14 @@ final pMetaStudent = RecordMeta(
 //   ]),
 //   const ExprValue.build(type: AttrType.string, ag: ["~~", null])
 // ]);
-final pWs = Workspace(
-  id: 'wsId',
-  name: 'wsName',
-  metas: [pMetaSchool, pMetaStudent],
-);
+final pWs = WorkspaceModel(
+    WorkspaceDto(
+      id: 'wsId',
+      name: 'wsName',
+      metas: [],
+      teamId: 'teamId',
+    ),
+    tm)..metas.addAll([pMetaSchool, pMetaStudent]);
 
 main() {
   test("测试Token", () {

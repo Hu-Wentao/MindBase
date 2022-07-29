@@ -1,4 +1,6 @@
+import 'package:appwrite/models.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mind_base/src/user/application/model/model.dart';
 import 'package:mind_base/src/workspace/application/service/expr/expr_evaluator.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
@@ -23,23 +25,26 @@ main() {
   });
 
   ///
+  final us = UserModel(null);
+  final tm = TeamModel(Team($id: 'id', name: "name", dateCreated: 123, total: 1), us);
+  final space = WorkspaceModel(WorkspaceDto.builder(), tm);
   const pMetaStudentId = ('6262e2d8113f6c880d5d736b');
   const pMetaSchoolId = ('626a109fd90369d16c2fbe0e');
   const pRcdHfuId = ("626a98b14a034567ff06f2f4");
   const pRcdZsId = ('6262e3b0118f5894993d4533');
-  final pMetaSchool = RecordMeta(
+  final pMetaSchool = MetaModel(RecordMetaDto(
       id: pMetaSchoolId,
       name: '学校表',
       memo: '学校信息',
       maxKey: 3,
-      attrs: const [
-        Attribute(k: 0, name: 'id', memo: 'memo', type: AttrType.string),
-        Attribute(k: 1, name: 'metaId', memo: 'memo', type: AttrType.string),
-        Attribute(k: 2, name: 'name', memo: '学校名称', type: AttrType.string),
-        Attribute(k: 3, name: 'sign', memo: '学校简称', type: AttrType.string),
+      attrs: [
+        AttributeDto.builder(k: 0, name: 'id', memo: 'memo', type: AttrTypeDto.string),
+        AttributeDto.builder(k: 1, name: 'metaId', memo: 'memo', type: AttrTypeDto.string),
+        AttributeDto.builder(k: 2, name: 'name', memo: '学校名称', type: AttrTypeDto.string),
+        AttributeDto.builder(k: 3, name: 'sign', memo: '学校简称', type: AttrTypeDto.string),
       ],
-      methods: []);
-  final pRcdHfu = Record(id: pRcdHfuId, meta: pMetaSchool, fields: {
+      methods: []), space);
+  final pRcdHfu = RecordDto.builder(id: pRcdHfuId, metaId: pMetaSchool.id, fields: {
     0: Value.of(pRcdHfuId),
     1: Value.of(pMetaSchool.id),
     2: Value.of("合肥学院"),

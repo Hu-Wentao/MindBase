@@ -1,18 +1,19 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
+import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 
 main() {
   test("Expression2", () {
     final exp = Expression(
         fn: IFunc.findBy("+"),
         ag: [
-          Value.of(1),
-          Value.of(2),
+          ExprValue.of(1),
+          ExprValue.of(2),
         ],
         type: AttrType.num);
     final r = exp.value;
     print("$r");
-    expect(r, Value.of(3).value);
+    expect(r, ExprValue.of(3).value);
   });
   test("Expression2#嵌套2", () {
     final exp = Expression(
@@ -21,16 +22,16 @@ main() {
           Expression(
               fn: IFunc.findBy("*"),
               ag: [
-                Value.of(4),
-                Value.of(2),
+                ExprValue.of(4),
+                ExprValue.of(2),
               ],
               type: AttrType.num),
-          Value.of(2),
+          ExprValue.of(2),
         ],
         type: AttrType.num);
     final r = exp.value;
     print("$r");
-    expect(r, Value.of(10).value);
+    expect(r, ExprValue.of(10).value);
   });
   test("Expression2#嵌套3", () {
     final exp = Expression(
@@ -39,12 +40,12 @@ main() {
           Expression(
               fn: IFunc.findBy("*"),
               ag: [
-                Value.of(4),
+                ExprValue.of(4),
                 Expression(
                     fn: IFunc.findBy("/"),
                     ag: [
-                      Value.of(6),
-                      Value.of(2),
+                      ExprValue.of(6),
+                      ExprValue.of(2),
                     ],
                     type: AttrType.num)
               ],
@@ -52,15 +53,15 @@ main() {
           Expression(
               fn: IFunc.findBy("-"),
               ag: [
-                Value.of(2),
-                Value.of(4),
+                ExprValue.of(2),
+                ExprValue.of(4),
               ],
               type: AttrType.num),
         ],
         type: AttrType.num);
     final r = exp.value;
     print("$r");
-    expect(r, Value.of(10.0).value);
+    expect(r, ExprValue.of(10.0).value);
   });
   test("Expression2#嵌套3", () {
     final exp = Expression(
@@ -69,12 +70,12 @@ main() {
           Expression(
               fn: IFunc.findBy("*"),
               ag: [
-                Value.of(4),
+                ExprValue.of(4),
                 Expression(
                     fn: IFunc.findBy("/"),
                     ag: [
-                      Value.of(6),
-                      Value.of(2),
+                      ExprValue.of(6),
+                      ExprValue.of(2),
                     ],
                     type: AttrType.num)
               ],
@@ -82,15 +83,15 @@ main() {
           Expression(
               fn: IFunc.findBy("-"),
               ag: [
-                Value.of(2),
-                Value.of(4),
+                ExprValue.of(2),
+                ExprValue.of(4),
               ],
               type: AttrType.num),
         ],
         type: AttrType.num);
     final r = exp.value;
     print("$r");
-    expect(r, Value.of(10.0).value);
+    expect(r, ExprValue.of(10.0).value);
   });
 
   /// Attr_v6 移除
