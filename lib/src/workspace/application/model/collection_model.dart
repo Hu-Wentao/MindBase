@@ -7,11 +7,8 @@ class CollectionModel extends ModelSidecar<String, BaseException?>
     with ModelStateChangeMx<String, BaseException?> {
   final _srvDb = sl<srv.Database>();
 
-  CollectionModel(String data, this.at)
+  CollectionModel(String data, [@Deprecated('弃用') _])
       : super(data, ExceptionAdapter.of);
-
-  // 父状态
-  final MetaModel at;
 
   // 子状态
   da.Collection? collection;
@@ -21,20 +18,20 @@ class CollectionModel extends ModelSidecar<String, BaseException?>
   /// === 业务逻辑 ===
   actUpdateCollection(CollectionDto? dto) async =>
       await actWrapper(() => reqWrapper(
-        accWhen: () => state != ModelState.init,
+            accWhen: () => state != ModelState.init,
             () async {
-          if (dto == null) return;
-          await _srvDb.updateCollection(
-            collectionId: collectionId,
-            name: collection!.name,
-            permission: collection!.permission,
-            // 访问级别, 表或者记录
-            read: dto.reads.isEmpty ? collection!.$read : dto.reads,
-            write: dto.writes.isEmpty ? collection!.$write : dto.writes,
-            enabled: dto.enabled ?? collection!.enabled,
-          );
-        },
-      ));
+              if (dto == null) return;
+              await _srvDb.updateCollection(
+                collectionId: collectionId,
+                name: collection!.name,
+                permission: collection!.permission,
+                // 访问级别, 表或者记录
+                read: dto.reads.isEmpty ? collection!.$read : dto.reads,
+                write: dto.writes.isEmpty ? collection!.$write : dto.writes,
+                enabled: dto.enabled ?? collection!.enabled,
+              );
+            },
+          ));
 
   /// === 状态更改 ===
 
