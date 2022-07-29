@@ -37,3 +37,5 @@ part 'record.dart';
 part 'propery.dart';
 
 part 'team.dart';
+
+part 'collection_model.dart';

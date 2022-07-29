@@ -165,9 +165,9 @@ abstract class IMetaModel extends ModelSidecar<RecordMetaDto, BaseException?>
 
   String get id;
 
-  RecordCollectionModel? get recordCollection;
+  CollectionModel? get recordCollection;
 
-  set recordCollection(RecordCollectionModel? value);
+  set recordCollection(CollectionModel? value);
 
   List<RecordModel> get records;
 
@@ -180,7 +180,7 @@ abstract class IMetaModel extends ModelSidecar<RecordMetaDto, BaseException?>
 
   RecordModel _addNewRecordModel(RecordDto data);
 
-  RecordCollectionModel _fetchRecordCollectionModel();
+  CollectionModel _fetchRecordCollectionModel();
 }
 
 class MetaModel extends IMetaModel with MetaStateChangeMx {
@@ -190,7 +190,7 @@ class MetaModel extends IMetaModel with MetaStateChangeMx {
 
   // 附加状态
   @override
-  RecordCollectionModel? recordCollection;
+  CollectionModel? recordCollection;
   @override
   List<RecordModel> records = [];
   @override
@@ -232,8 +232,8 @@ class MetaModel extends IMetaModel with MetaStateChangeMx {
   // 由于 [RecordCollectionModel]没有请求dto代码,所以没有入参
   // 只需要在加入到缓存中时立即初始化即可
   @override
-  RecordCollectionModel _fetchRecordCollectionModel() {
-    final model = RecordCollectionModel(recordCollectionId, this);
+  CollectionModel _fetchRecordCollectionModel() {
+    final model = CollectionModel(recordCollectionId, this);
     // 添加到缓存的同时, 立即请求刷新
     recordCollection = model..actInitSubscription();
     setDoneKeepState();
@@ -314,62 +314,4 @@ extension MetaModelX on MetaModel {
         log("actRemoveRecord $ettId");
         await _recordDtoRepo.deleteBy(ettId);
       });
-}
-
-/// Record表状态
-/// [data] String, record表的Id, 即MetaId
-class RecordCollectionModel extends ModelSidecar<String, BaseException?>
-    with ModelStateChangeMx<String, BaseException?> {
-  final _srvDb = sl<srv.Database>();
-
-  RecordCollectionModel(String data, this.at)
-      : super(data, ExceptionAdapter.of);
-
-  // 父状态
-  final MetaModel at;
-
-  // 子状态
-  da.Collection? collection;
-
-  get collectionId => data;
-
-  /// === 业务逻辑 ===
-  actUpdateCollection(CollectionDto? dto) async =>
-      await actWrapper(() => reqWrapper(
-            accWhen: () => state != ModelState.init,
-            () async {
-              if (dto == null) return;
-              await _srvDb.updateCollection(
-                collectionId: collectionId,
-                name: collection!.name,
-                permission: collection!.permission,
-                // 访问级别, 表或者记录
-                read: dto.reads.isEmpty ? collection!.$read : dto.reads,
-                write: dto.writes.isEmpty ? collection!.$write : dto.writes,
-                enabled: dto.enabled ?? collection!.enabled,
-              );
-            },
-          ));
-
-  /// === 状态更改 ===
-
-  @override
-  Future<FutureOr<void>> onFetch({bool isActive = false}) async {
-    collection = await _srvDb.getCollection(collectionId: data);
-  }
-
-  @override
-  FutureOr<void> onReset() {
-    collection = null;
-  }
-
-  @override
-  FutureOr<void> onSubscription() {
-    log("尚未实现 onSubscription");
-  }
-
-  @override
-  FutureOr<void> onCloseSubs() {
-    log("尚未实现 onCloseSubs");
-  }
 }
