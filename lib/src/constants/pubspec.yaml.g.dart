@@ -40,16 +40,16 @@
 // ignore_for_file: prefer_single_quotes
 
 /// Current app version
-const String version = r'1.1.2';
+const String version = r'2.0.1';
 
 /// The major version number: "1" in "1.2.3".
-const int major = 1;
+const int major = 2;
 
 /// The minor version number: "2" in "1.2.3".
-const int minor = 1;
+const int minor = 0;
 
 /// The patch version number: "3" in "1.2.3".
-const int patch = 2;
+const int patch = 1;
 
 /// The pre-release identifier: "foo" in "1.2.3-foo".
 const List<String> pre = <String>[];
@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1659058168;
+const int timestamp = 1659071912;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -111,7 +111,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'form_builder_validators': r'7.9.0',
   'json_annotation': r'>=4.4.0',
   'pluto_grid': r'5.0.3',
-  'appwrite': r'4.0.2',
+  'appwrite': r'6.0.0',
   'dart_appwrite': r'5.0.1',
 };
 
@@ -132,9 +132,6 @@ const Map<String, Object> dependencyOverrides = <String, Object>{
     },
   },
   'analyzer': r'>=4.2.0 <5.0.0',
-  'provider_sidecar': <String, Object>{
-    'path': r'../provider_sidecar',
-  },
 };
 
 /// Executables

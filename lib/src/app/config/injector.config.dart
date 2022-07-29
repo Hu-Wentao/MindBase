@@ -40,8 +40,8 @@ _i1.GetIt $initGetIt(_i1.GetIt get,
   gh.lazySingleton<_i4.Avatars>(() => appServerConfig.avatars);
   gh.lazySingleton<_i3.Client>(() => appClientConfig.client);
   gh.lazySingleton<_i4.Client>(() => appServerConfig.client);
-  gh.lazySingleton<_i3.Databases>(() => appClientConfig.database);
   gh.lazySingleton<_i4.Database>(() => appServerConfig.database);
+  gh.lazySingleton<_i3.Databases>(() => appClientConfig.database);
   gh.lazySingleton<_i6.EventBus>(() => eventBusConfig.eventBus);
   gh.lazySingleton<_i7.Logger>(
       () => configCommon.logger(get<_i8.MindBaseConfig>()));
@@ -50,6 +50,7 @@ _i1.GetIt $initGetIt(_i1.GetIt get,
       () => _i9.RealtimeChannelHub(get<_i3.Realtime>()));
   gh.lazySingleton<_i3.Storage>(() => appClientConfig.storage);
   gh.lazySingleton<_i4.Storage>(() => appServerConfig.storage);
+  gh.factory<String>(() => appClientConfig.mainDataBaseId);
   gh.lazySingleton<_i3.Teams>(() => appClientConfig.teams);
   gh.lazySingleton<_i4.Teams>(() => appServerConfig.teams);
   gh.lazySingleton<_i10.WorkspaceEttAccessor>(() => appClientConfig.wsEttAcc);

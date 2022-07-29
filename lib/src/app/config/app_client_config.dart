@@ -5,7 +5,8 @@ import 'package:mind_base/src/workspace/infra/dao/realtime_hub.dart';
 
 @module
 abstract class AppClientConfig {
-  static const mainDataBaseId = 'default';
+  final mainDataBaseId = 'default';
+
   @lazySingleton
   Client get client => Client()
     ..setEndpoint("http://app.shuttlecloud.cn/v1")
