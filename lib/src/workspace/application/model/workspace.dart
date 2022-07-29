@@ -14,7 +14,7 @@ abstract class IWorkspaceModel
 
   List<MetaModel> get metas;
 
-  MetaModel _newMetaModel(RecordMetaDto data);
+  MetaModel _addNewMetaModel(RecordMetaDto data);
 }
 
 mixin SpaceStateChangeMx on IWorkspaceModel {
@@ -85,11 +85,7 @@ mixin SpaceStateChangeMx on IWorkspaceModel {
     return i;
   }
 
-  MetaModel onMetaAdd(RecordMetaDto meta) {
-    final m = _newMetaModel(meta)..actInitSubscription();
-    metas.add(m);
-    return m;
-  }
+  MetaModel onMetaAdd(RecordMetaDto meta) => _addNewMetaModel(meta);
 
   RecordMetaDto onMetaUpdate(RecordMetaDto meta) {
     __indexByMetas(
@@ -162,9 +158,14 @@ class WorkspaceModel extends IWorkspaceModel with SpaceStateChangeMx {
   QueryMetaFn get queryMeta =>
       (metaId) => metas.firstWhereOrNull((element) => element.id == metaId)!;
 
-  // MetaModel? Function(String metaId) get getMetaBy => _workspace.getMetaBy;
   @override
-  MetaModel _newMetaModel(RecordMetaDto data) => MetaModel(data, this);
+  MetaModel _addNewMetaModel(RecordMetaDto data) {
+    final m = MetaModel(data, this);
+    metas.add(m
+      // 添加的同时初始化
+      ..actInitSubscription());
+    return m;
+  }
 
   @Deprecated('metas')
   Iterable<MetaModel> allMetas() => metas;
