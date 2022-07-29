@@ -65,15 +65,18 @@ mixin MetaStateChangeMx on IMetaModel {
   /// 单次刷新数据
   @override
   FutureOr<void> onFetch({bool isActive = false}) {
+    _fetchRecordCollectionModel();
     _fetchAllRecord();
   }
 
   /// 重置充血数据
   @override
   FutureOr<void> onReset() {
+    recordCollection = null;
     records.clear();
     cleanDataSourceCache();
   }
+
   /// 用于Meta属性被更新时
   /// 删除缓存后会自动根据最新的Meta重建UI
   @override
@@ -82,6 +85,7 @@ mixin MetaStateChangeMx on IMetaModel {
     _refreshDataVer();
     log("debug cleanDataSourceCache# 已清除DataSource缓存");
   }
+
   _fetchAllRecord({
     int reRryCount = 0,
   }) async {
@@ -133,12 +137,7 @@ mixin MetaStateChangeMx on IMetaModel {
     notifyListeners();
   }
 
-  RecordDto _onEvtInsertRecord(RecordDto record) {
-    final model = _newRecordModel(record);
-    records.add(model);
-    _cachedDataSource?.onInsertEvt(model);
-    return record;
-  }
+  void _onEvtInsertRecord(RecordDto record) => _addNewRecordModel(record);
 
   // 返回被更新的元素index
   int _onEvtUpdateRecord(RecordDto record) {
@@ -158,7 +157,6 @@ mixin MetaStateChangeMx on IMetaModel {
     // RecordDataGridSourcePluto.onRemoveEvt 不需要传入index,这里使用0
     _cachedDataSource?.onRemoveEvt(ettId, 0);
   }
-
 }
 
 abstract class IMetaModel extends ModelSidecar<RecordMetaDto, BaseException?>
@@ -166,6 +164,10 @@ abstract class IMetaModel extends ModelSidecar<RecordMetaDto, BaseException?>
   IMetaModel(RecordMetaDto data) : super(data, ExceptionAdapter.of);
 
   String get id;
+
+  RecordCollectionModel? get recordCollection;
+
+  set recordCollection(RecordCollectionModel? value);
 
   List<RecordModel> get records;
 
@@ -176,14 +178,19 @@ abstract class IMetaModel extends ModelSidecar<RecordMetaDto, BaseException?>
 
   cleanDataSourceCache();
 
-  RecordModel _newRecordModel(RecordDto data);
+  RecordModel _addNewRecordModel(RecordDto data);
+
+  RecordCollectionModel _fetchRecordCollectionModel();
 }
 
 class MetaModel extends IMetaModel with MetaStateChangeMx {
   MetaModel(super.data, this.at);
 
-  // 附加状态
   final WorkspaceModel at;
+
+  // 附加状态
+  @override
+  RecordCollectionModel? recordCollection;
   @override
   List<RecordModel> records = [];
   @override
@@ -196,6 +203,8 @@ class MetaModel extends IMetaModel with MetaStateChangeMx {
   String get id => data.id;
 
   String get name => data.name;
+
+  String get recordCollectionId => data.id;
 
   List<AttributeDto> get attrs => data.attrs;
 
@@ -212,7 +221,24 @@ class MetaModel extends IMetaModel with MetaStateChangeMx {
       );
 
   @override
-  RecordModel _newRecordModel(RecordDto data) => RecordModel(this, data);
+  RecordModel _addNewRecordModel(RecordDto data) {
+    final model = RecordModel(this, data);
+    records.add(model);
+    _cachedDataSource?.onInsertEvt(model);
+    setDoneKeepState();
+    return model;
+  }
+
+  // 由于 [RecordCollectionModel]没有请求dto代码,所以没有入参
+  // 只需要在加入到缓存中时立即初始化即可
+  @override
+  RecordCollectionModel _fetchRecordCollectionModel() {
+    final model = RecordCollectionModel(recordCollectionId, this);
+    // 添加到缓存的同时, 立即请求刷新
+    recordCollection = model..actInitSubscription();
+    setDoneKeepState();
+    return model;
+  }
 }
 
 extension MetaModelX on MetaModel {
@@ -288,4 +314,62 @@ extension MetaModelX on MetaModel {
         log("actRemoveRecord $ettId");
         await _recordDtoRepo.deleteBy(ettId);
       });
+}
+
+/// Record表状态
+/// [data] String, record表的Id, 即MetaId
+class RecordCollectionModel extends ModelSidecar<String, BaseException?>
+    with ModelStateChangeMx<String, BaseException?> {
+  final _srvDb = sl<srv.Database>();
+
+  RecordCollectionModel(String data, this.at)
+      : super(data, ExceptionAdapter.of);
+
+  // 父状态
+  final MetaModel at;
+
+  // 子状态
+  da.Collection? collection;
+
+  get collectionId => data;
+
+  /// === 业务逻辑 ===
+  actUpdateCollection(CollectionDto? dto) async =>
+      await actWrapper(() => reqWrapper(
+            accWhen: () => state != ModelState.init,
+            () async {
+              if (dto == null) return;
+              await _srvDb.updateCollection(
+                collectionId: collectionId,
+                name: collection!.name,
+                permission: collection!.permission,
+                // 访问级别, 表或者记录
+                read: dto.reads.isEmpty ? collection!.$read : dto.reads,
+                write: dto.writes.isEmpty ? collection!.$write : dto.writes,
+                enabled: dto.enabled ?? collection!.enabled,
+              );
+            },
+          ));
+
+  /// === 状态更改 ===
+
+  @override
+  Future<FutureOr<void>> onFetch({bool isActive = false}) async {
+    collection = await _srvDb.getCollection(collectionId: data);
+  }
+
+  @override
+  FutureOr<void> onReset() {
+    collection = null;
+  }
+
+  @override
+  FutureOr<void> onSubscription() {
+    log("尚未实现 onSubscription");
+  }
+
+  @override
+  FutureOr<void> onCloseSubs() {
+    log("尚未实现 onCloseSubs");
+  }
 }

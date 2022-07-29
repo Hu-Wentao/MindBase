@@ -54,6 +54,7 @@ mixin TeamStateChangeMx on ITeamModel {
 
 /// Team
 /// todo 实时刷新用户数据
+/// todo #517 没有字段用于存储roles枚举, 如果member过多,可能会导致某些roles不能立即加载
 class TeamModel extends ITeamModel with TeamStateChangeMx {
   @override
   String get id => data.$id;
