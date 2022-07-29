@@ -105,10 +105,10 @@ class CollectionDto extends IDto {
 
   final List<String> reads;
   final List<String> writes;
-  final bool enabled;
+  final bool? enabled;
 
   CollectionDto(
-      {required this.reads, required this.writes, this.enabled = true});
+      {required this.reads, required this.writes, this.enabled});
 
   /// Record表 权限信息, 存放于Meta记录中
   CollectionDto.builder({Permissions? reads, Permissions? writes})
