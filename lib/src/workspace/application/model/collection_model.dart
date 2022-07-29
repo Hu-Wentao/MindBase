@@ -1,13 +1,75 @@
 part of 'model.dart';
 
+/// 控制记录的状态
+/// 包括表级读写权限, 逻辑删除
+/// [data] collectionId, 表的Id
+class DocumentInfoModel extends ModelSidecar<String, BaseException?>
+    with ModelStateChangeMx<String, BaseException?> {
+  final _srvDb = sl<srv.Database>();
+  final _cliDb = sl<Databases>();
+
+  DocumentInfoModel(String metaId, this.metaCollectionId)
+      : super(metaId, ExceptionAdapter.of);
+  final String metaCollectionId;
+
+  // 子状态
+  aw.Document? collection;
+
+  get documentId => data; // at.id
+
+  /// === 业务逻辑 ===
+  actUpdateDocument(CollectionDto? dto) async =>
+      await actWrapper(() => reqWrapper(
+            accWhen: () => state != ModelState.init,
+            () async {
+              if (dto == null) return;
+              try {
+                await _cliDb.updateDocument(
+                  collectionId: metaCollectionId,
+                  documentId: documentId,
+                  // 访问级别, 表或者记录
+                  read: dto.reads.isEmpty ? collection!.$read : dto.reads,
+                  write: dto.writes.isEmpty ? collection!.$write : dto.writes,
+                );
+              } catch (e, s) {
+                lgShot('尝试更新meta记录的读写权限, 可能因为权限级别为集合而出错');
+                rethrow;
+              }
+            },
+          ));
+
+  /// === 状态更改 ===
+
+  @override
+  Future<FutureOr<void>> onFetch({bool isActive = false}) async {
+    collection = await _cliDb.getDocument(
+        collectionId: metaCollectionId, documentId: documentId);
+  }
+
+  @override
+  FutureOr<void> onReset() {
+    collection = null;
+  }
+
+  @override
+  FutureOr<void> onSubscription() {
+    log("尚未实现 onSubscription");
+  }
+
+  @override
+  FutureOr<void> onCloseSubs() {
+    log("尚未实现 onCloseSubs");
+  }
+}
+
 /// 控制表的状态
 /// 包括表级读写权限, 逻辑删除
 /// [data] collectionId, 表的Id
-class CollectionModel extends ModelSidecar<String, BaseException?>
+class CollectionInfoModel extends ModelSidecar<String, BaseException?>
     with ModelStateChangeMx<String, BaseException?> {
   final _srvDb = sl<srv.Database>();
 
-  CollectionModel(String data, [@Deprecated('弃用') _])
+  CollectionInfoModel(String data, [@Deprecated('弃用') _])
       : super(data, ExceptionAdapter.of);
 
   // 子状态
