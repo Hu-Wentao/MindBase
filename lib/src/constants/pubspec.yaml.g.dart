@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1658226573;
+const int timestamp = 1659058168;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -104,7 +104,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'provider_sidecar': <String, Object>{
     'git': <String, Object>{
       'url': r'https://e.coding.net/shuttlecloud/company/provider_sidecar.git',
-      'ref': r'v1.1',
+      'ref': r'v1.3',
     },
   },
   'flutter_form_builder': r'7.1.1',
@@ -132,6 +132,9 @@ const Map<String, Object> dependencyOverrides = <String, Object>{
     },
   },
   'analyzer': r'>=4.2.0 <5.0.0',
+  'provider_sidecar': <String, Object>{
+    'path': r'../provider_sidecar',
+  },
 };
 
 /// Executables
