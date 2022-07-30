@@ -58,13 +58,13 @@ mixin MetaStateChangeMx on IMetaModel {
   @override
   FutureOr<void> onCloseSubs() {
     _cachedRecordSubs?.cancel();
-    records.clear();
     return null;
   }
 
   /// 单次刷新数据
   @override
   FutureOr<void> onFetch({bool isActive = false}) {
+    _fetchMetaDocumentModel();
     _fetchRecordCollectionModel();
     _fetchAllRecord();
   }
@@ -72,6 +72,7 @@ mixin MetaStateChangeMx on IMetaModel {
   /// 重置充血数据
   @override
   FutureOr<void> onReset() {
+    metaDocument = null;
     recordCollection = null;
     records.clear();
     cleanDataSourceCache();
@@ -165,9 +166,13 @@ abstract class IMetaModel extends ModelSidecar<RecordMetaDto, BaseException?>
 
   String get id;
 
-  CollectionModel? get recordCollection;
+  DocumentInfoModel? get metaDocument;
 
-  set recordCollection(CollectionModel? value);
+  set metaDocument(DocumentInfoModel? value);
+
+  CollectionInfoModel? get recordCollection;
+
+  set recordCollection(CollectionInfoModel? value);
 
   List<RecordModel> get records;
 
@@ -180,7 +185,9 @@ abstract class IMetaModel extends ModelSidecar<RecordMetaDto, BaseException?>
 
   RecordModel _addNewRecordModel(RecordDto data);
 
-  CollectionModel _fetchRecordCollectionModel();
+  CollectionInfoModel _fetchRecordCollectionModel();
+
+  DocumentInfoModel _fetchMetaDocumentModel();
 }
 
 class MetaModel extends IMetaModel with MetaStateChangeMx {
@@ -188,9 +195,15 @@ class MetaModel extends IMetaModel with MetaStateChangeMx {
 
   final WorkspaceModel at;
 
-  // 附加状态
+  /// 子状态
+
+  // 当前Meta记录的权限
   @override
-  CollectionModel? recordCollection;
+  DocumentInfoModel? metaDocument;
+
+  // 下属record集合的权限
+  @override
+  CollectionInfoModel? recordCollection;
   @override
   List<RecordModel> records = [];
   @override
@@ -205,6 +218,10 @@ class MetaModel extends IMetaModel with MetaStateChangeMx {
   String get name => data.name;
 
   String get recordCollectionId => data.id;
+
+  String get metaDocumentId => data.id;
+
+  String get metaCollectionId => at.id;
 
   List<AttributeDto> get attrs => data.attrs;
 
@@ -232,8 +249,19 @@ class MetaModel extends IMetaModel with MetaStateChangeMx {
   // 由于 [RecordCollectionModel]没有请求dto代码,所以没有入参
   // 只需要在加入到缓存中时立即初始化即可
   @override
-  CollectionModel _fetchRecordCollectionModel() {
-    final model = CollectionModel(recordCollectionId, this);
+  DocumentInfoModel _fetchMetaDocumentModel() {
+    final model = DocumentInfoModel(metaDocumentId, metaCollectionId);
+    // 添加到缓存的同时, 立即请求刷新
+    metaDocument = model..actInitSubscription();
+    setDoneKeepState();
+    return model;
+  }
+
+  // 由于 [RecordCollectionModel]没有请求dto代码,所以没有入参
+  // 只需要在加入到缓存中时立即初始化即可
+  @override
+  CollectionInfoModel _fetchRecordCollectionModel() {
+    final model = CollectionInfoModel(recordCollectionId);
     // 添加到缓存的同时, 立即请求刷新
     recordCollection = model..actInitSubscription();
     setDoneKeepState();
