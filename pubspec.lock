@@ -842,7 +842,7 @@ packages:
     description:
       path: "."
       ref: "v1.3"
-      resolved-ref: "31b402149ef356d23e315e378055e8e51a47f069"
+      resolved-ref: d7f35ec98af5aed3842ebdf393b6b42dec37957d
       url: "https://e.coding.net/shuttlecloud/company/provider_sidecar.git"
     source: git
     version: "1.2.1"
