@@ -20,18 +20,20 @@ mixin SpaceStateChangeMx on IWorkspaceModel {
 
   @override
   FutureOr<void> onFetch({bool isActive = false}) {
+    _fetchMetaCollectionModel();
     _fetchAllMetas();
   }
 
   @override
   FutureOr<void> onReset() {
+    metaCollection = null;
     metas.clear();
   }
 
   @override
   FutureOr<void> onSubscription() {
     /// meta部分 ----------------
-    _metasSub = _metaAcc.watchAll().listen((event) {
+    _metasSub = _metaAcc.watch().listen((event) {
       log("#WorkspaceModel[$id]#监听到Meta变更: $event");
       onWatchMetaEvt(event);
     });
@@ -129,7 +131,13 @@ abstract class IWorkspaceModel
 
   List<MetaModel> get metas;
 
+  CollectionInfoModel? get metaCollection;
+
+  set metaCollection(CollectionInfoModel? value);
+
   MetaModel _addNewMetaModel(RecordMetaDto data);
+
+  _fetchMetaCollectionModel();
 }
 
 class WorkspaceModel extends IWorkspaceModel with SpaceStateChangeMx {
@@ -147,8 +155,13 @@ class WorkspaceModel extends IWorkspaceModel with SpaceStateChangeMx {
   // 父状态
   final TeamModel at;
 
+  // 子状态
   @override
   List<MetaModel> metas = [];
+
+  // 工作空间下的所有表
+  @override
+  CollectionInfoModel? metaCollection;
 
   @Deprecated('使用openedMetas代替')
   List<MetaModel> get openedMetas => metas;
@@ -169,6 +182,16 @@ class WorkspaceModel extends IWorkspaceModel with SpaceStateChangeMx {
       ..actInitSubscription());
     return m;
   }
+
+  @override
+  _fetchMetaCollectionModel() {
+    final model = CollectionInfoModel(metaCollectionId);
+    // 立即初始化
+    metaCollection = model..actInitSubscription();
+    setDoneKeepState();
+  }
+
+  get metaCollectionId => data.id; // 工作空间Id即为Meta集合Id
 
   @Deprecated('metas')
   Iterable<MetaModel> allMetas() => metas;
