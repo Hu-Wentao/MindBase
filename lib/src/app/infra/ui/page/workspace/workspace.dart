@@ -10,6 +10,7 @@ import 'package:mind_base/src/feedback/infra/ui/widget/feedback_btn.dart';
 import 'package:mind_base/src/user/application/model/model.dart';
 import 'package:mind_base/src/user/infra/ui/components/user_tile.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
+import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/collection_edit_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/widget/data_table_grid.dart';
 import 'package:mind_base/src/workspace/infra/ui/widget/space_selector_bar.dart';
@@ -199,8 +200,12 @@ class _WorkspacePageState extends State<WorkspacePage> {
                     return;
                   } else {
                     final dto = await showCollectionEditDialog(context, data, space.at.id);
+                    if(dto == null) return;
+                    final userId = context.read<UserModel>().id;
+                    final teamOwnerId = space.at.members.firstWhereOrNull((element) => element.roles.contains(Role.owner.value))?.id;
+                    space.at.members;
                     space.metaCollection!
-                        .actUpdateCollection(dto)
+                        .actUpdateCollection(userId,teamOwnerId, dto)
                         .thenDialog(context);
                   }
                 },

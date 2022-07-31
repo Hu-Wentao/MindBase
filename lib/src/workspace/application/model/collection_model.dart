@@ -68,6 +68,7 @@ class DocumentInfoModel extends ModelSidecar<String, BaseException?>
 class CollectionInfoModel extends ModelSidecar<String, BaseException?>
     with ModelStateChangeMx<String, BaseException?> {
   final _srvDb = sl<srv.Database>();
+  final CollectionService _srv = sl<CollectionService>();
 
   CollectionInfoModel(String data, [@Deprecated('弃用') _])
       : super(data, ExceptionAdapter.of);
@@ -80,20 +81,13 @@ class CollectionInfoModel extends ModelSidecar<String, BaseException?>
   CollectionDto? get dto => CollectionDto.from(collection);
 
   /// === 业务逻辑 ===
-  Future<BaseException?> actUpdateCollection(CollectionDto? dto) async =>
+  Future<BaseException?> actUpdateCollection(String? userId, String? teamOwnerId, CollectionDto? dto) async =>
       await actWrapper(() => reqWrapper(
             accWhen: () => state != ModelState.init,
             () async {
               if (dto == null) return;
-              final r = await _srvDb.updateCollection(
-                collectionId: collectionId,
-                name: collection!.name,
-                permission: collection!.permission,
-                // 访问级别, 表或者记录
-                read: dto.reads.isEmpty ? collection!.$read : dto.reads,
-                write: dto.writes.isEmpty ? collection!.$write : dto.writes,
-                enabled: dto.enabled ?? collection!.enabled,
-              );
+              // todo 判断是否有权限更新
+              final r = await _srv.updateCollection(userId, teamOwnerId, collection!, dto);
               // 非响应式, 必须手动更新状态
               collection = r;
               setDone();
