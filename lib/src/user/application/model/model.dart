@@ -216,7 +216,9 @@ extension UserModelX on UserModel {
     if (data == null || data!.$id != _cachedSession!.userId) {
       data = await _accountService.getUser();
     }
-    _setLogged(data!, "已登陆");
+    // 切换用户登录后 需要刷新全局状态
+    actReset();
+    actFetch();
     return null;
   }
 
