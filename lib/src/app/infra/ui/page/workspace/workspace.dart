@@ -198,7 +198,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
                     space.actFetch().thenDialog(context);
                     return;
                   } else {
-                    final dto = await showCollectionEditDialog(context, data);
+                    final dto = await showCollectionEditDialog(context, data, space.at.id);
                     space.metaCollection!
                         .actUpdateCollection(dto)
                         .thenDialog(context);
