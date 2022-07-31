@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:math' as math;
+import 'package:dart_appwrite/models.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:json_editor/json_editor.dart';
+import 'package:mind_base/src/app/config/common_config.dart';
 import 'package:mind_base/src/core/infra/dto/dto_json_impl.dart';
 import 'package:mind_base/src/core/inter/i_dto.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
@@ -107,8 +109,11 @@ class CollectionDto extends IDto {
   final List<String> writes;
   final bool? enabled;
 
-  CollectionDto(
-      {required this.reads, required this.writes, this.enabled});
+  CollectionDto({
+    required this.reads,
+    required this.writes,
+    this.enabled,
+  });
 
   /// Record表 权限信息, 存放于Meta记录中
   CollectionDto.builder({Permissions? reads, Permissions? writes})
@@ -129,6 +134,21 @@ class CollectionDto extends IDto {
         'writes': writes,
         'enabled': enabled,
       };
+
+  static from(Collection? collection) {
+    if (collection == null) return null;
+    return CollectionDto(
+      reads: collection.$read.map((e) => e as String).toList(),
+      writes: collection.$write.map((e) => e as String).toList(),
+      enabled: collection.enabled,
+    );
+  }
+
+  static fromForm(Map<String, dynamic> value) => CollectionDto(
+        reads: (value['reads'] as String).split(','),
+        writes: (value['writes'] as String).split(','),
+        enabled: value['enabled'] as bool?,
+      );
 }
 
 ///
