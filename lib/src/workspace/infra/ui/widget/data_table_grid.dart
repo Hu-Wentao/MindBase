@@ -71,7 +71,7 @@ class RecordDataGrid extends StatelessWidget {
                         final nCol = originCol.copyWith(visible: false);
                         final nCols = view!.cols
                           ..replaceRange(originIndex, originIndex + 1, [nCol]);
-                        openedMeta.actUpdateView(view!.copyWith(cols: nCols));
+                        openedMeta.actUpdateView(view!.copyWith(cols: nCols)).thenDialog(context);
                       }));
         },
         onColWidthChanged: (view == null)
@@ -281,7 +281,9 @@ class DataFrameTitlePluto extends StatelessWidget {
                     final recordIds =
                         checked.map((e) => (e.key as ValueKey<String>).value);
                     for (final recordId in recordIds) {
-                      await openedMeta.actRemoveRecord(recordId).thenDialog(context);
+                      await openedMeta
+                          .actRemoveRecord(recordId)
+                          .thenDialog(context);
                     }
                   }
                 }
