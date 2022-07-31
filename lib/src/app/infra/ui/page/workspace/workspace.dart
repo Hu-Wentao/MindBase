@@ -202,7 +202,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
                     final dto = await showCollectionEditDialog(context, data, space.at.id);
                     if(dto == null) return;
                     final userId = context.read<UserModel>().id;
-                    final teamOwnerId = space.at.members.firstWhereOrNull((element) => element.roles.contains(Role.owner.value))?.id;
+                    final teamOwnerId = space.at.members.firstWhereOrNull((element) => element.roles.contains(Role.owner.value))?.userId;
                     space.at.members;
                     space.metaCollection!
                         .actUpdateCollection(userId,teamOwnerId, dto)
