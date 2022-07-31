@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:math' as math;
+import 'package:collection/collection.dart';
 import 'package:dart_appwrite/models.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:json_editor/json_editor.dart';
-import 'package:mind_base/src/app/config/common_config.dart';
 import 'package:mind_base/src/core/infra/dto/dto_json_impl.dart';
 import 'package:mind_base/src/core/inter/i_dto.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
@@ -93,6 +93,83 @@ class RecordDto extends IEntityDto {
 extension RecordMetaX on MetaModel {
   RecordMetaDto toDto() => data;
 // RecordMetaDto.fromDomain(this);
+}
+
+/// 权限类型
+enum PermsType {
+  owner, // 创建者可读写, 成员可读
+  member, // 成员可读写
+  openRead, // 成员可读写, 外部人员可读
+  openWrite, // 所有人可读写
+  unknown, // 其他自定义配置项
+}
+
+extension CollectionX on CollectionDto {
+  updateBy(PermsType type, String teamId) {
+    switch (type) {
+      case PermsType.owner:
+        reads
+          ..clear()
+          ..addAll(_member(teamId));
+        writes
+          ..clear()
+          ..addAll(_owner(teamId));
+        break;
+      case PermsType.member:
+        final m = _member(teamId);
+        reads
+          ..clear()
+          ..addAll(m);
+        writes
+          ..clear()
+          ..addAll(m);
+        break;
+      case PermsType.openRead:
+        reads
+          ..clear()
+          ..addAll(Permissions.all.value);
+        writes
+          ..clear()
+          ..addAll(_member(teamId));
+        break;
+      case PermsType.openWrite:
+        reads
+          ..clear()
+          ..addAll(Permissions.all.value);
+        writes
+          ..clear()
+          ..addAll(Permissions.all.value);
+        break;
+      case PermsType.unknown:
+      default:
+        return this;
+    }
+  }
+
+  PermsType getType(String teamId) {
+    if (writes.equals(_owner(teamId))) {
+      return PermsType.owner;
+    } else {
+      final member = _member(teamId);
+      if (writes.equals(member)) {
+        if (reads.equals(member)) {
+          return PermsType.member;
+        } else if (reads.equals(Permissions.all.value)) {
+          return PermsType.openRead;
+        }
+      } else if (writes.equals(Permissions.all.value)) {
+        if (reads.equals(Permissions.all.value)) {
+          return PermsType.openWrite;
+        }
+      }
+    }
+    return PermsType.unknown;
+  }
+
+  static _owner(String teamId) =>
+      Permissions.team(teamId: teamId, roles: [Role.owner]).value;
+
+  static _member(String teamId) => Permissions.team(teamId: teamId).value;
 }
 
 ///
