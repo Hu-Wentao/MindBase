@@ -77,13 +77,15 @@ class CollectionInfoModel extends ModelSidecar<String, BaseException?>
 
   get collectionId => data;
 
+  CollectionDto? get dto => CollectionDto.from(collection);
+
   /// === 业务逻辑 ===
-  actUpdateCollection(CollectionDto? dto) async =>
+  Future<BaseException?> actUpdateCollection(CollectionDto? dto) async =>
       await actWrapper(() => reqWrapper(
             accWhen: () => state != ModelState.init,
             () async {
               if (dto == null) return;
-              await _srvDb.updateCollection(
+              final r = await _srvDb.updateCollection(
                 collectionId: collectionId,
                 name: collection!.name,
                 permission: collection!.permission,
@@ -92,6 +94,9 @@ class CollectionInfoModel extends ModelSidecar<String, BaseException?>
                 write: dto.writes.isEmpty ? collection!.$write : dto.writes,
                 enabled: dto.enabled ?? collection!.enabled,
               );
+              // 非响应式, 必须手动更新状态
+              collection = r;
+              setDone();
             },
           ));
 
