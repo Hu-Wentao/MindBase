@@ -22,6 +22,8 @@ class DialogFactory {
         return _buildBase(exception, context);
       case UnLoginException:
         return _buildUnLogin(exception, context);
+      case NoPermissionException:
+        return _buildNoPermission(exception, context);
       case AuthBaseException:
         return _buildAuth(exception, context);
       default:
@@ -46,6 +48,29 @@ class DialogFactory {
         actions: <Widget>[
           TextButton(
             child: const Text("前往登录页"),
+            onPressed: () async {
+              Navigator.of(context).pop(); //关闭当前Dialog
+              _buildAuth(exception, context);
+            },
+          ),
+          TextButton(
+              child: const Text("取消"),
+              onPressed: () => Navigator.of(context).pop()),
+        ],
+      );
+
+  static NDialog _buildNoPermission(
+          BaseException exception, BuildContext context) =>
+      NDialog(
+        dialogStyle: DialogStyle(titleDivider: true),
+        title: const Text("权限不足"),
+        content: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(exception.msg),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text("登录新账号"),
             onPressed: () async {
               Navigator.of(context).pop(); //关闭当前Dialog
               _buildAuth(exception, context);

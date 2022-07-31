@@ -23,7 +23,7 @@ BaseException _adapterAppwriteException(AppwriteException e) {
       switch (e.type) {
         case 'general_unauthorized_scope':
         case 'user_unauthorized':
-          return UnLoginException("登陆后再执行操作", e.toString());
+          return NoPermissionException("您没有权限!\n请登陆有权限的账号后再执行操作", e.toString());
         case 'user_invalid_credentials':
           return AuthBaseException("账号或密码错误", e.toString());
         // default:

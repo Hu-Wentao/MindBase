@@ -9,3 +9,8 @@ class AuthBaseException extends BaseException {
 class UnLoginException extends AuthBaseException {
   UnLoginException(super.msg, super.debugInfo);
 }
+/// 没有权限
+/// 包括了[UnLoginException]
+class NoPermissionException extends AuthBaseException {
+  NoPermissionException(super.msg, super.debugInfo);
+}
