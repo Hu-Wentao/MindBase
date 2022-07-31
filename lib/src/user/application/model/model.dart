@@ -39,7 +39,11 @@ mixin UserStateChangeMx on IUserModel {
 
   @override
   FutureOr<void> onReset() {
-    _cachedSession = null;
+    // 不能调用注销方法
+    _session = null;
+    //
+    data = null;
+    //
     teams.clear();
   }
 
@@ -50,33 +54,24 @@ mixin UserStateChangeMx on IUserModel {
 
   /// =====
 
-  // 尝试恢复用户登录状态, 如果之前的session还有效,在这里可以直接自动登录
+  /// 尝试恢复用户登录状态, 如果之前的session还有效,在这里可以直接自动登录
+  /// 注意,本方法会被 [onFetch] 调用
   _tryRecoveryUser() async {
     try {
-      final u = await _accountService.getUser();
-      _setLogged(u, "已恢复登录状态[$u]");
+      final user = await _accountService.getUser();
+      updateData(user, state: ModelState.done, msg: "已恢复登录状态[$user]");
     } catch (e, s) {
       log("尝试恢复用户登录状态时出错", e, s);
       // AppwriteException: general_unauthorized_scope, User (role: guest) missing scope (account) (401)],
       if (e is cli.AppwriteException &&
           e.code == 401 &&
           e.type == 'general_unauthorized_scope') {
-        _setLogout("尚未登录");
+        actReset();
+        setDoneKeepState("尚未登录");
       }
+      actReset();
       setDone("初始化出错,$e");
-      // rethrow;
     }
-  }
-
-  _setLogout([String m = '已退出登录']) {
-    data = null;
-    _cachedSession = null;
-    setDone(m);
-  }
-
-  _setLogged(aw.User u, [String m = '已登陆']) {
-    data = u;
-    setDone(m);
   }
 }
 
@@ -84,9 +79,9 @@ abstract class IUserModel extends ModelSidecar<aw.User?, BaseException?>
     with ModelStateChangeMx<aw.User?, BaseException?> {
   IUserModel(aw.User? data) : super(data, ExceptionAdapter.of);
 
-  aw.Session? get _cachedSession;
+  aw.Session? get _session;
 
-  set _cachedSession(aw.Session? value);
+  set _session(aw.Session? value);
 
   List<TeamModel> get teams;
 
@@ -106,7 +101,7 @@ class UserModel extends IUserModel with UserStateChangeMx {
 
   /// 核心状态
   @override
-  aw.Session? _cachedSession;
+  aw.Session? _session;
   @override
   List<TeamModel> teams = [];
 
@@ -212,13 +207,14 @@ extension UserModelX on UserModel {
       case AuthVerify.github:
         throw BaseException('尚未支持的登录方式[$authVerify]');
     }
-    _cachedSession = nSession;
-    if (data == null || data!.$id != _cachedSession!.userId) {
+    _session = nSession;
+    if (data == null || data!.$id != _session!.userId) {
       data = await _accountService.getUser();
     }
     // 切换用户登录后 需要刷新全局状态
-    actReset();
-    actFetch();
+    // actFetch();
+    onFetch(); // 不使用 actFetch, 可以保存上面存储的session
+    setDone("登录成功");
     return null;
   }
 
@@ -228,8 +224,9 @@ extension UserModelX on UserModel {
 
   actLogout() async => await actWrapper(() {
         // 'current' 代表登录登录的用户的session
-        _accountService.logout(_cachedSession?.$id ?? 'current');
-        _setLogout('已退出登录');
+        _accountService.logout(_session?.$id ?? 'current');
+        actReset();
+        setDoneKeepState('已退出登录');
       });
 }
 
