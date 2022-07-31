@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:bson/bson.dart';
-import 'package:flutter/material.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -140,13 +139,12 @@ class TableView {
       'TableView{vId: $vId, name: $name, type: $type, cols: $cols}';
 }
 
-
 class Role {
   final String value;
 
   const Role(this.value);
 
-  const Role.owner() : this('owner');
+  static const owner = Role('owner');
 }
 
 class Permissions {
@@ -167,6 +165,7 @@ class Permissions {
 
   // 给予未登录用户权限
   static const onlyGuest = Permissions(['role:guest']);
+
   // 给予已登录用户权限
   static const onlyMember = Permissions(['role:member']);
 
@@ -179,15 +178,14 @@ class Permissions {
   /// [role] 为empty表示 团队内全部成员
   Permissions.team({required String teamId, List<Role> roles = const []})
       : this(roles.isEmpty
-      ? ['team:$teamId']
-      : roles.map((role) => 'team:$teamId/${role.value}').toList());
+            ? ['team:$teamId']
+            : roles.map((role) => 'team:$teamId/${role.value}').toList());
 
   /// 以 成员 为单位授权权限
   /// 给予特定团队成员[memberId]权限
   /// 这样可以控制用户在离开团队后自动失去权限
   Permissions.member({required String memberId}) : this(['member:$memberId']);
 }
-
 
 /// === AttrType （属性类型）相关值对象 ===
 
