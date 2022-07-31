@@ -15,7 +15,7 @@ class CollectionService {
     if (teamOwnerId == null) {
       throw BaseException('被更新表所属团队没有团队创建者(owner)角色,无法更新权限');
     }
-    if (userId != teamOwnerId) throw BaseException("您不是团队创建者, 没有权限更新表");
+    if (userId != teamOwnerId) throw BaseException("您不是团队创建者, 没有权限更新表", debugInfo: "userId-$userId, teamOwnerId-$teamOwnerId");
 
     final r = await _srvDb.updateCollection(
       collectionId: collection.$id,
