@@ -10,6 +10,7 @@ import 'package:mind_base/src/feedback/infra/ui/widget/feedback_btn.dart';
 import 'package:mind_base/src/user/application/model/model.dart';
 import 'package:mind_base/src/user/infra/ui/components/user_tile.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
+import 'package:mind_base/src/workspace/infra/ui/dialog/collection_edit_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/widget/data_table_grid.dart';
 import 'package:mind_base/src/workspace/infra/ui/widget/space_selector_bar.dart';
 import 'package:mind_base/src/workspace/infra/ui/widget/widget.dart';
@@ -99,38 +100,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
                         icon: const Icon(Icons.home_rounded),
                         onPressed: () => context.go('/'),
                       ),
-                      title: SpaceSelectorBar(
-                        spaceName: Text(space?.name ?? 'loading ...'),
-                        menuBtn: PopupMenuButton<String>(
-                          itemBuilder: (ctx) => [
-                            ...model.workspaces.map(
-                              (e) => PopupMenuItem<String>(
-                                value: 'selectWorkspaceEvt${e.id}',
-                                child: ListTile(
-                                  leading:
-                                      const Icon(Icons.space_dashboard_rounded),
-                                  title: Text(e.name),
-                                ),
-                              ),
-                            ),
-                          ],
-                          onSelected: (value) {
-                            // 选中Item后,在这里会被二次调用
-                            switch (value) {
-                              default:
-                                if (value.startsWith('selectWorkspaceEvt')) {
-                                  final wsId = value
-                                      .substring('selectWorkspaceEvt'.length);
-                                  context.go(workspaceRouterPathBuilder(
-                                      teamId: model.id, workspaceId: wsId));
-                                  return;
-                                }
-                                print("debug#未知的value#$value");
-                                break;
-                            }
-                          },
-                        ),
-                      ),
+                      title: _buildTitle(context, model, space),
                       // title: const WorkspaceSelectorTitle(),
                       actions: const [
                         UserInfoTile(),
@@ -179,5 +149,65 @@ class _WorkspacePageState extends State<WorkspacePage> {
                   );
                 }),
               ),
+      );
+
+  _buildTitle(BuildContext context, TeamModel model, WorkspaceModel? space) =>
+      Row(
+        children: [
+          SpaceSelectorBar(
+            spaceName: Text(space?.name ?? 'loading ...'),
+            menuBtn: PopupMenuButton<String>(
+              itemBuilder: (ctx) => [
+                ...model.workspaces.map(
+                  (e) => PopupMenuItem<String>(
+                    value: 'selectWorkspaceEvt${e.id}',
+                    child: ListTile(
+                      leading: const Icon(Icons.space_dashboard_rounded),
+                      title: Text(e.name),
+                    ),
+                  ),
+                ),
+              ],
+              onSelected: (value) {
+                // 选中Item后,在这里会被二次调用
+                switch (value) {
+                  default:
+                    if (value.startsWith('selectWorkspaceEvt')) {
+                      final wsId = value.substring('selectWorkspaceEvt'.length);
+                      context.go(workspaceRouterPathBuilder(
+                          teamId: model.id, workspaceId: wsId));
+                      return;
+                    }
+                    print("debug#未知的value#$value");
+                    break;
+                }
+              },
+            ),
+          ),
+          if (space != null)
+            Tooltip(
+              message: '修改表权限',
+              child: TextButton.icon(
+                onPressed: () async {
+                  //  todo 权限
+                  final data = space.metaCollection?.dto;
+                  if (data == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("集合权限信息正在加载中,请稍后再试"),
+                    ));
+                    space.actFetch().thenDialog(context);
+                    return;
+                  } else {
+                    final dto = await showCollectionEditDialog(context, data);
+                    space.metaCollection!
+                        .actUpdateCollection(dto)
+                        .thenDialog(context);
+                  }
+                },
+                icon: const Icon(Icons.shield_outlined,color: Colors.white,),
+                label: const Text("修改权限"),
+              ),
+            ),
+        ],
       );
 }
