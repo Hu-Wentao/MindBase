@@ -18,7 +18,7 @@ void main() {
       ProviderSidecar.setLogger(_sidecarLogger.info);
       ModelSidecar.setLogger(_sidecarLogger.info);
     },
-    onApplicationRun: (g, c) async => runApp(const MindBaseApp()),
+    onApplicationRun: (g, c) async => runApp(MindBaseApp(sl: g, config: c)),
   ).run(
     GetIt.I,
     kEnvDev,

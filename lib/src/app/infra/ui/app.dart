@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:form_builder_validators/localization/l10n.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mind_base/src/app/application.dart';
 import 'package:mind_base/src/app/infra/ui/page/home/home.dart';
 import 'package:mind_base/src/app/infra/ui/page/workspace/workspace.dart';
 import 'package:mind_base/src/user/application/model/model.dart';
@@ -92,7 +94,11 @@ final _router = GoRouter(
     ]);
 
 class MindBaseApp extends StatelessWidget {
-  const MindBaseApp({Key? key}) : super(key: key);
+  final GetIt sl;
+  final MindBaseConfig config;
+
+  const MindBaseApp({Key? key, required this.sl, required this.config})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) =>
