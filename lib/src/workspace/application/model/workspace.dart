@@ -26,7 +26,7 @@ mixin SpaceStateChangeMx on IWorkspaceModel {
 
   @override
   FutureOr<void> onReset() {
-    metaCollection = null;
+    metaCollection.actReset();
     metas.clear();
   }
 
@@ -131,9 +131,9 @@ abstract class IWorkspaceModel
 
   List<MetaModel> get metas;
 
-  CollectionInfoModel? get metaCollection;
+  CollectionInfoModel get metaCollection;
 
-  set metaCollection(CollectionInfoModel? value);
+  set metaCollection(CollectionInfoModel value);
 
   MetaModel _addNewMetaModel(RecordMetaDto data);
 
@@ -150,7 +150,8 @@ class WorkspaceModel extends IWorkspaceModel with SpaceStateChangeMx {
   @Deprecated("转移位置..")
   static const ctxFindRecordFnSign = ">>_ctxFindRecordFnSign";
 
-  WorkspaceModel(super.data, this.at);
+  WorkspaceModel(super.data, this.at)
+      : metaCollection = CollectionInfoModel(data.id);
 
   // 父状态
   final TeamModel at;
@@ -161,7 +162,7 @@ class WorkspaceModel extends IWorkspaceModel with SpaceStateChangeMx {
 
   // 工作空间下的所有表
   @override
-  CollectionInfoModel? metaCollection;
+  CollectionInfoModel metaCollection;
 
   @Deprecated('使用openedMetas代替')
   List<MetaModel> get openedMetas => metas;
@@ -188,7 +189,8 @@ class WorkspaceModel extends IWorkspaceModel with SpaceStateChangeMx {
     final model = CollectionInfoModel(metaCollectionId);
     // 立即初始化
     metaCollection = model..actInitSubscription();
-    setDoneKeepState();
+    // 无需set,onFetch结束后会自动set
+    // setDoneKeepState();
   }
 
   get metaCollectionId => data.id; // 工作空间Id即为Meta集合Id
@@ -202,8 +204,6 @@ class WorkspaceModel extends IWorkspaceModel with SpaceStateChangeMx {
     return getRecords(value.type.meta!.id)
         .firstWhere((record) => record.id == value.value);
   }
-
-  // StreamSubscription<AccessorEvt<RecordMetaDto>> get subs => _metasSub;
 
   List<RecordModel> getRecords(String metaId) =>
       metas[__indexByOpenedMetas(metaId)].records;
