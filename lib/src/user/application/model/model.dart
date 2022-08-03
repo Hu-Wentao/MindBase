@@ -40,7 +40,7 @@ mixin UserStateChangeMx on IUserModel {
   @override
   FutureOr<void> onReset() {
     // 不能调用注销方法
-    _session = null;
+    session = null;
     //
     data = null;
     //
@@ -77,11 +77,9 @@ mixin UserStateChangeMx on IUserModel {
 
 abstract class IUserModel extends ModelSidecar<aw.User?, BaseException?>
     with ModelStateChangeMx<aw.User?, BaseException?> {
-  IUserModel(aw.User? data) : super(data, ExceptionAdapter.of);
+  IUserModel(aw.User? data, this.session) : super(data, ExceptionAdapter.of);
 
-  aw.Session? get _session;
-
-  set _session(aw.Session? value);
+  aw.Session?  session;
 
   List<TeamModel> get teams;
 
@@ -89,7 +87,7 @@ abstract class IUserModel extends ModelSidecar<aw.User?, BaseException?>
 }
 
 class UserModel extends IUserModel with UserStateChangeMx {
-  UserModel([super.data]);
+  UserModel([super.data, super.session]);
 
   String? get id => data?.$id;
 
@@ -101,7 +99,7 @@ class UserModel extends IUserModel with UserStateChangeMx {
 
   /// 核心状态
   @override
-  aw.Session? _session;
+  aw.Session? session;
   @override
   List<TeamModel> teams = [];
 
@@ -138,93 +136,9 @@ extension UserModelX on UserModel {
         return;
       });
 
-  // 注册/登录
-  Future<BaseException?> actAuthWith(
-    bool isRegister,
-    AuthVerify authVerify,
-    String identityStr,
-    Password password,
-  ) async =>
-      actAuthWithReq(AuthReq(isRegister, authVerify, identityStr, password));
-
-  Future<BaseException?> actAuthWithReq(AuthReq? req) async =>
-      await actWrapper(() async {
-        if (req == null) return;
-        // 先注册
-        if (req.isRegister) {
-          data =
-              await _onRegister(req.authVerify, req.identityStr, req.password);
-        }
-        // 注册完成后自动登录
-        await _onLogin(req.authVerify, req.identityStr, req.password);
-      });
-
-  Future<aw.User> _onRegister(
-    AuthVerify authVerify,
-    String identityStr,
-    Password password, {
-    String m = "正在注册...",
-  }) async {
-    setDoneKeepState(m);
-    switch (authVerify) {
-      case AuthVerify.email:
-        return await _accountService.signup(
-          name: identityStr,
-          email: identityStr,
-          password: password.v,
-        );
-      case AuthVerify.phoneNumber:
-      case AuthVerify.wechatOfficial:
-      case AuthVerify.qqConnect:
-      case AuthVerify.qqNumber:
-      case AuthVerify.github:
-        throw BaseException('功能尚未实现', debugInfo: '逻辑错误');
-    }
-  }
-
-  // 登录,得到token
-  Future<BaseException?> _onLogin(
-    AuthVerify authVerify,
-    String identityStr,
-    Password password, {
-    String m = "正在登录...",
-    // Session? oldSession,
-  }) async {
-    setDone(m);
-    //
-    aw.Session nSession;
-    switch (authVerify) {
-      case AuthVerify.email:
-        nSession = await _accountService.login(
-          email: identityStr,
-          password: password.v,
-        );
-        break;
-      case AuthVerify.phoneNumber:
-      case AuthVerify.wechatOfficial:
-      case AuthVerify.qqConnect:
-      case AuthVerify.qqNumber:
-      case AuthVerify.github:
-        throw BaseException('尚未支持的登录方式[$authVerify]');
-    }
-    _session = nSession;
-    if (data == null || data!.$id != _session!.userId) {
-      data = await _accountService.getUser();
-    }
-    // 切换用户登录后 需要刷新全局状态
-    // actFetch();
-    onFetch(); // 不使用 actFetch, 可以保存上面存储的session
-    setDone("登录成功");
-    return null;
-  }
-
-  Future<BaseException?> actCheckLoggedUser() async =>
-      await actWrapper(() async =>
-          isLogged ? null : UnLoginException('尚未登录', 'actCheckLoggedUser'));
-
   actLogout() async => await actWrapper(() {
         // 'current' 代表登录登录的用户的session
-        _accountService.logout(_session?.$id ?? 'current');
+        _accountService.logout(session?.$id ?? 'current');
         actReset();
         setDoneKeepState('已退出登录');
       });
