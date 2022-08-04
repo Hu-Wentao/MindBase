@@ -4,9 +4,8 @@ import 'package:appwrite/appwrite.dart' as cli;
 import 'package:appwrite/models.dart' as aw;
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
+import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/user/application/service/account_service.dart';
-import 'package:mind_base/src/user/domain/exceptions/exceptions.dart';
-import 'package:mind_base/src/user/domain/value/value.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/application/service/service.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
@@ -17,7 +16,6 @@ typedef UserProvider = UserModel;
 typedef TeamManagerModel = UserModel;
 
 mixin UserStateChangeMx on IUserModel {
-  final AccountService _accountService = sl<AccountService>();
   final TeamService _teamSrv = sl<TeamService>();
 
   @override
@@ -27,9 +25,6 @@ mixin UserStateChangeMx on IUserModel {
 
   @override
   Future<FutureOr<void>> onFetch({bool isActive = false}) async {
-    // user
-    await _tryRecoveryUser();
-
     // team
     final tms = await _teamSrv.getTeams();
     for (final t in tms) {
@@ -39,7 +34,7 @@ mixin UserStateChangeMx on IUserModel {
 
   @override
   FutureOr<void> onReset() {
-    // 不能调用注销方法
+    // 不能调用注销方法,因为重置本地缓存不代表退出登录
     session = null;
     //
     data = null;
@@ -51,43 +46,27 @@ mixin UserStateChangeMx on IUserModel {
   FutureOr<void> onSubscription() {
     log('onSubscription 尚未实现...');
   }
-
-  /// =====
-
-  /// 尝试恢复用户登录状态, 如果之前的session还有效,在这里可以直接自动登录
-  /// 注意,本方法会被 [onFetch] 调用
-  _tryRecoveryUser() async {
-    try {
-      final user = await _accountService.getUser();
-      updateData(user, state: ModelState.done, msg: "已恢复登录状态[$user]");
-    } catch (e, s) {
-      log("尝试恢复用户登录状态时出错", e, s);
-      // AppwriteException: general_unauthorized_scope, User (role: guest) missing scope (account) (401)],
-      if (e is cli.AppwriteException &&
-          e.code == 401 &&
-          e.type == 'general_unauthorized_scope') {
-        actReset();
-        setDoneKeepState("尚未登录");
-      }
-      actReset();
-      setDone("初始化出错,$e");
-    }
-  }
 }
 
 abstract class IUserModel extends ModelSidecar<aw.User?, BaseException?>
     with ModelStateChangeMx<aw.User?, BaseException?> {
-  IUserModel(aw.User? data, this.session) : super(data, ExceptionAdapter.of);
+  IUserModel(aw.User? data) : super(data, ExceptionAdapter.of);
 
-  aw.Session?  session;
+  // 状态
+  aw.Session? get session;
+
+  set session(aw.Session? value);
 
   List<TeamModel> get teams;
+
+  // 方法
+  bool get isLogged;
 
   TeamModel addNewTeamModel(aw.Team data);
 }
 
 class UserModel extends IUserModel with UserStateChangeMx {
-  UserModel([super.data, super.session]);
+  UserModel([super.data, this.session]);
 
   String? get id => data?.$id;
 
@@ -95,6 +74,7 @@ class UserModel extends IUserModel with UserStateChangeMx {
 
   String? get email => data?.email;
 
+  @override
   bool get isLogged => data != null;
 
   /// 核心状态
@@ -104,7 +84,8 @@ class UserModel extends IUserModel with UserStateChangeMx {
   List<TeamModel> teams = [];
 
   @override
-  TeamModel addNewTeamModel(aw.Team data, [bool isMember = true]) {
+  TeamModel addNewTeamModel(aw.Team data,
+      [@Deprecated("弃用") bool isMember = true]) {
     final m = TeamModel(data, this)..tmpIsMember = isMember;
     teams.add(m
       // 必须在此处初始化,否则Team列表无法显示Team内的工作空间信息
@@ -117,10 +98,16 @@ class UserModel extends IUserModel with UserStateChangeMx {
   aw.User loggedUser() => data!;
 }
 
-extension UserModelX on UserModel {
-  AccountService get _accountService => sl<AccountService>();
+extension UserBizX on UserModel {
+  AccountService get _accountSrv => sl<AccountService>();
 
-  TeamService get _teamSrv => sl<TeamService>();
+  /// 退出登录
+  /// 同时重置当前Model状态
+  Future<BaseException?> actLogout() async =>
+      await actWrapper(() => reqWrapper(() {
+            _accountSrv.logout(session?.$id);
+            actCloseReset().thenRethrow();
+          }, accWhen: () => state != ModelState.init));
 
   /// 尝试加载指定[TeamModel]
   /// 1. 查询当前用户名下是否存在team
@@ -136,15 +123,6 @@ extension UserModelX on UserModel {
         return;
       });
 
-  actLogout() async => await actWrapper(() {
-        // 'current' 代表登录登录的用户的session
-        _accountService.logout(session?.$id ?? 'current');
-        actReset();
-        setDoneKeepState('已退出登录');
-      });
-}
-
-extension WorkspaceModelX on UserModel {
   Future<BaseException?> actDeleteTeam(String teamId) async =>
       await actWrapper(() async {
         await _teamSrv.deleteTeam(teamId);
@@ -156,11 +134,5 @@ extension WorkspaceModelX on UserModel {
       await actWrapper(() async {
         final tm = await _teamSrv.createTeam(name);
         addNewTeamModel(tm);
-      });
-
-  // 打开一个空间
-  Future<BaseException?> actOpenWorkspaceById(String workspaceId) async =>
-      await actWrapper(() {
-        // todo 在team中查询是否存在该空间
       });
 }
