@@ -1,7 +1,9 @@
 part of 'model.dart';
 
-class AppStateModel extends ModelSidecar<MindBaseConfig, BaseException?>
-    with StateChangeMx<MindBaseConfig, BaseException?> {
+typedef UserProvider = AppStateModel;
+typedef AppModel = AppStateModel;
+
+class AppStateModel extends ModelSidecar<MindBaseConfig, BaseException?> {
   AccountService get _accountSrv => sl<AccountService>();
 
   AppStateModel(data)
@@ -10,6 +12,8 @@ class AppStateModel extends ModelSidecar<MindBaseConfig, BaseException?>
 
   // 子状态
   UserModel user;
+
+  /// === 状态刷新
 
   @override
   Future<bool?> onFetch({bool isActive = false}) async {
@@ -25,12 +29,16 @@ class AppStateModel extends ModelSidecar<MindBaseConfig, BaseException?>
     return true;
   }
 
+  /// === 状态更改
+
   // 刷新后立即初始化
   _setUserModel(Tuple2<aw.User, aw.Session>? u) {
     user.actUnsubscribe();
     user = UserModel(u?.value1, u?.value2)..actInitSubscription();
     setDoneKeepState('刷新并初始化user[$user]');
   }
+
+  /// === 实现
 
   /// 尝试恢复用户登录状态, 如果之前的session还有效,在这里可以直接自动登录
   /// 注意,本方法会被 [onFetch] 调用
@@ -53,19 +61,6 @@ class AppStateModel extends ModelSidecar<MindBaseConfig, BaseException?>
       return null;
     }
   }
-
-  // 注册/登录
-  Future<BaseException?> actAuthWithReq(AuthReq? req) async =>
-      await actWrapper(() async {
-        if (req == null) return;
-        // 先注册
-        if (req.isRegister) {
-          await _onRegister(req.authVerify, req.identityStr, req.password);
-        }
-        // 注册完成后自动登录
-        _setUserModel(
-            await _onLogin(req.authVerify, req.identityStr, req.password));
-      });
 
   Future<aw.User> _onRegister(
     AuthVerify authVerify,
@@ -115,4 +110,19 @@ class AppStateModel extends ModelSidecar<MindBaseConfig, BaseException?>
     final u = await _accountSrv.getUser();
     return Tuple2<aw.User, aw.Session>(u, nSession);
   }
+}
+
+extension AppStateModelBizX on AppStateModel {
+  // 注册/登录
+  Future<BaseException?> actAuthWithReq(AuthReq? req) async =>
+      await actWrapper(() async {
+        if (req == null) return;
+        // 先注册
+        if (req.isRegister) {
+          await _onRegister(req.authVerify, req.identityStr, req.password);
+        }
+        // 注册完成后自动登录
+        _setUserModel(
+            await _onLogin(req.authVerify, req.identityStr, req.password));
+      });
 }
