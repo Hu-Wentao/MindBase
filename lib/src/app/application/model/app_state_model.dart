@@ -5,10 +5,11 @@ typedef UserProvider = AppStateModel;
 @Deprecated('AppStateModel')
 typedef AppModel = AppStateModel;
 
-class AppStateModel extends ModelSidecar<MindBaseConfig, BaseException?> {
+class AppStateModel extends ModelSidecar<MindBaseConfig, BaseException?>
+    with StateChangeMx<MindBaseConfig, BaseException?> {
   AccountService get _accountSrv => sl<AccountService>();
 
-  AppStateModel(data)
+  AppStateModel(MindBaseConfig data)
       : user = UserModel(),
         super(data, ExceptionAdapter.of);
 
