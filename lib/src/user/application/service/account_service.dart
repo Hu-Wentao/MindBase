@@ -28,8 +28,8 @@ class AccountService {
         password: password,
       );
 
-  Future logout(String sessionId) =>
-      account.deleteSession(sessionId: sessionId);
+  Future logout([String? sessionId]) =>
+      account.deleteSession(sessionId: sessionId ?? 'current');
 
   Future<User> getUser() async => await account.get();
 
