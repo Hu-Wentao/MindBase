@@ -4,9 +4,12 @@ import 'package:mind_base/src/core/infra/ui/exception_router/dialog.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/snack.dart';
 
 extension BaseExceptionRouterX on BaseException? {
-  showDialog(BuildContext context, {Function()? onNull}) => (this == null)
-      ? onNull?.call()
-      : DialogFactory.byException(this, context)?.show(context);
+  rethrowException() => (this == null) ? null : throw this!;
+
+  Future showDialog(BuildContext context, {Function()? onNull}) =>
+      (this == null)
+          ? onNull?.call()
+          : DialogFactory.byException(this, context)?.show(context);
 
   ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? showSnackBar(
       BuildContext context,
@@ -21,7 +24,9 @@ extension BaseExceptionRouterX on BaseException? {
 }
 
 extension BaseFutureExceptionRouterX on Future<BaseException?> {
-  thenDialog(BuildContext context, {Function()? onNoneErr}) async =>
+  Future thenRethrow() async => (await this).rethrowException();
+
+  Future thenDialog(BuildContext context, {Function()? onNoneErr}) async =>
       (await this).showDialog(context, onNull: onNoneErr);
 
   Future<ScaffoldFeatureController<SnackBar, SnackBarClosedReason>?>
