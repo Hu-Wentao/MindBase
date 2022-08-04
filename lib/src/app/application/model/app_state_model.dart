@@ -1,6 +1,8 @@
 part of 'model.dart';
 
+@Deprecated('AppStateModel')
 typedef UserProvider = AppStateModel;
+@Deprecated('AppStateModel')
 typedef AppModel = AppStateModel;
 
 class AppStateModel extends ModelSidecar<MindBaseConfig, BaseException?> {
