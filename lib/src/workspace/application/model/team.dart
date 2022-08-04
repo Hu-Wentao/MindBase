@@ -86,6 +86,9 @@ class TeamModel extends ITeamModel with TeamStateChangeMx {
   @Deprecated("workspaces")
   List<WorkspaceModel> get openedWorkspaces => workspaces;
 
+  MemberModel? get teamOwner =>
+      members.firstWhereOrNull((mbr) => mbr.roles.contains(Role.owner.value));
+
   @override
   WorkspaceModel addNewWorkspaceModel(WorkspaceDto data) {
     final m = WorkspaceModel(data, this);
@@ -163,6 +166,7 @@ class MemberModel extends IMemberModel {
   String get id => data.$id;
 
   String get userId => data.userId;
+
   String get userName => data.userName;
 
   // String get teamId => data.teamId;
