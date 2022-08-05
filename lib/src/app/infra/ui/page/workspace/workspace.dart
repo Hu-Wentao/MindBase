@@ -7,7 +7,7 @@ import 'package:mind_base/src/app/infra/ui/app.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/feedback/infra/ui/widget/feedback_btn.dart';
-import 'package:mind_base/src/user/application/model/model.dart';
+import 'package:mind_base/src/app/application/model/model.dart';
 import 'package:mind_base/src/user/infra/ui/components/user_tile.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/collection_edit_dialog.dart';
@@ -88,14 +88,42 @@ class _WorkspacePageState extends State<WorkspacePage> {
         builder: (c, s) => (s.data == null)
             ? (s.connectionState != ConnectionState.done)
                 ? Scaffold(
+                    appBar: AppBar(
+                      leading: IconButton(
+                        icon: const Icon(Icons.home_rounded),
+                        onPressed: () => context.go('/'),
+                      ),
+                      title: const Text("加载中 ..."),
+                      actions: const [
+                        UserInfoTile(),
+                        FeedbackBtn(),
+                      ],
+                    ),
                     body: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Padding(
-                          padding: EdgeInsets.all(28.0),
-                          child: Text('加载中... 长时间无响应请尝试刷新页面...'),
+                          padding: const EdgeInsets.all(28.0),
+                          child: Text.rich(
+                            TextSpan(children: [
+                              const TextSpan(text: '长时间无响应请尝试 刷新页面 '),
+                              const TextSpan(text: '或'),
+                              WidgetSpan(
+                                  alignment: PlaceholderAlignment.middle,
+                                  child: TextButton(
+                                    child: Text(
+                                      '回到首页',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2
+                                          ?.copyWith(color: Colors.blueAccent),
+                                    ),
+                                    onPressed: () => context.go('/'),
+                                  )),
+                            ]),
+                          ),
                         ),
-                        Center(child: CircularProgressIndicator()),
+                        const Center(child: CircularProgressIndicator()),
                       ],
                     ),
                   )
@@ -208,7 +236,8 @@ class _WorkspacePageState extends State<WorkspacePage> {
                     space.actRefresh().thenDialog(context);
                     return;
                   } else {
-                    final dto = await showCollectionEditDialog(context, data, space.at.id);
+                    final dto = await showCollectionEditDialog(
+                        context, data, space.at.id);
                     if (dto == null) return;
                     final userId = context.read<UserModel>().id;
                     final teamOwnerId = space.at.teamOwner?.userId;
