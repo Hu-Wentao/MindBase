@@ -1,4 +1,5 @@
 part of 'model.dart';
+
 mixin UserStateChangeMx on IUserModel {
   final TeamService _teamSrv = sl<TeamService>();
 
@@ -61,6 +62,10 @@ class UserModel extends IUserModel with UserStateChangeMx {
   @override
   bool get isLogged => data != null;
 
+  // 当前登录用户是否为 "匿名用户"
+  bool get isAnonymous =>
+      session == null ? true : (session!.provider == 'anonymous');
+
   /// 核心状态
   @override
   aw.Session? session;
@@ -72,7 +77,7 @@ class UserModel extends IUserModel with UserStateChangeMx {
       [@Deprecated("弃用") bool isMember = true]) {
     final m = TeamModel(data, this)..tmpIsMember = isMember;
     teams.add(m
-    // 必须在此处初始化,否则Team列表无法显示Team内的工作空间信息
+      // 必须在此处初始化,否则Team列表无法显示Team内的工作空间信息
       ..actInitSubscription());
     setDoneKeepState("新增TeamModel[${m.id}]");
     return m;
@@ -89,9 +94,9 @@ extension UserBizX on UserModel {
   /// 同时重置当前Model状态
   Future<BaseException?> actLogout() async =>
       await actWrapper(() => reqWrapper(() {
-        _accountSrv.logout(session?.$id);
-        actCloseReset().thenRethrow();
-      }, accWhen: () => state != ModelState.init));
+            _accountSrv.logout(session?.$id);
+            actCloseReset().thenRethrow();
+          }, accWhen: () => state != ModelState.init));
 
   /// 尝试加载指定[TeamModel]
   /// 1. 查询当前用户名下是否存在team
@@ -116,6 +121,9 @@ extension UserBizX on UserModel {
 
   Future<BaseException?> actCreateTeam(String name) async =>
       await actWrapper(() async {
+        if (isAnonymous) {
+          throw UnLoginException('当前以匿名身份登录, 无法创建团队', '请先注册或登录新账号');
+        }
         final tm = await _teamSrv.createTeam(name);
         addNewTeamModel(tm);
       });
