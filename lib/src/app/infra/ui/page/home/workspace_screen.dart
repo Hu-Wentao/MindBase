@@ -5,7 +5,7 @@ class WorkspacesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Consumer<UserProvider>(builder: (c, pUser, _) {
+      Consumer<UserModel>(builder: (c, pUser, _) {
         if (pUser.isLogged) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -26,7 +26,7 @@ class WorkspacesScreen extends StatelessWidget {
                             );
                             if (name == null) return;
                             context
-                                .read<TeamManagerModel>()
+                                .read<UserModel>()
                                 .actCreateTeam(name)
                                 .thenDialog(context);
                           },
@@ -74,7 +74,7 @@ class _TeamPanelState extends State<TeamPanel> {
   Widget build(BuildContext context) => Expanded(
         child: SingleChildScrollView(
           controller: ScrollController(),
-          child: Consumer<TeamManagerModel>(
+          child: Consumer<UserModel>(
               builder: (c, teamManger, _) => ExpansionPanelList(
                     // 当元素增减,强制刷新ExpansionPanelList,否则展开/折叠会报错
                     key: ValueKey(teamManger.teams.length),
@@ -128,7 +128,8 @@ class WorkspaceTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Link(
-        uri: Uri.tryParse(workspaceRouterPathBuilder(teamId: team.id, workspaceId: space.id)),
+        uri: Uri.tryParse(
+            workspaceRouterPathBuilder(teamId: team.id, workspaceId: space.id)),
         builder: (ctx, followLink) => ListTile(
           leading: const Icon(Icons.space_dashboard_rounded),
           title: Text(space.name),
@@ -237,7 +238,8 @@ class TeamTile extends StatelessWidget {
               break;
             case "create_space":
               await team.actCreateWorkspace('新建空间', onCreated: (w) {
-                context.go(workspaceRouterPathBuilder(teamId:team.id, workspaceId: w.id));
+                context.go(workspaceRouterPathBuilder(
+                    teamId: team.id, workspaceId: w.id));
               }).thenDialog(context);
               break;
             case "delete":
@@ -245,7 +247,7 @@ class TeamTile extends StatelessWidget {
                 context: context,
                 title: "确认删除团队[${team.name}]吗?",
                 onConfirm: () => context
-                    .read<TeamManagerModel>()
+                    .read<UserModel>()
                     .actDeleteTeam(team.id)
                     .thenDialog(context),
               );
