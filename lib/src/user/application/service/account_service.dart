@@ -35,4 +35,7 @@ class AccountService {
 
   Future<Session> getSession({String sessionId = 'current'}) =>
       account.getSession(sessionId: sessionId);
+
+  Future<Session> createAnonymousSession() =>
+      account.createAnonymousSession();
 }
