@@ -1,10 +1,5 @@
 part of 'model.dart';
 
-@Deprecated('AppStateModel')
-typedef UserProvider = AppStateModel;
-@Deprecated('AppStateModel')
-typedef AppModel = AppStateModel;
-
 class AppStateModel extends ModelSidecar<MindBaseConfig, BaseException?>
     with StateChangeMx<MindBaseConfig, BaseException?> {
   AccountService get _accountSrv => sl<AccountService>();
@@ -61,7 +56,11 @@ class AppStateModel extends ModelSidecar<MindBaseConfig, BaseException?>
       } else {
         setDone("初始化遇到未知错误, $e");
       }
-      return null;
+      // 默认登陆匿名用户
+      final sen = await _accountSrv.createAnonymousSession();
+      final usr = await _accountSrv.getUser();
+      log("以匿名身份登录[${usr.toMap()}]\n${sen.toMap()}");
+      return Tuple2(usr, sen);
     }
   }
 
