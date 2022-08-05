@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mind_base/src/app/config/common_config.dart';
 import 'package:mind_base/src/app/infra/ui/app.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
@@ -52,6 +53,15 @@ class _WorkspacePageState extends State<WorkspacePage> {
     teamId = widget.teamId;
     metaId = widget.metaId;
     viewId = widget.viewId;
+    assert(() {
+      slLogger.info('[$runtimeType] initState ${workspaceRouterPathBuilder(
+        teamId: teamId,
+        workspaceId: workspaceId,
+        metaId: metaId,
+        viewId: viewId,
+      )}');
+      return true;
+    }());
     Future.microtask(() async {
       try {
         final model = context.read<UserModel>();
