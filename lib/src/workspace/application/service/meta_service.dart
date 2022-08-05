@@ -7,13 +7,13 @@ import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 /// 有状态服务, 不能依赖注入
 @Deprecated("合并到WorkspaceService中")
 class MetaService {
-  final Database _db;
+  final Databases _db;
   final MetaDtoRepo _metaDtoRepo;
 
   MetaService(this._metaDtoRepo, this._db);
 
   static MetaService? withDI(GetIt sl, String workspaceId) {
-    return MetaService(MetaDtoRepo.withDI(sl, workspaceId), sl<Database>());
+    return MetaService(MetaDtoRepo.withDI(sl, workspaceId), sl<Databases>());
   }
 
   Future insertMetaDto(RecordMetaDto metaDto) {

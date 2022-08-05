@@ -61,10 +61,10 @@ dependencies:
   pluto_grid: "5.0.3"
   linked_scroll_controller: # pluto_grid 需要使用
   appwrite: 6.0.0
+  dart_appwrite: 6.0.0
   flutter_svg:
   bson:
   easy_debounce:
-  dart_appwrite: "5.0.1"
   event_bus:
   adaptive_breakpoints:
   feedback:

@@ -41,8 +41,8 @@ _i1.GetIt $initGetIt(_i1.GetIt get,
   gh.lazySingleton<_i3.Client>(() => appClientConfig.client);
   gh.lazySingleton<_i4.Client>(() => appServerConfig.client);
   gh.lazySingleton<_i6.CollectionService>(() => _i6.CollectionService());
-  gh.lazySingleton<_i4.Database>(() => appServerConfig.database);
   gh.lazySingleton<_i3.Databases>(() => appClientConfig.database);
+  gh.lazySingleton<_i4.Databases>(() => appServerConfig.database);
   gh.lazySingleton<_i7.EventBus>(() => eventBusConfig.eventBus);
   gh.lazySingleton<_i8.Logger>(
       () => configCommon.logger(get<_i9.MindBaseConfig>()));

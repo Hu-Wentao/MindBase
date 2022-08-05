@@ -3,7 +3,7 @@ part of 'service.dart';
 /// 管理表与记录的读写权限
 @lazySingleton
 class CollectionService {
-  final _srvDb = sl<srv.Database>();
+  final _srvDb = sl<srv.Databases>();
 
   Future<da.Collection?> updateCollection(String? userId, String? teamOwnerId,
       da.Collection collection, CollectionDto? dto) async {

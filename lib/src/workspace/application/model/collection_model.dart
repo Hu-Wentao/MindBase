@@ -5,7 +5,7 @@ part of 'model.dart';
 /// [data] collectionId, 表的Id
 class DocumentInfoModel extends ModelSidecar<String, BaseException?>
     with ModelStateChangeMx<String, BaseException?> {
-  final _srvDb = sl<srv.Database>();
+  final _srvDb = sl<srv.Databases>();
   final _cliDb = sl<Databases>();
 
   DocumentInfoModel(String metaId, this.metaCollectionId)
@@ -67,7 +67,7 @@ class DocumentInfoModel extends ModelSidecar<String, BaseException?>
 /// [data] collectionId, 表的Id
 class CollectionInfoModel extends ModelSidecar<String, BaseException?>
     with ModelStateChangeMx<String, BaseException?> {
-  final _srvDb = sl<srv.Database>();
+  final _srvDb = sl<srv.Databases>();
   final CollectionService _srv = sl<CollectionService>();
 
   CollectionInfoModel(String data, [@Deprecated('弃用') _])
@@ -86,7 +86,7 @@ class CollectionInfoModel extends ModelSidecar<String, BaseException?>
             accWhen: () => state != ModelState.init,
             () async {
               if (dto == null) return;
-              // todo 判断是否有权限更新
+              // 判断是否有权限更新
               final r = await _srv.updateCollection(userId, teamOwnerId, collection!, dto);
               // 非响应式, 必须手动更新状态
               collection = r;

@@ -1,7 +1,7 @@
 // repo 是对与聚合根而言的
 
 import 'package:appwrite/appwrite.dart';
-import 'package:dart_appwrite/dart_appwrite.dart' as server;
+import 'package:dart_appwrite/dart_appwrite.dart' as srv;
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/app/config/common_config.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
@@ -12,7 +12,7 @@ import '../../application/model/model.dart';
 
 // 需要传入指定集合ID, 因此无法注入
 class MetaDtoRepo {
-  final server.Database _serverDb;
+  final srv.Databases _serverDb;
   final String collectionId; // 也是所在workspaceId
   final RecordMetaEttAccessor _metaAcc;
 
@@ -23,7 +23,7 @@ class MetaDtoRepo {
   );
 
   static MetaDtoRepo withDI(GetIt get, String workspaceId) => MetaDtoRepo(
-        get<server.Database>(),
+        get<srv.Databases>(),
         RecordMetaEttAccessor(get<Databases>(), workspaceId),
         workspaceId,
       );
@@ -177,37 +177,37 @@ class MetaDtoRepo {
   }
 
   final metaStructure = {
-    'name': (String collectionId, server.Database _serverDb) async =>
+    'name': (String collectionId, srv.Databases _serverDb) async =>
         await _serverDb.createStringAttribute(
             collectionId: collectionId,
             key: 'name',
             size: 127,
             xrequired: true),
-    'memo': (String collectionId, server.Database _serverDb) async =>
+    'memo': (String collectionId, srv.Databases _serverDb) async =>
         await _serverDb.createStringAttribute(
             collectionId: collectionId,
             key: 'memo',
             size: 255,
             xrequired: false,
             xdefault: ''),
-    'maxKey': (String collectionId, server.Database _serverDb) async =>
+    'maxKey': (String collectionId, srv.Databases _serverDb) async =>
         await _serverDb.createIntegerAttribute(
             collectionId: collectionId, key: 'maxKey', xrequired: true),
-    'attrs': (String collectionId, server.Database _serverDb) async =>
+    'attrs': (String collectionId, srv.Databases _serverDb) async =>
         await _serverDb.createStringAttribute(
             collectionId: collectionId,
             key: 'attrs',
             size: 65535,
             xrequired: false,
             xdefault: ''),
-    'methods': (String collectionId, server.Database _serverDb) async =>
+    'methods': (String collectionId, srv.Databases _serverDb) async =>
         await _serverDb.createStringAttribute(
             collectionId: collectionId,
             key: 'methods',
             size: 65535,
             xrequired: false,
             xdefault: ''),
-    'views': (String collectionId, server.Database _serverDb) async =>
+    'views': (String collectionId, srv.Databases _serverDb) async =>
         await _serverDb.createStringAttribute(
             collectionId: collectionId,
             key: 'views',
@@ -234,7 +234,7 @@ class MetaDtoRepo {
 }
 
 class RecordDtoRepo {
-  final server.Database _serverDb;
+  final srv.Databases _serverDb;
 
   final RecordMetaDto meta;
   final RecordEttAccessor _recordAcc;
@@ -254,7 +254,7 @@ class RecordDtoRepo {
 
   static RecordDtoRepo withDtoDI(GetIt get, RecordMetaDto meta) =>
       RecordDtoRepo(
-        get<server.Database>(),
+        get<srv.Databases>(),
         RecordEttAccessor(get<Databases>(), meta.id),
         meta,
       );
@@ -372,7 +372,7 @@ class RecordDtoRepo {
 
 /// 为Record集合新增属性
 Future _createAttr(
-  server.Database _db,
+  srv.Databases _db,
   String metaId,
   AttributeDto attr,
 ) =>
@@ -384,7 +384,7 @@ Future _createAttr(
     );
 
 Future _createCollectionAttr(
-  server.Database _db, {
+  srv.Databases _db, {
   required String collectionId,
   required String attrKey,
   int size = 511,

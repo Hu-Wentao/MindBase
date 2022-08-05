@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1659299442;
+const int timestamp = 1659709372;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -112,7 +112,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'json_annotation': r'>=4.4.0',
   'pluto_grid': r'5.0.3',
   'appwrite': r'6.0.0',
-  'dart_appwrite': r'5.0.1',
+  'dart_appwrite': r'6.0.0',
 };
 
 /// Developer dependencies

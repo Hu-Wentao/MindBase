@@ -1,6 +1,8 @@
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:dart_appwrite/dart_appwrite.dart';
 
+const mainDataBaseId = 'default';
+
 @module
 abstract class AppServerConfig {
   @lazySingleton
@@ -19,7 +21,7 @@ abstract class AppServerConfig {
   Teams get teams => Teams(sl<Client>());
 
   @lazySingleton
-  Database get database => Database(sl<Client>());
+  Databases get database => Databases(sl<Client>(), databaseId: mainDataBaseId);
 
   @lazySingleton
   Storage get storage => Storage(sl<Client>());
