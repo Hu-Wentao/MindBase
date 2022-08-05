@@ -1,10 +1,10 @@
 import 'package:adaptive_breakpoints/adaptive_breakpoints.dart';
 import 'package:flutter/material.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:mind_base/src/app/application/model/model.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/confirm_dialog.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/core/infra/ui/widget/RadiusInkWell.dart';
-import 'package:mind_base/src/user/application/model/model.dart';
 import 'package:mind_base/src/user/infra/ui/dialog/auth_dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -18,16 +18,22 @@ class UserInfoTile extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // todo 展示用户头像
-              const Icon(Icons.person),
+              (user.isLogged && user.isAnonymous)
+                  ? const Icon(LineIcons.userSecret)
+                  // todo 展示用户头像
+                  : const Icon(Icons.person),
               const SizedBox(width: 4),
               // 手机竖屏模式不展示用户名
               if (getWindowType(c) != AdaptiveWindowType.xsmall)
-                Text(user.isLogged ? user.data!.name : "未登录"),
+                Text(user.isLogged
+                    ? user.isAnonymous
+                        ? "匿名用户"
+                        : user.data!.name
+                    : "未登录"),
             ],
           ),
           onTap: () async {
-            if (user.isLogged) {
+            if (user.isLogged && !user.isAnonymous) {
               //  退出登录
               await showConfirmDialog(
                 context: context,
