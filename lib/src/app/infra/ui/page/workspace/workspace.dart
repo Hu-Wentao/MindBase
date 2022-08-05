@@ -10,7 +10,6 @@ import 'package:mind_base/src/feedback/infra/ui/widget/feedback_btn.dart';
 import 'package:mind_base/src/user/application/model/model.dart';
 import 'package:mind_base/src/user/infra/ui/components/user_tile.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
-import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/collection_edit_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/widget/data_table_grid.dart';
 import 'package:mind_base/src/workspace/infra/ui/widget/space_selector_bar.dart';
@@ -88,7 +87,18 @@ class _WorkspacePageState extends State<WorkspacePage> {
         future: _futureTeamModel,
         builder: (c, s) => (s.data == null)
             ? (s.connectionState != ConnectionState.done)
-                ? const CircularProgressIndicator()
+                ? Scaffold(
+                    body: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.all(28.0),
+                          child: Text('加载中... 长时间无响应请尝试刷新页面...'),
+                        ),
+                        Center(child: CircularProgressIndicator()),
+                      ],
+                    ),
+                  )
                 : Center(child: Text('${s.error}'))
             : ChangeNotifierProvider<TeamModel>.value(
                 value: s.data!,
@@ -190,26 +200,24 @@ class _WorkspacePageState extends State<WorkspacePage> {
               message: '修改表权限',
               child: TextButton.icon(
                 onPressed: () async {
-                  //  todo 权限
-                  final data = space.metaCollection?.dto;
+                  final data = space.metaCollection.dto;
                   if (data == null) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text("集合权限信息正在加载中,请稍后再试"),
                     ));
-                    space.actFetch().thenDialog(context);
+                    space.actRefresh().thenDialog(context);
                     return;
                   } else {
                     final dto = await showCollectionEditDialog(context, data, space.at.id);
-                    if(dto == null) return;
+                    if (dto == null) return;
                     final userId = context.read<UserModel>().id;
-                    final teamOwnerId = space.at.members.firstWhereOrNull((element) => element.roles.contains(Role.owner.value))?.userId;
-                    space.at.members;
-                    space.metaCollection!
-                        .actUpdateCollection(userId,teamOwnerId, dto)
+                    final teamOwnerId = space.at.teamOwner?.userId;
+                    space.metaCollection
+                        .actUpdateCollection(userId, teamOwnerId, dto)
                         .thenDialog(context);
                   }
                 },
-                icon: const Icon(Icons.shield_outlined,color: Colors.white,),
+                icon: const Icon(Icons.shield_outlined, color: Colors.white),
                 label: const Text("修改权限"),
               ),
             ),
