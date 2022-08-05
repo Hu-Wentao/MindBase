@@ -402,7 +402,7 @@ packages:
       name: flutter_svg
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.1.1+1"
+    version: "1.1.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -498,7 +498,7 @@ packages:
       name: go_router
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "4.2.2"
+    version: "4.2.7"
   graphs:
     dependency: transitive
     description:
@@ -512,7 +512,7 @@ packages:
       name: http
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.13.4"
+    version: "0.13.5"
   http_multi_server:
     dependency: transitive
     description:
@@ -729,14 +729,14 @@ packages:
       name: path_drawing
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.0"
+    version: "1.0.1"
   path_parsing:
     dependency: transitive
     description:
       name: path_parsing
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.0"
+    version: "1.0.1"
   path_provider:
     dependency: transitive
     description:
@@ -842,7 +842,7 @@ packages:
     description:
       path: "."
       ref: "v1.3"
-      resolved-ref: d7f35ec98af5aed3842ebdf393b6b42dec37957d
+      resolved-ref: "8d84aedefb54264318fbd688b4c7d12e9415471d"
       url: "https://e.coding.net/shuttlecloud/company/provider_sidecar.git"
     source: git
     version: "1.2.1"
