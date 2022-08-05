@@ -4,6 +4,7 @@ import 'package:form_builder_validators/localization/l10n.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mind_base/src/app/application.dart';
+import 'package:mind_base/src/app/application/model/model.dart';
 import 'package:mind_base/src/app/infra/ui/page/home/home.dart';
 import 'package:mind_base/src/app/infra/ui/page/workspace/workspace.dart';
 import 'package:mind_base/src/user/application/model/model.dart';
@@ -103,35 +104,34 @@ class MindBaseApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       // 配置Provider
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider<UserModel>(
-            create: (_) => UserModel()..actInitSubscription(),
-          ),
-        ],
-        child:
-            // 配置 AutoRoute
-            MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          routeInformationProvider: _router.routeInformationProvider,
-          routeInformationParser: _router.routeInformationParser,
-          routerDelegate: _router.routerDelegate,
-          title: 'Mind Base',
-          localizationsDelegates: const [
-            FormBuilderLocalizations.delegate,
-            ...GlobalMaterialLocalizations.delegates,
-          ],
-          supportedLocales: const [
-            Locale('zh', ''),
-            Locale('en', ''),
-            Locale('es', ''),
-            Locale('fa', ''),
-            Locale('fr', ''),
-            Locale('ja', ''),
-            Locale('pt', ''),
-            Locale('sk', ''),
-            Locale('pl', ''),
-          ],
-        ),
+      ChangeNotifierProvider<AppStateModel>(
+        create: (_) => AppStateModel(config)..actInitSubscription(),
+        child: Builder(
+            builder: (ctx) => ChangeNotifierProvider<UserModel>.value(
+                  value: ctx.select<AppStateModel, UserModel>((_) => _.user),
+                  child: MaterialApp.router(
+                    debugShowCheckedModeBanner: false,
+                    // 配置 router
+                    routeInformationProvider: _router.routeInformationProvider,
+                    routeInformationParser: _router.routeInformationParser,
+                    routerDelegate: _router.routerDelegate,
+                    title: 'Mind Base',
+                    localizationsDelegates: const [
+                      FormBuilderLocalizations.delegate,
+                      ...GlobalMaterialLocalizations.delegates,
+                    ],
+                    supportedLocales: const [
+                      Locale('zh', ''),
+                      Locale('en', ''),
+                      Locale('es', ''),
+                      Locale('fa', ''),
+                      Locale('fr', ''),
+                      Locale('ja', ''),
+                      Locale('pt', ''),
+                      Locale('sk', ''),
+                      Locale('pl', ''),
+                    ],
+                  ),
+                )),
       );
 }
