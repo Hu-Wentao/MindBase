@@ -73,9 +73,8 @@ class UserModel extends IUserModel with UserStateChangeMx {
   List<TeamModel> teams = [];
 
   @override
-  TeamModel addNewTeamModel(aw.Team data,
-      [@Deprecated("弃用") bool isMember = true]) {
-    final m = TeamModel(data, this)..tmpIsMember = isMember;
+  TeamModel addNewTeamModel(aw.Team data) {
+    final m = TeamModel(data, this);
     teams.add(m
       // 必须在此处初始化,否则Team列表无法显示Team内的工作空间信息
       ..actInitSubscription());
@@ -85,6 +84,9 @@ class UserModel extends IUserModel with UserStateChangeMx {
 
   @Deprecated("避免使用")
   aw.User loggedUser() => data!;
+
+  @override
+  String toString() => 'UserModel{user: ${data?.toMap()} session: ${session?.toMap()}, teams: $teams}';
 }
 
 extension UserBizX on UserModel {

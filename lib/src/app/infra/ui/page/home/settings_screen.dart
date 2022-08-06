@@ -1,5 +1,8 @@
 part of 'home.dart';
 
+const _devPath =
+    '/team/628895eb97858942e1ddb007/workspace/629393c8ebbbf5094df3e564/meta/""/view/-1';
+
 class SettingScreen extends StatelessWidget {
   const SettingScreen({Key? key}) : super(key: key);
 
@@ -14,17 +17,13 @@ class SettingScreen extends StatelessWidget {
               title: const Text("测试空间视图Url跳转"),
               onTap: () {
                 // 学生测试, 学生表4, view1
-                context.go(
-                    '/workspace/629393c8ebbbf5094df3e564/meta/62b88d0a1859252c4816ed24/view/1');
+                context.go(_devPath);
               },
               trailing: IconButton(
                 icon: const Icon(Icons.more_vert_rounded),
                 onPressed: () async {
                   final target = await showTextInputDialog(
-                      context: context,
-                      title: '路由跳转',
-                      origin:
-                          '/workspace/629393c8ebbbf5094df3e564/meta/62b88d0a1859252c4816ed24/view/1');
+                      context: context, title: '路由跳转', origin: _devPath);
                   if (target != null) {
                     context.go(target);
                   }

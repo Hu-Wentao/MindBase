@@ -36,8 +36,8 @@ final _router = GoRouter(
       ),
       GoRoute(path: '/team', redirect: (_) => '/${ScreenType.teams.name}'),
       GoRoute(
-          //      /team/:teamId/workspace/:workspaceId/meta/:metaId/view/:viewId
-          // /team/628895eb97858942e1ddb007/workspace/629393c8ebbbf5094df3e564/meta//view/-1
+          // /team/:teamId/workspace/:workspaceId/meta/:metaId/view/:viewId
+          // /team/628895eb97858942e1ddb007/workspace/629393c8ebbbf5094df3e564/meta/''/view/-1
           path: '/team/:teamId',
           redirect: (_) => '/${ScreenType.teams.name}', // todo 尚未完成独立Team页面
           routes: [
