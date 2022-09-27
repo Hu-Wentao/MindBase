@@ -7,8 +7,7 @@ import 'package:mind_base/src/app/application.dart';
 import 'package:mind_base/src/app/application/model/model.dart';
 import 'package:mind_base/src/app/infra/ui/page/home/home.dart';
 import 'package:mind_base/src/app/infra/ui/page/workspace/workspace.dart';
-import 'package:mind_base/src/user/application/model/model.dart';
-import 'package:provider/provider.dart';
+import 'package:provider_sidecar/provider_sidecar_ex.dart';
 
 /// 由于路由参数可能从 地址栏 直接传入,因此入参必须是 String? 类型
 workspaceRouterPathBuilder({
@@ -81,7 +80,7 @@ final _router = GoRouter(
                               if (viewId == null || viewId == -1) {
                                 viewId = null;
                               }
-                              return WorkspacePage(
+                              return WorkspacePage2(
                                   // key 必须是 workspaceId,因为页面以单个工作空间刷新
                                   key: ValueKey(s.params['workspaceId']),
                                   teamId: s.params['teamId']!,
@@ -104,34 +103,37 @@ class MindBaseApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       // 配置Provider
-      ChangeNotifierProvider<AppStateModel>(
-        create: (_) => AppStateModel(config)..actInitSubscription(),
-        child: Builder(
-            builder: (ctx) => ChangeNotifierProvider<UserModel>.value(
-                  value: ctx.select<AppStateModel, UserModel>((_) => _.user),
-                  child: MaterialApp.router(
-                    debugShowCheckedModeBanner: false,
-                    // 配置 router
-                    routeInformationProvider: _router.routeInformationProvider,
-                    routeInformationParser: _router.routeInformationParser,
-                    routerDelegate: _router.routerDelegate,
-                    title: 'Mind Base',
-                    localizationsDelegates: const [
-                      FormBuilderLocalizations.delegate,
-                      ...GlobalMaterialLocalizations.delegates,
-                    ],
-                    supportedLocales: const [
-                      Locale('zh', ''),
-                      Locale('en', ''),
-                      Locale('es', ''),
-                      Locale('fa', ''),
-                      Locale('fr', ''),
-                      Locale('ja', ''),
-                      Locale('pt', ''),
-                      Locale('sk', ''),
-                      Locale('pl', ''),
-                    ],
-                  ),
-                )),
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<AppStateModel>(
+            create: (_) => AppStateModel(config)..actInitSubscription(),
+          ),
+          ChangeNotifierProxyProvider<AppStateModel, UserModel>.value(
+            update: (c, m, o) => m.user,
+          ),
+        ],
+        child: MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          // 配置 router
+          routeInformationProvider: _router.routeInformationProvider,
+          routeInformationParser: _router.routeInformationParser,
+          routerDelegate: _router.routerDelegate,
+          title: 'Mind Base',
+          localizationsDelegates: const [
+            FormBuilderLocalizations.delegate,
+            ...GlobalMaterialLocalizations.delegates,
+          ],
+          supportedLocales: const [
+            Locale('zh', ''),
+            Locale('en', ''),
+            Locale('es', ''),
+            Locale('fa', ''),
+            Locale('fr', ''),
+            Locale('ja', ''),
+            Locale('pt', ''),
+            Locale('sk', ''),
+            Locale('pl', ''),
+          ],
+        ),
       );
 }
