@@ -46,6 +46,10 @@ dependencies:
     git:
       url: https://e.coding.net/shuttlecloud/company/provider_sidecar.git
       ref: v1.3
+  slowly:
+    git:
+      url: https://gitee.com/hu_wt/slowly.git
+      ref: main
 
   # form
   flutter_form_builder: "7.1.1"

@@ -842,7 +842,7 @@ packages:
     description:
       path: "."
       ref: "v1.3"
-      resolved-ref: "85d4bfba952c63bd2e31c29f4c602d1bec44a3c8"
+      resolved-ref: "234b8ce7fb1dbdf61835da0706a8c394adb902e6"
       url: "https://e.coding.net/shuttlecloud/company/provider_sidecar.git"
     source: git
     version: "1.2.1"
@@ -914,6 +914,15 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
+  slowly:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: main
+      resolved-ref: e04bf0dba357ee49ea876fd3e794f082f4233709
+      url: "https://gitee.com/hu_wt/slowly.git"
+    source: git
+    version: "0.1.0"
   source_gen:
     dependency: transitive
     description:
