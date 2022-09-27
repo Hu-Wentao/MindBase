@@ -72,6 +72,10 @@ class UserModel extends IUserModel with UserStateChangeMx {
   @override
   List<TeamModel> teams = [];
 
+  // 以当前用户身份获取团队Model
+  TeamModel? getTeam(String teamId) =>
+      teams.firstWhereOrNull((tm) => tm.id == teamId);
+
   @override
   TeamModel addNewTeamModel(aw.Team data) {
     final m = TeamModel(data, this);
@@ -86,7 +90,8 @@ class UserModel extends IUserModel with UserStateChangeMx {
   aw.User loggedUser() => data!;
 
   @override
-  String toString() => 'UserModel{user: ${data?.toMap()} session: ${session?.toMap()}, teams: $teams}';
+  String toString() =>
+      'UserModel{user: ${data?.toMap()} session: ${session?.toMap()}, teams: $teams}';
 }
 
 extension UserBizX on UserModel {

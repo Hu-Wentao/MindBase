@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/app/application.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
