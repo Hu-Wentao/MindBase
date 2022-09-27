@@ -112,6 +112,18 @@ class AppStateModel extends ModelSidecar<MindBaseConfig, BaseException?>
     final u = await _accountSrv.getUser();
     return Tuple2<aw.User, aw.Session>(u, nSession);
   }
+
+  /// 自动登陆 (确保当前状态为 logged)
+  /// 恢复登陆状态或以匿名身份登陆
+  Future<BaseException?> actUserAutoLogged() async =>
+      await actWrapper(() => reqWrapper(
+            () {
+              onFetch(isActive: false);
+              setDone('actUserAutoLogged, 确保当前有登陆用户[${user.data?.toMap()}]');
+            },
+            // 可能要根据情况改成其他状态
+            accWhen: () => !user.isLogged,
+          ));
 }
 
 extension AppStateModelBizX on AppStateModel {
