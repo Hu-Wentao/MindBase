@@ -4,22 +4,42 @@ import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:go_router/go_router.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:mind_base/generated/assets.dart';
+import 'package:mind_base/src/app/application/model/model.dart';
 import 'package:mind_base/src/user/domain/value/value.dart';
 import 'package:mind_base/src/user/infra/ui/widget/rounded_button.dart';
 import 'package:mind_base/src/user/infra/ui/widget/rounded_input_field.dart';
 import 'package:mind_base/src/user/infra/ui/widget/rounded_password_field.dart';
 import 'dart:math' as m;
+
+import 'package:provider/provider.dart';
+import 'package:provider_sidecar/provider_sidecar.dart';
+
 part 'router.dart';
 
 part 'auth.g.dart';
 
-class AuthPage extends StatelessWidget {
+class AuthPage extends StatefulWidget {
   final bool login;
+
   const AuthPage({Key? key, this.login = true}) : super(key: key);
 
   @override
+  State<AuthPage> createState() => _AuthPageState();
+}
+
+class _AuthPageState extends State<AuthPage>
+    with OnInitStateMx<AppStateModel, AuthPage> {
+  @override
+  onInitState(m, msgr) => m.events.listen((evt) => evt.maybeWhen(
+      msg: (msg) => msgr.showSnackBar(SnackBar(content: Text(msg))),
+      orElse: () => null));
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Body());
+    return Scaffold(
+        body: Body(
+      initIsRegister: !widget.login,
+    ));
   }
 }
 
@@ -137,13 +157,13 @@ class _BodyState extends State<Body> {
                 SizedBox(height: size.height * 0.03),
                 isRegister
                     ? SvgPicture.asset(
-                  Assets.authLogin,
-                  height: size.height * 0.35,
-                )
+                        Assets.authLogin,
+                        height: size.height * 0.35,
+                      )
                     : SvgPicture.asset(
-                  Assets.authSignup,
-                  height: size.height * 0.35,
-                ),
+                        Assets.authSignup,
+                        height: size.height * 0.35,
+                      ),
                 // 展示上次请求的错误信息
                 if (widget.rsp != null)
                   Padding(
@@ -151,13 +171,13 @@ class _BodyState extends State<Body> {
                     child: FutureBuilder(
                         future: Future.delayed(const Duration(seconds: 5)),
                         builder: (c, s) =>
-                        (s.connectionState == ConnectionState.done)
-                            ? const SizedBox()
-                            : Text(
-                          "${widget.rsp!.msg}",
-                          style: const TextStyle(
-                              color: Colors.red, fontSize: 18),
-                        )),
+                            (s.connectionState == ConnectionState.done)
+                                ? const SizedBox()
+                                : Text(
+                                    "${widget.rsp!.msg}",
+                                    style: const TextStyle(
+                                        color: Colors.red, fontSize: 18),
+                                  )),
                   ),
                 ..._buildInputField(context),
                 SizedBox(height: size.height * 0.03),
@@ -177,17 +197,17 @@ class _BodyState extends State<Body> {
   }
 
   List<Widget> _buildAuthOptionsRow(List<AuthVerify> authList) => [
-    const OrDivider(),
-    Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: authList
-          .map((auth) => IconButton(
-        onPressed: () => switchAuthVerify(auth),
-        icon: Icon(_getAuthVerifyIcon(auth)),
-      ))
-          .toList(),
-    )
-  ];
+        const OrDivider(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: authList
+              .map((auth) => IconButton(
+                    onPressed: () => switchAuthVerify(auth),
+                    icon: Icon(_getAuthVerifyIcon(auth)),
+                  ))
+              .toList(),
+        )
+      ];
 
   List<Widget> _buildInputField(BuildContext ctx) {
     switch (authVerify) {
@@ -207,12 +227,17 @@ class _BodyState extends State<Body> {
             text: isRegister ? "注册" : "登陆",
             press: () async {
               if (_formKey.currentState!.validate()) {
-                Navigator.of(context).pop(AuthReq(
-                  isRegister,
-                  authVerify,
-                  identityStr,
-                  Password(pwd),
-                ));
+                context.read<AppStateModel>().actEntrance(
+                      isRegister
+                          ? AppAct.signupLogin(
+                              authVerify: authVerify,
+                              identityStr: identityStr,
+                              password: Password(pwd))
+                          : AppAct.login(
+                              authVerify: authVerify,
+                              identityStr: identityStr,
+                              password: Password(pwd)),
+                    );
               }
             },
             color: Theme.of(context).primaryColor,
@@ -329,24 +354,24 @@ class SocialIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-    onTap: press,
-    child: Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        border: Border.all(
-          width: 2,
-          color: Theme.of(context).primaryColor,
+        onTap: press,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 2,
+              color: Theme.of(context).primaryColor,
+            ),
+            shape: BoxShape.circle,
+          ),
+          child: SvgPicture.asset(
+            iconSrc,
+            height: 20,
+            width: 20,
+          ),
         ),
-        shape: BoxShape.circle,
-      ),
-      child: SvgPicture.asset(
-        iconSrc,
-        height: 20,
-        width: 20,
-      ),
-    ),
-  );
+      );
 }
 
 class AlreadyHaveAnAccountCheck extends StatelessWidget {
@@ -361,24 +386,24 @@ class AlreadyHaveAnAccountCheck extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: <Widget>[
-      Text(
-        login ? "已有账号 ? " : "没有账号 ? ",
-        style:
-        TextStyle(color: Theme.of(context).primaryColor, fontSize: 14),
-      ),
-      GestureDetector(
-        onTap: press,
-        child: Text(
-          login ? "登录" : "注册",
-          style: TextStyle(
-            color: Theme.of(context).primaryColor,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            login ? "已有账号 ? " : "没有账号 ? ",
+            style:
+                TextStyle(color: Theme.of(context).primaryColor, fontSize: 14),
           ),
-        ),
-      )
-    ],
-  );
+          GestureDetector(
+            onTap: press,
+            child: Text(
+              login ? "登录" : "注册",
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          )
+        ],
+      );
 }
