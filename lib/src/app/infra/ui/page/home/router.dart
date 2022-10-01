@@ -1,6 +1,6 @@
 part of 'home.dart';
 
-@TypedGoRoute<HomeRoute>(path: '/home:screen', routes: [])
+@TypedGoRoute<HomeRoute>(path: '/home/:screen', routes: [])
 class HomeRoute extends GoRouteData {
   final ScreenType screen;
 

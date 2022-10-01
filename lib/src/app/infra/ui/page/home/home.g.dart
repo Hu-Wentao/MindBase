@@ -11,7 +11,7 @@ List<GoRoute> get $appRoutes => [
     ];
 
 GoRoute get $homeRoute => GoRouteData.$route(
-      path: '/home:screen',
+      path: '/home/:screen',
       factory: $HomeRouteExtension._fromState,
     );
 
@@ -21,7 +21,7 @@ extension $HomeRouteExtension on HomeRoute {
       );
 
   String get location => GoRouteData.$location(
-        '/home${Uri.encodeComponent(_$ScreenTypeEnumMap[screen]!)}',
+        '/home/${Uri.encodeComponent(_$ScreenTypeEnumMap[screen]!)}',
       );
 
   void go(BuildContext context) => context.go(location, extra: this);

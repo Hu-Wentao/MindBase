@@ -78,9 +78,8 @@ class _HomePageState extends State<HomePage> {
         body: _buildBody(context),
         selectedIndex: activeIdx,
         destinations: _destinations,
-        onDestinationSelected: (i) {
-          context.go("/${ScreenType.values[i].name}");
-        },
+        onDestinationSelected: (i) =>
+            HomeRoute(ScreenType.values[i]).go(context),
         // drawerHeader: _buildDrawerHeader(context),
         // navigationTypeResolver: (ctx) {
         //   if (MediaQuery.of(context).size.width > 600) {
