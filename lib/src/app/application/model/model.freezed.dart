@@ -1314,49 +1314,56 @@ abstract class AppStateUnLogged implements AppState {
 
 /// @nodoc
 mixin _$AppEvt {
-  String get msg => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String msg) msg,
+    required TResult Function() recovering,
+    required TResult Function(String? errMsg) recoverDone,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(String msg)? msg,
+    TResult Function()? recovering,
+    TResult Function(String? errMsg)? recoverDone,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String msg)? msg,
+    TResult Function()? recovering,
+    TResult Function(String? errMsg)? recoverDone,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(AppEvtMsg value) msg,
+    required TResult Function(AppEvtRecovering value) recovering,
+    required TResult Function(AppEvtRecoverDone value) recoverDone,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult Function(AppEvtMsg value)? msg,
+    TResult Function(AppEvtRecovering value)? recovering,
+    TResult Function(AppEvtRecoverDone value)? recoverDone,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(AppEvtMsg value)? msg,
+    TResult Function(AppEvtRecovering value)? recovering,
+    TResult Function(AppEvtRecoverDone value)? recoverDone,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
-
-  @JsonKey(ignore: true)
-  $AppEvtCopyWith<AppEvt> get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $AppEvtCopyWith<$Res> {
   factory $AppEvtCopyWith(AppEvt value, $Res Function(AppEvt) then) =
       _$AppEvtCopyWithImpl<$Res>;
-  $Res call({String msg});
 }
 
 /// @nodoc
@@ -1366,26 +1373,13 @@ class _$AppEvtCopyWithImpl<$Res> implements $AppEvtCopyWith<$Res> {
   final AppEvt _value;
   // ignore: unused_field
   final $Res Function(AppEvt) _then;
-
-  @override
-  $Res call({
-    Object? msg = freezed,
-  }) {
-    return _then(_value.copyWith(
-      msg: msg == freezed
-          ? _value.msg
-          : msg // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
 }
 
 /// @nodoc
-abstract class _$$AppEvtMsgCopyWith<$Res> implements $AppEvtCopyWith<$Res> {
+abstract class _$$AppEvtMsgCopyWith<$Res> {
   factory _$$AppEvtMsgCopyWith(
           _$AppEvtMsg value, $Res Function(_$AppEvtMsg) then) =
       __$$AppEvtMsgCopyWithImpl<$Res>;
-  @override
   $Res call({String msg});
 }
 
@@ -1446,6 +1440,8 @@ class _$AppEvtMsg implements AppEvtMsg {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String msg) msg,
+    required TResult Function() recovering,
+    required TResult Function(String? errMsg) recoverDone,
   }) {
     return msg(this.msg);
   }
@@ -1454,6 +1450,8 @@ class _$AppEvtMsg implements AppEvtMsg {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(String msg)? msg,
+    TResult Function()? recovering,
+    TResult Function(String? errMsg)? recoverDone,
   }) {
     return msg?.call(this.msg);
   }
@@ -1462,6 +1460,8 @@ class _$AppEvtMsg implements AppEvtMsg {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String msg)? msg,
+    TResult Function()? recovering,
+    TResult Function(String? errMsg)? recoverDone,
     required TResult orElse(),
   }) {
     if (msg != null) {
@@ -1474,6 +1474,8 @@ class _$AppEvtMsg implements AppEvtMsg {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(AppEvtMsg value) msg,
+    required TResult Function(AppEvtRecovering value) recovering,
+    required TResult Function(AppEvtRecoverDone value) recoverDone,
   }) {
     return msg(this);
   }
@@ -1482,6 +1484,8 @@ class _$AppEvtMsg implements AppEvtMsg {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult Function(AppEvtMsg value)? msg,
+    TResult Function(AppEvtRecovering value)? recovering,
+    TResult Function(AppEvtRecoverDone value)? recoverDone,
   }) {
     return msg?.call(this);
   }
@@ -1490,6 +1494,8 @@ class _$AppEvtMsg implements AppEvtMsg {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(AppEvtMsg value)? msg,
+    TResult Function(AppEvtRecovering value)? recovering,
+    TResult Function(AppEvtRecoverDone value)? recoverDone,
     required TResult orElse(),
   }) {
     if (msg != null) {
@@ -1502,10 +1508,257 @@ class _$AppEvtMsg implements AppEvtMsg {
 abstract class AppEvtMsg implements AppEvt {
   const factory AppEvtMsg(final String msg) = _$AppEvtMsg;
 
-  @override
   String get msg;
-  @override
   @JsonKey(ignore: true)
   _$$AppEvtMsgCopyWith<_$AppEvtMsg> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$AppEvtRecoveringCopyWith<$Res> {
+  factory _$$AppEvtRecoveringCopyWith(
+          _$AppEvtRecovering value, $Res Function(_$AppEvtRecovering) then) =
+      __$$AppEvtRecoveringCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$AppEvtRecoveringCopyWithImpl<$Res> extends _$AppEvtCopyWithImpl<$Res>
+    implements _$$AppEvtRecoveringCopyWith<$Res> {
+  __$$AppEvtRecoveringCopyWithImpl(
+      _$AppEvtRecovering _value, $Res Function(_$AppEvtRecovering) _then)
+      : super(_value, (v) => _then(v as _$AppEvtRecovering));
+
+  @override
+  _$AppEvtRecovering get _value => super._value as _$AppEvtRecovering;
+}
+
+/// @nodoc
+
+class _$AppEvtRecovering implements AppEvtRecovering {
+  const _$AppEvtRecovering();
+
+  @override
+  String toString() {
+    return 'AppEvt.recovering()';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$AppEvtRecovering);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String msg) msg,
+    required TResult Function() recovering,
+    required TResult Function(String? errMsg) recoverDone,
+  }) {
+    return recovering();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function(String msg)? msg,
+    TResult Function()? recovering,
+    TResult Function(String? errMsg)? recoverDone,
+  }) {
+    return recovering?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String msg)? msg,
+    TResult Function()? recovering,
+    TResult Function(String? errMsg)? recoverDone,
+    required TResult orElse(),
+  }) {
+    if (recovering != null) {
+      return recovering();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(AppEvtMsg value) msg,
+    required TResult Function(AppEvtRecovering value) recovering,
+    required TResult Function(AppEvtRecoverDone value) recoverDone,
+  }) {
+    return recovering(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(AppEvtMsg value)? msg,
+    TResult Function(AppEvtRecovering value)? recovering,
+    TResult Function(AppEvtRecoverDone value)? recoverDone,
+  }) {
+    return recovering?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(AppEvtMsg value)? msg,
+    TResult Function(AppEvtRecovering value)? recovering,
+    TResult Function(AppEvtRecoverDone value)? recoverDone,
+    required TResult orElse(),
+  }) {
+    if (recovering != null) {
+      return recovering(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class AppEvtRecovering implements AppEvt {
+  const factory AppEvtRecovering() = _$AppEvtRecovering;
+}
+
+/// @nodoc
+abstract class _$$AppEvtRecoverDoneCopyWith<$Res> {
+  factory _$$AppEvtRecoverDoneCopyWith(
+          _$AppEvtRecoverDone value, $Res Function(_$AppEvtRecoverDone) then) =
+      __$$AppEvtRecoverDoneCopyWithImpl<$Res>;
+  $Res call({String? errMsg});
+}
+
+/// @nodoc
+class __$$AppEvtRecoverDoneCopyWithImpl<$Res> extends _$AppEvtCopyWithImpl<$Res>
+    implements _$$AppEvtRecoverDoneCopyWith<$Res> {
+  __$$AppEvtRecoverDoneCopyWithImpl(
+      _$AppEvtRecoverDone _value, $Res Function(_$AppEvtRecoverDone) _then)
+      : super(_value, (v) => _then(v as _$AppEvtRecoverDone));
+
+  @override
+  _$AppEvtRecoverDone get _value => super._value as _$AppEvtRecoverDone;
+
+  @override
+  $Res call({
+    Object? errMsg = freezed,
+  }) {
+    return _then(_$AppEvtRecoverDone(
+      errMsg == freezed
+          ? _value.errMsg
+          : errMsg // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$AppEvtRecoverDone implements AppEvtRecoverDone {
+  const _$AppEvtRecoverDone(this.errMsg);
+
+  @override
+  final String? errMsg;
+
+  @override
+  String toString() {
+    return 'AppEvt.recoverDone(errMsg: $errMsg)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$AppEvtRecoverDone &&
+            const DeepCollectionEquality().equals(other.errMsg, errMsg));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(errMsg));
+
+  @JsonKey(ignore: true)
+  @override
+  _$$AppEvtRecoverDoneCopyWith<_$AppEvtRecoverDone> get copyWith =>
+      __$$AppEvtRecoverDoneCopyWithImpl<_$AppEvtRecoverDone>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String msg) msg,
+    required TResult Function() recovering,
+    required TResult Function(String? errMsg) recoverDone,
+  }) {
+    return recoverDone(errMsg);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function(String msg)? msg,
+    TResult Function()? recovering,
+    TResult Function(String? errMsg)? recoverDone,
+  }) {
+    return recoverDone?.call(errMsg);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String msg)? msg,
+    TResult Function()? recovering,
+    TResult Function(String? errMsg)? recoverDone,
+    required TResult orElse(),
+  }) {
+    if (recoverDone != null) {
+      return recoverDone(errMsg);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(AppEvtMsg value) msg,
+    required TResult Function(AppEvtRecovering value) recovering,
+    required TResult Function(AppEvtRecoverDone value) recoverDone,
+  }) {
+    return recoverDone(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(AppEvtMsg value)? msg,
+    TResult Function(AppEvtRecovering value)? recovering,
+    TResult Function(AppEvtRecoverDone value)? recoverDone,
+  }) {
+    return recoverDone?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(AppEvtMsg value)? msg,
+    TResult Function(AppEvtRecovering value)? recovering,
+    TResult Function(AppEvtRecoverDone value)? recoverDone,
+    required TResult orElse(),
+  }) {
+    if (recoverDone != null) {
+      return recoverDone(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class AppEvtRecoverDone implements AppEvt {
+  const factory AppEvtRecoverDone(final String? errMsg) = _$AppEvtRecoverDone;
+
+  String? get errMsg;
+  @JsonKey(ignore: true)
+  _$$AppEvtRecoverDoneCopyWith<_$AppEvtRecoverDone> get copyWith =>
       throw _privateConstructorUsedError;
 }

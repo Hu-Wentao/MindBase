@@ -34,6 +34,10 @@ class AppState with _$AppState {
 class AppEvt with _$AppEvt {
   // 由于没有级联逻辑，Evt目前只承担消息通知功能
   const factory AppEvt.msg(String msg) = AppEvtMsg;
+
+  const factory AppEvt.recovering() = AppEvtRecovering;
+
+  const factory AppEvt.recoverDone(String? errMsg) = AppEvtRecoverDone;
 }
 
 class AppStateModel extends BaseActEntranceModel<AppAct, AppState>
@@ -83,10 +87,16 @@ class AppStateModel extends BaseActEntranceModel<AppAct, AppState>
   }
 
   recover() async {
-    final session = await _recoverSession();
-    final user = await _recoverUser();
-    evtEntrance(const AppEvt.msg("恢复登陆成功"));
-    setState(AppState.logged(user: UserModel(user, session)), '恢复登陆成功');
+    evtEntrance(const AppEvt.recovering());
+    try {
+      final session = await _recoverSession();
+      final user = await _recoverUser();
+      setState(AppState.logged(user: UserModel(user, session)), '恢复登陆成功');
+    } catch (e) {
+      evtEntrance(AppEvt.recoverDone('恢复登陆失败 $e'));
+      rethrow;
+    }
+    evtEntrance(const AppEvt.recoverDone(null));
   }
 
   loginAnonymous() async {
