@@ -6,6 +6,8 @@ class HomeRoute extends GoRouteData {
 
   const HomeRoute(this.screen);
 
+  const HomeRoute.auto([this.screen = ScreenType.workspaces]);
+
   @override
   Widget build(BuildContext context) => HomePage(
         key: const ValueKey('home'),
