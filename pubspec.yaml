@@ -19,7 +19,7 @@ version: 2.1.0
 
 environment:
   sdk: ">=2.18.0-44.1.beta <3.0.0"
-
+  flutter: ">=3.3.0"
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
 # consider running `flutter pub upgrade --major-versions`. Alternatively,
@@ -75,7 +75,7 @@ dependencies:
   url_launcher:
   json_editor:
   collection:
-  go_router:
+  go_router: ^5.0.5
   device_info_plus_platform_interface: '2.3.0+1'
 dev_dependencies:
   flutter_test:
@@ -85,6 +85,7 @@ dev_dependencies:
   json_serializable: # 需要 json_annotation
   injectable_generator:
   freezed:
+  go_router_builder:
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -98,6 +99,8 @@ dependency_overrides:
     git:
       url: https://e.coding.net/shuttlecloud/mindbase/pluto_grid.git
       ref: feat_on_col_moved_evt
+  provider_sidecar:
+    path: ../provider_sidecar
   analyzer: ">=4.2.0 <5.0.0"
 #    path: D:\_proj\pluto_grid
 #  get_arch_core:
