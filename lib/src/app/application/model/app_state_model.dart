@@ -1,76 +1,138 @@
 part of 'model.dart';
 
-class AppStateModel extends ModelSidecar<MindBaseConfig, BaseException?>
-    with StateChangeMx<MindBaseConfig, BaseException?> {
-  AccountService get _accountSrv => sl<AccountService>();
+@freezed
+class AppAct with _$AppAct {
+  const factory AppAct.signupLogin({
+    required AuthVerify authVerify,
+    required String identityStr,
+    required Password password,
+  }) = AppActSignupLogin;
 
-  AppStateModel(MindBaseConfig data)
-      : user = UserModel(),
-        super(data, ExceptionAdapter.of);
+  const factory AppAct.login({
+    required AuthVerify authVerify,
+    required String identityStr,
+    required Password password,
+  }) = AppActLogin;
 
-  // 子状态
-  UserModel user;
+  const factory AppAct.loginAnonymous() = AppActLoginAnonymous;
 
-  /// === 状态刷新
+  const factory AppAct.recover() = AppActRecover;
+
+  const factory AppAct.logout() = AppActLogout;
+}
+
+@freezed
+class AppState with _$AppState {
+  const factory AppState.init() = AppStateInit;
+
+  const factory AppState.logged({required UserModel user}) = AppStateLogged;
+
+  const factory AppState.unLogged() = AppStateUnLogged;
+}
+
+@freezed
+class AppEvt with _$AppEvt {
+  // 由于没有级联逻辑，Evt目前只承担消息通知功能
+  const factory AppEvt.msg(String msg) = AppEvtMsg;
+}
+
+class AppStateModel extends BaseActEntranceModel<AppAct, AppState>
+    with EvtEntranceMx<AppEvt> {
+  final MindBaseConfig config;
+
+  AppStateModel(this.config, [AppState state = const AppState.init()])
+      : super(state: state, onCatch: ExceptionAdapter.of);
 
   @override
-  Future<bool?> onFetch({bool isActive = false}) async {
-    _setUserModel(await _fetchUser());
-
-    return true;
-  }
+  onActEntrance(AppAct act) async => await act.when(
+        signupLogin: signupLogin,
+        login: login,
+        logout: logout,
+        recover: recover,
+        loginAnonymous: loginAnonymous,
+      );
 
   @override
-  Future<bool?> onReset() async {
-    user.actCloseReset();
-
-    return true;
+  onEvent(AppEvt evt) {
+    super.onEvent(evt);
+    evt.maybeWhen(orElse: () {});
   }
 
-  /// === 状态更改
-
-  // 刷新后立即初始化
-  _setUserModel(Tuple2<aw.User, aw.Session>? u) {
-    user.actUnsubscribe();
-    user = UserModel(u?.value1, u?.value2)..actInitSubscription();
-    setDoneKeepState('刷新并初始化user[$user]');
+  /// 注册+登陆
+  signupLogin(
+    AuthVerify authVerify,
+    String identityStr,
+    Password password,
+  ) async {
+    final user = await _onSignup(authVerify, identityStr, password);
+    evtEntrance(const AppEvt.msg("注册成功"));
+    await login(authVerify, identityStr, password, user: user);
   }
 
-  /// === 实现
-
-  /// 尝试恢复用户登录状态, 如果之前的session还有效,在这里可以直接自动登录
-  /// 注意,本方法会被 [onFetch] 调用
-  /// 《立即初始化状态》
-  Future<Tuple2<aw.User, aw.Session>?> _fetchUser() async {
-    try {
-      final usr = await _accountSrv.getUser();
-      final sen = await _accountSrv.getSession();
-      return Tuple2<aw.User, aw.Session>(usr, sen);
-    } catch (e, s) {
-      log("尝试恢复用户登录状态时出错", e, s);
-      // AppwriteException: general_unauthorized_scope, User (role: guest) missing scope (account) (401)],
-      if (e is cli.AppwriteException &&
-          e.code == 401 &&
-          e.type == 'general_unauthorized_scope') {
-        setDone("您尚未登录");
-      } else {
-        setDone("初始化遇到未知错误, $e");
-      }
-      // 默认登陆匿名用户
-      final sen = await _accountSrv.createAnonymousSession();
-      final usr = await _accountSrv.getUser();
-      log("以匿名身份登录[${usr.toMap()}]\n${sen.toMap()}");
-      return Tuple2(usr, sen);
-    }
-  }
-
-  Future<aw.User> _onRegister(
+  /// 登陆
+  login(
     AuthVerify authVerify,
     String identityStr,
     Password password, {
-    String m = "正在注册...",
+    aw.User? user,
   }) async {
-    setDoneKeepState(m);
+    final session = await _onLogin(authVerify, identityStr, password);
+    user ??= await _recoverUser();
+    evtEntrance(const AppEvt.msg("登陆成功"));
+    setState(AppState.logged(user: UserModel(user, session)), '登陆成功');
+  }
+
+  recover() async {
+    final session = await _recoverSession();
+    final user = await _recoverUser();
+    evtEntrance(const AppEvt.msg("恢复登陆成功"));
+    setState(AppState.logged(user: UserModel(user, session)), '恢复登陆成功');
+  }
+
+  loginAnonymous() async {
+    final session = await _anonymousSession();
+    final user = await _recoverUser();
+    evtEntrance(const AppEvt.msg("匿名登陆成功"));
+    setState(AppState.logged(user: UserModel(user, session)), '匿名登陆成功');
+  }
+
+  logout() async {
+    await _logout(null);
+    evtEntrance(const AppEvt.msg("您已退出登陆"));
+    setState(const AppState.unLogged(), '退出登陆');
+  }
+}
+
+extension AppAccountX on AppStateModel {
+  AccountService get _accountSrv => sl<AccountService>();
+
+  _logout(String? sessionId) async => await _accountSrv.logout(sessionId);
+
+  Future<aw.Session> _recoverSession() async => await _accountSrv.getSession();
+
+  Future<aw.Session> _anonymousSession() async =>
+      await _accountSrv.createAnonymousSession();
+
+  Future<aw.User> _recoverUser() async {
+    try {
+      return await _accountSrv.getUser();
+    } catch (e) {
+      late AppEvt evt;
+      if (e is cli.AppwriteException &&
+          e.code == 401 &&
+          e.type == 'general_unauthorized_scope') {
+        evt = const AppEvt.msg("您尚未登录");
+        throw UnLoginException('您尚未登陆', '恢复User失败 $e');
+      } else {
+        evt = AppEvt.msg("恢复User遇到未知错误, $e");
+      }
+      evtEntrance(evt);
+      rethrow;
+    }
+  }
+
+  Future<aw.User> _onSignup(
+      AuthVerify authVerify, String identityStr, Password password) async {
     switch (authVerify) {
       case AuthVerify.email:
         return await _accountSrv.signup(
@@ -83,17 +145,16 @@ class AppStateModel extends ModelSidecar<MindBaseConfig, BaseException?>
       case AuthVerify.qqConnect:
       case AuthVerify.qqNumber:
       case AuthVerify.github:
-        throw BaseException('功能尚未实现', debugInfo: '逻辑错误');
+        throw FeatDeveloping('注册方式[$authVerify]尚未实现');
     }
   }
 
   // 登录,得到token
-  Future<Tuple2<aw.User, aw.Session>> _onLogin(
+  Future<aw.Session> _onLogin(
     AuthVerify authVerify,
     String identityStr,
-    Password password, {
-    String m = "正在登录...",
-  }) async {
+    Password password,
+  ) async {
     aw.Session nSession;
     switch (authVerify) {
       case AuthVerify.email:
@@ -109,34 +170,32 @@ class AppStateModel extends ModelSidecar<MindBaseConfig, BaseException?>
       case AuthVerify.github:
         throw BaseException('尚未支持的登录方式[$authVerify]');
     }
-    final u = await _accountSrv.getUser();
-    return Tuple2<aw.User, aw.Session>(u, nSession);
+    return nSession;
   }
-
-  /// 自动登陆 (确保当前状态为 logged)
-  /// 恢复登陆状态或以匿名身份登陆
-  Future<BaseException?> actUserAutoLogged() async =>
-      await actWrapper(() => reqWrapper(
-            () {
-              onFetch(isActive: false);
-              setDone('actUserAutoLogged, 确保当前有登陆用户[${user.data?.toMap()}]');
-            },
-            // 可能要根据情况改成其他状态
-            accWhen: () => !user.isLogged,
-          ));
 }
 
+@Deprecated('')
 extension AppStateModelBizX on AppStateModel {
-  // 注册/登录
+  /// 自动登陆 (确保当前状态为 logged)
+  /// 恢复登陆状态或以匿名身份登陆
+  @Deprecated("recover")
+  Future<BaseException?> actUserAutoLogged() =>
+      actEntrance(const AppAct.recover());
+
+// 注册/登录
+  @Deprecated("register / login")
   Future<BaseException?> actAuthWithReq(AuthReq? req) async =>
       await actWrapper(() async {
-        if (req == null) return;
-        // 先注册
+        if (req == null) return null;
         if (req.isRegister) {
-          await _onRegister(req.authVerify, req.identityStr, req.password);
+          return await actEntrance(AppAct.signupLogin(
+              authVerify: req.authVerify,
+              identityStr: req.identityStr,
+              password: req.password));
         }
-        // 注册完成后自动登录
-        _setUserModel(
-            await _onLogin(req.authVerify, req.identityStr, req.password));
+        return await actEntrance(AppAct.login(
+            authVerify: req.authVerify,
+            identityStr: req.identityStr,
+            password: req.password));
       });
 }

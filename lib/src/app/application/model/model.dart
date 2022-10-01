@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/app/application.dart';
+import 'package:mind_base/src/app/application/model/base_model.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/user/application/service/account_service.dart';
@@ -15,4 +17,7 @@ import 'package:appwrite/appwrite.dart' as cli;
 import 'package:appwrite/models.dart' as aw;
 
 part 'app_state_model.dart';
+
 part 'user_model.dart';
+
+part 'model.freezed.dart';
