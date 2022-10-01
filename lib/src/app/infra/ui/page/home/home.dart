@@ -25,6 +25,10 @@ part 'discover_screen.dart';
 
 part 'settings_screen.dart';
 
+part 'router.dart';
+
+part 'home.g.dart';
+
 enum ScreenType {
   workspaces,
   teams,
