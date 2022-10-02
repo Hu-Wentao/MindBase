@@ -84,15 +84,14 @@ class _TeamPanelState extends State<TeamPanel> {
                 body: ChangeNotifierProvider<TeamModel>.value(
                     value: teams[index],
                     child: Consumer<TeamModel>(
-                      builder: (c, team, _) => ListView.separated(
-                        itemCount: team.workspaces.length,
-                        itemBuilder: (BuildContext context, int i) =>
+                      builder: (c, team, _) => Column(
+                        children: [
+                          for (final space in team.workspaces)
                             WorkspaceTile(
-                          team: team,
-                          space: team.workspaces[i].data,
-                        ),
-                        separatorBuilder: (c, i) => const Divider(),
-                        shrinkWrap: true,
+                              team: team,
+                              space: space.data,
+                            )
+                        ],
                       ),
                     )))
         ],
