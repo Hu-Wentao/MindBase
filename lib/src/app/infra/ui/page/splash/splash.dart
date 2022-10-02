@@ -18,11 +18,11 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage>
-    with OnInitStateMx<AppStateModel, SplashPage> {
+    with OnInitStateMx<SplashPage, AppStateModel> {
   bool recovering = false;
 
   @override
-  onInitState(AppStateModel model, ScaffoldMessengerState msgr) => model
+  onInitState(msgr, model) => model
     ..events.listen((evt) => evt.maybeWhen(
         msg: (msg) => msgr.showSnackBar(SnackBar(content: Text(msg))),
         recovering: () => setState(() => recovering = true),

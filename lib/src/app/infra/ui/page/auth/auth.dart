@@ -28,9 +28,9 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage>
-    with OnInitStateMx<AppStateModel, AuthPage> {
+    with OnInitStateMx<AuthPage,AppStateModel> {
   @override
-  onInitState(m, msgr) => m.events.listen((evt) => evt.maybeWhen(
+  onInitState(msgr,m) => m.events.listen((evt) => evt.maybeWhen(
       msg: (msg) => msgr.showSnackBar(SnackBar(content: Text(msg))),
       orElse: () => null));
 
