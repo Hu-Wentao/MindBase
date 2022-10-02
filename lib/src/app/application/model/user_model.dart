@@ -77,8 +77,8 @@ extension UserTeamX on UserModel {
               ),
               s.value2),
           '更新List状态');
-      await refreshTeams();
     });
+    await refreshTeams();
   }
 
   createTeam(String name) async {
