@@ -49,7 +49,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with OnInitStateMx<HomePage, UserModel> {
   @override
-  onInitState(msgr, m) => m..actEntrance(const UserAct.initSubTeams());
+  onInitState(msgr, m) => m..actEntrance(const UserAct.initModel());
 
   late int activeIdx;
 
