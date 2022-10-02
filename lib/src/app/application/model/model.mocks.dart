@@ -8,11 +8,9 @@ import 'dart:ui' as _i7;
 
 import 'package:appwrite/models.dart' as _i2;
 import 'package:get_arch_core/get_arch_core.dart' as _i5;
-import 'package:mind_base/src/user/application/model/model.dart' as _i3;
+import 'package:mind_base/src/app/application/model/model.dart' as _i3;
 import 'package:mind_base/src/workspace/application/model/model.dart' as _i4;
-import 'package:mind_base/src/workspace/inter/dto/i_dto.dart' as _i9;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:provider_sidecar/provider_sidecar.dart' as _i8;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -40,24 +38,13 @@ class _FakeUserState_2 extends _i1.SmartFake implements _i3.UserState {
       : super(parent, parentInvocation);
 }
 
-class _FakeUserModel_3 extends _i1.SmartFake implements _i3.UserModel {
-  _FakeUserModel_3(Object parent, Invocation parentInvocation)
+class _FakeTeam_3 extends _i1.SmartFake implements _i2.Team {
+  _FakeTeam_3(Object parent, Invocation parentInvocation)
       : super(parent, parentInvocation);
 }
 
-class _FakeTeam_4 extends _i1.SmartFake implements _i2.Team {
-  _FakeTeam_4(Object parent, Invocation parentInvocation)
-      : super(parent, parentInvocation);
-}
-
-class _FakeWorkspaceModel_5 extends _i1.SmartFake
-    implements _i4.WorkspaceModel {
-  _FakeWorkspaceModel_5(Object parent, Invocation parentInvocation)
-      : super(parent, parentInvocation);
-}
-
-class _FakeMemberModel_6 extends _i1.SmartFake implements _i4.MemberModel {
-  _FakeMemberModel_6(Object parent, Invocation parentInvocation)
+class _FakeTeamState_4 extends _i1.SmartFake implements _i4.TeamState {
+  _FakeTeamState_4(Object parent, Invocation parentInvocation)
       : super(parent, parentInvocation);
 }
 
@@ -151,35 +138,13 @@ class MockUserModel extends _i1.Mock implements _i3.UserModel {
 /// See the documentation for Mockito's code generation for more information.
 class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
   @override
-  bool get tmpIsMember => (super.noSuchMethod(Invocation.getter(#tmpIsMember),
-      returnValue: false, returnValueForMissingStub: false) as bool);
-  @override
-  set tmpIsMember(bool? _tmpIsMember) =>
-      super.noSuchMethod(Invocation.setter(#tmpIsMember, _tmpIsMember),
-          returnValueForMissingStub: null);
-  @override
-  _i3.UserModel get at => (super.noSuchMethod(Invocation.getter(#at),
-      returnValue: _FakeUserModel_3(this, Invocation.getter(#at)),
+  _i2.Team get data => (super.noSuchMethod(Invocation.getter(#data),
+      returnValue: _FakeTeam_3(this, Invocation.getter(#data)),
       returnValueForMissingStub:
-          _FakeUserModel_3(this, Invocation.getter(#at))) as _i3.UserModel);
+          _FakeTeam_3(this, Invocation.getter(#data))) as _i2.Team);
   @override
-  List<_i4.WorkspaceModel> get workspaces =>
-      (super.noSuchMethod(Invocation.getter(#workspaces),
-              returnValue: <_i4.WorkspaceModel>[],
-              returnValueForMissingStub: <_i4.WorkspaceModel>[])
-          as List<_i4.WorkspaceModel>);
-  @override
-  set workspaces(List<_i4.WorkspaceModel>? _workspaces) =>
-      super.noSuchMethod(Invocation.setter(#workspaces, _workspaces),
-          returnValueForMissingStub: null);
-  @override
-  List<_i4.MemberModel> get members => (super.noSuchMethod(
-      Invocation.getter(#members),
-      returnValue: <_i4.MemberModel>[],
-      returnValueForMissingStub: <_i4.MemberModel>[]) as List<_i4.MemberModel>);
-  @override
-  set members(List<_i4.MemberModel>? _members) =>
-      super.noSuchMethod(Invocation.setter(#members, _members),
+  set data(_i2.Team? _data) =>
+      super.noSuchMethod(Invocation.setter(#data, _data),
           returnValueForMissingStub: null);
   @override
   String get id => (super.noSuchMethod(Invocation.getter(#id),
@@ -194,35 +159,23 @@ class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
   int get total => (super.noSuchMethod(Invocation.getter(#total),
       returnValue: 0, returnValueForMissingStub: 0) as int);
   @override
-  bool get isMember => (super.noSuchMethod(Invocation.getter(#isMember),
-      returnValue: false, returnValueForMissingStub: false) as bool);
-  @override
-  List<_i4.WorkspaceModel> get openedWorkspaces =>
-      (super.noSuchMethod(Invocation.getter(#openedWorkspaces),
+  List<_i4.WorkspaceModel> get workspaces =>
+      (super.noSuchMethod(Invocation.getter(#workspaces),
               returnValue: <_i4.WorkspaceModel>[],
               returnValueForMissingStub: <_i4.WorkspaceModel>[])
           as List<_i4.WorkspaceModel>);
   @override
-  _i2.Team get data => (super.noSuchMethod(Invocation.getter(#data),
-      returnValue: _FakeTeam_4(this, Invocation.getter(#data)),
+  List<_i4.MemberModel> get members => (super.noSuchMethod(
+      Invocation.getter(#members),
+      returnValue: <_i4.MemberModel>[],
+      returnValueForMissingStub: <_i4.MemberModel>[]) as List<_i4.MemberModel>);
+  @override
+  _i4.TeamState get state => (super.noSuchMethod(Invocation.getter(#state),
+      returnValue: _FakeTeamState_4(this, Invocation.getter(#state)),
       returnValueForMissingStub:
-          _FakeTeam_4(this, Invocation.getter(#data))) as _i2.Team);
+          _FakeTeamState_4(this, Invocation.getter(#state))) as _i4.TeamState);
   @override
-  set data(_i2.Team? _data) =>
-      super.noSuchMethod(Invocation.setter(#data, _data),
-          returnValueForMissingStub: null);
-  @override
-  bool get isAnemic => (super.noSuchMethod(Invocation.getter(#isAnemic),
-      returnValue: false, returnValueForMissingStub: false) as bool);
-  @override
-  bool get isRich => (super.noSuchMethod(Invocation.getter(#isRich),
-      returnValue: false, returnValueForMissingStub: false) as bool);
-  @override
-  _i8.ModelState get state => (super.noSuchMethod(Invocation.getter(#state),
-      returnValue: _i8.ModelState.init,
-      returnValueForMissingStub: _i8.ModelState.init) as _i8.ModelState);
-  @override
-  set state(_i8.ModelState? _state) =>
+  set state(_i4.TeamState? _state) =>
       super.noSuchMethod(Invocation.setter(#state, _state),
           returnValueForMissingStub: null);
   @override
@@ -235,96 +188,17 @@ class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
   bool get hasListeners => (super.noSuchMethod(Invocation.getter(#hasListeners),
       returnValue: false, returnValueForMissingStub: false) as bool);
   @override
-  _i4.WorkspaceModel addNewWorkspaceModel(_i9.WorkspaceDto? data) =>
-      (super.noSuchMethod(Invocation.method(#addNewWorkspaceModel, [data]),
-              returnValue: _FakeWorkspaceModel_5(
-                  this, Invocation.method(#addNewWorkspaceModel, [data])),
-              returnValueForMissingStub: _FakeWorkspaceModel_5(
-                  this, Invocation.method(#addNewWorkspaceModel, [data])))
-          as _i4.WorkspaceModel);
+  dynamic onActEntrance(_i4.TeamAct? act) =>
+      super.noSuchMethod(Invocation.method(#onActEntrance, [act]),
+          returnValueForMissingStub: null);
   @override
-  _i4.MemberModel addNewMemberModel(_i2.Membership? data) =>
-      (super.noSuchMethod(Invocation.method(#addNewMemberModel, [data]),
-              returnValue: _FakeMemberModel_6(
-                  this, Invocation.method(#addNewMemberModel, [data])),
-              returnValueForMissingStub: _FakeMemberModel_6(
-                  this, Invocation.method(#addNewMemberModel, [data])))
-          as _i4.MemberModel);
+  dynamic updateTeam(_i2.Team? team) =>
+      super.noSuchMethod(Invocation.method(#updateTeam, [team]),
+          returnValueForMissingStub: null);
   @override
-  T? reqWrapper<T>(T? Function()? onAccess,
-          {List<_i8.ModelState>? accWhenAny,
-          List<_i8.ModelState>? rejWhenAny,
-          bool Function()? accWhen,
-          T? Function()? onReject,
-          int? traceLine = 3}) =>
-      (super.noSuchMethod(
-          Invocation.method(#reqWrapper, [
-            onAccess
-          ], {
-            #accWhenAny: accWhenAny,
-            #rejWhenAny: rejWhenAny,
-            #accWhen: accWhen,
-            #onReject: onReject,
-            #traceLine: traceLine
-          }),
-          returnValueForMissingStub: null) as T?);
-  @override
-  T? setInit<T>(
-          [String? m = r'初始状态', T Function()? before, int? traceLine = 2]) =>
-      (super.noSuchMethod(Invocation.method(#setInit, [m, before, traceLine]),
-          returnValueForMissingStub: null) as T?);
-  @override
-  T? setActive<T>(
-          [String? m = r'刷新状态...', T Function()? before, int? traceLine = 2]) =>
-      (super.noSuchMethod(Invocation.method(#setActive, [m, before, traceLine]),
-          returnValueForMissingStub: null) as T?);
-  @override
-  T? setDone<T>(
-          [String? m = r'完成刷新',
-          T? Function()? before,
-          bool? changeState = true,
-          int? traceLine = 2]) =>
-      (super.noSuchMethod(
-          Invocation.method(#setDone, [m, before, changeState, traceLine]),
-          returnValueForMissingStub: null) as T?);
-  @override
-  T? setDoneKeepState<T>(
-          [String? m = r'完成刷新', T? Function()? before, int? traceLine = 2]) =>
-      (super.noSuchMethod(
-          Invocation.method(#setDoneKeepState, [m, before, traceLine]),
-          returnValueForMissingStub: null) as T?);
-  @override
-  _i2.Team updateData(_i2.Team? data,
-          {bool? silence = false,
-          _i8.ModelState? state = _i8.ModelState.active,
-          String? msg = r'刷新数据'}) =>
-      (super
-          .noSuchMethod(Invocation.method(#updateData, [data], {#silence: silence, #state: state, #msg: msg}),
-              returnValue: _FakeTeam_4(
-                  this,
-                  Invocation.method(#updateData, [data],
-                      {#silence: silence, #state: state, #msg: msg})),
-              returnValueForMissingStub: _FakeTeam_4(
-                  this,
-                  Invocation.method(#updateData, [
-                    data
-                  ], {
-                    #silence: silence,
-                    #state: state,
-                    #msg: msg
-                  }))) as _i2.Team);
-  @override
-  T? setUninitialized<T>([String? m = r'初始状态', T Function()? before]) =>
-      (super.noSuchMethod(Invocation.method(#setUninitialized, [m, before]),
-          returnValueForMissingStub: null) as T?);
-  @override
-  T? setInitializing<T>([String? m = r'刷新状态...', T Function()? before]) =>
-      (super.noSuchMethod(Invocation.method(#setInitializing, [m, before]),
-          returnValueForMissingStub: null) as T?);
-  @override
-  T? setInitialized<T>([String? m = r'完成刷新', T Function()? before]) =>
-      (super.noSuchMethod(Invocation.method(#setInitialized, [m, before]),
-          returnValueForMissingStub: null) as T?);
+  _i5.BaseException? onBeforeActEntrance(_i4.TeamAct? act) =>
+      (super.noSuchMethod(Invocation.method(#onBeforeActEntrance, [act]),
+          returnValueForMissingStub: null) as _i5.BaseException?);
   @override
   _i6.Future<_i5.BaseException?> actWrapper(
           [Function? action, int? traceLine = 1]) =>
@@ -333,8 +207,8 @@ class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
               returnValueForMissingStub: _i6.Future<_i5.BaseException?>.value())
           as _i6.Future<_i5.BaseException?>);
   @override
-  T? setState<T>(_i8.ModelState? state, String? m,
-          {T? Function()? before, int? traceLine = 1}) =>
+  T? setState<T>(_i4.TeamState? state, String? m,
+          {T? Function()? before, int? traceLine = 2}) =>
       (super.noSuchMethod(
           Invocation.method(
               #setState, [state, m], {#before: before, #traceLine: traceLine}),
@@ -355,58 +229,9 @@ class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
       super.noSuchMethod(Invocation.method(#notifyListeners, []),
           returnValueForMissingStub: null);
   @override
-  _i6.Future<_i5.BaseException?> actInitSubscription() =>
-      (super.noSuchMethod(Invocation.method(#actInitSubscription, []),
+  _i6.Future<_i5.BaseException?> actEntrance(_i4.TeamAct? act) =>
+      (super.noSuchMethod(Invocation.method(#actEntrance, [act]),
               returnValue: _i6.Future<_i5.BaseException?>.value(),
               returnValueForMissingStub: _i6.Future<_i5.BaseException?>.value())
           as _i6.Future<_i5.BaseException?>);
-  @override
-  _i6.Future<_i5.BaseException?> actCloseReset() =>
-      (super.noSuchMethod(Invocation.method(#actCloseReset, []),
-              returnValue: _i6.Future<_i5.BaseException?>.value(),
-              returnValueForMissingStub: _i6.Future<_i5.BaseException?>.value())
-          as _i6.Future<_i5.BaseException?>);
-  @override
-  _i6.Future<_i5.BaseException?> actSubscription() =>
-      (super.noSuchMethod(Invocation.method(#actSubscription, []),
-              returnValue: _i6.Future<_i5.BaseException?>.value(),
-              returnValueForMissingStub: _i6.Future<_i5.BaseException?>.value())
-          as _i6.Future<_i5.BaseException?>);
-  @override
-  _i6.Future<_i5.BaseException?> actUnsubscribe() =>
-      (super.noSuchMethod(Invocation.method(#actUnsubscribe, []),
-              returnValue: _i6.Future<_i5.BaseException?>.value(),
-              returnValueForMissingStub: _i6.Future<_i5.BaseException?>.value())
-          as _i6.Future<_i5.BaseException?>);
-  @override
-  _i6.Future<_i5.BaseException?> actRefresh({bool? isActive = false}) =>
-      (super.noSuchMethod(
-              Invocation.method(#actRefresh, [], {#isActive: isActive}),
-              returnValue: _i6.Future<_i5.BaseException?>.value(),
-              returnValueForMissingStub: _i6.Future<_i5.BaseException?>.value())
-          as _i6.Future<_i5.BaseException?>);
-  @override
-  _i6.Future<_i6.FutureOr<void>> onFetch({bool? isActive = false}) => (super
-          .noSuchMethod(Invocation.method(#onFetch, [], {#isActive: isActive}),
-              returnValue: _i6.Future<_i6.FutureOr<void>>.value(),
-              returnValueForMissingStub: _i6.Future<_i6.FutureOr<void>>.value())
-      as _i6.Future<_i6.FutureOr<void>>);
-  @override
-  _i6.Future<_i5.BaseException?> actCloseSubs() =>
-      (super.noSuchMethod(Invocation.method(#actCloseSubs, []),
-              returnValue: _i6.Future<_i5.BaseException?>.value(),
-              returnValueForMissingStub: _i6.Future<_i5.BaseException?>.value())
-          as _i6.Future<_i5.BaseException?>);
-  @override
-  _i6.Future<_i5.BaseException?> actReset() =>
-      (super.noSuchMethod(Invocation.method(#actReset, []),
-              returnValue: _i6.Future<_i5.BaseException?>.value(),
-              returnValueForMissingStub: _i6.Future<_i5.BaseException?>.value())
-          as _i6.Future<_i5.BaseException?>);
-  @override
-  _i6.Future<_i5.BaseException?> actFetch({bool? isActive = false}) => (super
-          .noSuchMethod(Invocation.method(#actFetch, [], {#isActive: isActive}),
-              returnValue: _i6.Future<_i5.BaseException?>.value(),
-              returnValueForMissingStub: _i6.Future<_i5.BaseException?>.value())
-      as _i6.Future<_i5.BaseException?>);
 }

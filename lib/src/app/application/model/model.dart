@@ -16,6 +16,7 @@ import 'package:mockito/annotations.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 import 'package:appwrite/appwrite.dart' as cli;
 import 'package:appwrite/models.dart' as aw;
+import 'package:get_sweet/get_sweet.dart';
 
 // Annotation which generates the cat.mocks.dart library and the MockCat class.
 @GenerateNiceMocks([

@@ -2,9 +2,9 @@ part of 'model.dart';
 
 @freezed
 class UserAct with _$UserAct {
-  const factory UserAct.initSubTeams() = UserActInitSubTeams;
+  const factory UserAct.initModel() = UserActInitModel;
 
-  const factory UserAct.refreshTeams() = UserActRefreshTeams;
+  const factory UserAct.updateTeams() = UserActUpdateTeams;
 
   const factory UserAct.createTeam(String name) = UserActCreateTeam;
 
@@ -47,10 +47,10 @@ class UserModel extends BaseActEntranceModel<UserAct, UserState> {
 
   @override
   onActEntrance(UserAct act) => act.when(
-        refreshTeams: refreshTeams,
+        updateTeams: updateTeams,
         deleteTeam: deleteTeam,
         createTeam: createTeam,
-        initSubTeams: initSubTeams,
+        initModel: initModel,
       );
 
   @protected
@@ -62,25 +62,26 @@ class UserModel extends BaseActEntranceModel<UserAct, UserState> {
 }
 
 extension UserTeamX on UserModel {
-  initSubTeams() async {
+  @protected
+  initModel() async {
     _realtimeSrv.watchTeams().listen((event) async {
       final Tuple2<List<TeamModel>, String?> s = state.map(
           // ignore: prefer_const_constructors
           init: (e) => Tuple2([], null),
           done: (e) => Tuple2(e.teams, e.markId));
-      setState(
-          UserStateDone(
-              s.value1.updateDataSet<aw.Team>(
-                event,
-                equals: (a, b) => a.id == b.id,
-                transform: (data) => TeamModel(data, this),
-              ),
-              s.value2),
-          '更新List状态');
+      final nState = UserStateDone(
+          s.value1.updateDataSet<aw.Team>(
+            event,
+            equals: (a, b) => a.id == b.id,
+            transform: TeamModel.new,
+          ),
+          s.value2);
+      setState(nState, '更新TeamList[${event.type}]');
     });
-    await refreshTeams();
+    await updateTeams();
   }
 
+  @protected
   createTeam(String name) async {
     if (isAnonymous) {
       throw UnLoginException('当前以匿名身份登录, 无法创建团队', '请先注册或登录新账号');
@@ -89,6 +90,7 @@ extension UserTeamX on UserModel {
     setState(state, '创建team[${tm.$id}]');
   }
 
+  @protected
   deleteTeam(String teamId) async {
     await _teamSrv.deleteTeam(teamId);
     state.mapOrNull(
@@ -96,10 +98,25 @@ extension UserTeamX on UserModel {
     setState(state, '删除team[$teamId]');
   }
 
-  refreshTeams() async {
-    final tms =
-        (await _teamSrv.getTeams()).map((e) => TeamModel(e, this)).toList();
-    setState(UserState.done(tms, markedTeam?.id), '刷新teams列表');
+  // 因为TeamModel内部包含子状态，因此team列表需要更新data，而不是替换列表
+  @protected
+  updateTeams() async {
+    final modelLs = state.isOrNull<UserStateDone>()?.teams ?? [];
+    final dataLs = await _teamSrv.getTeams();
+    final rst = <TeamModel>[];
+    // 复用老Model（以新team为基础）
+    for (final model in modelLs) {
+      final nTeam = (dataLs.removeWhereOrNull((t) => t.$id == model.id));
+      // 新列表没有，表明该team已经被删除
+      if (nTeam == null) continue;
+      // 将有效Model添加到新List
+      rst.add(model..actEntrance(TeamAct.updateTeam(nTeam)));
+    }
+    // 添加新Model
+    for (final data in dataLs) {
+      rst.add(TeamModel(data));
+    }
+    setState(UserState.done(rst, markedTeam?.id), '刷新teams列表[${rst.length}]');
   }
 
   RealtimeSrv get _realtimeSrv => sl<RealtimeSrv>();
@@ -107,7 +124,8 @@ extension UserTeamX on UserModel {
   TeamService get _teamSrv => sl<TeamService>();
 }
 
-extension UserDepreX on UserModel {
+@Deprecated('')
+extension UserDeprecatedX on UserModel {
   @Deprecated('存在即登陆')
   bool get isLogged => true;
 
@@ -129,7 +147,7 @@ extension UserDepreX on UserModel {
   ///   1.2 如果不存在, 则尝试以访客身份加入team; 结束;
   @Deprecated('refreshTeams')
   Future<BaseException?> actLoadTeam(String teamId) =>
-      actEntrance(const UserAct.refreshTeams());
+      actEntrance(const UserAct.updateTeams());
 
   @Deprecated('deleteTeam')
   Future<BaseException?> actDeleteTeam(String teamId) =>

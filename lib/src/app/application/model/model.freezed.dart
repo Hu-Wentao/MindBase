@@ -1767,24 +1767,24 @@ abstract class AppEvtRecoverDone implements AppEvt {
 mixin _$UserAct {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initSubTeams,
-    required TResult Function() refreshTeams,
+    required TResult Function() initModel,
+    required TResult Function() updateTeams,
     required TResult Function(String name) createTeam,
     required TResult Function(String teamId) deleteTeam,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initSubTeams,
-    TResult Function()? refreshTeams,
+    TResult Function()? initModel,
+    TResult Function()? updateTeams,
     TResult Function(String name)? createTeam,
     TResult Function(String teamId)? deleteTeam,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initSubTeams,
-    TResult Function()? refreshTeams,
+    TResult Function()? initModel,
+    TResult Function()? updateTeams,
     TResult Function(String name)? createTeam,
     TResult Function(String teamId)? deleteTeam,
     required TResult orElse(),
@@ -1792,24 +1792,24 @@ mixin _$UserAct {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(UserActInitSubTeams value) initSubTeams,
-    required TResult Function(UserActRefreshTeams value) refreshTeams,
+    required TResult Function(UserActInitModel value) initModel,
+    required TResult Function(UserActUpdateTeams value) updateTeams,
     required TResult Function(UserActCreateTeam value) createTeam,
     required TResult Function(UserActDeleteTeam value) deleteTeam,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(UserActInitSubTeams value)? initSubTeams,
-    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActInitModel value)? initModel,
+    TResult Function(UserActUpdateTeams value)? updateTeams,
     TResult Function(UserActCreateTeam value)? createTeam,
     TResult Function(UserActDeleteTeam value)? deleteTeam,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(UserActInitSubTeams value)? initSubTeams,
-    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActInitModel value)? initModel,
+    TResult Function(UserActUpdateTeams value)? updateTeams,
     TResult Function(UserActCreateTeam value)? createTeam,
     TResult Function(UserActDeleteTeam value)? deleteTeam,
     required TResult orElse(),
@@ -1833,38 +1833,37 @@ class _$UserActCopyWithImpl<$Res> implements $UserActCopyWith<$Res> {
 }
 
 /// @nodoc
-abstract class _$$UserActInitSubTeamsCopyWith<$Res> {
-  factory _$$UserActInitSubTeamsCopyWith(_$UserActInitSubTeams value,
-          $Res Function(_$UserActInitSubTeams) then) =
-      __$$UserActInitSubTeamsCopyWithImpl<$Res>;
+abstract class _$$UserActInitModelCopyWith<$Res> {
+  factory _$$UserActInitModelCopyWith(
+          _$UserActInitModel value, $Res Function(_$UserActInitModel) then) =
+      __$$UserActInitModelCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$UserActInitSubTeamsCopyWithImpl<$Res>
-    extends _$UserActCopyWithImpl<$Res>
-    implements _$$UserActInitSubTeamsCopyWith<$Res> {
-  __$$UserActInitSubTeamsCopyWithImpl(
-      _$UserActInitSubTeams _value, $Res Function(_$UserActInitSubTeams) _then)
-      : super(_value, (v) => _then(v as _$UserActInitSubTeams));
+class __$$UserActInitModelCopyWithImpl<$Res> extends _$UserActCopyWithImpl<$Res>
+    implements _$$UserActInitModelCopyWith<$Res> {
+  __$$UserActInitModelCopyWithImpl(
+      _$UserActInitModel _value, $Res Function(_$UserActInitModel) _then)
+      : super(_value, (v) => _then(v as _$UserActInitModel));
 
   @override
-  _$UserActInitSubTeams get _value => super._value as _$UserActInitSubTeams;
+  _$UserActInitModel get _value => super._value as _$UserActInitModel;
 }
 
 /// @nodoc
 
-class _$UserActInitSubTeams implements UserActInitSubTeams {
-  const _$UserActInitSubTeams();
+class _$UserActInitModel implements UserActInitModel {
+  const _$UserActInitModel();
 
   @override
   String toString() {
-    return 'UserAct.initSubTeams()';
+    return 'UserAct.initModel()';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$UserActInitSubTeams);
+        (other.runtimeType == runtimeType && other is _$UserActInitModel);
   }
 
   @override
@@ -1873,36 +1872,36 @@ class _$UserActInitSubTeams implements UserActInitSubTeams {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initSubTeams,
-    required TResult Function() refreshTeams,
+    required TResult Function() initModel,
+    required TResult Function() updateTeams,
     required TResult Function(String name) createTeam,
     required TResult Function(String teamId) deleteTeam,
   }) {
-    return initSubTeams();
+    return initModel();
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initSubTeams,
-    TResult Function()? refreshTeams,
+    TResult Function()? initModel,
+    TResult Function()? updateTeams,
     TResult Function(String name)? createTeam,
     TResult Function(String teamId)? deleteTeam,
   }) {
-    return initSubTeams?.call();
+    return initModel?.call();
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initSubTeams,
-    TResult Function()? refreshTeams,
+    TResult Function()? initModel,
+    TResult Function()? updateTeams,
     TResult Function(String name)? createTeam,
     TResult Function(String teamId)? deleteTeam,
     required TResult orElse(),
   }) {
-    if (initSubTeams != null) {
-      return initSubTeams();
+    if (initModel != null) {
+      return initModel();
     }
     return orElse();
   }
@@ -1910,78 +1909,78 @@ class _$UserActInitSubTeams implements UserActInitSubTeams {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(UserActInitSubTeams value) initSubTeams,
-    required TResult Function(UserActRefreshTeams value) refreshTeams,
+    required TResult Function(UserActInitModel value) initModel,
+    required TResult Function(UserActUpdateTeams value) updateTeams,
     required TResult Function(UserActCreateTeam value) createTeam,
     required TResult Function(UserActDeleteTeam value) deleteTeam,
   }) {
-    return initSubTeams(this);
+    return initModel(this);
   }
 
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(UserActInitSubTeams value)? initSubTeams,
-    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActInitModel value)? initModel,
+    TResult Function(UserActUpdateTeams value)? updateTeams,
     TResult Function(UserActCreateTeam value)? createTeam,
     TResult Function(UserActDeleteTeam value)? deleteTeam,
   }) {
-    return initSubTeams?.call(this);
+    return initModel?.call(this);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(UserActInitSubTeams value)? initSubTeams,
-    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActInitModel value)? initModel,
+    TResult Function(UserActUpdateTeams value)? updateTeams,
     TResult Function(UserActCreateTeam value)? createTeam,
     TResult Function(UserActDeleteTeam value)? deleteTeam,
     required TResult orElse(),
   }) {
-    if (initSubTeams != null) {
-      return initSubTeams(this);
+    if (initModel != null) {
+      return initModel(this);
     }
     return orElse();
   }
 }
 
-abstract class UserActInitSubTeams implements UserAct {
-  const factory UserActInitSubTeams() = _$UserActInitSubTeams;
+abstract class UserActInitModel implements UserAct {
+  const factory UserActInitModel() = _$UserActInitModel;
 }
 
 /// @nodoc
-abstract class _$$UserActRefreshTeamsCopyWith<$Res> {
-  factory _$$UserActRefreshTeamsCopyWith(_$UserActRefreshTeams value,
-          $Res Function(_$UserActRefreshTeams) then) =
-      __$$UserActRefreshTeamsCopyWithImpl<$Res>;
+abstract class _$$UserActUpdateTeamsCopyWith<$Res> {
+  factory _$$UserActUpdateTeamsCopyWith(_$UserActUpdateTeams value,
+          $Res Function(_$UserActUpdateTeams) then) =
+      __$$UserActUpdateTeamsCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$$UserActRefreshTeamsCopyWithImpl<$Res>
+class __$$UserActUpdateTeamsCopyWithImpl<$Res>
     extends _$UserActCopyWithImpl<$Res>
-    implements _$$UserActRefreshTeamsCopyWith<$Res> {
-  __$$UserActRefreshTeamsCopyWithImpl(
-      _$UserActRefreshTeams _value, $Res Function(_$UserActRefreshTeams) _then)
-      : super(_value, (v) => _then(v as _$UserActRefreshTeams));
+    implements _$$UserActUpdateTeamsCopyWith<$Res> {
+  __$$UserActUpdateTeamsCopyWithImpl(
+      _$UserActUpdateTeams _value, $Res Function(_$UserActUpdateTeams) _then)
+      : super(_value, (v) => _then(v as _$UserActUpdateTeams));
 
   @override
-  _$UserActRefreshTeams get _value => super._value as _$UserActRefreshTeams;
+  _$UserActUpdateTeams get _value => super._value as _$UserActUpdateTeams;
 }
 
 /// @nodoc
 
-class _$UserActRefreshTeams implements UserActRefreshTeams {
-  const _$UserActRefreshTeams();
+class _$UserActUpdateTeams implements UserActUpdateTeams {
+  const _$UserActUpdateTeams();
 
   @override
   String toString() {
-    return 'UserAct.refreshTeams()';
+    return 'UserAct.updateTeams()';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$UserActRefreshTeams);
+        (other.runtimeType == runtimeType && other is _$UserActUpdateTeams);
   }
 
   @override
@@ -1990,36 +1989,36 @@ class _$UserActRefreshTeams implements UserActRefreshTeams {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initSubTeams,
-    required TResult Function() refreshTeams,
+    required TResult Function() initModel,
+    required TResult Function() updateTeams,
     required TResult Function(String name) createTeam,
     required TResult Function(String teamId) deleteTeam,
   }) {
-    return refreshTeams();
+    return updateTeams();
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initSubTeams,
-    TResult Function()? refreshTeams,
+    TResult Function()? initModel,
+    TResult Function()? updateTeams,
     TResult Function(String name)? createTeam,
     TResult Function(String teamId)? deleteTeam,
   }) {
-    return refreshTeams?.call();
+    return updateTeams?.call();
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initSubTeams,
-    TResult Function()? refreshTeams,
+    TResult Function()? initModel,
+    TResult Function()? updateTeams,
     TResult Function(String name)? createTeam,
     TResult Function(String teamId)? deleteTeam,
     required TResult orElse(),
   }) {
-    if (refreshTeams != null) {
-      return refreshTeams();
+    if (updateTeams != null) {
+      return updateTeams();
     }
     return orElse();
   }
@@ -2027,43 +2026,43 @@ class _$UserActRefreshTeams implements UserActRefreshTeams {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(UserActInitSubTeams value) initSubTeams,
-    required TResult Function(UserActRefreshTeams value) refreshTeams,
+    required TResult Function(UserActInitModel value) initModel,
+    required TResult Function(UserActUpdateTeams value) updateTeams,
     required TResult Function(UserActCreateTeam value) createTeam,
     required TResult Function(UserActDeleteTeam value) deleteTeam,
   }) {
-    return refreshTeams(this);
+    return updateTeams(this);
   }
 
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(UserActInitSubTeams value)? initSubTeams,
-    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActInitModel value)? initModel,
+    TResult Function(UserActUpdateTeams value)? updateTeams,
     TResult Function(UserActCreateTeam value)? createTeam,
     TResult Function(UserActDeleteTeam value)? deleteTeam,
   }) {
-    return refreshTeams?.call(this);
+    return updateTeams?.call(this);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(UserActInitSubTeams value)? initSubTeams,
-    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActInitModel value)? initModel,
+    TResult Function(UserActUpdateTeams value)? updateTeams,
     TResult Function(UserActCreateTeam value)? createTeam,
     TResult Function(UserActDeleteTeam value)? deleteTeam,
     required TResult orElse(),
   }) {
-    if (refreshTeams != null) {
-      return refreshTeams(this);
+    if (updateTeams != null) {
+      return updateTeams(this);
     }
     return orElse();
   }
 }
 
-abstract class UserActRefreshTeams implements UserAct {
-  const factory UserActRefreshTeams() = _$UserActRefreshTeams;
+abstract class UserActUpdateTeams implements UserAct {
+  const factory UserActUpdateTeams() = _$UserActUpdateTeams;
 }
 
 /// @nodoc
@@ -2131,8 +2130,8 @@ class _$UserActCreateTeam implements UserActCreateTeam {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initSubTeams,
-    required TResult Function() refreshTeams,
+    required TResult Function() initModel,
+    required TResult Function() updateTeams,
     required TResult Function(String name) createTeam,
     required TResult Function(String teamId) deleteTeam,
   }) {
@@ -2142,8 +2141,8 @@ class _$UserActCreateTeam implements UserActCreateTeam {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initSubTeams,
-    TResult Function()? refreshTeams,
+    TResult Function()? initModel,
+    TResult Function()? updateTeams,
     TResult Function(String name)? createTeam,
     TResult Function(String teamId)? deleteTeam,
   }) {
@@ -2153,8 +2152,8 @@ class _$UserActCreateTeam implements UserActCreateTeam {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initSubTeams,
-    TResult Function()? refreshTeams,
+    TResult Function()? initModel,
+    TResult Function()? updateTeams,
     TResult Function(String name)? createTeam,
     TResult Function(String teamId)? deleteTeam,
     required TResult orElse(),
@@ -2168,8 +2167,8 @@ class _$UserActCreateTeam implements UserActCreateTeam {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(UserActInitSubTeams value) initSubTeams,
-    required TResult Function(UserActRefreshTeams value) refreshTeams,
+    required TResult Function(UserActInitModel value) initModel,
+    required TResult Function(UserActUpdateTeams value) updateTeams,
     required TResult Function(UserActCreateTeam value) createTeam,
     required TResult Function(UserActDeleteTeam value) deleteTeam,
   }) {
@@ -2179,8 +2178,8 @@ class _$UserActCreateTeam implements UserActCreateTeam {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(UserActInitSubTeams value)? initSubTeams,
-    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActInitModel value)? initModel,
+    TResult Function(UserActUpdateTeams value)? updateTeams,
     TResult Function(UserActCreateTeam value)? createTeam,
     TResult Function(UserActDeleteTeam value)? deleteTeam,
   }) {
@@ -2190,8 +2189,8 @@ class _$UserActCreateTeam implements UserActCreateTeam {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(UserActInitSubTeams value)? initSubTeams,
-    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActInitModel value)? initModel,
+    TResult Function(UserActUpdateTeams value)? updateTeams,
     TResult Function(UserActCreateTeam value)? createTeam,
     TResult Function(UserActDeleteTeam value)? deleteTeam,
     required TResult orElse(),
@@ -2277,8 +2276,8 @@ class _$UserActDeleteTeam implements UserActDeleteTeam {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initSubTeams,
-    required TResult Function() refreshTeams,
+    required TResult Function() initModel,
+    required TResult Function() updateTeams,
     required TResult Function(String name) createTeam,
     required TResult Function(String teamId) deleteTeam,
   }) {
@@ -2288,8 +2287,8 @@ class _$UserActDeleteTeam implements UserActDeleteTeam {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initSubTeams,
-    TResult Function()? refreshTeams,
+    TResult Function()? initModel,
+    TResult Function()? updateTeams,
     TResult Function(String name)? createTeam,
     TResult Function(String teamId)? deleteTeam,
   }) {
@@ -2299,8 +2298,8 @@ class _$UserActDeleteTeam implements UserActDeleteTeam {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initSubTeams,
-    TResult Function()? refreshTeams,
+    TResult Function()? initModel,
+    TResult Function()? updateTeams,
     TResult Function(String name)? createTeam,
     TResult Function(String teamId)? deleteTeam,
     required TResult orElse(),
@@ -2314,8 +2313,8 @@ class _$UserActDeleteTeam implements UserActDeleteTeam {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(UserActInitSubTeams value) initSubTeams,
-    required TResult Function(UserActRefreshTeams value) refreshTeams,
+    required TResult Function(UserActInitModel value) initModel,
+    required TResult Function(UserActUpdateTeams value) updateTeams,
     required TResult Function(UserActCreateTeam value) createTeam,
     required TResult Function(UserActDeleteTeam value) deleteTeam,
   }) {
@@ -2325,8 +2324,8 @@ class _$UserActDeleteTeam implements UserActDeleteTeam {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(UserActInitSubTeams value)? initSubTeams,
-    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActInitModel value)? initModel,
+    TResult Function(UserActUpdateTeams value)? updateTeams,
     TResult Function(UserActCreateTeam value)? createTeam,
     TResult Function(UserActDeleteTeam value)? deleteTeam,
   }) {
@@ -2336,8 +2335,8 @@ class _$UserActDeleteTeam implements UserActDeleteTeam {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(UserActInitSubTeams value)? initSubTeams,
-    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActInitModel value)? initModel,
+    TResult Function(UserActUpdateTeams value)? updateTeams,
     TResult Function(UserActCreateTeam value)? createTeam,
     TResult Function(UserActDeleteTeam value)? deleteTeam,
     required TResult orElse(),
