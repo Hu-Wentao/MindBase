@@ -186,15 +186,8 @@ class SubChannel {
           tag: tag,
         );
 
-  //
-  const SubChannel.team(String teamId, {String tag = ''})
-      : this("$_teamsL1.$teamId", tag);
-
-  //
-  // SubChannel.member(String teamId) : this("$_membershipsL1.$teamId");
-  /// 监听指定团队的 `删改` 事件
-  const SubChannel.watchTeam(String teamId, {String tag = ''})
-      : this.team(teamId, tag: tag);
+  /// 监听所有团队的 `增删改` 事件
+  const SubChannel.watchTeams({String tag = ''}) : this(_teamsL1, tag);
 
   @override
   String toString() => 'SubChannel{tag: $tag, channel: $channel}';
