@@ -11,9 +11,12 @@ class TeamService {
     return (await _teams.list()).teams;
   }
 
-  Future<aw.Team> updateName(aw.Team team, String newName) async {
-    return await _teams.update(teamId: team.$id, name: newName);
-  }
+  Future<aw.Team> updateNameBy(String teamId, String name) async =>
+      await _teams.update(teamId: teamId, name: name);
+
+  @Deprecated('updateNameBy')
+  Future<aw.Team> updateName(aw.Team team, String newName) async =>
+      await updateNameBy(team.$id, newName);
 
   Future<void> deleteTeam(String teamId) async =>
       await _teams.delete(teamId: teamId);
