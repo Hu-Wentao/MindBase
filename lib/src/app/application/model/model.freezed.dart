@@ -1762,3 +1762,910 @@ abstract class AppEvtRecoverDone implements AppEvt {
   _$$AppEvtRecoverDoneCopyWith<_$AppEvtRecoverDone> get copyWith =>
       throw _privateConstructorUsedError;
 }
+
+/// @nodoc
+mixin _$UserAct {
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initSubTeams,
+    required TResult Function() refreshTeams,
+    required TResult Function(String name) createTeam,
+    required TResult Function(String teamId) deleteTeam,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? initSubTeams,
+    TResult Function()? refreshTeams,
+    TResult Function(String name)? createTeam,
+    TResult Function(String teamId)? deleteTeam,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initSubTeams,
+    TResult Function()? refreshTeams,
+    TResult Function(String name)? createTeam,
+    TResult Function(String teamId)? deleteTeam,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(UserActInitSubTeams value) initSubTeams,
+    required TResult Function(UserActRefreshTeams value) refreshTeams,
+    required TResult Function(UserActCreateTeam value) createTeam,
+    required TResult Function(UserActDeleteTeam value) deleteTeam,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(UserActInitSubTeams value)? initSubTeams,
+    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActCreateTeam value)? createTeam,
+    TResult Function(UserActDeleteTeam value)? deleteTeam,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(UserActInitSubTeams value)? initSubTeams,
+    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActCreateTeam value)? createTeam,
+    TResult Function(UserActDeleteTeam value)? deleteTeam,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $UserActCopyWith<$Res> {
+  factory $UserActCopyWith(UserAct value, $Res Function(UserAct) then) =
+      _$UserActCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class _$UserActCopyWithImpl<$Res> implements $UserActCopyWith<$Res> {
+  _$UserActCopyWithImpl(this._value, this._then);
+
+  final UserAct _value;
+  // ignore: unused_field
+  final $Res Function(UserAct) _then;
+}
+
+/// @nodoc
+abstract class _$$UserActInitSubTeamsCopyWith<$Res> {
+  factory _$$UserActInitSubTeamsCopyWith(_$UserActInitSubTeams value,
+          $Res Function(_$UserActInitSubTeams) then) =
+      __$$UserActInitSubTeamsCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$UserActInitSubTeamsCopyWithImpl<$Res>
+    extends _$UserActCopyWithImpl<$Res>
+    implements _$$UserActInitSubTeamsCopyWith<$Res> {
+  __$$UserActInitSubTeamsCopyWithImpl(
+      _$UserActInitSubTeams _value, $Res Function(_$UserActInitSubTeams) _then)
+      : super(_value, (v) => _then(v as _$UserActInitSubTeams));
+
+  @override
+  _$UserActInitSubTeams get _value => super._value as _$UserActInitSubTeams;
+}
+
+/// @nodoc
+
+class _$UserActInitSubTeams implements UserActInitSubTeams {
+  const _$UserActInitSubTeams();
+
+  @override
+  String toString() {
+    return 'UserAct.initSubTeams()';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$UserActInitSubTeams);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initSubTeams,
+    required TResult Function() refreshTeams,
+    required TResult Function(String name) createTeam,
+    required TResult Function(String teamId) deleteTeam,
+  }) {
+    return initSubTeams();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? initSubTeams,
+    TResult Function()? refreshTeams,
+    TResult Function(String name)? createTeam,
+    TResult Function(String teamId)? deleteTeam,
+  }) {
+    return initSubTeams?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initSubTeams,
+    TResult Function()? refreshTeams,
+    TResult Function(String name)? createTeam,
+    TResult Function(String teamId)? deleteTeam,
+    required TResult orElse(),
+  }) {
+    if (initSubTeams != null) {
+      return initSubTeams();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(UserActInitSubTeams value) initSubTeams,
+    required TResult Function(UserActRefreshTeams value) refreshTeams,
+    required TResult Function(UserActCreateTeam value) createTeam,
+    required TResult Function(UserActDeleteTeam value) deleteTeam,
+  }) {
+    return initSubTeams(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(UserActInitSubTeams value)? initSubTeams,
+    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActCreateTeam value)? createTeam,
+    TResult Function(UserActDeleteTeam value)? deleteTeam,
+  }) {
+    return initSubTeams?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(UserActInitSubTeams value)? initSubTeams,
+    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActCreateTeam value)? createTeam,
+    TResult Function(UserActDeleteTeam value)? deleteTeam,
+    required TResult orElse(),
+  }) {
+    if (initSubTeams != null) {
+      return initSubTeams(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class UserActInitSubTeams implements UserAct {
+  const factory UserActInitSubTeams() = _$UserActInitSubTeams;
+}
+
+/// @nodoc
+abstract class _$$UserActRefreshTeamsCopyWith<$Res> {
+  factory _$$UserActRefreshTeamsCopyWith(_$UserActRefreshTeams value,
+          $Res Function(_$UserActRefreshTeams) then) =
+      __$$UserActRefreshTeamsCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$UserActRefreshTeamsCopyWithImpl<$Res>
+    extends _$UserActCopyWithImpl<$Res>
+    implements _$$UserActRefreshTeamsCopyWith<$Res> {
+  __$$UserActRefreshTeamsCopyWithImpl(
+      _$UserActRefreshTeams _value, $Res Function(_$UserActRefreshTeams) _then)
+      : super(_value, (v) => _then(v as _$UserActRefreshTeams));
+
+  @override
+  _$UserActRefreshTeams get _value => super._value as _$UserActRefreshTeams;
+}
+
+/// @nodoc
+
+class _$UserActRefreshTeams implements UserActRefreshTeams {
+  const _$UserActRefreshTeams();
+
+  @override
+  String toString() {
+    return 'UserAct.refreshTeams()';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$UserActRefreshTeams);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initSubTeams,
+    required TResult Function() refreshTeams,
+    required TResult Function(String name) createTeam,
+    required TResult Function(String teamId) deleteTeam,
+  }) {
+    return refreshTeams();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? initSubTeams,
+    TResult Function()? refreshTeams,
+    TResult Function(String name)? createTeam,
+    TResult Function(String teamId)? deleteTeam,
+  }) {
+    return refreshTeams?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initSubTeams,
+    TResult Function()? refreshTeams,
+    TResult Function(String name)? createTeam,
+    TResult Function(String teamId)? deleteTeam,
+    required TResult orElse(),
+  }) {
+    if (refreshTeams != null) {
+      return refreshTeams();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(UserActInitSubTeams value) initSubTeams,
+    required TResult Function(UserActRefreshTeams value) refreshTeams,
+    required TResult Function(UserActCreateTeam value) createTeam,
+    required TResult Function(UserActDeleteTeam value) deleteTeam,
+  }) {
+    return refreshTeams(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(UserActInitSubTeams value)? initSubTeams,
+    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActCreateTeam value)? createTeam,
+    TResult Function(UserActDeleteTeam value)? deleteTeam,
+  }) {
+    return refreshTeams?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(UserActInitSubTeams value)? initSubTeams,
+    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActCreateTeam value)? createTeam,
+    TResult Function(UserActDeleteTeam value)? deleteTeam,
+    required TResult orElse(),
+  }) {
+    if (refreshTeams != null) {
+      return refreshTeams(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class UserActRefreshTeams implements UserAct {
+  const factory UserActRefreshTeams() = _$UserActRefreshTeams;
+}
+
+/// @nodoc
+abstract class _$$UserActCreateTeamCopyWith<$Res> {
+  factory _$$UserActCreateTeamCopyWith(
+          _$UserActCreateTeam value, $Res Function(_$UserActCreateTeam) then) =
+      __$$UserActCreateTeamCopyWithImpl<$Res>;
+  $Res call({String name});
+}
+
+/// @nodoc
+class __$$UserActCreateTeamCopyWithImpl<$Res>
+    extends _$UserActCopyWithImpl<$Res>
+    implements _$$UserActCreateTeamCopyWith<$Res> {
+  __$$UserActCreateTeamCopyWithImpl(
+      _$UserActCreateTeam _value, $Res Function(_$UserActCreateTeam) _then)
+      : super(_value, (v) => _then(v as _$UserActCreateTeam));
+
+  @override
+  _$UserActCreateTeam get _value => super._value as _$UserActCreateTeam;
+
+  @override
+  $Res call({
+    Object? name = freezed,
+  }) {
+    return _then(_$UserActCreateTeam(
+      name == freezed
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$UserActCreateTeam implements UserActCreateTeam {
+  const _$UserActCreateTeam(this.name);
+
+  @override
+  final String name;
+
+  @override
+  String toString() {
+    return 'UserAct.createTeam(name: $name)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UserActCreateTeam &&
+            const DeepCollectionEquality().equals(other.name, name));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(name));
+
+  @JsonKey(ignore: true)
+  @override
+  _$$UserActCreateTeamCopyWith<_$UserActCreateTeam> get copyWith =>
+      __$$UserActCreateTeamCopyWithImpl<_$UserActCreateTeam>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initSubTeams,
+    required TResult Function() refreshTeams,
+    required TResult Function(String name) createTeam,
+    required TResult Function(String teamId) deleteTeam,
+  }) {
+    return createTeam(name);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? initSubTeams,
+    TResult Function()? refreshTeams,
+    TResult Function(String name)? createTeam,
+    TResult Function(String teamId)? deleteTeam,
+  }) {
+    return createTeam?.call(name);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initSubTeams,
+    TResult Function()? refreshTeams,
+    TResult Function(String name)? createTeam,
+    TResult Function(String teamId)? deleteTeam,
+    required TResult orElse(),
+  }) {
+    if (createTeam != null) {
+      return createTeam(name);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(UserActInitSubTeams value) initSubTeams,
+    required TResult Function(UserActRefreshTeams value) refreshTeams,
+    required TResult Function(UserActCreateTeam value) createTeam,
+    required TResult Function(UserActDeleteTeam value) deleteTeam,
+  }) {
+    return createTeam(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(UserActInitSubTeams value)? initSubTeams,
+    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActCreateTeam value)? createTeam,
+    TResult Function(UserActDeleteTeam value)? deleteTeam,
+  }) {
+    return createTeam?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(UserActInitSubTeams value)? initSubTeams,
+    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActCreateTeam value)? createTeam,
+    TResult Function(UserActDeleteTeam value)? deleteTeam,
+    required TResult orElse(),
+  }) {
+    if (createTeam != null) {
+      return createTeam(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class UserActCreateTeam implements UserAct {
+  const factory UserActCreateTeam(final String name) = _$UserActCreateTeam;
+
+  String get name;
+  @JsonKey(ignore: true)
+  _$$UserActCreateTeamCopyWith<_$UserActCreateTeam> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$UserActDeleteTeamCopyWith<$Res> {
+  factory _$$UserActDeleteTeamCopyWith(
+          _$UserActDeleteTeam value, $Res Function(_$UserActDeleteTeam) then) =
+      __$$UserActDeleteTeamCopyWithImpl<$Res>;
+  $Res call({String teamId});
+}
+
+/// @nodoc
+class __$$UserActDeleteTeamCopyWithImpl<$Res>
+    extends _$UserActCopyWithImpl<$Res>
+    implements _$$UserActDeleteTeamCopyWith<$Res> {
+  __$$UserActDeleteTeamCopyWithImpl(
+      _$UserActDeleteTeam _value, $Res Function(_$UserActDeleteTeam) _then)
+      : super(_value, (v) => _then(v as _$UserActDeleteTeam));
+
+  @override
+  _$UserActDeleteTeam get _value => super._value as _$UserActDeleteTeam;
+
+  @override
+  $Res call({
+    Object? teamId = freezed,
+  }) {
+    return _then(_$UserActDeleteTeam(
+      teamId == freezed
+          ? _value.teamId
+          : teamId // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$UserActDeleteTeam implements UserActDeleteTeam {
+  const _$UserActDeleteTeam(this.teamId);
+
+  @override
+  final String teamId;
+
+  @override
+  String toString() {
+    return 'UserAct.deleteTeam(teamId: $teamId)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UserActDeleteTeam &&
+            const DeepCollectionEquality().equals(other.teamId, teamId));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(teamId));
+
+  @JsonKey(ignore: true)
+  @override
+  _$$UserActDeleteTeamCopyWith<_$UserActDeleteTeam> get copyWith =>
+      __$$UserActDeleteTeamCopyWithImpl<_$UserActDeleteTeam>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initSubTeams,
+    required TResult Function() refreshTeams,
+    required TResult Function(String name) createTeam,
+    required TResult Function(String teamId) deleteTeam,
+  }) {
+    return deleteTeam(teamId);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? initSubTeams,
+    TResult Function()? refreshTeams,
+    TResult Function(String name)? createTeam,
+    TResult Function(String teamId)? deleteTeam,
+  }) {
+    return deleteTeam?.call(teamId);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initSubTeams,
+    TResult Function()? refreshTeams,
+    TResult Function(String name)? createTeam,
+    TResult Function(String teamId)? deleteTeam,
+    required TResult orElse(),
+  }) {
+    if (deleteTeam != null) {
+      return deleteTeam(teamId);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(UserActInitSubTeams value) initSubTeams,
+    required TResult Function(UserActRefreshTeams value) refreshTeams,
+    required TResult Function(UserActCreateTeam value) createTeam,
+    required TResult Function(UserActDeleteTeam value) deleteTeam,
+  }) {
+    return deleteTeam(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(UserActInitSubTeams value)? initSubTeams,
+    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActCreateTeam value)? createTeam,
+    TResult Function(UserActDeleteTeam value)? deleteTeam,
+  }) {
+    return deleteTeam?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(UserActInitSubTeams value)? initSubTeams,
+    TResult Function(UserActRefreshTeams value)? refreshTeams,
+    TResult Function(UserActCreateTeam value)? createTeam,
+    TResult Function(UserActDeleteTeam value)? deleteTeam,
+    required TResult orElse(),
+  }) {
+    if (deleteTeam != null) {
+      return deleteTeam(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class UserActDeleteTeam implements UserAct {
+  const factory UserActDeleteTeam(final String teamId) = _$UserActDeleteTeam;
+
+  String get teamId;
+  @JsonKey(ignore: true)
+  _$$UserActDeleteTeamCopyWith<_$UserActDeleteTeam> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+mixin _$UserState {
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() init,
+    required TResult Function(List<TeamModel> teams, String? markId) done,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? init,
+    TResult Function(List<TeamModel> teams, String? markId)? done,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? init,
+    TResult Function(List<TeamModel> teams, String? markId)? done,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(UserStateInit value) init,
+    required TResult Function(UserStateDone value) done,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(UserStateInit value)? init,
+    TResult Function(UserStateDone value)? done,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(UserStateInit value)? init,
+    TResult Function(UserStateDone value)? done,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $UserStateCopyWith<$Res> {
+  factory $UserStateCopyWith(UserState value, $Res Function(UserState) then) =
+      _$UserStateCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class _$UserStateCopyWithImpl<$Res> implements $UserStateCopyWith<$Res> {
+  _$UserStateCopyWithImpl(this._value, this._then);
+
+  final UserState _value;
+  // ignore: unused_field
+  final $Res Function(UserState) _then;
+}
+
+/// @nodoc
+abstract class _$$UserStateInitCopyWith<$Res> {
+  factory _$$UserStateInitCopyWith(
+          _$UserStateInit value, $Res Function(_$UserStateInit) then) =
+      __$$UserStateInitCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$UserStateInitCopyWithImpl<$Res> extends _$UserStateCopyWithImpl<$Res>
+    implements _$$UserStateInitCopyWith<$Res> {
+  __$$UserStateInitCopyWithImpl(
+      _$UserStateInit _value, $Res Function(_$UserStateInit) _then)
+      : super(_value, (v) => _then(v as _$UserStateInit));
+
+  @override
+  _$UserStateInit get _value => super._value as _$UserStateInit;
+}
+
+/// @nodoc
+
+class _$UserStateInit implements UserStateInit {
+  const _$UserStateInit();
+
+  @override
+  String toString() {
+    return 'UserState.init()';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$UserStateInit);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() init,
+    required TResult Function(List<TeamModel> teams, String? markId) done,
+  }) {
+    return init();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? init,
+    TResult Function(List<TeamModel> teams, String? markId)? done,
+  }) {
+    return init?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? init,
+    TResult Function(List<TeamModel> teams, String? markId)? done,
+    required TResult orElse(),
+  }) {
+    if (init != null) {
+      return init();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(UserStateInit value) init,
+    required TResult Function(UserStateDone value) done,
+  }) {
+    return init(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(UserStateInit value)? init,
+    TResult Function(UserStateDone value)? done,
+  }) {
+    return init?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(UserStateInit value)? init,
+    TResult Function(UserStateDone value)? done,
+    required TResult orElse(),
+  }) {
+    if (init != null) {
+      return init(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class UserStateInit implements UserState {
+  const factory UserStateInit() = _$UserStateInit;
+}
+
+/// @nodoc
+abstract class _$$UserStateDoneCopyWith<$Res> {
+  factory _$$UserStateDoneCopyWith(
+          _$UserStateDone value, $Res Function(_$UserStateDone) then) =
+      __$$UserStateDoneCopyWithImpl<$Res>;
+  $Res call({List<TeamModel> teams, String? markId});
+}
+
+/// @nodoc
+class __$$UserStateDoneCopyWithImpl<$Res> extends _$UserStateCopyWithImpl<$Res>
+    implements _$$UserStateDoneCopyWith<$Res> {
+  __$$UserStateDoneCopyWithImpl(
+      _$UserStateDone _value, $Res Function(_$UserStateDone) _then)
+      : super(_value, (v) => _then(v as _$UserStateDone));
+
+  @override
+  _$UserStateDone get _value => super._value as _$UserStateDone;
+
+  @override
+  $Res call({
+    Object? teams = freezed,
+    Object? markId = freezed,
+  }) {
+    return _then(_$UserStateDone(
+      teams == freezed
+          ? _value._teams
+          : teams // ignore: cast_nullable_to_non_nullable
+              as List<TeamModel>,
+      markId == freezed
+          ? _value.markId
+          : markId // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$UserStateDone implements UserStateDone {
+  const _$UserStateDone(final List<TeamModel> teams, this.markId)
+      : _teams = teams;
+
+  final List<TeamModel> _teams;
+  @override
+  List<TeamModel> get teams {
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_teams);
+  }
+
+  @override
+  final String? markId;
+
+  @override
+  String toString() {
+    return 'UserState.done(teams: $teams, markId: $markId)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UserStateDone &&
+            const DeepCollectionEquality().equals(other._teams, _teams) &&
+            const DeepCollectionEquality().equals(other.markId, markId));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(_teams),
+      const DeepCollectionEquality().hash(markId));
+
+  @JsonKey(ignore: true)
+  @override
+  _$$UserStateDoneCopyWith<_$UserStateDone> get copyWith =>
+      __$$UserStateDoneCopyWithImpl<_$UserStateDone>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() init,
+    required TResult Function(List<TeamModel> teams, String? markId) done,
+  }) {
+    return done(teams, markId);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? init,
+    TResult Function(List<TeamModel> teams, String? markId)? done,
+  }) {
+    return done?.call(teams, markId);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? init,
+    TResult Function(List<TeamModel> teams, String? markId)? done,
+    required TResult orElse(),
+  }) {
+    if (done != null) {
+      return done(teams, markId);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(UserStateInit value) init,
+    required TResult Function(UserStateDone value) done,
+  }) {
+    return done(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(UserStateInit value)? init,
+    TResult Function(UserStateDone value)? done,
+  }) {
+    return done?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(UserStateInit value)? init,
+    TResult Function(UserStateDone value)? done,
+    required TResult orElse(),
+  }) {
+    if (done != null) {
+      return done(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class UserStateDone implements UserState {
+  const factory UserStateDone(
+      final List<TeamModel> teams, final String? markId) = _$UserStateDone;
+
+  List<TeamModel> get teams;
+  String? get markId;
+  @JsonKey(ignore: true)
+  _$$UserStateDoneCopyWith<_$UserStateDone> get copyWith =>
+      throw _privateConstructorUsedError;
+}
