@@ -1,6 +1,5 @@
-import 'package:appwrite/models.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mind_base/src/user/application/model/model.dart';
+import 'package:mind_base/src/app/application/model/model.mocks.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/application/service/expr/expr_evaluator.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
@@ -25,9 +24,8 @@ main() {
   });
 
   ///
-  final us = UserModel(null);
-  final tm = TeamModel(Team($id: 'id', name: "name", $createdAt: 123, total: 1, $updatedAt: 1233), us);
-  final space = WorkspaceModel(WorkspaceDto.builder(), tm);
+  // final tm = TeamModel(Team($id: 'id', name: "name", $createdAt: 123, total: 1, $updatedAt: 1233), us);
+  final space = WorkspaceModel(WorkspaceDto.builder(), MockTeamModel());
   const pMetaStudentId = ('6262e2d8113f6c880d5d736b');
   const pMetaSchoolId = ('626a109fd90369d16c2fbe0e');
   const pRcdHfuId = ("626a98b14a034567ff06f2f4");

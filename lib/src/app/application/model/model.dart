@@ -12,9 +12,17 @@ import 'package:mind_base/src/user/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/user/domain/value/value.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/application/service/service.dart';
+import 'package:mockito/annotations.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 import 'package:appwrite/appwrite.dart' as cli;
 import 'package:appwrite/models.dart' as aw;
+
+// Annotation which generates the cat.mocks.dart library and the MockCat class.
+@GenerateNiceMocks([
+  MockSpec<UserModel>(),
+  MockSpec<TeamModel>(),
+])
+import 'model.mocks.dart';
 
 part 'app_state_model.dart';
 

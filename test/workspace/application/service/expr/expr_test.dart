@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:appwrite/models.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mind_base/src/app/application/model/model.mocks.dart';
 import 'package:mind_base/src/user/application/model/model.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/application/service/expr/expression_parser.dart';
@@ -23,11 +24,9 @@ const pMetaStudentId = ('6262e2d8113f6c880d5d736b');
 const pMetaSchoolId = ('626a109fd90369d16c2fbe0e');
 const pRcdSchoolHfuId = ("626a98b14a034567ff06f2f4");
 const pRcdStudentZsId = ('6262e3b0118f5894993d4533');
-
-final us = UserModel(null);
-final tm =
-    TeamModel(Team($id: 'id', name: "name", $createdAt: 124,$updatedAt:1234, total: 1), us);
-final sp = WorkspaceModel(WorkspaceDto.builder(), tm)..metas.addAll([pMetaSchool, pMetaStudent]);
+final tm = MockTeamModel();
+final sp = WorkspaceModel(WorkspaceDto.builder(), tm)
+  ..metas.addAll([pMetaSchool, pMetaStudent]);
 
 // Meta 2个
 /// 学校meta
@@ -60,84 +59,86 @@ final pRcdHfu =
 });
 
 /// 学生表
-final pMetaStudent = MetaModel(RecordMetaDto(
-    id: pMetaStudentId,
-    name: '学生表',
-    memo: '记录一个学生的信息',
-    maxKey: 4,
-    attrs: [
-      AttributeDto.builder(
-          k: 0, name: 'id', memo: '', type: AttrTypeDto.string),
-      AttributeDto.builder(
-          k: 1, name: 'metaId', memo: '', type: AttrTypeDto.string),
-      AttributeDto.builder(
-          k: 2, name: 'name', memo: '', type: AttrTypeDto.string),
-      AttributeDto.builder(
-          k: 3, name: 'age', memo: '年龄', type: AttrTypeDto.string),
-      AttributeDto.builder(
-          k: 4, name: '备注', memo: '备注', type: AttrTypeDto.string),
-      AttributeDto.builder(
-          k: 5,
-          name: '学校',
-          memo: '学校引用',
-          type: AttrTypeDto.ref(pMetaSchool.id)),
-    ],
-    methods: [
-      MethodDto(
-          k: 0,
-          name: 'getName',
-          memo: 'memo2',
-          expr: ExprNodeDto.fromDomain(Expression(
-            fn: IFunc.findBy("member"),
-            ag: [
-              ExprValue.of("a2"), // 表示attribute 0
-            ],
-            type: AttrType.string,
-          ))),
-      MethodDto(
-          k: 1,
-          name: 'sayHello',
-          memo: 'memo',
-          // ("'Hello every one! My name is'+this.name")
-          expr: ExprNodeDto.fromDomain(Expression(
-            fn: IFunc.findBy("add"),
-            ag: [
-              ExprValue.of("Hello everyone! My name is "),
-              Expression(
+final pMetaStudent = MetaModel(
+    RecordMetaDto(
+        id: pMetaStudentId,
+        name: '学生表',
+        memo: '记录一个学生的信息',
+        maxKey: 4,
+        attrs: [
+          AttributeDto.builder(
+              k: 0, name: 'id', memo: '', type: AttrTypeDto.string),
+          AttributeDto.builder(
+              k: 1, name: 'metaId', memo: '', type: AttrTypeDto.string),
+          AttributeDto.builder(
+              k: 2, name: 'name', memo: '', type: AttrTypeDto.string),
+          AttributeDto.builder(
+              k: 3, name: 'age', memo: '年龄', type: AttrTypeDto.string),
+          AttributeDto.builder(
+              k: 4, name: '备注', memo: '备注', type: AttrTypeDto.string),
+          AttributeDto.builder(
+              k: 5,
+              name: '学校',
+              memo: '学校引用',
+              type: AttrTypeDto.ref(pMetaSchool.id)),
+        ],
+        methods: [
+          MethodDto(
+              k: 0,
+              name: 'getName',
+              memo: 'memo2',
+              expr: ExprNodeDto.fromDomain(Expression(
                 fn: IFunc.findBy("member"),
                 ag: [
-                  // fixme  `const Value(fn: AsFuncThis(), ag: [])`表达this
-                  ExprValue.of(''),
-                  ExprValue.of("a2"),
-                  // 填入 propId
+                  ExprValue.of("a2"), // 表示attribute 0
                 ],
                 type: AttrType.string,
-              )
-            ],
-            type: AttrType.string,
-          ))),
-      MethodDto(
-        k: 2,
-        name: 'say学校',
-        memo: 'memo',
-        // ("'Hello every one! My name is'+this.name")
-        expr: IExprJsonDtoAppwriteX.fromJson({
-          'fn': 'member',
-          'type': 'string',
-          'ag': jsonEncode([
-            {
-              'type': 'ref_626a109fd90369d16c2fbe0e',
-              'ag': jsonEncode([]),
-            },
-            {
+              ))),
+          MethodDto(
+              k: 1,
+              name: 'sayHello',
+              memo: 'memo',
+              // ("'Hello every one! My name is'+this.name")
+              expr: ExprNodeDto.fromDomain(Expression(
+                fn: IFunc.findBy("add"),
+                ag: [
+                  ExprValue.of("Hello everyone! My name is "),
+                  Expression(
+                    fn: IFunc.findBy("member"),
+                    ag: [
+                      // fixme  `const Value(fn: AsFuncThis(), ag: [])`表达this
+                      ExprValue.of(''),
+                      ExprValue.of("a2"),
+                      // 填入 propId
+                    ],
+                    type: AttrType.string,
+                  )
+                ],
+                type: AttrType.string,
+              ))),
+          MethodDto(
+            k: 2,
+            name: 'say学校',
+            memo: 'memo',
+            // ("'Hello every one! My name is'+this.name")
+            expr: IExprJsonDtoAppwriteX.fromJson({
+              'fn': 'member',
               'type': 'string',
-              'ag': jsonEncode(['"a3"']),
-            }
-          ]),
-        }),
-        // expr: ExpressionDto.of(parser, '"我的学校是: "+ this.学校.name').toDomain(),
-      )
-    ]), sp);
+              'ag': jsonEncode([
+                {
+                  'type': 'ref_626a109fd90369d16c2fbe0e',
+                  'ag': jsonEncode([]),
+                },
+                {
+                  'type': 'string',
+                  'ag': jsonEncode(['"a3"']),
+                }
+              ]),
+            }),
+            // expr: ExpressionDto.of(parser, '"我的学校是: "+ this.学校.name').toDomain(),
+          )
+        ]),
+    sp);
 
 // // ([{fn: member, ag: [{"type":"ref_629393f8ff13cb4dbbf5a09a","ag":"[]"},{"type":"any","ag":"[\"a3\"]"}], type: any}, {type: string, ag: ["~~",null]}])
 // final expr = Expression(fn: IFunc.findBy("+"), type: AttrType.any, ag: [
@@ -155,7 +156,8 @@ final pWs = WorkspaceModel(
       metas: [],
       teamId: 'teamId',
     ),
-    tm)..metas.addAll([pMetaSchool, pMetaStudent]);
+    tm)
+  ..metas.addAll([pMetaSchool, pMetaStudent]);
 
 main() {
   test("测试Token", () {
