@@ -128,7 +128,7 @@ class MindBaseApp extends StatelessWidget {
                 : null,
           ),
           ChangeNotifierProxyProvider<UserModel?, TeamModel?>.value(
-            update: (c, m, o) => m?.selectedTeam,
+            update: (c, m, o) => m?.markedTeam,
           ),
           ChangeNotifierProxyProvider<TeamModel?, WorkspaceModel?>.value(
             update: (c, m, o) => m?.selectedWorkspace,
