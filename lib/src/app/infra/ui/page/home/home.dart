@@ -15,6 +15,7 @@ import 'package:mind_base/src/constants/pubspec.yaml.g.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/confirm_dialog.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 import 'package:provider/provider.dart';
+import 'package:provider_sidecar/provider_sidecar.dart';
 import 'package:url_launcher/link.dart';
 
 part 'workspace_screen.dart';
@@ -45,7 +46,11 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with OnInitStateMx<HomePage, UserModel> {
+  @override
+  onInitState(msgr, m) => m..actEntrance(const UserAct.initSubTeams());
+
   late int activeIdx;
 
   @override
