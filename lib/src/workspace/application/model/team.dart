@@ -1,62 +1,46 @@
 part of 'model.dart';
 
-@Deprecated('TeamModel')
-typedef OpenedSpaceManagerModel = TeamModel;
+@freezed
+class TeamAct with _$TeamAct {
+  const factory TeamAct.initModel() = TeamActInitModel;
 
-abstract class ITeamModel extends ModelSidecar<aw.Team, BaseException?>
-    with ModelStateChangeMx<aw.Team, BaseException?> {
-  ITeamModel(aw.Team data) : super(data, ExceptionAdapter.of);
+  ///
+  const factory TeamAct.updateTeam(aw.Team team) = TeamActUpdateTeam;
 
-  String get id;
+  const factory TeamAct.renameTeam(String name) = TeamActRenameTeam;
 
-  List<WorkspaceModel> get workspaces;
+  ///
+  const factory TeamAct.updateSpaces() = TeamActUpdateSpaces;
 
-  List<MemberModel> get members;
+  const factory TeamAct.createSpace(String name) = TeamActCreateSpace;
 
-  WorkspaceModel addNewWorkspaceModel(WorkspaceDto data);
+  const factory TeamAct.deleteSpace(String spaceId) = TeamActDeleteSpace;
 
-  MemberModel addNewMemberModel(aw.Membership data);
+  ///
+  const factory TeamAct.updateMembers() = TeamActUpdateMembers;
+
+  const factory TeamAct.inviteMember(String userEmail) = TeamActInviteMember;
 }
 
-mixin TeamStateChangeMx on ITeamModel {
-  final WorkspaceService _workspaceSrv = sl<WorkspaceService>();
-  final _tmSrv = sl<Teams>();
+@freezed
+class TeamState with _$TeamState {
+  const factory TeamState.init() = TeamStateInit;
 
-  @override
-  Future<FutureOr<void>> onFetch({bool isActive = false}) async {
-    // 全量拉取数据,原有数据将在 onReset方法中被清除
-    // workspace
-    for (var data in (await _workspaceSrv.queryWorkspaceDto(id))) {
-      addNewWorkspaceModel(data);
-    }
-    // member
-    for (var data in (await _tmSrv.getMemberships(teamId: id)).memberships) {
-      addNewMemberModel(data);
-    }
-  }
-
-  @override
-  FutureOr<void> onReset() {
-    workspaces.clear();
-    members.clear();
-  }
-
-  @override
-  FutureOr<void> onSubscription() {
-    log('onSubscription 尚未实现...');
-  }
-
-  @override
-  FutureOr<void> onCloseSubs() {
-    log('onCloseSubs 尚未实现...');
-  }
+  const factory TeamState.done({
+    String? markId,
+    required List<WorkspaceModel> workspaces,
+    required List<MemberModel> members,
+  }) = TeamStateDone;
 }
 
 /// Team
 /// todo 实时刷新用户数据
 /// todo #517 没有字段用于存储roles枚举, 如果member过多,可能会导致某些roles不能立即加载
-class TeamModel extends ITeamModel with TeamStateChangeMx {
-  @override
+class TeamModel extends BaseActEntranceModel<TeamAct, TeamState> {
+  aw.Team data; // 可变
+
+  TeamModel(this.data, {super.state = const TeamState.init()});
+
   String get id => data.$id;
 
   String get name => data.name;
@@ -65,92 +49,148 @@ class TeamModel extends ITeamModel with TeamStateChangeMx {
 
   int get total => data.total;
 
-  // todo
-  @Deprecated('后期实现人员列表后更新为纯getter,目前通过手动配置')
-  bool tmpIsMember = true;
-
-  bool get isMember => tmpIsMember;
-
-  /// 上层状态引用
-  final UserModel at;
-
   /// 子状态Model
-  // 懒初始化 (初始化一个工作空间比较昂贵)
-  @override
-  List<WorkspaceModel> workspaces = [];
-  @override
-  List<MemberModel> members = [];
+  @protected
+  List<WorkspaceModel> get workspaces =>
+      state.isOrNull<TeamStateDone>()?.workspaces ?? const [];
 
-  TeamModel(super.data, this.at);
-
-  @Deprecated("workspaces")
-  List<WorkspaceModel> get openedWorkspaces => workspaces;
+  @protected
+  List<MemberModel> get members =>
+      state.isOrNull<TeamStateDone>()?.members ?? const [];
 
   MemberModel? get teamOwner =>
       members.firstWhereOrNull((mbr) => mbr.roles.contains(Role.owner.value));
 
-  @override
-  WorkspaceModel addNewWorkspaceModel(WorkspaceDto data) {
-    final m = WorkspaceModel(data, this);
-    // 没有必要立即初始化工作空间, 打开空间比较昂贵, 在Page中手动调用比较合适
-    workspaces.add(m);
-    setDoneKeepState("新增 WorkspaceModel[${m.id}]");
-    return m;
+  WorkspaceModel? get selectedWorkspace {
+    final mkId = state.isOrNull<TeamStateDone>()?.markId;
+    return workspaces.firstWhereOrNull((s) => s.id == mkId);
   }
 
   @override
-  MemberModel addNewMemberModel(aw.Membership data) {
-    final m = MemberModel(data, this);
-    members.add(m);
-    setDoneKeepState("新增 MemberModel[${m.id}]");
-    return m;
+  onActEntrance(TeamAct act) => act.when(
+        initModel: initModel,
+        updateTeam: updateTeam,
+        renameTeam: renameTeam,
+        updateSpaces: updateSpaces,
+        createSpace: createSpace,
+        deleteSpace: deleteSpace,
+        updateMembers: updateMembers,
+        inviteMember: inviteMember,
+      );
+
+  initModel() async {
+    // todo 订阅 member + space变更
+    // 刷新数据
+    await updateSpaces();
+    await updateMembers();
+  }
+
+  updateTeam(aw.Team team) async {
+    data = team;
+    setState(state, '更新team[$id]');
   }
 }
 
 extension TeamModelX on TeamModel {
+  renameTeam(String name) async {
+    final data = await _teamSrv.updateNameBy(id, name);
+    updateTeam(data);
+  }
+
   TeamService get _teamSrv => sl<TeamService>();
+}
+
+extension TeamSpaceX on TeamModel {
+  deleteSpace(String spaceId) async {
+    await _workspaceSrv.deleteSpace(id);
+    workspaces.removeWhere((w) => w.id == spaceId);
+    setState(state, "删除工作空间[$spaceId]完成");
+  }
+
+  createSpace(String name) async {
+    final data = await _workspaceSrv.createWorkspaceDtoBy(id, name);
+    state.isOrNull<TeamStateDone>()?.workspaces.add(WorkspaceModel(data, this));
+    setState(state, '新增space[${data.id}]');
+  }
+
+  updateSpaces() async {
+    final dataLs = await _workspaceSrv.queryWorkspaceDto(id);
+    final rst = <WorkspaceModel>[];
+    // 以新spaceLs为基础，复用老Model
+    for (final model in workspaces) {
+      final nData = dataLs.removeWhereOrNull((s) => s.id == model.id);
+      if (nData == null) continue;
+      rst.add(model..updateData(nData));
+    }
+    for (var data in dataLs) {
+      rst.add(WorkspaceModel(data, this));
+    }
+    setState(TeamStateDone(workspaces: rst, members: members),
+        '刷新Workspaces[${rst.length}]');
+  }
 
   WorkspaceService get _workspaceSrv => sl<WorkspaceService>();
+}
 
+extension TeamMemberX on TeamModel {
+  inviteMember(String userEmail) async {
+    await _teamSrv.inviteMember(data, userEmail);
+    setState(state, "邀请用户[$userEmail]加入团队[$name]");
+  }
+
+  updateMembers() async {
+    final dataLs = (await _tmSrv.getMemberships(teamId: id)).memberships;
+    final rst = <MemberModel>[];
+    for (final model in members) {
+      final nData = dataLs.removeWhereOrNull((_) => _.$id == model.id);
+      if (nData == null) continue;
+      rst.add(model..updateData(nData));
+    }
+    for (var data in dataLs) {
+      rst.add(MemberModel(data, this));
+    }
+    setState(TeamStateDone(workspaces: workspaces, members: rst),
+        '刷新Members[${rst.length}]');
+  }
+
+  Teams get _tmSrv => sl<Teams>();
+}
+
+extension TeamDeprecatedX on TeamModel {
+  @Deprecated('请在SpaceModel中重命名')
+  Future<BaseException?> actRenameSpaceName(
+          WorkspaceDto space, String? nName) async =>
+      throw '请在SpaceModel中重命名';
+
+  @Deprecated('deleteSpace')
+  Future<BaseException?> actDeleteSpace(String spaceId) async =>
+      actEntrance(TeamAct.deleteSpace(spaceId));
+
+  @Deprecated('弃用')
+  Future<BaseException?> actLoadWorkspace(String spaceId) async =>
+      await actWrapper(() async {
+        final r = await _workspaceSrv.findSpace(spaceId);
+        if (r == null) return null;
+        workspaces.add(WorkspaceModel(r, this));
+        // setDone("加载工作空间[$spaceId]完成", null);
+      });
+
+  @Deprecated('renameTeam')
   Future<BaseException?> actRenameTeam(String? newName) async =>
-      await actWrapper(() async {
-        if (newName == null) return null;
-        data = await _teamSrv.updateName(data, newName);
-        setDone("重命名团队[$name]", null, false);
-      });
+      (newName != null) ? await actEntrance(TeamAct.renameTeam(newName)) : null;
 
+  @Deprecated('inviteMember')
   Future<BaseException?> actInviteMember(String? userEmail) async =>
-      await actWrapper(() async {
-        if (userEmail == null) return;
-        await _teamSrv.inviteMember(data, userEmail);
-        setDone("邀请用户[$userEmail]加入团队[$name]");
-      });
+      (userEmail != null)
+          ? await actEntrance(TeamAct.inviteMember(userEmail))
+          : null;
 
-  /// 新建工作空间
+  @Deprecated('createSpace')
   Future<BaseException?> actCreateWorkspace(
     String spaceName, {
     Function(WorkspaceDto w)? onCreated,
-  }) async =>
-      await actWrapper(() async {
-        final data = await _workspaceSrv.createWorkspaceDtoBy(id, spaceName);
-        addNewWorkspaceModel(data);
-        onCreated?.call(data);
-      });
-
-  Future<BaseException?> actRenameSpaceName(
-          WorkspaceDto space, String? nName) async =>
-      await actWrapper(() async {
-        if (nName == null) return;
-        final r = await _workspaceSrv.updateWorkspaceName(space, nName);
-        setDone("重命名工作空间[$nName]完成", null, false);
-      });
-
-  Future<BaseException?> actDeleteSpace(String spaceId) async =>
-      await actWrapper(() async {
-        final r = await _workspaceSrv.deleteSpace(spaceId);
-        workspaces.removeWhere((w) => w.id == spaceId);
-        setDone("删除工作空间[$spaceId]完成", null, false);
-      });
+  }) =>
+      actEntrance(TeamAct.createSpace(spaceName));
 }
 
 /// ============================================================================

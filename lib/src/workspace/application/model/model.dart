@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:get_sweet/get_sweet.dart';
+import 'package:mind_base/src/app/application/model/base_model.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/core/inter/i_dao.dart';
-import 'package:mind_base/src/user/application/model/model.dart';
 import 'package:mind_base/src/workspace/application/service/expr/expr_evaluator.dart';
 import 'package:mind_base/src/workspace/application/service/meta_service.dart';
 import 'package:mind_base/src/workspace/domain/repo/repo.dart';
@@ -39,3 +41,5 @@ part 'propery.dart';
 part 'team.dart';
 
 part 'collection_model.dart';
+
+part 'model.freezed.dart';
