@@ -17,6 +17,7 @@ import 'package:provider_sidecar/provider_sidecar.dart';
 
 import 'package:mind_base/src/workspace/application/service/workspace_service.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
+import 'package:slowly/slowly.dart';
 
 import '../../infra/ui/dialog/import_data_dialog.dart';
 import '../service/meta_service.dart';

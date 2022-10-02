@@ -18,7 +18,7 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$TeamAct {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initModel,
+    required TResult Function(String id) initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -30,7 +30,7 @@ mixin _$TeamAct {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -42,7 +42,7 @@ mixin _$TeamAct {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -112,6 +112,7 @@ abstract class _$$TeamActInitModelCopyWith<$Res> {
   factory _$$TeamActInitModelCopyWith(
           _$TeamActInitModel value, $Res Function(_$TeamActInitModel) then) =
       __$$TeamActInitModelCopyWithImpl<$Res>;
+  $Res call({String id});
 }
 
 /// @nodoc
@@ -123,31 +124,54 @@ class __$$TeamActInitModelCopyWithImpl<$Res> extends _$TeamActCopyWithImpl<$Res>
 
   @override
   _$TeamActInitModel get _value => super._value as _$TeamActInitModel;
+
+  @override
+  $Res call({
+    Object? id = freezed,
+  }) {
+    return _then(_$TeamActInitModel(
+      id == freezed
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
 }
 
 /// @nodoc
 
 class _$TeamActInitModel implements TeamActInitModel {
-  const _$TeamActInitModel();
+  const _$TeamActInitModel(this.id);
+
+  @override
+  final String id;
 
   @override
   String toString() {
-    return 'TeamAct.initModel()';
+    return 'TeamAct.initModel(id: $id)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$TeamActInitModel);
+        (other.runtimeType == runtimeType &&
+            other is _$TeamActInitModel &&
+            const DeepCollectionEquality().equals(other.id, id));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(id));
+
+  @JsonKey(ignore: true)
+  @override
+  _$$TeamActInitModelCopyWith<_$TeamActInitModel> get copyWith =>
+      __$$TeamActInitModelCopyWithImpl<_$TeamActInitModel>(this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initModel,
+    required TResult Function(String id) initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -156,13 +180,13 @@ class _$TeamActInitModel implements TeamActInitModel {
     required TResult Function() updateMembers,
     required TResult Function(String userEmail) inviteMember,
   }) {
-    return initModel();
+    return initModel(id);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -171,13 +195,13 @@ class _$TeamActInitModel implements TeamActInitModel {
     TResult Function()? updateMembers,
     TResult Function(String userEmail)? inviteMember,
   }) {
-    return initModel?.call();
+    return initModel?.call(id);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -188,7 +212,7 @@ class _$TeamActInitModel implements TeamActInitModel {
     required TResult orElse(),
   }) {
     if (initModel != null) {
-      return initModel();
+      return initModel(id);
     }
     return orElse();
   }
@@ -244,7 +268,12 @@ class _$TeamActInitModel implements TeamActInitModel {
 }
 
 abstract class TeamActInitModel implements TeamAct {
-  const factory TeamActInitModel() = _$TeamActInitModel;
+  const factory TeamActInitModel(final String id) = _$TeamActInitModel;
+
+  String get id;
+  @JsonKey(ignore: true)
+  _$$TeamActInitModelCopyWith<_$TeamActInitModel> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -312,7 +341,7 @@ class _$TeamActUpdateTeam implements TeamActUpdateTeam {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initModel,
+    required TResult Function(String id) initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -327,7 +356,7 @@ class _$TeamActUpdateTeam implements TeamActUpdateTeam {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -342,7 +371,7 @@ class _$TeamActUpdateTeam implements TeamActUpdateTeam {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -482,7 +511,7 @@ class _$TeamActRenameTeam implements TeamActRenameTeam {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initModel,
+    required TResult Function(String id) initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -497,7 +526,7 @@ class _$TeamActRenameTeam implements TeamActRenameTeam {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -512,7 +541,7 @@ class _$TeamActRenameTeam implements TeamActRenameTeam {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -628,7 +657,7 @@ class _$TeamActUpdateSpaces implements TeamActUpdateSpaces {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initModel,
+    required TResult Function(String id) initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -643,7 +672,7 @@ class _$TeamActUpdateSpaces implements TeamActUpdateSpaces {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -658,7 +687,7 @@ class _$TeamActUpdateSpaces implements TeamActUpdateSpaces {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -794,7 +823,7 @@ class _$TeamActCreateSpace implements TeamActCreateSpace {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initModel,
+    required TResult Function(String id) initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -809,7 +838,7 @@ class _$TeamActCreateSpace implements TeamActCreateSpace {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -824,7 +853,7 @@ class _$TeamActCreateSpace implements TeamActCreateSpace {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -965,7 +994,7 @@ class _$TeamActDeleteSpace implements TeamActDeleteSpace {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initModel,
+    required TResult Function(String id) initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -980,7 +1009,7 @@ class _$TeamActDeleteSpace implements TeamActDeleteSpace {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -995,7 +1024,7 @@ class _$TeamActDeleteSpace implements TeamActDeleteSpace {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -1111,7 +1140,7 @@ class _$TeamActUpdateMembers implements TeamActUpdateMembers {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initModel,
+    required TResult Function(String id) initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -1126,7 +1155,7 @@ class _$TeamActUpdateMembers implements TeamActUpdateMembers {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -1141,7 +1170,7 @@ class _$TeamActUpdateMembers implements TeamActUpdateMembers {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -1277,7 +1306,7 @@ class _$TeamActInviteMember implements TeamActInviteMember {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initModel,
+    required TResult Function(String id) initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -1292,7 +1321,7 @@ class _$TeamActInviteMember implements TeamActInviteMember {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -1307,7 +1336,7 @@ class _$TeamActInviteMember implements TeamActInviteMember {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initModel,
+    TResult Function(String id)? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,

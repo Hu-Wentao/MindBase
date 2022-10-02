@@ -71,8 +71,9 @@ class _TeamPanelState extends State<TeamPanel> {
                     ChangeNotifierProvider<TeamModel>.value(
                       value: teams[index],
                       child: Consumer<TeamModel>(builder: (c, team, _) {
+                        // 自动初始化TeamModel
                         team.state.isOrNull<TeamStateInit>((_) {
-                          team.actEntrance(const TeamAct.initModel());
+                          team.actEntrance(TeamAct.initModel(team.id));
                         });
                         return TeamTile(
                           isExpanded: isExpanded,
