@@ -112,7 +112,6 @@ extension TeamModelX on TeamModel {
 extension TeamSpaceX on TeamModel {
   deleteSpace(String spaceId) async {
     await _workspaceSrv.deleteSpace(spaceId);
-    workspaces.removeWhere((w) => w.id == spaceId);
     setState(state, "删除工作空间[$spaceId]完成");
   }
 
