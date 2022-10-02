@@ -4,59 +4,44 @@ class WorkspacesScreen extends StatelessWidget {
   const WorkspacesScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) =>
-      Consumer<UserModel>(builder: (c, pUser, _) {
-        if (pUser.isLogged) {
-          return Column(
+  Widget build(BuildContext context) => Consumer<UserModel>(
+      builder: (c, mUser, _) => MdMainColumn(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      ElevatedButton.icon(
-                          onPressed: () async {
-                            final name = await showTextInputDialog(
-                              context: context,
-                              title: "设置团队名称",
-                              origin: "${pUser.name}'s Team",
-                            );
-                            if (name == null) return;
-                            context
-                                .read<UserModel>()
-                                .actCreateTeam(name)
-                                .thenDialog(context);
-                          },
-                          icon: const Icon(Icons.add),
-                          label: const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text("新建团队"),
-                          ))
-                    ],
-                  ),
-                ),
+              /// Header
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(children: [
+                  _buildCreateTeamBtn(context, mUser),
+                ]),
               ),
-              const TeamPanel(),
+              const Divider(),
+              TeamPanel(teams: mUser.teams),
             ],
-          );
-        } else {
-          return _buildUnLogged(c);
-        }
-      });
+          ));
 
-  Widget _buildUnLogged(BuildContext c) => Center(
-        child: OutlinedButton(
-            onPressed: () async =>
-                Future.value(UnLoginException("登录后再查看", "")).thenDialog(c),
-            child: const Text('请先登录')),
-      );
+  _buildCreateTeamBtn(BuildContext context, UserModel mUser) =>
+      ElevatedButton.icon(
+          onPressed: () async {
+            final name = await showTextInputDialog(
+              context: context,
+              title: "新团队名称",
+              origin: "${mUser.name}'s Team",
+            );
+            if (name == null) return;
+            mUser.actEntrance(UserAct.createTeam(name)).thenDialog(context);
+          },
+          icon: const Icon(Icons.add),
+          label: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text("新建团队"),
+          ));
 }
 
 class TeamPanel extends StatefulWidget {
-  const TeamPanel({Key? key}) : super(key: key);
+  final List<TeamModel> teams;
+
+  const TeamPanel({Key? key, required this.teams}) : super(key: key);
 
   @override
   State<TeamPanel> createState() => _TeamPanelState();
@@ -70,52 +55,47 @@ class _TeamPanelState extends State<TeamPanel> {
         _panelExpanded[panelIndex] = !isExpanded;
       });
 
+  List<TeamModel> get teams => widget.teams;
+
   @override
-  Widget build(BuildContext context) => Expanded(
-        child: SingleChildScrollView(
-          controller: ScrollController(),
-          child: Consumer<UserModel>(
-              builder: (c, teamManger, _) => ExpansionPanelList(
-                    // 当元素增减,强制刷新ExpansionPanelList,否则展开/折叠会报错
-                    key: ValueKey(teamManger.teams.length),
-                    expansionCallback: _onExpandedCall,
-                    children: List.generate(
-                      teamManger.teams.length,
-                      (index) {
-                        final team = teamManger.teams[index];
-                        return ExpansionPanel(
-                            canTapOnHeader: true,
-                            isExpanded: _panelExpanded[index] ??= true,
-                            headerBuilder: (c, bool isExpanded) =>
-                                ChangeNotifierProvider<TeamModel>.value(
-                                  value: team,
-                                  child: Consumer<TeamModel>(
-                                      builder: (c, team, _) => TeamTile(
-                                            isExpanded: isExpanded,
-                                            team: team,
-                                          )),
-                                ),
-                            body: ChangeNotifierProvider<TeamModel>.value(
-                                value: team,
-                                child: Consumer<TeamModel>(
-                                  builder: (c, team, _) => ListView.separated(
-                                    itemCount: team.workspaces.length,
-                                    itemBuilder:
-                                        (BuildContext context, int i) =>
-                                            WorkspaceTile(
-                                      team: team,
-                                      space: team.workspaces[i].data,
-                                    ),
-                                    separatorBuilder: (context, int index) =>
-                                        const Divider(),
-                                    shrinkWrap: true,
-                                  ),
-                                )));
-                      },
+  Widget build(BuildContext context) => ExpansionPanelList(
+        // 当元素增减,强制刷新ExpansionPanelList,否则展开/折叠会报错
+        key: ValueKey(teams.length),
+        expansionCallback: _onExpandedCall,
+        children: [
+          for (int index = 0; index < teams.length; index++)
+            ExpansionPanel(
+                canTapOnHeader: true,
+                isExpanded: _panelExpanded[index] ??= true,
+                headerBuilder: (c, bool isExpanded) =>
+                    ChangeNotifierProvider<TeamModel>.value(
+                      value: teams[index],
+                      child: Consumer<TeamModel>(builder: (c, team, _) {
+                        team.state.isOrNull<TeamStateInit>((_) {
+                          team.actEntrance(const TeamAct.initModel());
+                        });
+                        return TeamTile(
+                          isExpanded: isExpanded,
+                          team: team,
+                        );
+                      }),
                     ),
-                    animationDuration: const Duration(microseconds: 50),
-                  )),
-        ),
+                body: ChangeNotifierProvider<TeamModel>.value(
+                    value: teams[index],
+                    child: Consumer<TeamModel>(
+                      builder: (c, team, _) => ListView.separated(
+                        itemCount: team.workspaces.length,
+                        itemBuilder: (BuildContext context, int i) =>
+                            WorkspaceTile(
+                          team: team,
+                          space: team.workspaces[i].data,
+                        ),
+                        separatorBuilder: (c, i) => const Divider(),
+                        shrinkWrap: true,
+                      ),
+                    )))
+        ],
+        animationDuration: const Duration(microseconds: 50),
       );
 }
 
@@ -191,7 +171,8 @@ class TeamTile extends StatelessWidget {
         team.name,
         style: Theme.of(context).textTheme.titleMedium,
       ),
-      subtitle: Text("成员: ${team.total}  工作空间: ${team.workspaces.length}"),
+      subtitle: Text(
+          "成员: ${team.total}  工作空间: ${team.state.isOrNull<TeamStateDone>()?.workspaces.length ?? '--'}"),
       trailing: PopupMenuButton<String>(
         itemBuilder: (ctx) => [
           const PopupMenuItem(
