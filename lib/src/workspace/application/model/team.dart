@@ -27,7 +27,6 @@ class TeamState with _$TeamState {
   const factory TeamState.init() = TeamStateInit;
 
   const factory TeamState.done({
-    String? markId,
     required List<WorkspaceModel> workspaces,
     required List<MemberModel> members,
   }) = TeamStateDone;
@@ -61,10 +60,8 @@ class TeamModel extends BaseActEntranceModel<TeamAct, TeamState> {
   MemberModel? get teamOwner =>
       members.firstWhereOrNull((mbr) => mbr.roles.contains(Role.owner.value));
 
-  WorkspaceModel? get selectedWorkspace {
-    final mkId = state.isOrNull<TeamStateDone>()?.markId;
-    return workspaces.firstWhereOrNull((s) => s.id == mkId);
-  }
+  WorkspaceModel? findSpace(spaceId) =>
+      workspaces.firstWhereOrNull((s) => s.id == spaceId);
 
   @override
   BaseException? onBeforeActEntrance(TeamAct act) => sl<Slowly>().seconds(

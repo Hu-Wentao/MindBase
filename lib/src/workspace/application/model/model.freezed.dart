@@ -1417,24 +1417,24 @@ mixin _$TeamState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() init,
-    required TResult Function(String? markId, List<WorkspaceModel> workspaces,
-            List<MemberModel> members)
+    required TResult Function(
+            List<WorkspaceModel> workspaces, List<MemberModel> members)
         done,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(String? markId, List<WorkspaceModel> workspaces,
-            List<MemberModel> members)?
+    TResult Function(
+            List<WorkspaceModel> workspaces, List<MemberModel> members)?
         done,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(String? markId, List<WorkspaceModel> workspaces,
-            List<MemberModel> members)?
+    TResult Function(
+            List<WorkspaceModel> workspaces, List<MemberModel> members)?
         done,
     required TResult orElse(),
   }) =>
@@ -1516,8 +1516,8 @@ class _$TeamStateInit implements TeamStateInit {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() init,
-    required TResult Function(String? markId, List<WorkspaceModel> workspaces,
-            List<MemberModel> members)
+    required TResult Function(
+            List<WorkspaceModel> workspaces, List<MemberModel> members)
         done,
   }) {
     return init();
@@ -1527,8 +1527,8 @@ class _$TeamStateInit implements TeamStateInit {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(String? markId, List<WorkspaceModel> workspaces,
-            List<MemberModel> members)?
+    TResult Function(
+            List<WorkspaceModel> workspaces, List<MemberModel> members)?
         done,
   }) {
     return init?.call();
@@ -1538,8 +1538,8 @@ class _$TeamStateInit implements TeamStateInit {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(String? markId, List<WorkspaceModel> workspaces,
-            List<MemberModel> members)?
+    TResult Function(
+            List<WorkspaceModel> workspaces, List<MemberModel> members)?
         done,
     required TResult orElse(),
   }) {
@@ -1590,10 +1590,7 @@ abstract class _$$TeamStateDoneCopyWith<$Res> {
   factory _$$TeamStateDoneCopyWith(
           _$TeamStateDone value, $Res Function(_$TeamStateDone) then) =
       __$$TeamStateDoneCopyWithImpl<$Res>;
-  $Res call(
-      {String? markId,
-      List<WorkspaceModel> workspaces,
-      List<MemberModel> members});
+  $Res call({List<WorkspaceModel> workspaces, List<MemberModel> members});
 }
 
 /// @nodoc
@@ -1608,15 +1605,10 @@ class __$$TeamStateDoneCopyWithImpl<$Res> extends _$TeamStateCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object? markId = freezed,
     Object? workspaces = freezed,
     Object? members = freezed,
   }) {
     return _then(_$TeamStateDone(
-      markId: markId == freezed
-          ? _value.markId
-          : markId // ignore: cast_nullable_to_non_nullable
-              as String?,
       workspaces: workspaces == freezed
           ? _value._workspaces
           : workspaces // ignore: cast_nullable_to_non_nullable
@@ -1633,14 +1625,11 @@ class __$$TeamStateDoneCopyWithImpl<$Res> extends _$TeamStateCopyWithImpl<$Res>
 
 class _$TeamStateDone implements TeamStateDone {
   const _$TeamStateDone(
-      {this.markId,
-      required final List<WorkspaceModel> workspaces,
+      {required final List<WorkspaceModel> workspaces,
       required final List<MemberModel> members})
       : _workspaces = workspaces,
         _members = members;
 
-  @override
-  final String? markId;
   final List<WorkspaceModel> _workspaces;
   @override
   List<WorkspaceModel> get workspaces {
@@ -1657,7 +1646,7 @@ class _$TeamStateDone implements TeamStateDone {
 
   @override
   String toString() {
-    return 'TeamState.done(markId: $markId, workspaces: $workspaces, members: $members)';
+    return 'TeamState.done(workspaces: $workspaces, members: $members)';
   }
 
   @override
@@ -1665,7 +1654,6 @@ class _$TeamStateDone implements TeamStateDone {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$TeamStateDone &&
-            const DeepCollectionEquality().equals(other.markId, markId) &&
             const DeepCollectionEquality()
                 .equals(other._workspaces, _workspaces) &&
             const DeepCollectionEquality().equals(other._members, _members));
@@ -1674,7 +1662,6 @@ class _$TeamStateDone implements TeamStateDone {
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      const DeepCollectionEquality().hash(markId),
       const DeepCollectionEquality().hash(_workspaces),
       const DeepCollectionEquality().hash(_members));
 
@@ -1687,35 +1674,35 @@ class _$TeamStateDone implements TeamStateDone {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() init,
-    required TResult Function(String? markId, List<WorkspaceModel> workspaces,
-            List<MemberModel> members)
+    required TResult Function(
+            List<WorkspaceModel> workspaces, List<MemberModel> members)
         done,
   }) {
-    return done(markId, workspaces, members);
+    return done(workspaces, members);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(String? markId, List<WorkspaceModel> workspaces,
-            List<MemberModel> members)?
+    TResult Function(
+            List<WorkspaceModel> workspaces, List<MemberModel> members)?
         done,
   }) {
-    return done?.call(markId, workspaces, members);
+    return done?.call(workspaces, members);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(String? markId, List<WorkspaceModel> workspaces,
-            List<MemberModel> members)?
+    TResult Function(
+            List<WorkspaceModel> workspaces, List<MemberModel> members)?
         done,
     required TResult orElse(),
   }) {
     if (done != null) {
-      return done(markId, workspaces, members);
+      return done(workspaces, members);
     }
     return orElse();
   }
@@ -1754,11 +1741,9 @@ class _$TeamStateDone implements TeamStateDone {
 
 abstract class TeamStateDone implements TeamState {
   const factory TeamStateDone(
-      {final String? markId,
-      required final List<WorkspaceModel> workspaces,
+      {required final List<WorkspaceModel> workspaces,
       required final List<MemberModel> members}) = _$TeamStateDone;
 
-  String? get markId;
   List<WorkspaceModel> get workspaces;
   List<MemberModel> get members;
   @JsonKey(ignore: true)
