@@ -5,7 +5,7 @@ import 'package:get_arch_core/get_arch_core.dart';
 import 'package:get_sweet/get_sweet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mind_base/src/app/application/model/model.dart';
-import 'package:mind_base/src/app/infra/ui/app.dart';
+import 'package:mind_base/src/app/infra/ui/page/home/workspace/workspace.dart';
 import 'package:mind_base/src/app/infra/ui/widget/widget.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/text_input_dialog.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
