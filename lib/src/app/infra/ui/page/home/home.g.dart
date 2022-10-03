@@ -41,11 +41,11 @@ extension $WorkspaceRouteExtension on WorkspaceRoute {
         state.params['teamId']!,
         state.params['spaceId']!,
         state.params['metaId']!,
-        state.params['viewId']!,
+        int.parse(state.params['viewId']!),
       );
 
   String get location => GoRouteData.$location(
-        '/home/${Uri.encodeComponent(_$ScreenTypeEnumMap[screen]!)}/team/${Uri.encodeComponent(teamId)}/space/${Uri.encodeComponent(spaceId)}/meta/${Uri.encodeComponent(metaId)}/view/${Uri.encodeComponent(viewId)}',
+        '/home/${Uri.encodeComponent(_$ScreenTypeEnumMap[screen]!)}/team/${Uri.encodeComponent(teamId)}/space/${Uri.encodeComponent(spaceId)}/meta/${Uri.encodeComponent(metaId)}/view/${Uri.encodeComponent(viewId.toString())}',
       );
 
   void go(BuildContext context) => context.go(location, extra: this);

@@ -23,7 +23,7 @@ class WorkspaceRoute extends GoRouteData {
   final String teamId;
   final String spaceId;
   final String metaId;
-  final String viewId;
+  final int viewId;
 
   const WorkspaceRoute(
     this.screen,
@@ -37,7 +37,7 @@ class WorkspaceRoute extends GoRouteData {
     required this.teamId,
     required this.spaceId,
     this.metaId = 'null',
-    this.viewId = 'null',
+    this.viewId = -1,
     this.screen = ScreenType.workspaces,
   });
 
