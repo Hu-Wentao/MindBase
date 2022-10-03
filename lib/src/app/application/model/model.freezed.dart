@@ -2362,19 +2362,19 @@ mixin _$UserState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() init,
-    required TResult Function(List<TeamModel> teams, String? markId) done,
+    required TResult Function(List<TeamModel> teams) done,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(List<TeamModel> teams, String? markId)? done,
+    TResult Function(List<TeamModel> teams)? done,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(List<TeamModel> teams, String? markId)? done,
+    TResult Function(List<TeamModel> teams)? done,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -2455,7 +2455,7 @@ class _$UserStateInit implements UserStateInit {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() init,
-    required TResult Function(List<TeamModel> teams, String? markId) done,
+    required TResult Function(List<TeamModel> teams) done,
   }) {
     return init();
   }
@@ -2464,7 +2464,7 @@ class _$UserStateInit implements UserStateInit {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(List<TeamModel> teams, String? markId)? done,
+    TResult Function(List<TeamModel> teams)? done,
   }) {
     return init?.call();
   }
@@ -2473,7 +2473,7 @@ class _$UserStateInit implements UserStateInit {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(List<TeamModel> teams, String? markId)? done,
+    TResult Function(List<TeamModel> teams)? done,
     required TResult orElse(),
   }) {
     if (init != null) {
@@ -2523,7 +2523,7 @@ abstract class _$$UserStateDoneCopyWith<$Res> {
   factory _$$UserStateDoneCopyWith(
           _$UserStateDone value, $Res Function(_$UserStateDone) then) =
       __$$UserStateDoneCopyWithImpl<$Res>;
-  $Res call({List<TeamModel> teams, String? markId});
+  $Res call({List<TeamModel> teams});
 }
 
 /// @nodoc
@@ -2539,17 +2539,12 @@ class __$$UserStateDoneCopyWithImpl<$Res> extends _$UserStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? teams = freezed,
-    Object? markId = freezed,
   }) {
     return _then(_$UserStateDone(
       teams == freezed
           ? _value._teams
           : teams // ignore: cast_nullable_to_non_nullable
               as List<TeamModel>,
-      markId == freezed
-          ? _value.markId
-          : markId // ignore: cast_nullable_to_non_nullable
-              as String?,
     ));
   }
 }
@@ -2557,8 +2552,7 @@ class __$$UserStateDoneCopyWithImpl<$Res> extends _$UserStateCopyWithImpl<$Res>
 /// @nodoc
 
 class _$UserStateDone implements UserStateDone {
-  const _$UserStateDone(final List<TeamModel> teams, this.markId)
-      : _teams = teams;
+  const _$UserStateDone(final List<TeamModel> teams) : _teams = teams;
 
   final List<TeamModel> _teams;
   @override
@@ -2568,11 +2562,8 @@ class _$UserStateDone implements UserStateDone {
   }
 
   @override
-  final String? markId;
-
-  @override
   String toString() {
-    return 'UserState.done(teams: $teams, markId: $markId)';
+    return 'UserState.done(teams: $teams)';
   }
 
   @override
@@ -2580,15 +2571,12 @@ class _$UserStateDone implements UserStateDone {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$UserStateDone &&
-            const DeepCollectionEquality().equals(other._teams, _teams) &&
-            const DeepCollectionEquality().equals(other.markId, markId));
+            const DeepCollectionEquality().equals(other._teams, _teams));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(_teams),
-      const DeepCollectionEquality().hash(markId));
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_teams));
 
   @JsonKey(ignore: true)
   @override
@@ -2599,29 +2587,29 @@ class _$UserStateDone implements UserStateDone {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() init,
-    required TResult Function(List<TeamModel> teams, String? markId) done,
+    required TResult Function(List<TeamModel> teams) done,
   }) {
-    return done(teams, markId);
+    return done(teams);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(List<TeamModel> teams, String? markId)? done,
+    TResult Function(List<TeamModel> teams)? done,
   }) {
-    return done?.call(teams, markId);
+    return done?.call(teams);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(List<TeamModel> teams, String? markId)? done,
+    TResult Function(List<TeamModel> teams)? done,
     required TResult orElse(),
   }) {
     if (done != null) {
-      return done(teams, markId);
+      return done(teams);
     }
     return orElse();
   }
@@ -2659,11 +2647,9 @@ class _$UserStateDone implements UserStateDone {
 }
 
 abstract class UserStateDone implements UserState {
-  const factory UserStateDone(
-      final List<TeamModel> teams, final String? markId) = _$UserStateDone;
+  const factory UserStateDone(final List<TeamModel> teams) = _$UserStateDone;
 
   List<TeamModel> get teams;
-  String? get markId;
   @JsonKey(ignore: true)
   _$$UserStateDoneCopyWith<_$UserStateDone> get copyWith =>
       throw _privateConstructorUsedError;

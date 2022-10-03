@@ -89,6 +89,10 @@ class MockUserModel extends _i1.Mock implements _i3.UserModel {
   bool get hasListeners => (super.noSuchMethod(Invocation.getter(#hasListeners),
       returnValue: false, returnValueForMissingStub: false) as bool);
   @override
+  _i4.TeamModel? findTeam(String? teamId) =>
+      (super.noSuchMethod(Invocation.method(#findTeam, [teamId]),
+          returnValueForMissingStub: null) as _i4.TeamModel?);
+  @override
   dynamic onActEntrance(_i3.UserAct? act) =>
       super.noSuchMethod(Invocation.method(#onActEntrance, [act]),
           returnValueForMissingStub: null);

@@ -17,7 +17,6 @@ class UserState with _$UserState {
 
   const factory UserState.done(
     List<TeamModel> teams,
-    String? markId,
   ) = UserStateDone;
 }
 
@@ -41,9 +40,8 @@ class UserModel extends BaseActEntranceModel<UserAct, UserState> {
   // 当前登录用户是否为 "匿名用户"
   bool get isAnonymous => (session.provider == 'anonymous');
 
-  // 首选团队
-  TeamModel? get markedTeam => state.mapOrNull<TeamModel?>(
-      done: (it) => it.teams.firstWhereOrNull((team) => team.id == it.markId));
+  TeamModel? findTeam(String teamId) => state.mapOrNull<TeamModel?>(
+      done: (it) => it.teams.firstWhereOrNull((team) => team.id == teamId));
 
   @override
   onActEntrance(UserAct act) => act.when(
@@ -65,17 +63,12 @@ extension UserTeamX on UserModel {
   @protected
   initModel() async {
     _realtimeSrv.watchTeams().listen((event) async {
-      final Tuple2<List<TeamModel>, String?> s = state.map(
-          // ignore: prefer_const_constructors
-          init: (e) => Tuple2([], null),
-          done: (e) => Tuple2(e.teams, e.markId));
       final nState = UserStateDone(
-          s.value1.updateDataSet<aw.Team>(
+          teams.updateDataSet<aw.Team>(
             event,
             equals: (a, b) => a.id == b.id,
             transform: TeamModel.new,
-          ),
-          s.value2);
+          ));
       setState(nState, '更新TeamList[${event.type}]');
     });
     await updateTeams();
@@ -116,7 +109,7 @@ extension UserTeamX on UserModel {
     for (final data in dataLs) {
       rst.add(TeamModel(data));
     }
-    setState(UserState.done(rst, markedTeam?.id), '刷新teams列表[${rst.length}]');
+    setState(UserState.done(rst), '刷新teams列表[${rst.length}]');
   }
 
   RealtimeSrv get _realtimeSrv => sl<RealtimeSrv>();
