@@ -109,7 +109,7 @@ class WorkspaceTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Link(
         uri: Uri.tryParse(
-            workspaceRouterPathBuilder(teamId: team.id, workspaceId: space.id)),
+            WorkspaceRoute.auto(teamId: team.id, spaceId: space.id).location),
         builder: (ctx, followLink) => ListTile(
           leading: const Icon(Icons.space_dashboard_rounded),
           title: Text(space.name),
@@ -219,8 +219,7 @@ class TeamTile extends StatelessWidget {
               break;
             case "create_space":
               await team.actCreateWorkspace('新建空间', onCreated: (w) {
-                context.go(workspaceRouterPathBuilder(
-                    teamId: team.id, workspaceId: w.id));
+                WorkspaceRoute.auto(teamId: team.id, spaceId: w.id).go(context);
               }).thenDialog(context);
               break;
             case "delete":
