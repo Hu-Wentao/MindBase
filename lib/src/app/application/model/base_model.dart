@@ -11,9 +11,12 @@ abstract class BaseActEntranceModel<ACT, S> extends Sidecar<S, BaseException?>
     super.onCatch = ExceptionAdapter.of,
   });
 
+  // 如果实现类在程序中不是单例，则应当覆写该字段，避免被全局Slowly过滤掉Act
+  String get id => 'singleton';
+
   @override
   BaseException? onBeforeActEntrance(ACT act) =>
-      sl<Slowly>().seconds(act.runtimeType, sec: 1)
+      sl<Slowly>().seconds('${id}_${act.runtimeType}', sec: 1)
           ? null
           : BaseException('msg');
 }
