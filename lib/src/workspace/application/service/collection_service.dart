@@ -1,9 +1,13 @@
 part of 'service.dart';
 
+/// todo 在后端加强数据访问权限控制
 /// 管理表与记录的读写权限
 @lazySingleton
 class CollectionService {
   final _srvDb = sl<srv.Databases>();
+
+  Future<da.Collection> findCollection(String collectionId) =>
+      _srvDb.getCollection(collectionId: collectionId);
 
   Future<da.Collection?> updateCollection(String? userId, String? teamOwnerId,
       da.Collection collection, CollectionDto? dto) async {
@@ -15,7 +19,10 @@ class CollectionService {
     if (teamOwnerId == null) {
       throw BaseException('被更新表所属团队没有团队创建者(owner)角色,无法更新权限');
     }
-    if (userId != teamOwnerId) throw BaseException("您不是团队创建者, 没有权限更新表", debugInfo: "userId-$userId, teamOwnerId-$teamOwnerId");
+    if (userId != teamOwnerId) {
+      throw BaseException("您不是团队创建者, 没有权限更新表",
+          debugInfo: "userId-$userId, teamOwnerId-$teamOwnerId");
+    }
 
     final r = await _srvDb.updateCollection(
       collectionId: collection.$id,
