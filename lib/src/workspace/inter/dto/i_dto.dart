@@ -547,6 +547,7 @@ class WorkspaceDto extends IEntityDto {
   String id;
   String name;
   String teamId;
+  @Deprecated("meta列表不存在这里，而是通过查询得到，考虑改为关联meta的数量")
   List<String> metas;
 
   WorkspaceDto({
