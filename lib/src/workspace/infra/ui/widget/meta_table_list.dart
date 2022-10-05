@@ -1,15 +1,17 @@
 part of 'widget.dart';
 
 class MetaTableList extends StatefulWidget {
-  final TeamModel mTeam;
-  final WorkspaceModel mSpace;
-  final String? metaId;
+  final String teamId;
+  final List<MetaModel> metas;
+  final String? markedMetaId;
+  final String Function(String metaId, int? viewId) fetchMetaViewLocation;
 
   const MetaTableList({
     Key? key,
-    required this.mTeam,
-    required this.mSpace,
-    required this.metaId,
+    required this.teamId,
+    required this.fetchMetaViewLocation,
+    required this.metas,
+    required this.markedMetaId,
   }) : super(key: key);
 
   @override
@@ -21,9 +23,9 @@ class _MetaTableListState extends State<MetaTableList> {
   final _kAttrBuilder = GlobalKey<FormBuilderState>();
   final _kMethodBuilder = GlobalKey<FormBuilderState>();
 
-  WorkspaceModel get space => widget.mSpace;
+  List<MetaModel> get metas => widget.metas;
 
-  TeamModel get team => widget.mTeam;
+  String get teamId => widget.teamId;
 
   final _panelExpanded = <int, bool>{};
 
@@ -46,44 +48,33 @@ class _MetaTableListState extends State<MetaTableList> {
                   controller: ScrollController(),
                   child: ExpansionPanelList(
                     expansionCallback: _onExpandedCall,
-                    children: List.generate(
-                      space.metas.length,
-                      (i) {
-                        final meta = space.metas[i];
-                        final metaDto = meta.data;
-                        return ExpansionPanel(
+                    children: [
+                      for (int i = 0; i < metas.length; i++)
+                        ExpansionPanel(
                           canTapOnHeader: true,
                           isExpanded: _panelExpanded[i] ??= false,
-                          headerBuilder: (c, ex) => TableTile(
-                            openedSpace: space,
-                            openedMeta: meta,
-                            selected: meta.id == widget.metaId,
-                            onTap: () => WorkspaceRoute.auto(
-                                      teamId: team.id,
-                                      spaceId: space.id,
-                                      metaId: meta.id)
-                                  .go(context),
-                          ),
+                          headerBuilder: (c, ex) {
+                            final meta = metas[i];
+                            return TableTile(
+                              meta: meta,
+                              selected: meta.id == widget.markedMetaId,
+                              onTap: () => context.go(
+                                  widget.fetchMetaViewLocation(meta.id, null)),
+                            );
+                          },
 
                           /// 构建视图列表
-                          body: ListView.separated(
-                            shrinkWrap: true,
-                            itemCount: metaDto.views.length,
-                            itemBuilder: (context, int index) => TableViewTile(
-                              openedMeta: meta,
-                              view: metaDto.views[index],
-                              viewUri: Uri.parse(WorkspaceRoute.auto(
-                                      teamId: team.id,
-                                      spaceId: space.id,
-                                      metaId: meta.id,
-                                      viewId: metaDto.views[index].vId)
-                                  .location),
-                            ),
-                            separatorBuilder: (ctx, i) => const Divider(),
-                          ),
-                        );
-                      },
-                    ),
+                          body: Column(children: [
+                            for (int j = 0; j < metas[i].data.views.length; j++)
+                              TableViewTile(
+                                openedMeta: metas[i],
+                                view: metas[i].data.views[j],
+                                viewUri: Uri.parse(widget.fetchMetaViewLocation(
+                                    metas[i].id, metas[i].data.views[j].vId)),
+                              ),
+                          ]),
+                        )
+                    ],
                     animationDuration: const Duration(microseconds: 50),
                   ),
                 ),
@@ -101,6 +92,7 @@ class _MetaTableListState extends State<MetaTableList> {
                         IconButton(
                           icon: const Icon(Icons.add),
                           onPressed: () async {
+                            final space = context.read<SpaceModel>();
                             final nMeta = (await showRecordMetaEditDialog(
                               context: context,
                               kAttrBuilder: _kAttrBuilder,
@@ -130,7 +122,8 @@ class _MetaTableListState extends State<MetaTableList> {
                                 final dto = await showImportDataDialog(
                                     context: context);
                                 if (dto == null) return;
-                                return await space
+                                return await context
+                                    .read<SpaceModel>()
                                     .actUpdateByTable(dto)
                                     .thenDialog(context);
                             }
