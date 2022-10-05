@@ -24,15 +24,19 @@ class CollectionService {
           debugInfo: "userId-$userId, teamOwnerId-$teamOwnerId");
     }
 
-    final r = await _srvDb.updateCollection(
-      collectionId: collection.$id,
-      name: collection.name,
-      permission: collection.permission,
-      // 访问级别, 表或者记录
-      read: dto.reads.isEmpty ? collection.$read : dto.reads,
-      write: dto.writes.isEmpty ? collection.$write : dto.writes,
-      enabled: dto.enabled ?? collection.enabled,
-    );
-    return r;
+    return updateCollectionNoCheck(collection, dto);
   }
+
+  // todo 普通用户改用_cliDb发送请求，自动过滤非法操作
+  Future<da.Collection> updateCollectionNoCheck(
+          da.Collection collection, CollectionDto dto) async =>
+      await _srvDb.updateCollection(
+        collectionId: collection.$id,
+        name: collection.name,
+        permission: collection.permission,
+        // 访问级别, 表或者记录
+        read: dto.reads.isEmpty ? collection.$read : dto.reads,
+        write: dto.writes.isEmpty ? collection.$write : dto.writes,
+        enabled: dto.enabled ?? collection.enabled,
+      );
 }
