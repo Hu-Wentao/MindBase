@@ -24,25 +24,10 @@ class DataEvt<T> {
   final T data;
 
   DataEvt(this.type, this.data);
-
-  List<T> updateDataSet(List<T> dataSet,
-      {bool Function(T raw, T data)? equals}) {
-    equals ??= (a, b) => a == b;
-    switch (type) {
-      case DataEvtTp.create:
-        return dataSet..add(data);
-      case DataEvtTp.delete:
-        return dataSet..removeWhere((e) => equals!.call(e, data));
-      case DataEvtTp.update:
-        return dataSet
-          ..removeWhere((e) => equals!.call(e, data))
-          ..add(data);
-    }
-  }
 }
 
 extension DataSetX<T> on List<T> {
-  updateDataSet<R>(
+  List<T> updateDataSet<R>(
     DataEvt<R> event, {
     required T Function(R data) transform,
     required bool Function(T origin, T data) equals,
@@ -52,6 +37,7 @@ extension DataSetX<T> on List<T> {
       case DataEvtTp.create:
         return this..add(data);
       case DataEvtTp.delete:
+        // todo 如果删除事件 仅回传被删除实体的Id，则此处会出错
         return this..removeWhere((e) => equals.call(e, data));
       case DataEvtTp.update:
         return this
@@ -61,6 +47,8 @@ extension DataSetX<T> on List<T> {
   }
 }
 
+///
+/// 将监听逻辑整合到本类中，Stream直接由hub持有
 @lazySingleton
 class RealtimeSrv {
   final RealtimeChannelHub _hub;
