@@ -25,7 +25,7 @@ const pMetaSchoolId = ('626a109fd90369d16c2fbe0e');
 const pRcdSchoolHfuId = ("626a98b14a034567ff06f2f4");
 const pRcdStudentZsId = ('6262e3b0118f5894993d4533');
 final tm = MockTeamModel();
-final sp = WorkspaceModel(WorkspaceDto.builder(), tm)
+final sp = WorkspaceModel(WorkspaceDto.builder(), )
   ..metas.addAll([pMetaSchool, pMetaStudent]);
 
 // Meta 2个
@@ -156,7 +156,7 @@ final pWs = WorkspaceModel(
       metas: [],
       teamId: 'teamId',
     ),
-    tm)
+    )
   ..metas.addAll([pMetaSchool, pMetaStudent]);
 
 main() {
