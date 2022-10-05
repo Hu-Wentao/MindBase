@@ -63,6 +63,9 @@ class MockUserModel extends _i1.Mock implements _i3.UserModel {
       returnValueForMissingStub:
           _FakeUser_1(this, Invocation.getter(#data))) as _i2.User);
   @override
+  String get id => (super.noSuchMethod(Invocation.getter(#id),
+      returnValue: '', returnValueForMissingStub: '') as String);
+  @override
   bool get isAnonymous => (super.noSuchMethod(Invocation.getter(#isAnonymous),
       returnValue: false, returnValueForMissingStub: false) as bool);
   @override
@@ -163,11 +166,10 @@ class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
   int get total => (super.noSuchMethod(Invocation.getter(#total),
       returnValue: 0, returnValueForMissingStub: 0) as int);
   @override
-  List<_i4.WorkspaceModel> get workspaces =>
-      (super.noSuchMethod(Invocation.getter(#workspaces),
-              returnValue: <_i4.WorkspaceModel>[],
-              returnValueForMissingStub: <_i4.WorkspaceModel>[])
-          as List<_i4.WorkspaceModel>);
+  List<_i4.SpaceModel> get workspaces => (super.noSuchMethod(
+      Invocation.getter(#workspaces),
+      returnValue: <_i4.SpaceModel>[],
+      returnValueForMissingStub: <_i4.SpaceModel>[]) as List<_i4.SpaceModel>);
   @override
   List<_i4.MemberModel> get members => (super.noSuchMethod(
       Invocation.getter(#members),
@@ -192,21 +194,17 @@ class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
   bool get hasListeners => (super.noSuchMethod(Invocation.getter(#hasListeners),
       returnValue: false, returnValueForMissingStub: false) as bool);
   @override
-  _i5.BaseException? onBeforeActEntrance(_i4.TeamAct? act) =>
-      (super.noSuchMethod(Invocation.method(#onBeforeActEntrance, [act]),
-          returnValueForMissingStub: null) as _i5.BaseException?);
-  @override
   dynamic onActEntrance(_i4.TeamAct? act) =>
       super.noSuchMethod(Invocation.method(#onActEntrance, [act]),
-          returnValueForMissingStub: null);
-  @override
-  dynamic initModel(String? id) =>
-      super.noSuchMethod(Invocation.method(#initModel, [id]),
           returnValueForMissingStub: null);
   @override
   dynamic updateTeam(_i2.Team? team) =>
       super.noSuchMethod(Invocation.method(#updateTeam, [team]),
           returnValueForMissingStub: null);
+  @override
+  _i5.BaseException? onBeforeActEntrance(_i4.TeamAct? act) =>
+      (super.noSuchMethod(Invocation.method(#onBeforeActEntrance, [act]),
+          returnValueForMissingStub: null) as _i5.BaseException?);
   @override
   _i6.Future<_i5.BaseException?> actWrapper(
           [Function? action, int? traceLine = 1]) =>

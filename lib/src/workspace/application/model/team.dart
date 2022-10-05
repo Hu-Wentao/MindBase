@@ -15,6 +15,7 @@ class TeamAct with _$TeamAct {
   ///
   const factory TeamAct.updateSpaces() = TeamActUpdateSpaces;
 
+  ///
   const factory TeamAct.createSpace(String name) = TeamActCreateSpace;
 
   const factory TeamAct.deleteSpace(String spaceId) = TeamActDeleteSpace;
@@ -109,7 +110,7 @@ extension TeamSpaceX on TeamModel {
 
   createSpace(String name) async {
     final data = await _workspaceSrv.createWorkspaceDtoBy(id, name);
-    state.isOrNull<TeamStateDone>()?.workspaces.add(WorkspaceModel(data, this));
+    state.isOrNull<TeamStateDone>()?.workspaces.add(WorkspaceModel(data));
     setState(state, '新增space[${data.id}]');
   }
 
@@ -123,7 +124,7 @@ extension TeamSpaceX on TeamModel {
       rst.add(model..updateData(nData));
     }
     for (var data in dataLs) {
-      rst.add(WorkspaceModel(data, this));
+      rst.add(WorkspaceModel(data));
     }
     setState(TeamStateDone(workspaces: rst, members: members),
         '刷新Workspaces[${rst.length}]');
@@ -165,15 +166,6 @@ extension TeamDeprecatedX on TeamModel {
   @Deprecated('deleteSpace')
   Future<BaseException?> actDeleteSpace(String spaceId) async =>
       actEntrance(TeamAct.deleteSpace(spaceId));
-
-  @Deprecated('弃用')
-  Future<BaseException?> actLoadWorkspace(String spaceId) async =>
-      await actWrapper(() async {
-        final r = await _workspaceSrv.findSpace(spaceId);
-        if (r == null) return null;
-        workspaces.add(WorkspaceModel(r, this));
-        // setDone("加载工作空间[$spaceId]完成", null);
-      });
 
   @Deprecated('renameTeam')
   Future<BaseException?> actRenameTeam(String? newName) async =>

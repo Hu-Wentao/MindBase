@@ -1,43 +1,208 @@
 part of 'model.dart';
 
-@Deprecated('use WorkspaceModel')
-typedef OpenedWorkspace = WorkspaceModel;
-@Deprecated('use WorkspaceModel')
-typedef Workspace = WorkspaceModel;
+@freezed
+class SpaceAct with _$SpaceAct {
+  /// 初始化：更新collection/metas,并watch metas变更
+  const factory SpaceAct.initModel() = SpaceActInitModel;
 
-mixin SpaceStateChangeMx on IWorkspaceModel {
-  RecordMetaEttAccessor? __metaAcc;
+  const factory SpaceAct.updateModel(WorkspaceDto data) = SpaceActUpdateModel;
+
+  ///
+  const factory SpaceAct.updateTableDetail(CollectionDto data) =
+      SpaceActUpdateTableDetail;
+
+  ///
+  const factory SpaceAct.insertMeta(RecordMetaDto data) = SpaceActInsertMeta;
+
+  const factory SpaceAct.deleteMeta(String metaId) = SpaceActDeleteMeta;
+
+  const factory SpaceAct.updateByTable(TableDto dto) = SpaceActUpdateByTable;
+}
+
+@freezed
+class SpaceState with _$SpaceState {
+  const factory SpaceState.init() = SpaceStateInit;
+
+  const factory SpaceState.done(
+    da.Collection metaTableDetail,
+    List<MetaModel> metas,
+  ) = SpaceStateDone;
+}
+
+class SpaceModel extends BaseActEntranceModel<SpaceAct, SpaceState> {
+  WorkspaceDto data;
+
+  SpaceModel(this.data, {super.state = const SpaceState.init()});
+
+  @override
+  String get id => data.id;
+
+  String get name => data.name;
+
+  @protected
+  da.Collection? get metaTableDetail =>
+      state.isOrNull<SpaceStateDone>()?.metaTableDetail;
+
+  CollectionDto? get metaTableDetailDto => CollectionDto.from(metaTableDetail);
+
+  @protected
+  List<MetaModel> get metas => state.isOrNull<SpaceStateDone>()?.metas ?? [];
+
+  QueryMetaFn get queryMeta => (metaId) => findMeta(metaId)!;
+
+  MetaModel? findMeta(String? metaId) =>
+      metas.firstWhereOrNull((element) => element.id == metaId);
+
+  String get metaCollectionId => data.id; // 工作空间Id即为Meta集合Id
+
+  RecordModel findRecord(ExprValue value) {
+    assert(value.type.isRef, "findRecord: value.type.isRef 必须是Ref类型才能作为查询参数");
+    // value.type.meta
+    return getRecords(value.type.meta!.id)
+        .firstWhere((record) => record.id == value.value);
+  }
+
+  List<RecordModel> getRecords(String metaId) =>
+      metas[__indexByOpenedMetas(metaId)].records;
+
+  Iterable<List<RecordModel>> allRecords() =>
+      metas.map((element) => element.records);
+
+  /// 节流flag改用 [act] 实例
+  @override
+  BaseException? onBeforeActEntrance(SpaceAct act) =>
+      sl<Slowly>().seconds(act, sec: 1) ? null : BaseException('msg');
+
+  @override
+  onActEntrance(SpaceAct act) async => await act.when(
+        initModel: initModel,
+        updateModel: updateModel,
+        updateTableDetail: updateTableDetail,
+        insertMeta: insertMeta,
+        deleteMeta: deleteMeta,
+        updateByTable: updateByTable,
+      );
+
+  MetaModel _addNewMetaModel(RecordMetaDto data) {
+    final m = MetaModel(data, this);
+    metas.add(m
+      // 添加的同时初始化
+      ..actInitSubscription());
+    return m;
+  }
+
+  /// ==== deprecated
+
+  @Deprecated('metaTableInfo')
+  da.Collection? get metaCollection => metaTableDetail;
+
+  @Deprecated('metas')
+  Iterable<MetaModel> allMetas() => metas;
+
+  @Deprecated('使用openedMetas代替')
+  List<MetaModel> get openedMetas => metas;
+
+  //   /// 开头`>>`用于防止用户自己设置同名变量
+  //   /// 用于DTO->Domain转换: 对应Value类型为 [QueryMetaFn] 将`MetaId->Meta查询`注入到ctx中, 以便读取meta,同时解决循环依赖问题
+  @Deprecated("转移位置..")
+  static const ctxQueryMetaSign = ">>_ctxQueryMetaSign";
+
+  /// 用于表达式求值: 在工作空间内查询Record的实例(参见[AttrType.ref], [AsFuncThis])
+  @Deprecated("转移位置..")
+  static const ctxFindRecordFnSign = ">>_ctxFindRecordFnSign";
+}
+
+extension SpaceModelX on SpaceModel {
+  updateTableDetail(CollectionDto dto) async {
+    // 判断是否有权限更新
+    final tableDetail =
+        await _collectionSrv.updateCollectionNoCheck(metaTableDetail!, dto);
+    // 非响应式, 必须手动更新状态
+    setState(SpaceStateDone(tableDetail, metas), '更新TableDetail');
+  }
+
+  @protected
+  initModel() async {
+    // 暂不允许重复初始化
+    if (state is SpaceStateDone) return;
+
+    // 先watch fixme 没有close
+    _metaAcc.watch().listen(onWatchMetaEvt);
+
+    // 后fetch
+    final metaTableInfo = await _collectionSrv.findCollection(metaCollectionId);
+    final metaDtoLs = await _fetchAllMetas().toList();
+    final metas = metaDtoLs.map((e) => MetaModel(e, this)).toList();
+    setState(
+      SpaceStateDone(metaTableInfo, metas),
+      '初始化Space[$id],metas[${metas.length}]',
+    );
+  }
+
+  updateModel(WorkspaceDto data) async {
+    this.data = data;
+    setState(state, '更新data');
+  }
+
+  @protected
+  insertMeta(RecordMetaDto meta) async {
+    await _metaService.insertMetaDto(meta);
+    // 通过listen监听刷新
+  }
+
+  @protected
+  deleteMeta(String metaId) async {
+    // 从数据库中删除 Meta记录和Record集合
+    await _metaService.deleteBy(metaId);
+    // 通过listen监听刷新
+  }
+
+  @protected
+  updateByTable(TableDto dto) async {
+    await _workspaceSrv.insertTable(_metaService, dto);
+    // 通过listen监听刷新
+  }
+
+  CollectionService get _collectionSrv => sl<CollectionService>();
+
+  MetaService get _metaService => MetaService.withDI(sl, id)!;
+
+  WorkspaceService get _workspaceSrv => sl<WorkspaceService>();
+
+  @Deprecated('updateModel')
+  Future<BaseException?> updateData(WorkspaceDto data) async =>
+      actEntrance(SpaceAct.updateModel(data));
+
+  @Deprecated('initModel')
+  Future<BaseException?> actRefresh() =>
+      actEntrance(const SpaceAct.initModel());
+
+  /// 注意,[actInsertMetaDto]与[actUpdateMeta]不能混用, Insert必须使用Meta,而不是Dto
+  /// 本地数据由stream事件触发更新
+  @Deprecated('insertMeta')
+  Future<BaseException?> actInsertMetaDto(RecordMetaDto meta) async =>
+      actEntrance(SpaceAct.insertMeta(meta));
+
+  /// 同时更新Meta与数据
+  /// 本地数据由stream事件触发更新
+  @Deprecated('actEntrance')
+  Future<BaseException?> actUpdateByTable(TableDto dto) async =>
+      actEntrance(SpaceAct.updateByTable(dto));
+
+  /// 移除Meta
+  /// 本地数据由stream事件触发更新
+  @Deprecated('actEntrance deleteMeta')
+  Future<BaseException?> actRemoveOpenedMeta(MetaModel meta) async =>
+      actEntrance(SpaceAct.deleteMeta(meta.id));
+}
+
+@Deprecated('SpaceModelX')
+extension SpaceStateChangeX on SpaceModel {
+// RecordMetaEttAccessor? __metaAcc;
 
   RecordMetaEttAccessor get _metaAcc =>
-      __metaAcc ??= RecordMetaEttAccessor(sl<Databases>(), data.id);
-  StreamSubscription<AccessorEvt<RecordMetaDto>>? _metasSub;
-
-  @override
-  FutureOr<void> onCloseSubs() {
-    metas.map((openedMeta) => openedMeta.actCloseSubs());
-    _metasSub?.cancel();
-  }
-
-  @override
-  FutureOr<void> onFetch({bool isActive = false}) {
-    _fetchMetaCollectionModel();
-    _fetchAllMetas();
-  }
-
-  @override
-  FutureOr<void> onReset() {
-    metaCollection.actReset();
-    metas.clear();
-  }
-
-  @override
-  FutureOr<void> onSubscription() {
-    /// meta部分 ----------------
-    _metasSub = _metaAcc.watch().listen((event) {
-      log("#WorkspaceModel[$id]#监听到Meta变更: $event");
-      onWatchMetaEvt(event);
-    });
-  }
+      // __metaAcc ??=
+      RecordMetaEttAccessor(sl<Databases>(), data.id);
 
   int __indexByOpenedMetas(
     String metaId, {
@@ -108,135 +273,24 @@ mixin SpaceStateChangeMx on IWorkspaceModel {
     notifyListeners();
   }
 
-  _fetchAllMetas() => _metaAcc.findAll().listen((e) {
-        onMetaAdd(e);
-        notifyListeners();
-      }, onError: (e, s) {
-        if (e is AppwriteException &&
-            e.code == 404 &&
-            e.type == "collection_not_found") {
-          // 不存在则无需抛出异常
-          log("debug MetaModel.openBy: [$e], 由推测的`Meta集合`尚未创建导致的,无需抛出异常");
-        }
-        throw ExceptionAdapter.of(e, s);
-      });
+  Stream<RecordMetaDto> _fetchAllMetas() => _metaAcc.findAll();
+      // .listen((e) {
+      //   onMetaAdd(e);
+      //   notifyListeners();
+      // }, onError: (e, s) {
+      //   if (e is AppwriteException &&
+      //       e.code == 404 &&
+      //       e.type == "collection_not_found") {
+      //     // 不存在则无需抛出异常
+      //     log("debug MetaModel.openBy: [$e], 由推测的`Meta集合`尚未创建导致的,无需抛出异常");
+      //   }
+      //   throw ExceptionAdapter.of(e, s);
+      // });
 }
 
-abstract class IWorkspaceModel
-    extends ModelSidecar<WorkspaceDto, BaseException?>
-    with ModelStateChangeMx<WorkspaceDto, BaseException?> {
-  IWorkspaceModel(WorkspaceDto data) : super(data, ExceptionAdapter.of);
-
-  String get id;
-
-  List<MetaModel> get metas;
-
-  CollectionInfoModel get metaCollection;
-
-  set metaCollection(CollectionInfoModel value);
-
-  MetaModel _addNewMetaModel(RecordMetaDto data);
-
-  _fetchMetaCollectionModel();
-}
-
-class WorkspaceModel extends IWorkspaceModel with SpaceStateChangeMx {
-  //   /// 开头`>>`用于防止用户自己设置同名变量
-//   /// 用于DTO->Domain转换: 对应Value类型为 [QueryMetaFn] 将`MetaId->Meta查询`注入到ctx中, 以便读取meta,同时解决循环依赖问题
-  @Deprecated("转移位置..")
-  static const ctxQueryMetaSign = ">>_ctxQueryMetaSign";
-
-  /// 用于表达式求值: 在工作空间内查询Record的实例(参见[AttrType.ref], [AsFuncThis])
-  @Deprecated("转移位置..")
-  static const ctxFindRecordFnSign = ">>_ctxFindRecordFnSign";
-
-  WorkspaceModel(super.data, this.at)
-      : metaCollection = CollectionInfoModel(data.id);
-
-  // 父状态
-  final TeamModel at;
-
-  // 子状态
-  @override
-  List<MetaModel> metas = [];
-
-  // 工作空间下的所有表
-  @override
-  CollectionInfoModel metaCollection;
-
-  @Deprecated('使用openedMetas代替')
-  List<MetaModel> get openedMetas => metas;
-
-  @override
-  String get id => data.id;
-
-  String get name => data.name;
-
-  QueryMetaFn get queryMeta =>
-      (metaId) => metas.firstWhereOrNull((element) => element.id == metaId)!;
-
-  @override
-  MetaModel _addNewMetaModel(RecordMetaDto data) {
-    final m = MetaModel(data, this);
-    metas.add(m
-      // 添加的同时初始化
-      ..actInitSubscription());
-    return m;
-  }
-
-  @override
-  _fetchMetaCollectionModel() {
-    final model = CollectionInfoModel(metaCollectionId);
-    // 立即初始化
-    metaCollection = model..actInitSubscription();
-    // 无需set,onFetch结束后会自动set
-    // setDoneKeepState();
-  }
-
-  get metaCollectionId => data.id; // 工作空间Id即为Meta集合Id
-
-  @Deprecated('metas')
-  Iterable<MetaModel> allMetas() => metas;
-
-  RecordModel findRecord(ExprValue value) {
-    assert(value.type.isRef, "findRecord: value.type.isRef 必须是Ref类型才能作为查询参数");
-    // value.type.meta
-    return getRecords(value.type.meta!.id)
-        .firstWhere((record) => record.id == value.value);
-  }
-
-  List<RecordModel> getRecords(String metaId) =>
-      metas[__indexByOpenedMetas(metaId)].records;
-
-  Iterable<List<RecordModel>> allRecords() =>
-      metas.map((element) => element.records);
-}
-
-extension WorkspaceModelX on WorkspaceModel {
-  MetaService get _metaService => MetaService.withDI(sl, id)!;
-
-  WorkspaceService get _workspaceSrv => sl<WorkspaceService>();
-
-  /// 注意,[actInsertMetaDto]与[actUpdateMeta]不能混用, Insert必须使用Meta,而不是Dto
-  /// 本地数据由stream事件触发更新
-  Future<BaseException?> actInsertMetaDto(RecordMetaDto meta) async =>
-      await actWrapper(() => setDone("新增Meta [$meta]", () async {
-            await _metaService.insertMetaDto(meta);
-          }, false));
-
-  /// 同时更新Meta与数据
-  /// 本地数据由stream事件触发更新
-  Future<BaseException?> actUpdateByTable(TableDto dto) async =>
-      await actWrapper(() => setDone("通过Table更新Meta/record [$dto]", () async {
-            await _workspaceSrv.insertTable(_metaService, dto);
-          }, false));
-
-  /// 移除Meta
-  /// 本地数据由stream事件触发更新
-  Future<BaseException?> actRemoveOpenedMeta(MetaModel meta) async =>
-      await actWrapper(() => setDone("删除Meta [${meta.id}]", () async {
-            meta.actReset();
-            // 从数据库中删除 Meta记录和Record集合
-            await _metaService.deleteBy(meta.id);
-          }, false));
-}
+@Deprecated('use SpaceModel')
+typedef WorkspaceModel = SpaceModel;
+@Deprecated('use SpaceModel')
+typedef OpenedWorkspace = SpaceModel;
+@Deprecated('use SpaceModel')
+typedef Workspace = SpaceModel;
