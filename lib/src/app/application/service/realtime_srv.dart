@@ -1,6 +1,6 @@
 part of 'service.dart';
 
-Pattern _ptn = RegExp(r'\.(create|update|delete)$');
+Pattern _ptn = RegExp(r'.*\.(create|update|delete)$');
 
 enum DataEvtTp {
   create,
@@ -15,7 +15,7 @@ enum DataEvtTp {
         return DataEvtTp.values.byName(name);
       }
     }
-    throw '无法识别DataEvtTp类型';
+    throw '无法识别DataEvtTp类型[$events]';
   }
 }
 
