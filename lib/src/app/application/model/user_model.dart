@@ -31,7 +31,8 @@ class UserModel extends BaseActEntranceModel<UserAct, UserState> {
   final aw.Session session;
   final aw.User data;
 
-  String? get id => data.$id;
+  @override
+  String get id => data.$id;
 
   String? get name => data.name;
 
@@ -63,12 +64,11 @@ extension UserTeamX on UserModel {
   @protected
   initModel() async {
     _realtimeSrv.watchTeams().listen((event) async {
-      final nState = UserStateDone(
-          teams.updateDataSet<aw.Team>(
-            event,
-            equals: (a, b) => a.id == b.id,
-            transform: TeamModel.new,
-          ));
+      final nState = UserStateDone(teams.updateDataSet<aw.Team>(
+        event,
+        equals: (a, b) => a.id == b.id,
+        transform: TeamModel.new,
+      ));
       setState(nState, '更新TeamList[${event.type}]');
     });
     await updateTeams();
