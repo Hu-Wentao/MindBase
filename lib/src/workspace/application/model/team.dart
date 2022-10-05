@@ -2,7 +2,10 @@ part of 'model.dart';
 
 @freezed
 class TeamAct with _$TeamAct {
-  const factory TeamAct.initModel(String id) = TeamActInitModel;
+  /// 初始化：更新spaces/members,并watch spaces/members变更
+  const factory TeamAct.initModel() = TeamActInitModel;
+
+  // const factory TeamAct.closeModel() = TeamActCloseSpaces;
 
   ///
   const factory TeamAct.updateTeam(aw.Team team) = TeamActUpdateTeam;
@@ -63,14 +66,6 @@ class TeamModel extends BaseActEntranceModel<TeamAct, TeamState> {
   WorkspaceModel? findSpace(spaceId) =>
       workspaces.firstWhereOrNull((s) => s.id == spaceId);
 
-  @override
-  BaseException? onBeforeActEntrance(TeamAct act) => sl<Slowly>().seconds(
-        // 避免多个Team同时初始化被节流过滤掉
-        (act is TeamActInitModel) ? act : act.runtimeType,
-        sec: 1,
-      )
-          ? null
-          : BaseException('msg');
 
   @override
   onActEntrance(TeamAct act) => act.when(
@@ -84,7 +79,7 @@ class TeamModel extends BaseActEntranceModel<TeamAct, TeamState> {
         inviteMember: inviteMember,
       );
 
-  initModel(String id) async {
+  initModel() async {
     // todo 订阅 member + space变更
     // 刷新数据
     await updateSpaces();

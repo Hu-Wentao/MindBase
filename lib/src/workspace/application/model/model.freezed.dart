@@ -15,10 +15,1145 @@ final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
+mixin _$SpaceAct {
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initModel,
+    required TResult Function(WorkspaceDto data) updateModel,
+    required TResult Function(RecordMetaDto data) insertMeta,
+    required TResult Function(String metaId) deleteMeta,
+    required TResult Function(TableDto dto) updateByTable,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? initModel,
+    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(String metaId)? deleteMeta,
+    TResult Function(TableDto dto)? updateByTable,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initModel,
+    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(String metaId)? deleteMeta,
+    TResult Function(TableDto dto)? updateByTable,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(SpaceActInitModel value) initModel,
+    required TResult Function(SpaceActUpdateModel value) updateModel,
+    required TResult Function(SpaceActInsertMeta value) insertMeta,
+    required TResult Function(SpaceActDeleteMeta value) deleteMeta,
+    required TResult Function(SpaceActUpdateByTable value) updateByTable,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(SpaceActInitModel value)? initModel,
+    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActInsertMeta value)? insertMeta,
+    TResult Function(SpaceActDeleteMeta value)? deleteMeta,
+    TResult Function(SpaceActUpdateByTable value)? updateByTable,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(SpaceActInitModel value)? initModel,
+    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActInsertMeta value)? insertMeta,
+    TResult Function(SpaceActDeleteMeta value)? deleteMeta,
+    TResult Function(SpaceActUpdateByTable value)? updateByTable,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $SpaceActCopyWith<$Res> {
+  factory $SpaceActCopyWith(SpaceAct value, $Res Function(SpaceAct) then) =
+      _$SpaceActCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class _$SpaceActCopyWithImpl<$Res> implements $SpaceActCopyWith<$Res> {
+  _$SpaceActCopyWithImpl(this._value, this._then);
+
+  final SpaceAct _value;
+  // ignore: unused_field
+  final $Res Function(SpaceAct) _then;
+}
+
+/// @nodoc
+abstract class _$$SpaceActInitModelCopyWith<$Res> {
+  factory _$$SpaceActInitModelCopyWith(
+          _$SpaceActInitModel value, $Res Function(_$SpaceActInitModel) then) =
+      __$$SpaceActInitModelCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$SpaceActInitModelCopyWithImpl<$Res>
+    extends _$SpaceActCopyWithImpl<$Res>
+    implements _$$SpaceActInitModelCopyWith<$Res> {
+  __$$SpaceActInitModelCopyWithImpl(
+      _$SpaceActInitModel _value, $Res Function(_$SpaceActInitModel) _then)
+      : super(_value, (v) => _then(v as _$SpaceActInitModel));
+
+  @override
+  _$SpaceActInitModel get _value => super._value as _$SpaceActInitModel;
+}
+
+/// @nodoc
+
+class _$SpaceActInitModel implements SpaceActInitModel {
+  const _$SpaceActInitModel();
+
+  @override
+  String toString() {
+    return 'SpaceAct.initModel()';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$SpaceActInitModel);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initModel,
+    required TResult Function(WorkspaceDto data) updateModel,
+    required TResult Function(RecordMetaDto data) insertMeta,
+    required TResult Function(String metaId) deleteMeta,
+    required TResult Function(TableDto dto) updateByTable,
+  }) {
+    return initModel();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? initModel,
+    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(String metaId)? deleteMeta,
+    TResult Function(TableDto dto)? updateByTable,
+  }) {
+    return initModel?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initModel,
+    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(String metaId)? deleteMeta,
+    TResult Function(TableDto dto)? updateByTable,
+    required TResult orElse(),
+  }) {
+    if (initModel != null) {
+      return initModel();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(SpaceActInitModel value) initModel,
+    required TResult Function(SpaceActUpdateModel value) updateModel,
+    required TResult Function(SpaceActInsertMeta value) insertMeta,
+    required TResult Function(SpaceActDeleteMeta value) deleteMeta,
+    required TResult Function(SpaceActUpdateByTable value) updateByTable,
+  }) {
+    return initModel(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(SpaceActInitModel value)? initModel,
+    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActInsertMeta value)? insertMeta,
+    TResult Function(SpaceActDeleteMeta value)? deleteMeta,
+    TResult Function(SpaceActUpdateByTable value)? updateByTable,
+  }) {
+    return initModel?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(SpaceActInitModel value)? initModel,
+    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActInsertMeta value)? insertMeta,
+    TResult Function(SpaceActDeleteMeta value)? deleteMeta,
+    TResult Function(SpaceActUpdateByTable value)? updateByTable,
+    required TResult orElse(),
+  }) {
+    if (initModel != null) {
+      return initModel(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class SpaceActInitModel implements SpaceAct {
+  const factory SpaceActInitModel() = _$SpaceActInitModel;
+}
+
+/// @nodoc
+abstract class _$$SpaceActUpdateModelCopyWith<$Res> {
+  factory _$$SpaceActUpdateModelCopyWith(_$SpaceActUpdateModel value,
+          $Res Function(_$SpaceActUpdateModel) then) =
+      __$$SpaceActUpdateModelCopyWithImpl<$Res>;
+  $Res call({WorkspaceDto data});
+}
+
+/// @nodoc
+class __$$SpaceActUpdateModelCopyWithImpl<$Res>
+    extends _$SpaceActCopyWithImpl<$Res>
+    implements _$$SpaceActUpdateModelCopyWith<$Res> {
+  __$$SpaceActUpdateModelCopyWithImpl(
+      _$SpaceActUpdateModel _value, $Res Function(_$SpaceActUpdateModel) _then)
+      : super(_value, (v) => _then(v as _$SpaceActUpdateModel));
+
+  @override
+  _$SpaceActUpdateModel get _value => super._value as _$SpaceActUpdateModel;
+
+  @override
+  $Res call({
+    Object? data = freezed,
+  }) {
+    return _then(_$SpaceActUpdateModel(
+      data == freezed
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as WorkspaceDto,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$SpaceActUpdateModel implements SpaceActUpdateModel {
+  const _$SpaceActUpdateModel(this.data);
+
+  @override
+  final WorkspaceDto data;
+
+  @override
+  String toString() {
+    return 'SpaceAct.updateModel(data: $data)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SpaceActUpdateModel &&
+            const DeepCollectionEquality().equals(other.data, data));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(data));
+
+  @JsonKey(ignore: true)
+  @override
+  _$$SpaceActUpdateModelCopyWith<_$SpaceActUpdateModel> get copyWith =>
+      __$$SpaceActUpdateModelCopyWithImpl<_$SpaceActUpdateModel>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initModel,
+    required TResult Function(WorkspaceDto data) updateModel,
+    required TResult Function(RecordMetaDto data) insertMeta,
+    required TResult Function(String metaId) deleteMeta,
+    required TResult Function(TableDto dto) updateByTable,
+  }) {
+    return updateModel(data);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? initModel,
+    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(String metaId)? deleteMeta,
+    TResult Function(TableDto dto)? updateByTable,
+  }) {
+    return updateModel?.call(data);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initModel,
+    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(String metaId)? deleteMeta,
+    TResult Function(TableDto dto)? updateByTable,
+    required TResult orElse(),
+  }) {
+    if (updateModel != null) {
+      return updateModel(data);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(SpaceActInitModel value) initModel,
+    required TResult Function(SpaceActUpdateModel value) updateModel,
+    required TResult Function(SpaceActInsertMeta value) insertMeta,
+    required TResult Function(SpaceActDeleteMeta value) deleteMeta,
+    required TResult Function(SpaceActUpdateByTable value) updateByTable,
+  }) {
+    return updateModel(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(SpaceActInitModel value)? initModel,
+    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActInsertMeta value)? insertMeta,
+    TResult Function(SpaceActDeleteMeta value)? deleteMeta,
+    TResult Function(SpaceActUpdateByTable value)? updateByTable,
+  }) {
+    return updateModel?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(SpaceActInitModel value)? initModel,
+    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActInsertMeta value)? insertMeta,
+    TResult Function(SpaceActDeleteMeta value)? deleteMeta,
+    TResult Function(SpaceActUpdateByTable value)? updateByTable,
+    required TResult orElse(),
+  }) {
+    if (updateModel != null) {
+      return updateModel(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class SpaceActUpdateModel implements SpaceAct {
+  const factory SpaceActUpdateModel(final WorkspaceDto data) =
+      _$SpaceActUpdateModel;
+
+  WorkspaceDto get data;
+  @JsonKey(ignore: true)
+  _$$SpaceActUpdateModelCopyWith<_$SpaceActUpdateModel> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$SpaceActInsertMetaCopyWith<$Res> {
+  factory _$$SpaceActInsertMetaCopyWith(_$SpaceActInsertMeta value,
+          $Res Function(_$SpaceActInsertMeta) then) =
+      __$$SpaceActInsertMetaCopyWithImpl<$Res>;
+  $Res call({RecordMetaDto data});
+}
+
+/// @nodoc
+class __$$SpaceActInsertMetaCopyWithImpl<$Res>
+    extends _$SpaceActCopyWithImpl<$Res>
+    implements _$$SpaceActInsertMetaCopyWith<$Res> {
+  __$$SpaceActInsertMetaCopyWithImpl(
+      _$SpaceActInsertMeta _value, $Res Function(_$SpaceActInsertMeta) _then)
+      : super(_value, (v) => _then(v as _$SpaceActInsertMeta));
+
+  @override
+  _$SpaceActInsertMeta get _value => super._value as _$SpaceActInsertMeta;
+
+  @override
+  $Res call({
+    Object? data = freezed,
+  }) {
+    return _then(_$SpaceActInsertMeta(
+      data == freezed
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as RecordMetaDto,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$SpaceActInsertMeta implements SpaceActInsertMeta {
+  const _$SpaceActInsertMeta(this.data);
+
+  @override
+  final RecordMetaDto data;
+
+  @override
+  String toString() {
+    return 'SpaceAct.insertMeta(data: $data)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SpaceActInsertMeta &&
+            const DeepCollectionEquality().equals(other.data, data));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(data));
+
+  @JsonKey(ignore: true)
+  @override
+  _$$SpaceActInsertMetaCopyWith<_$SpaceActInsertMeta> get copyWith =>
+      __$$SpaceActInsertMetaCopyWithImpl<_$SpaceActInsertMeta>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initModel,
+    required TResult Function(WorkspaceDto data) updateModel,
+    required TResult Function(RecordMetaDto data) insertMeta,
+    required TResult Function(String metaId) deleteMeta,
+    required TResult Function(TableDto dto) updateByTable,
+  }) {
+    return insertMeta(data);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? initModel,
+    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(String metaId)? deleteMeta,
+    TResult Function(TableDto dto)? updateByTable,
+  }) {
+    return insertMeta?.call(data);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initModel,
+    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(String metaId)? deleteMeta,
+    TResult Function(TableDto dto)? updateByTable,
+    required TResult orElse(),
+  }) {
+    if (insertMeta != null) {
+      return insertMeta(data);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(SpaceActInitModel value) initModel,
+    required TResult Function(SpaceActUpdateModel value) updateModel,
+    required TResult Function(SpaceActInsertMeta value) insertMeta,
+    required TResult Function(SpaceActDeleteMeta value) deleteMeta,
+    required TResult Function(SpaceActUpdateByTable value) updateByTable,
+  }) {
+    return insertMeta(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(SpaceActInitModel value)? initModel,
+    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActInsertMeta value)? insertMeta,
+    TResult Function(SpaceActDeleteMeta value)? deleteMeta,
+    TResult Function(SpaceActUpdateByTable value)? updateByTable,
+  }) {
+    return insertMeta?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(SpaceActInitModel value)? initModel,
+    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActInsertMeta value)? insertMeta,
+    TResult Function(SpaceActDeleteMeta value)? deleteMeta,
+    TResult Function(SpaceActUpdateByTable value)? updateByTable,
+    required TResult orElse(),
+  }) {
+    if (insertMeta != null) {
+      return insertMeta(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class SpaceActInsertMeta implements SpaceAct {
+  const factory SpaceActInsertMeta(final RecordMetaDto data) =
+      _$SpaceActInsertMeta;
+
+  RecordMetaDto get data;
+  @JsonKey(ignore: true)
+  _$$SpaceActInsertMetaCopyWith<_$SpaceActInsertMeta> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$SpaceActDeleteMetaCopyWith<$Res> {
+  factory _$$SpaceActDeleteMetaCopyWith(_$SpaceActDeleteMeta value,
+          $Res Function(_$SpaceActDeleteMeta) then) =
+      __$$SpaceActDeleteMetaCopyWithImpl<$Res>;
+  $Res call({String metaId});
+}
+
+/// @nodoc
+class __$$SpaceActDeleteMetaCopyWithImpl<$Res>
+    extends _$SpaceActCopyWithImpl<$Res>
+    implements _$$SpaceActDeleteMetaCopyWith<$Res> {
+  __$$SpaceActDeleteMetaCopyWithImpl(
+      _$SpaceActDeleteMeta _value, $Res Function(_$SpaceActDeleteMeta) _then)
+      : super(_value, (v) => _then(v as _$SpaceActDeleteMeta));
+
+  @override
+  _$SpaceActDeleteMeta get _value => super._value as _$SpaceActDeleteMeta;
+
+  @override
+  $Res call({
+    Object? metaId = freezed,
+  }) {
+    return _then(_$SpaceActDeleteMeta(
+      metaId == freezed
+          ? _value.metaId
+          : metaId // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$SpaceActDeleteMeta implements SpaceActDeleteMeta {
+  const _$SpaceActDeleteMeta(this.metaId);
+
+  @override
+  final String metaId;
+
+  @override
+  String toString() {
+    return 'SpaceAct.deleteMeta(metaId: $metaId)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SpaceActDeleteMeta &&
+            const DeepCollectionEquality().equals(other.metaId, metaId));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(metaId));
+
+  @JsonKey(ignore: true)
+  @override
+  _$$SpaceActDeleteMetaCopyWith<_$SpaceActDeleteMeta> get copyWith =>
+      __$$SpaceActDeleteMetaCopyWithImpl<_$SpaceActDeleteMeta>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initModel,
+    required TResult Function(WorkspaceDto data) updateModel,
+    required TResult Function(RecordMetaDto data) insertMeta,
+    required TResult Function(String metaId) deleteMeta,
+    required TResult Function(TableDto dto) updateByTable,
+  }) {
+    return deleteMeta(metaId);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? initModel,
+    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(String metaId)? deleteMeta,
+    TResult Function(TableDto dto)? updateByTable,
+  }) {
+    return deleteMeta?.call(metaId);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initModel,
+    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(String metaId)? deleteMeta,
+    TResult Function(TableDto dto)? updateByTable,
+    required TResult orElse(),
+  }) {
+    if (deleteMeta != null) {
+      return deleteMeta(metaId);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(SpaceActInitModel value) initModel,
+    required TResult Function(SpaceActUpdateModel value) updateModel,
+    required TResult Function(SpaceActInsertMeta value) insertMeta,
+    required TResult Function(SpaceActDeleteMeta value) deleteMeta,
+    required TResult Function(SpaceActUpdateByTable value) updateByTable,
+  }) {
+    return deleteMeta(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(SpaceActInitModel value)? initModel,
+    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActInsertMeta value)? insertMeta,
+    TResult Function(SpaceActDeleteMeta value)? deleteMeta,
+    TResult Function(SpaceActUpdateByTable value)? updateByTable,
+  }) {
+    return deleteMeta?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(SpaceActInitModel value)? initModel,
+    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActInsertMeta value)? insertMeta,
+    TResult Function(SpaceActDeleteMeta value)? deleteMeta,
+    TResult Function(SpaceActUpdateByTable value)? updateByTable,
+    required TResult orElse(),
+  }) {
+    if (deleteMeta != null) {
+      return deleteMeta(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class SpaceActDeleteMeta implements SpaceAct {
+  const factory SpaceActDeleteMeta(final String metaId) = _$SpaceActDeleteMeta;
+
+  String get metaId;
+  @JsonKey(ignore: true)
+  _$$SpaceActDeleteMetaCopyWith<_$SpaceActDeleteMeta> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$SpaceActUpdateByTableCopyWith<$Res> {
+  factory _$$SpaceActUpdateByTableCopyWith(_$SpaceActUpdateByTable value,
+          $Res Function(_$SpaceActUpdateByTable) then) =
+      __$$SpaceActUpdateByTableCopyWithImpl<$Res>;
+  $Res call({TableDto dto});
+}
+
+/// @nodoc
+class __$$SpaceActUpdateByTableCopyWithImpl<$Res>
+    extends _$SpaceActCopyWithImpl<$Res>
+    implements _$$SpaceActUpdateByTableCopyWith<$Res> {
+  __$$SpaceActUpdateByTableCopyWithImpl(_$SpaceActUpdateByTable _value,
+      $Res Function(_$SpaceActUpdateByTable) _then)
+      : super(_value, (v) => _then(v as _$SpaceActUpdateByTable));
+
+  @override
+  _$SpaceActUpdateByTable get _value => super._value as _$SpaceActUpdateByTable;
+
+  @override
+  $Res call({
+    Object? dto = freezed,
+  }) {
+    return _then(_$SpaceActUpdateByTable(
+      dto == freezed
+          ? _value.dto
+          : dto // ignore: cast_nullable_to_non_nullable
+              as TableDto,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$SpaceActUpdateByTable implements SpaceActUpdateByTable {
+  const _$SpaceActUpdateByTable(this.dto);
+
+  @override
+  final TableDto dto;
+
+  @override
+  String toString() {
+    return 'SpaceAct.updateByTable(dto: $dto)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SpaceActUpdateByTable &&
+            const DeepCollectionEquality().equals(other.dto, dto));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(dto));
+
+  @JsonKey(ignore: true)
+  @override
+  _$$SpaceActUpdateByTableCopyWith<_$SpaceActUpdateByTable> get copyWith =>
+      __$$SpaceActUpdateByTableCopyWithImpl<_$SpaceActUpdateByTable>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initModel,
+    required TResult Function(WorkspaceDto data) updateModel,
+    required TResult Function(RecordMetaDto data) insertMeta,
+    required TResult Function(String metaId) deleteMeta,
+    required TResult Function(TableDto dto) updateByTable,
+  }) {
+    return updateByTable(dto);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? initModel,
+    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(String metaId)? deleteMeta,
+    TResult Function(TableDto dto)? updateByTable,
+  }) {
+    return updateByTable?.call(dto);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initModel,
+    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(String metaId)? deleteMeta,
+    TResult Function(TableDto dto)? updateByTable,
+    required TResult orElse(),
+  }) {
+    if (updateByTable != null) {
+      return updateByTable(dto);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(SpaceActInitModel value) initModel,
+    required TResult Function(SpaceActUpdateModel value) updateModel,
+    required TResult Function(SpaceActInsertMeta value) insertMeta,
+    required TResult Function(SpaceActDeleteMeta value) deleteMeta,
+    required TResult Function(SpaceActUpdateByTable value) updateByTable,
+  }) {
+    return updateByTable(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(SpaceActInitModel value)? initModel,
+    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActInsertMeta value)? insertMeta,
+    TResult Function(SpaceActDeleteMeta value)? deleteMeta,
+    TResult Function(SpaceActUpdateByTable value)? updateByTable,
+  }) {
+    return updateByTable?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(SpaceActInitModel value)? initModel,
+    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActInsertMeta value)? insertMeta,
+    TResult Function(SpaceActDeleteMeta value)? deleteMeta,
+    TResult Function(SpaceActUpdateByTable value)? updateByTable,
+    required TResult orElse(),
+  }) {
+    if (updateByTable != null) {
+      return updateByTable(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class SpaceActUpdateByTable implements SpaceAct {
+  const factory SpaceActUpdateByTable(final TableDto dto) =
+      _$SpaceActUpdateByTable;
+
+  TableDto get dto;
+  @JsonKey(ignore: true)
+  _$$SpaceActUpdateByTableCopyWith<_$SpaceActUpdateByTable> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+mixin _$SpaceState {
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() init,
+    required TResult Function(
+            da.Collection metaTableInfo, List<MetaModel> metas)
+        done,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? init,
+    TResult Function(da.Collection metaTableInfo, List<MetaModel> metas)? done,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? init,
+    TResult Function(da.Collection metaTableInfo, List<MetaModel> metas)? done,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(SpaceStateInit value) init,
+    required TResult Function(SpaceStateDone value) done,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(SpaceStateInit value)? init,
+    TResult Function(SpaceStateDone value)? done,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(SpaceStateInit value)? init,
+    TResult Function(SpaceStateDone value)? done,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $SpaceStateCopyWith<$Res> {
+  factory $SpaceStateCopyWith(
+          SpaceState value, $Res Function(SpaceState) then) =
+      _$SpaceStateCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class _$SpaceStateCopyWithImpl<$Res> implements $SpaceStateCopyWith<$Res> {
+  _$SpaceStateCopyWithImpl(this._value, this._then);
+
+  final SpaceState _value;
+  // ignore: unused_field
+  final $Res Function(SpaceState) _then;
+}
+
+/// @nodoc
+abstract class _$$SpaceStateInitCopyWith<$Res> {
+  factory _$$SpaceStateInitCopyWith(
+          _$SpaceStateInit value, $Res Function(_$SpaceStateInit) then) =
+      __$$SpaceStateInitCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$SpaceStateInitCopyWithImpl<$Res>
+    extends _$SpaceStateCopyWithImpl<$Res>
+    implements _$$SpaceStateInitCopyWith<$Res> {
+  __$$SpaceStateInitCopyWithImpl(
+      _$SpaceStateInit _value, $Res Function(_$SpaceStateInit) _then)
+      : super(_value, (v) => _then(v as _$SpaceStateInit));
+
+  @override
+  _$SpaceStateInit get _value => super._value as _$SpaceStateInit;
+}
+
+/// @nodoc
+
+class _$SpaceStateInit implements SpaceStateInit {
+  const _$SpaceStateInit();
+
+  @override
+  String toString() {
+    return 'SpaceState.init()';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$SpaceStateInit);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() init,
+    required TResult Function(
+            da.Collection metaTableInfo, List<MetaModel> metas)
+        done,
+  }) {
+    return init();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? init,
+    TResult Function(da.Collection metaTableInfo, List<MetaModel> metas)? done,
+  }) {
+    return init?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? init,
+    TResult Function(da.Collection metaTableInfo, List<MetaModel> metas)? done,
+    required TResult orElse(),
+  }) {
+    if (init != null) {
+      return init();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(SpaceStateInit value) init,
+    required TResult Function(SpaceStateDone value) done,
+  }) {
+    return init(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(SpaceStateInit value)? init,
+    TResult Function(SpaceStateDone value)? done,
+  }) {
+    return init?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(SpaceStateInit value)? init,
+    TResult Function(SpaceStateDone value)? done,
+    required TResult orElse(),
+  }) {
+    if (init != null) {
+      return init(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class SpaceStateInit implements SpaceState {
+  const factory SpaceStateInit() = _$SpaceStateInit;
+}
+
+/// @nodoc
+abstract class _$$SpaceStateDoneCopyWith<$Res> {
+  factory _$$SpaceStateDoneCopyWith(
+          _$SpaceStateDone value, $Res Function(_$SpaceStateDone) then) =
+      __$$SpaceStateDoneCopyWithImpl<$Res>;
+  $Res call({da.Collection metaTableInfo, List<MetaModel> metas});
+}
+
+/// @nodoc
+class __$$SpaceStateDoneCopyWithImpl<$Res>
+    extends _$SpaceStateCopyWithImpl<$Res>
+    implements _$$SpaceStateDoneCopyWith<$Res> {
+  __$$SpaceStateDoneCopyWithImpl(
+      _$SpaceStateDone _value, $Res Function(_$SpaceStateDone) _then)
+      : super(_value, (v) => _then(v as _$SpaceStateDone));
+
+  @override
+  _$SpaceStateDone get _value => super._value as _$SpaceStateDone;
+
+  @override
+  $Res call({
+    Object? metaTableInfo = freezed,
+    Object? metas = freezed,
+  }) {
+    return _then(_$SpaceStateDone(
+      metaTableInfo == freezed
+          ? _value.metaTableInfo
+          : metaTableInfo // ignore: cast_nullable_to_non_nullable
+              as da.Collection,
+      metas == freezed
+          ? _value._metas
+          : metas // ignore: cast_nullable_to_non_nullable
+              as List<MetaModel>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$SpaceStateDone implements SpaceStateDone {
+  const _$SpaceStateDone(this.metaTableInfo, final List<MetaModel> metas)
+      : _metas = metas;
+
+  @override
+  final da.Collection metaTableInfo;
+  final List<MetaModel> _metas;
+  @override
+  List<MetaModel> get metas {
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_metas);
+  }
+
+  @override
+  String toString() {
+    return 'SpaceState.done(metaTableInfo: $metaTableInfo, metas: $metas)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SpaceStateDone &&
+            const DeepCollectionEquality()
+                .equals(other.metaTableInfo, metaTableInfo) &&
+            const DeepCollectionEquality().equals(other._metas, _metas));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(metaTableInfo),
+      const DeepCollectionEquality().hash(_metas));
+
+  @JsonKey(ignore: true)
+  @override
+  _$$SpaceStateDoneCopyWith<_$SpaceStateDone> get copyWith =>
+      __$$SpaceStateDoneCopyWithImpl<_$SpaceStateDone>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() init,
+    required TResult Function(
+            da.Collection metaTableInfo, List<MetaModel> metas)
+        done,
+  }) {
+    return done(metaTableInfo, metas);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult Function()? init,
+    TResult Function(da.Collection metaTableInfo, List<MetaModel> metas)? done,
+  }) {
+    return done?.call(metaTableInfo, metas);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? init,
+    TResult Function(da.Collection metaTableInfo, List<MetaModel> metas)? done,
+    required TResult orElse(),
+  }) {
+    if (done != null) {
+      return done(metaTableInfo, metas);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(SpaceStateInit value) init,
+    required TResult Function(SpaceStateDone value) done,
+  }) {
+    return done(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult Function(SpaceStateInit value)? init,
+    TResult Function(SpaceStateDone value)? done,
+  }) {
+    return done?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(SpaceStateInit value)? init,
+    TResult Function(SpaceStateDone value)? done,
+    required TResult orElse(),
+  }) {
+    if (done != null) {
+      return done(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class SpaceStateDone implements SpaceState {
+  const factory SpaceStateDone(
+          final da.Collection metaTableInfo, final List<MetaModel> metas) =
+      _$SpaceStateDone;
+
+  da.Collection get metaTableInfo;
+  List<MetaModel> get metas;
+  @JsonKey(ignore: true)
+  _$$SpaceStateDoneCopyWith<_$SpaceStateDone> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
 mixin _$TeamAct {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id) initModel,
+    required TResult Function() initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -30,7 +1165,7 @@ mixin _$TeamAct {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -42,7 +1177,7 @@ mixin _$TeamAct {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -112,7 +1247,6 @@ abstract class _$$TeamActInitModelCopyWith<$Res> {
   factory _$$TeamActInitModelCopyWith(
           _$TeamActInitModel value, $Res Function(_$TeamActInitModel) then) =
       __$$TeamActInitModelCopyWithImpl<$Res>;
-  $Res call({String id});
 }
 
 /// @nodoc
@@ -124,54 +1258,31 @@ class __$$TeamActInitModelCopyWithImpl<$Res> extends _$TeamActCopyWithImpl<$Res>
 
   @override
   _$TeamActInitModel get _value => super._value as _$TeamActInitModel;
-
-  @override
-  $Res call({
-    Object? id = freezed,
-  }) {
-    return _then(_$TeamActInitModel(
-      id == freezed
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
 }
 
 /// @nodoc
 
 class _$TeamActInitModel implements TeamActInitModel {
-  const _$TeamActInitModel(this.id);
-
-  @override
-  final String id;
+  const _$TeamActInitModel();
 
   @override
   String toString() {
-    return 'TeamAct.initModel(id: $id)';
+    return 'TeamAct.initModel()';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$TeamActInitModel &&
-            const DeepCollectionEquality().equals(other.id, id));
+        (other.runtimeType == runtimeType && other is _$TeamActInitModel);
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(id));
-
-  @JsonKey(ignore: true)
-  @override
-  _$$TeamActInitModelCopyWith<_$TeamActInitModel> get copyWith =>
-      __$$TeamActInitModelCopyWithImpl<_$TeamActInitModel>(this, _$identity);
+  int get hashCode => runtimeType.hashCode;
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id) initModel,
+    required TResult Function() initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -180,13 +1291,13 @@ class _$TeamActInitModel implements TeamActInitModel {
     required TResult Function() updateMembers,
     required TResult Function(String userEmail) inviteMember,
   }) {
-    return initModel(id);
+    return initModel();
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -195,13 +1306,13 @@ class _$TeamActInitModel implements TeamActInitModel {
     TResult Function()? updateMembers,
     TResult Function(String userEmail)? inviteMember,
   }) {
-    return initModel?.call(id);
+    return initModel?.call();
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -212,7 +1323,7 @@ class _$TeamActInitModel implements TeamActInitModel {
     required TResult orElse(),
   }) {
     if (initModel != null) {
-      return initModel(id);
+      return initModel();
     }
     return orElse();
   }
@@ -268,12 +1379,7 @@ class _$TeamActInitModel implements TeamActInitModel {
 }
 
 abstract class TeamActInitModel implements TeamAct {
-  const factory TeamActInitModel(final String id) = _$TeamActInitModel;
-
-  String get id;
-  @JsonKey(ignore: true)
-  _$$TeamActInitModelCopyWith<_$TeamActInitModel> get copyWith =>
-      throw _privateConstructorUsedError;
+  const factory TeamActInitModel() = _$TeamActInitModel;
 }
 
 /// @nodoc
@@ -341,7 +1447,7 @@ class _$TeamActUpdateTeam implements TeamActUpdateTeam {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id) initModel,
+    required TResult Function() initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -356,7 +1462,7 @@ class _$TeamActUpdateTeam implements TeamActUpdateTeam {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -371,7 +1477,7 @@ class _$TeamActUpdateTeam implements TeamActUpdateTeam {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -511,7 +1617,7 @@ class _$TeamActRenameTeam implements TeamActRenameTeam {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id) initModel,
+    required TResult Function() initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -526,7 +1632,7 @@ class _$TeamActRenameTeam implements TeamActRenameTeam {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -541,7 +1647,7 @@ class _$TeamActRenameTeam implements TeamActRenameTeam {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -657,7 +1763,7 @@ class _$TeamActUpdateSpaces implements TeamActUpdateSpaces {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id) initModel,
+    required TResult Function() initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -672,7 +1778,7 @@ class _$TeamActUpdateSpaces implements TeamActUpdateSpaces {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -687,7 +1793,7 @@ class _$TeamActUpdateSpaces implements TeamActUpdateSpaces {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -823,7 +1929,7 @@ class _$TeamActCreateSpace implements TeamActCreateSpace {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id) initModel,
+    required TResult Function() initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -838,7 +1944,7 @@ class _$TeamActCreateSpace implements TeamActCreateSpace {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -853,7 +1959,7 @@ class _$TeamActCreateSpace implements TeamActCreateSpace {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -994,7 +2100,7 @@ class _$TeamActDeleteSpace implements TeamActDeleteSpace {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id) initModel,
+    required TResult Function() initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -1009,7 +2115,7 @@ class _$TeamActDeleteSpace implements TeamActDeleteSpace {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -1024,7 +2130,7 @@ class _$TeamActDeleteSpace implements TeamActDeleteSpace {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -1140,7 +2246,7 @@ class _$TeamActUpdateMembers implements TeamActUpdateMembers {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id) initModel,
+    required TResult Function() initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -1155,7 +2261,7 @@ class _$TeamActUpdateMembers implements TeamActUpdateMembers {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -1170,7 +2276,7 @@ class _$TeamActUpdateMembers implements TeamActUpdateMembers {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -1306,7 +2412,7 @@ class _$TeamActInviteMember implements TeamActInviteMember {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String id) initModel,
+    required TResult Function() initModel,
     required TResult Function(aw.Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
@@ -1321,7 +2427,7 @@ class _$TeamActInviteMember implements TeamActInviteMember {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -1336,7 +2442,7 @@ class _$TeamActInviteMember implements TeamActInviteMember {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id)? initModel,
+    TResult Function()? initModel,
     TResult Function(aw.Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
@@ -1418,23 +2524,21 @@ mixin _$TeamState {
   TResult when<TResult extends Object?>({
     required TResult Function() init,
     required TResult Function(
-            List<WorkspaceModel> workspaces, List<MemberModel> members)
+            List<SpaceModel> workspaces, List<MemberModel> members)
         done,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(
-            List<WorkspaceModel> workspaces, List<MemberModel> members)?
+    TResult Function(List<SpaceModel> workspaces, List<MemberModel> members)?
         done,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(
-            List<WorkspaceModel> workspaces, List<MemberModel> members)?
+    TResult Function(List<SpaceModel> workspaces, List<MemberModel> members)?
         done,
     required TResult orElse(),
   }) =>
@@ -1517,7 +2621,7 @@ class _$TeamStateInit implements TeamStateInit {
   TResult when<TResult extends Object?>({
     required TResult Function() init,
     required TResult Function(
-            List<WorkspaceModel> workspaces, List<MemberModel> members)
+            List<SpaceModel> workspaces, List<MemberModel> members)
         done,
   }) {
     return init();
@@ -1527,8 +2631,7 @@ class _$TeamStateInit implements TeamStateInit {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(
-            List<WorkspaceModel> workspaces, List<MemberModel> members)?
+    TResult Function(List<SpaceModel> workspaces, List<MemberModel> members)?
         done,
   }) {
     return init?.call();
@@ -1538,8 +2641,7 @@ class _$TeamStateInit implements TeamStateInit {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(
-            List<WorkspaceModel> workspaces, List<MemberModel> members)?
+    TResult Function(List<SpaceModel> workspaces, List<MemberModel> members)?
         done,
     required TResult orElse(),
   }) {
@@ -1590,7 +2692,7 @@ abstract class _$$TeamStateDoneCopyWith<$Res> {
   factory _$$TeamStateDoneCopyWith(
           _$TeamStateDone value, $Res Function(_$TeamStateDone) then) =
       __$$TeamStateDoneCopyWithImpl<$Res>;
-  $Res call({List<WorkspaceModel> workspaces, List<MemberModel> members});
+  $Res call({List<SpaceModel> workspaces, List<MemberModel> members});
 }
 
 /// @nodoc
@@ -1612,7 +2714,7 @@ class __$$TeamStateDoneCopyWithImpl<$Res> extends _$TeamStateCopyWithImpl<$Res>
       workspaces: workspaces == freezed
           ? _value._workspaces
           : workspaces // ignore: cast_nullable_to_non_nullable
-              as List<WorkspaceModel>,
+              as List<SpaceModel>,
       members: members == freezed
           ? _value._members
           : members // ignore: cast_nullable_to_non_nullable
@@ -1625,14 +2727,14 @@ class __$$TeamStateDoneCopyWithImpl<$Res> extends _$TeamStateCopyWithImpl<$Res>
 
 class _$TeamStateDone implements TeamStateDone {
   const _$TeamStateDone(
-      {required final List<WorkspaceModel> workspaces,
+      {required final List<SpaceModel> workspaces,
       required final List<MemberModel> members})
       : _workspaces = workspaces,
         _members = members;
 
-  final List<WorkspaceModel> _workspaces;
+  final List<SpaceModel> _workspaces;
   @override
-  List<WorkspaceModel> get workspaces {
+  List<SpaceModel> get workspaces {
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_workspaces);
   }
@@ -1675,7 +2777,7 @@ class _$TeamStateDone implements TeamStateDone {
   TResult when<TResult extends Object?>({
     required TResult Function() init,
     required TResult Function(
-            List<WorkspaceModel> workspaces, List<MemberModel> members)
+            List<SpaceModel> workspaces, List<MemberModel> members)
         done,
   }) {
     return done(workspaces, members);
@@ -1685,8 +2787,7 @@ class _$TeamStateDone implements TeamStateDone {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(
-            List<WorkspaceModel> workspaces, List<MemberModel> members)?
+    TResult Function(List<SpaceModel> workspaces, List<MemberModel> members)?
         done,
   }) {
     return done?.call(workspaces, members);
@@ -1696,8 +2797,7 @@ class _$TeamStateDone implements TeamStateDone {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(
-            List<WorkspaceModel> workspaces, List<MemberModel> members)?
+    TResult Function(List<SpaceModel> workspaces, List<MemberModel> members)?
         done,
     required TResult orElse(),
   }) {
@@ -1741,10 +2841,10 @@ class _$TeamStateDone implements TeamStateDone {
 
 abstract class TeamStateDone implements TeamState {
   const factory TeamStateDone(
-      {required final List<WorkspaceModel> workspaces,
+      {required final List<SpaceModel> workspaces,
       required final List<MemberModel> members}) = _$TeamStateDone;
 
-  List<WorkspaceModel> get workspaces;
+  List<SpaceModel> get workspaces;
   List<MemberModel> get members;
   @JsonKey(ignore: true)
   _$$TeamStateDoneCopyWith<_$TeamStateDone> get copyWith =>

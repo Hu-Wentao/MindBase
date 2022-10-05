@@ -73,7 +73,7 @@ class _TeamPanelState extends State<TeamPanel> {
                       child: Consumer<TeamModel>(builder: (c, team, _) {
                         // 自动初始化TeamModel
                         team.state.isOrNull<TeamStateInit>((_) {
-                          team.actEntrance(TeamAct.initModel(team.id));
+                          team.actEntrance(const TeamAct.initModel());
                         });
                         return TeamTile(
                           isExpanded: isExpanded,
