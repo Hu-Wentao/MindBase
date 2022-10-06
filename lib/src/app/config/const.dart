@@ -1,5 +1,5 @@
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/constants/pubspec.yaml.g.dart' as spec;
+import 'package:mind_base/src/core/config/config.dart' as spec;
 import 'package:mind_base/src/app/application.dart';
 
 const kName = spec.name;
