@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1659709372;
+const int timestamp = 1665033433;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -84,6 +84,7 @@ const String publishTo = r'none';
 /// Environment
 const Map<String, String> environment = <String, String>{
   'sdk': '>=2.18.0-44.1.beta <3.0.0',
+  'flutter': '>=2.18.0-44.1.beta <3.0.0',
 };
 
 /// Dependencies
@@ -107,12 +108,23 @@ const Map<String, Object> dependencies = <String, Object>{
       'ref': r'v1.3',
     },
   },
+  'slowly': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://gitee.com/hu_wt/slowly.git',
+      'ref': r'main',
+    },
+  },
   'flutter_form_builder': r'7.1.1',
   'form_builder_validators': r'7.9.0',
   'json_annotation': r'>=4.4.0',
   'pluto_grid': r'5.0.3',
   'appwrite': r'6.0.0',
   'dart_appwrite': r'6.0.0',
+  'go_router': r'^5.0.5',
+  'device_info_plus_platform_interface': r'2.3.0+1',
+  'get_sweet': <String, Object>{
+    'path': r'../get_sweet',
+  },
 };
 
 /// Developer dependencies
@@ -130,6 +142,9 @@ const Map<String, Object> dependencyOverrides = <String, Object>{
       'url': r'https://e.coding.net/shuttlecloud/mindbase/pluto_grid.git',
       'ref': r'feat_on_col_moved_evt',
     },
+  },
+  'provider_sidecar': <String, Object>{
+    'path': r'../provider_sidecar',
   },
   'analyzer': r'>=4.2.0 <5.0.0',
 };
@@ -151,6 +166,12 @@ const Map<String, Object> source = <String, Object>{
   'dependencies': dependencies,
   'dev_dependencies': devDependencies,
   'dependency_overrides': dependencyOverrides,
+  'flutter_gen': <String, Object>{
+    'output': r'lib/src/core/config/assets/',
+    'integrations': <String, Object>{
+      'flutter_svg': true,
+    },
+  },
   'flutter': <String, Object>{
     'uses-material-design': true,
     'assets': <Object>[
