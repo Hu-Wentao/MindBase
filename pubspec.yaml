@@ -69,7 +69,6 @@ dependencies:
   flutter_svg:
   bson:
   easy_debounce:
-  event_bus:
   adaptive_breakpoints:
   feedback:
   url_launcher:
