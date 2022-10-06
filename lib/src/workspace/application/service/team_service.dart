@@ -46,7 +46,6 @@ class TeamService {
   Future<aw.Team> getTeam(String teamId) async {
     final tm = await _srvTeams.get(teamId: teamId);
     final mp = tm.toMap();
-    slLogger.info('map # $mp');
     return aw.Team.fromMap(mp);
   }
 // Future<aw.Team> getTeam(String teamId) async => _teams.get(teamId: teamId);
