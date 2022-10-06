@@ -1,13 +1,11 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
-import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
-import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/confirm_dialog.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
@@ -17,6 +15,7 @@ import 'package:mind_base/src/workspace/infra/ui/dialog/record_meta_edit_dialog.
 import 'package:mind_base/src/workspace/infra/ui/widget/column_menu_delegate.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 import 'package:pluto_grid/pluto_grid.dart';
+import 'package:slowly/slowly.dart';
 
 import 'data_table_source.dart';
 
@@ -71,30 +70,33 @@ class RecordDataGrid extends StatelessWidget {
                         final nCol = originCol.copyWith(visible: false);
                         final nCols = view!.cols
                           ..replaceRange(originIndex, originIndex + 1, [nCol]);
-                        openedMeta.actUpdateView(view!.copyWith(cols: nCols)).thenDialog(context);
+                        openedMeta
+                            .actUpdateView(view!.copyWith(cols: nCols))
+                            .thenDialog(context);
                       }));
         },
         onColWidthChanged: (view == null)
             ? null
             : (evt) {
                 // 防抖, 避免无效更新
-                EasyDebounce.debounce('调整列宽度', const Duration(seconds: 1), () {
-                  var nWidth = evt.column.width;
-                  final propId = evt.column.field;
-                  final originIndex =
-                      view!.cols.indexWhere((c) => c.propId == propId);
-                  final originCol = view!.cols[originIndex];
-                  final originWidth = originCol.width;
-                  // 如果新旧宽度差小于 0.1, 则不更新; 否则保留1位小数并更新
-                  if ((originWidth - nWidth).abs() < 0.1) return;
-                  nWidth = (nWidth * 10).toInt() / 10;
-                  final nCol = originCol.copyWith(width: nWidth);
-                  final nCols = view!.cols
-                    ..replaceRange(originIndex, originIndex + 1, [nCol]);
-                  openedMeta.actUpdateView(
-                    view!.copyWith(cols: nCols),
-                  );
-                });
+                final accept = sl<Slowly>()
+                    .seconds('on调整列宽度', tp: SlowlyTp.debounce, sec: 1);
+                if (!accept) return;
+                var nWidth = evt.column.width;
+                final propId = evt.column.field;
+                final originIndex =
+                    view!.cols.indexWhere((c) => c.propId == propId);
+                final originCol = view!.cols[originIndex];
+                final originWidth = originCol.width;
+                // 如果新旧宽度差小于 0.1, 则不更新; 否则保留1位小数并更新
+                if ((originWidth - nWidth).abs() < 0.1) return;
+                nWidth = (nWidth * 10).toInt() / 10;
+                final nCol = originCol.copyWith(width: nWidth);
+                final nCols = view!.cols
+                  ..replaceRange(originIndex, originIndex + 1, [nCol]);
+                openedMeta.actUpdateView(
+                  view!.copyWith(cols: nCols),
+                );
               },
         onColMoved: (view == null)
             ? null

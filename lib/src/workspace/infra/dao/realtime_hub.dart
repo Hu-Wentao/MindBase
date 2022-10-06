@@ -1,9 +1,8 @@
 import 'dart:async';
 
 import 'package:appwrite/appwrite.dart';
-import 'package:easy_debounce/easy_debounce.dart';
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/core/config/common_config.dart';
+import 'package:slowly/slowly.dart';
 
 /// 统一管理Appwrite-Realtime的Channel
 /// 由于Realtime是基于单个websocket的, 因此需要统一管理订阅channel
@@ -33,9 +32,9 @@ class RealtimeChannelHub {
   actAddChannel(SubChannel channel) {
     _readyAddChannels.add(channel);
     // 防抖
-    EasyDebounce.debounce('刷新订阅', const Duration(milliseconds: 500), () {
-      _actUpdateChannels();
-    });
+    final accept = sl<Slowly>().ms('刷新订阅', tp: SlowlyTp.debounce, ms: 500);
+    if (!accept) return;
+    _actUpdateChannels();
   }
 
   // 移除订阅
