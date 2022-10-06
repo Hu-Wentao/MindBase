@@ -102,8 +102,8 @@ class _MetaTableListState extends State<MetaTableList> {
                               allMetas: space.allMetas,
                             ));
                             if (nMeta == null) return;
-                            return await space
-                                .actInsertMetaDto(nMeta)
+                            await space
+                                .actEntrance(SpaceAct.insertMeta(nMeta))
                                 .thenDialog(context);
                           },
                         ),
