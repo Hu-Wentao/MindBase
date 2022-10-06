@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:mind_base/src/workspace/application/service/expr/expression_parser.dart';
-import 'package:mind_base/src/app/config/common_config.dart';
+import 'package:mind_base/src/core/config/common_config.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';

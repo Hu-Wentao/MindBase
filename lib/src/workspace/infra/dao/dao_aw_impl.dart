@@ -1,7 +1,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/app/config/common_config.dart';
+import 'package:mind_base/src/core/config/common_config.dart';
 import 'package:mind_base/src/workspace/infra/dao/realtime_hub.dart';
 import 'package:mind_base/src/workspace/infra/dto/dto_aw_impl.dart';
 import 'package:mind_base/src/core/inter/i_dao.dart';

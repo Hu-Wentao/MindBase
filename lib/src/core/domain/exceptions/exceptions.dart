@@ -1,6 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/app/config/common_config.dart';
+import 'package:mind_base/src/core/config/common_config.dart';
 import 'package:mind_base/src/user/domain/exceptions/exceptions.dart';
 
 part 'exception_adapter.dart';

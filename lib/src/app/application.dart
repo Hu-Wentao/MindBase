@@ -1,5 +1,5 @@
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/app/config/injector.dart';
+import 'package:mind_base/src/core/config/injector.dart';
 
 class MindBaseConfig extends BaseConfig {
   MindBaseConfig({

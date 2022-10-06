@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:logging/logging.dart';
-import 'package:mind_base/src/app/config/common_config.dart';
-import 'package:mind_base/src/app/config/const.dart';
+import 'package:mind_base/src/core/config/common_config.dart';
+import 'package:mind_base/src/core/config/const.dart';
 import 'package:mind_base/src/app/application.dart';
 import 'package:mind_base/src/app/infra/ui/app.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
