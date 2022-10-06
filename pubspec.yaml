@@ -90,6 +90,7 @@ dev_dependencies:
   injectable_generator:
   freezed:
   go_router_builder:
+  flutter_gen_runner:
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -113,7 +114,10 @@ dependency_overrides:
 #    path: ../provider_sidecar
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-
+flutter_gen:
+  output: lib/src/core/config/assets/
+  integrations:
+    flutter_svg: true
 # The following section is specific to Flutter.
 flutter:
 
