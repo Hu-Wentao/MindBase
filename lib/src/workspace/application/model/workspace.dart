@@ -19,7 +19,7 @@ class SpaceAct with _$SpaceAct {
   const factory SpaceAct.updateByTable(TableDto dto) = SpaceActUpdateByTable;
 }
 
-@freezed
+@Freezed(makeCollectionsUnmodifiable: false)
 class SpaceState with _$SpaceState {
   const factory SpaceState.init() = SpaceStateInit;
 
@@ -84,10 +84,16 @@ class SpaceModel extends BaseActEntranceModel<SpaceAct, SpaceState> {
       );
 
   MetaModel _addNewMetaModel(RecordMetaDto data) {
-    final m = MetaModel(data, this);
-    metas.add(m
+    final m = MetaModel(data, this)
       // 添加的同时初始化
-      ..actInitSubscription());
+      ..actInitSubscription();
+    state.isOrNull<SpaceStateDone>((s) => s.metas.add(m));
+    // setState(
+    //     state.map(
+    //       init: (_) => _,
+    //       done: (s) => s.copyWith(metas: [...s.metas, m]),
+    //     ),
+    //     '插入MetaModel[${m.id}]');
     return m;
   }
 
@@ -274,18 +280,18 @@ extension SpaceStateChangeX on SpaceModel {
   }
 
   Stream<RecordMetaDto> _fetchAllMetas() => _metaAcc.findAll();
-      // .listen((e) {
-      //   onMetaAdd(e);
-      //   notifyListeners();
-      // }, onError: (e, s) {
-      //   if (e is AppwriteException &&
-      //       e.code == 404 &&
-      //       e.type == "collection_not_found") {
-      //     // 不存在则无需抛出异常
-      //     log("debug MetaModel.openBy: [$e], 由推测的`Meta集合`尚未创建导致的,无需抛出异常");
-      //   }
-      //   throw ExceptionAdapter.of(e, s);
-      // });
+// .listen((e) {
+//   onMetaAdd(e);
+//   notifyListeners();
+// }, onError: (e, s) {
+//   if (e is AppwriteException &&
+//       e.code == 404 &&
+//       e.type == "collection_not_found") {
+//     // 不存在则无需抛出异常
+//     log("debug MetaModel.openBy: [$e], 由推测的`Meta集合`尚未创建导致的,无需抛出异常");
+//   }
+//   throw ExceptionAdapter.of(e, s);
+// });
 }
 
 @Deprecated('use SpaceModel')

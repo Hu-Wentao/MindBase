@@ -2542,7 +2542,7 @@ class __$$UserStateDoneCopyWithImpl<$Res> extends _$UserStateCopyWithImpl<$Res>
   }) {
     return _then(_$UserStateDone(
       teams == freezed
-          ? _value._teams
+          ? _value.teams
           : teams // ignore: cast_nullable_to_non_nullable
               as List<TeamModel>,
     ));
@@ -2552,14 +2552,10 @@ class __$$UserStateDoneCopyWithImpl<$Res> extends _$UserStateCopyWithImpl<$Res>
 /// @nodoc
 
 class _$UserStateDone implements UserStateDone {
-  const _$UserStateDone(final List<TeamModel> teams) : _teams = teams;
+  const _$UserStateDone(this.teams);
 
-  final List<TeamModel> _teams;
   @override
-  List<TeamModel> get teams {
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_teams);
-  }
+  final List<TeamModel> teams;
 
   @override
   String toString() {
@@ -2571,12 +2567,12 @@ class _$UserStateDone implements UserStateDone {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$UserStateDone &&
-            const DeepCollectionEquality().equals(other._teams, _teams));
+            const DeepCollectionEquality().equals(other.teams, teams));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_teams));
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(teams));
 
   @JsonKey(ignore: true)
   @override

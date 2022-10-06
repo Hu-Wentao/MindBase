@@ -11,7 +11,7 @@ class UserAct with _$UserAct {
   const factory UserAct.deleteTeam(String teamId) = UserActDeleteTeam;
 }
 
-@freezed
+@Freezed(makeCollectionsUnmodifiable: false)
 class UserState with _$UserState {
   const factory UserState.init() = UserStateInit;
 

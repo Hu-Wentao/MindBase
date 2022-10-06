@@ -1233,7 +1233,7 @@ class __$$SpaceStateDoneCopyWithImpl<$Res>
           : metaTableDetail // ignore: cast_nullable_to_non_nullable
               as da.Collection,
       metas == freezed
-          ? _value._metas
+          ? _value.metas
           : metas // ignore: cast_nullable_to_non_nullable
               as List<MetaModel>,
     ));
@@ -1243,17 +1243,12 @@ class __$$SpaceStateDoneCopyWithImpl<$Res>
 /// @nodoc
 
 class _$SpaceStateDone implements SpaceStateDone {
-  const _$SpaceStateDone(this.metaTableDetail, final List<MetaModel> metas)
-      : _metas = metas;
+  const _$SpaceStateDone(this.metaTableDetail, this.metas);
 
   @override
   final da.Collection metaTableDetail;
-  final List<MetaModel> _metas;
   @override
-  List<MetaModel> get metas {
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_metas);
-  }
+  final List<MetaModel> metas;
 
   @override
   String toString() {
@@ -1267,14 +1262,14 @@ class _$SpaceStateDone implements SpaceStateDone {
             other is _$SpaceStateDone &&
             const DeepCollectionEquality()
                 .equals(other.metaTableDetail, metaTableDetail) &&
-            const DeepCollectionEquality().equals(other._metas, _metas));
+            const DeepCollectionEquality().equals(other.metas, metas));
   }
 
   @override
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(metaTableDetail),
-      const DeepCollectionEquality().hash(_metas));
+      const DeepCollectionEquality().hash(metas));
 
   @JsonKey(ignore: true)
   @override
