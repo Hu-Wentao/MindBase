@@ -3,8 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:go_router/go_router.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:mind_base/generated/assets.dart';
 import 'package:mind_base/src/app/application/model/model.dart';
+import 'package:mind_base/src/core/config/assets/assets.gen.dart';
 import 'package:mind_base/src/user/domain/value/value.dart';
 import 'package:mind_base/src/user/infra/ui/widget/rounded_button.dart';
 import 'package:mind_base/src/user/infra/ui/widget/rounded_input_field.dart';
@@ -28,9 +28,9 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage>
-    with OnInitStateMx<AuthPage,AppStateModel> {
+    with OnInitStateMx<AuthPage, AppStateModel> {
   @override
-  onInitState(msgr,m) => m.events.listen((evt) => evt.maybeWhen(
+  onInitState(msgr, m) => m.events.listen((evt) => evt.maybeWhen(
       msg: (msg) => msgr.showSnackBar(SnackBar(content: Text(msg))),
       orElse: () => null));
 
@@ -156,14 +156,8 @@ class _BodyState extends State<Body> {
               children: <Widget>[
                 SizedBox(height: size.height * 0.03),
                 isRegister
-                    ? SvgPicture.asset(
-                        Assets.authLogin,
-                        height: size.height * 0.35,
-                      )
-                    : SvgPicture.asset(
-                        Assets.authSignup,
-                        height: size.height * 0.35,
-                      ),
+                    ? Assets.icon.auth.login.svg(height: size.height * 0.35)
+                    : Assets.icon.auth.signup.svg(height: size.height * 0.35),
                 // 展示上次请求的错误信息
                 if (widget.rsp != null)
                   Padding(
@@ -281,21 +275,13 @@ class Background extends StatelessWidget {
         alignment: Alignment.center,
         children: <Widget>[
           Positioned(
-            top: 0,
-            left: 0,
-            child: Image.asset(
-              Assets.imageSignupTop,
-              width: widthFactor * 0.35,
-            ),
-          ),
+              top: 0,
+              left: 0,
+              child: Assets.image.signupTop.image(width: widthFactor * 0.35)),
           Positioned(
-            bottom: 0,
-            left: 0,
-            child: Image.asset(
-              Assets.imageMainBottom,
-              width: widthFactor * 0.25,
-            ),
-          ),
+              bottom: 0,
+              left: 0,
+              child: Assets.image.mainBottom.image(width: widthFactor * 0.25)),
           child,
           if (secondChild != null) secondChild!,
         ],

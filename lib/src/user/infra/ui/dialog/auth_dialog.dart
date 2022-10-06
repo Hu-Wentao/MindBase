@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:mind_base/generated/assets.dart';
+import 'package:mind_base/src/core/config/assets/assets.gen.dart';
 import 'package:mind_base/src/user/infra/ui/widget/rounded_button.dart';
 import 'package:mind_base/src/user/infra/ui/widget/rounded_input_field.dart';
 import 'package:mind_base/src/user/infra/ui/widget/rounded_password_field.dart';
@@ -158,14 +158,8 @@ class _BodyState extends State<Body> {
                 ),
                 SizedBox(height: size.height * 0.03),
                 isRegister
-                    ? SvgPicture.asset(
-                        Assets.authLogin,
-                        height: size.height * 0.35,
-                      )
-                    : SvgPicture.asset(
-                        Assets.authSignup,
-                        height: size.height * 0.35,
-                      ),
+                    ? Assets.icon.auth.login.svg(height: size.height * 0.35)
+                    : Assets.icon.auth.signup.svg(height: size.height * 0.35),
                 // 展示上次请求的错误信息
                 if (widget.rsp != null)
                   Padding(
@@ -281,7 +275,7 @@ class Background extends StatelessWidget {
             top: 0,
             left: 0,
             child: Image.asset(
-              Assets.imageSignupTop,
+              Assets.image.signupTop.path,
               width: widthFactor * 0.35,
             ),
           ),
@@ -289,7 +283,7 @@ class Background extends StatelessWidget {
             bottom: 0,
             left: 0,
             child: Image.asset(
-              Assets.imageMainBottom,
+              Assets.image.mainBottom.path,
               width: widthFactor * 0.25,
             ),
           ),

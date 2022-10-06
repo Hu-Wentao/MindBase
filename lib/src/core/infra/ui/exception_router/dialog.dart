@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:logging/logging.dart';
+import 'package:mind_base/src/app/infra/ui/page/auth/auth.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/app/application/model/model.dart';
 import 'package:mind_base/src/user/domain/exceptions/exceptions.dart';
@@ -33,8 +34,9 @@ class DialogFactory {
 
   static _buildAuth(BaseException exc, BuildContext context) async {
     final withRsp = (exc is AuthBaseException) ? AuthRsp.err(exc) : null;
-    final req = await showAuthDialog(context: context, withRsp: withRsp);
-    context.read<AppStateModel>().actAuthWithReq(req).thenDialog(context);
+    const AuthRoute(true).go(context);
+    // final req = await showAuthDialog(context: context, withRsp: withRsp);
+    // context.read<AppStateModel>().actAuthWithReq(req).thenDialog(context);
   }
 
   static NDialog _buildUnLogin(BaseException exception, BuildContext context) =>
