@@ -6,7 +6,10 @@ import 'package:mind_base/src/core/infra/ui/exception_router/snack.dart';
 extension BaseExceptionRouterX on BaseException? {
   rethrowException() => (this == null) ? null : throw this!;
 
-  Future showDialog(BuildContext context, {Function()? onNull}) =>
+  Future<dynamic> showDialog(
+    BuildContext context, {
+    Function()? onNull,
+  }) async =>
       (this == null)
           ? onNull?.call()
           : DialogFactory.byException(this, context)?.show(context);
