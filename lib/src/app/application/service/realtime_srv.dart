@@ -58,7 +58,9 @@ class RealtimeSrv {
   Stream<DataEvt<md.Team>> watchTeams() =>
       watchBy(const SubChannel.watchTeams()).map((event) => DataEvt<md.Team>(
             DataEvtTp.ofEvents(event.events),
-            md.Team.fromMap(event.payload),
+            md.Team.fromMap(event.payload
+              // 修复属性值缺失问题
+              ..['total'] = 0),
           ));
 
   @protected
