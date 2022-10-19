@@ -1,0 +1,11 @@
+# Read about `build.yaml` at https://pub.flutter-io.cn/packages/build_config
+targets:
+  $default:
+    sources:
+      - $package$
+      - lib/**
+      - pubspec.yaml
+    builders:
+      pubspec_generator:
+        options:
+          output: lib/src/core/config/pubspec.yaml.g.dart
