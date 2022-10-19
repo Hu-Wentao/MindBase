@@ -34,6 +34,7 @@ dev_dependencies:
   flutter_lints: ^2.0.0
   build_runner:
   pubspec_generator:
+  injectable_generator:
 
 flutter:
   uses-material-design: true

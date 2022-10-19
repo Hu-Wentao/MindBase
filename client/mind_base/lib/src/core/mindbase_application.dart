@@ -1,13 +1,6 @@
 import 'package:get_arch_core/get_arch_core.dart';
 
-class MindBaseConfig extends BaseConfig {
-  MindBaseConfig({
-    required EnvSign sign,
-    required String name,
-    required String version,
-    required DateTime packAt,
-  }) : super(sign: sign, name: name, version: version, packAt: packAt);
-}
+import 'config/config.dart';
 
 class MindBasePackage extends BasePackage<MindBaseConfig> {
   MindBasePackage({
@@ -54,11 +47,11 @@ class MindBaseApplication extends MindBasePackage
   MindBaseApplication({
     this.packages = const [],
     this.onBeforeAppInit,
-    required Future<void> Function(GetIt getIt, IConfig config) appInit,
+    required Future<void> Function(GetIt getIt, IConfig config) onAppInit,
     this.onBeforeAppRun,
     this.onApplicationRun,
     this.onAfterAppRun,
     this.onAppError,
     this.onAppFinally,
-  }) : super(initPackageDI: appInit);
+  }) : super(initPackageDI: onAppInit);
 }
