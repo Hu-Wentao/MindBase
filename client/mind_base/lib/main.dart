@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/core/config/config.dart';
+import 'package:mind_base/src/core/mindbase_application.dart';
 
 void main() {
-  runApp(const MyApp());
+  MindBaseApplication(
+    onBeforeAppInit: (g, c) async => WidgetsFlutterBinding.ensureInitialized(),
+    onBeforeAppRun: (g) async {},
+    onAppInit: initPackageDI,
+    onApplicationRun: (g, c) async => runApp(MindBaseApp(sl: g, config: c)),
+  ).run(GetIt.I, kEnvDev);
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MindBaseApp extends StatelessWidget {
+  const MindBaseApp({
+    super.key,
+    required GetIt sl,
+    required MindBaseConfig config,
+  });
 
   // This widget is the root of your application.
   @override
