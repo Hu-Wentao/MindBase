@@ -43,6 +43,14 @@ dev_dependencies:
   injectable_generator:
   freezed:
   go_router_builder:
+  flutter_gen_runner:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/icons/
+
+flutter_gen:
+  output: lib/src/core/config/assets/
+  integrations:
+    flutter_svg: true
