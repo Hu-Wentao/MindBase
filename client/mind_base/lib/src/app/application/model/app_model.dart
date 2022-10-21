@@ -44,11 +44,11 @@ class AppEvt with _$AppEvt {
   const factory AppEvt.recoverDone(String? errMsg) = AppEvtRecoverDone;
 }
 
-class AppStateModel extends BaseActEntranceModel<AppAct, AppState>
+class AppModel extends BaseActEntranceModel<AppAct, AppState>
     with EvtEntranceMx<AppEvt> {
   final MindBaseConfig config;
 
-  AppStateModel(this.config, [AppState state = const AppState.init()])
+  AppModel(this.config, [AppState state = const AppState.init()])
       : super(state: state);
 
   @override
@@ -117,7 +117,7 @@ class AppStateModel extends BaseActEntranceModel<AppAct, AppState>
   }
 }
 
-extension AppAccountX on AppStateModel {
+extension AppAccountX on AppModel {
   AccountService get _actSrv => sl<AccountService>();
 
   _logout(String? sessionId) async => await _actSrv.logout(sessionId);
