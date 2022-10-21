@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'1'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1666200658;
+const int timestamp = 1666364600;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -115,6 +115,8 @@ const Map<String, Object> dependencies = <String, Object>{
       'ref': r'v1.0',
     },
   },
+  'appwrite': r'6.0.0',
+  'dart_appwrite': r'6.0.0',
 };
 
 /// Developer dependencies
