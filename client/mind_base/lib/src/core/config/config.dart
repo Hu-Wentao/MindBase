@@ -8,8 +8,10 @@ import './pubspec.yaml.g.dart' as spec;
 
 export './pubspec.yaml.g.dart';
 export './injector.dart';
+export './assets/assets.gen.dart';
 
 part 'const.dart';
+
 part 'exception_adapter.dart';
 
 class MindBaseConfig extends BaseConfig {
