@@ -19,10 +19,10 @@ mixin _$AppAct {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)
+            AuthTp authVerify, String identityStr, Password password)
         signupLogin,
     required TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)
+            AuthTp authVerify, String identityStr, Password password)
         login,
     required TResult Function() loginAnonymous,
     required TResult Function() recover,
@@ -31,11 +31,9 @@ mixin _$AppAct {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         login,
     TResult Function()? loginAnonymous,
     TResult Function()? recover,
@@ -44,11 +42,9 @@ mixin _$AppAct {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         login,
     TResult Function()? loginAnonymous,
     TResult Function()? recover,
@@ -106,7 +102,7 @@ abstract class _$$AppActSignupLoginCopyWith<$Res> {
   factory _$$AppActSignupLoginCopyWith(
           _$AppActSignupLogin value, $Res Function(_$AppActSignupLogin) then) =
       __$$AppActSignupLoginCopyWithImpl<$Res>;
-  $Res call({AuthVerify authVerify, String identityStr, Password password});
+  $Res call({AuthTp authVerify, String identityStr, Password password});
 }
 
 /// @nodoc
@@ -129,7 +125,7 @@ class __$$AppActSignupLoginCopyWithImpl<$Res> extends _$AppActCopyWithImpl<$Res>
       authVerify: authVerify == freezed
           ? _value.authVerify
           : authVerify // ignore: cast_nullable_to_non_nullable
-              as AuthVerify,
+              as AuthTp,
       identityStr: identityStr == freezed
           ? _value.identityStr
           : identityStr // ignore: cast_nullable_to_non_nullable
@@ -151,7 +147,7 @@ class _$AppActSignupLogin implements AppActSignupLogin {
       required this.password});
 
   @override
-  final AuthVerify authVerify;
+  final AuthTp authVerify;
   @override
   final String identityStr;
   @override
@@ -190,10 +186,10 @@ class _$AppActSignupLogin implements AppActSignupLogin {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)
+            AuthTp authVerify, String identityStr, Password password)
         signupLogin,
     required TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)
+            AuthTp authVerify, String identityStr, Password password)
         login,
     required TResult Function() loginAnonymous,
     required TResult Function() recover,
@@ -205,11 +201,9 @@ class _$AppActSignupLogin implements AppActSignupLogin {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         login,
     TResult Function()? loginAnonymous,
     TResult Function()? recover,
@@ -221,11 +215,9 @@ class _$AppActSignupLogin implements AppActSignupLogin {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         login,
     TResult Function()? loginAnonymous,
     TResult Function()? recover,
@@ -281,11 +273,11 @@ class _$AppActSignupLogin implements AppActSignupLogin {
 
 abstract class AppActSignupLogin implements AppAct {
   const factory AppActSignupLogin(
-      {required final AuthVerify authVerify,
+      {required final AuthTp authVerify,
       required final String identityStr,
       required final Password password}) = _$AppActSignupLogin;
 
-  AuthVerify get authVerify;
+  AuthTp get authVerify;
   String get identityStr;
   Password get password;
   @JsonKey(ignore: true)
@@ -298,7 +290,7 @@ abstract class _$$AppActLoginCopyWith<$Res> {
   factory _$$AppActLoginCopyWith(
           _$AppActLogin value, $Res Function(_$AppActLogin) then) =
       __$$AppActLoginCopyWithImpl<$Res>;
-  $Res call({AuthVerify authVerify, String identityStr, Password password});
+  $Res call({AuthTp authVerify, String identityStr, Password password});
 }
 
 /// @nodoc
@@ -321,7 +313,7 @@ class __$$AppActLoginCopyWithImpl<$Res> extends _$AppActCopyWithImpl<$Res>
       authVerify: authVerify == freezed
           ? _value.authVerify
           : authVerify // ignore: cast_nullable_to_non_nullable
-              as AuthVerify,
+              as AuthTp,
       identityStr: identityStr == freezed
           ? _value.identityStr
           : identityStr // ignore: cast_nullable_to_non_nullable
@@ -343,7 +335,7 @@ class _$AppActLogin implements AppActLogin {
       required this.password});
 
   @override
-  final AuthVerify authVerify;
+  final AuthTp authVerify;
   @override
   final String identityStr;
   @override
@@ -382,10 +374,10 @@ class _$AppActLogin implements AppActLogin {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)
+            AuthTp authVerify, String identityStr, Password password)
         signupLogin,
     required TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)
+            AuthTp authVerify, String identityStr, Password password)
         login,
     required TResult Function() loginAnonymous,
     required TResult Function() recover,
@@ -397,11 +389,9 @@ class _$AppActLogin implements AppActLogin {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         login,
     TResult Function()? loginAnonymous,
     TResult Function()? recover,
@@ -413,11 +403,9 @@ class _$AppActLogin implements AppActLogin {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         login,
     TResult Function()? loginAnonymous,
     TResult Function()? recover,
@@ -473,11 +461,11 @@ class _$AppActLogin implements AppActLogin {
 
 abstract class AppActLogin implements AppAct {
   const factory AppActLogin(
-      {required final AuthVerify authVerify,
+      {required final AuthTp authVerify,
       required final String identityStr,
       required final Password password}) = _$AppActLogin;
 
-  AuthVerify get authVerify;
+  AuthTp get authVerify;
   String get identityStr;
   Password get password;
   @JsonKey(ignore: true)
@@ -527,10 +515,10 @@ class _$AppActLoginAnonymous implements AppActLoginAnonymous {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)
+            AuthTp authVerify, String identityStr, Password password)
         signupLogin,
     required TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)
+            AuthTp authVerify, String identityStr, Password password)
         login,
     required TResult Function() loginAnonymous,
     required TResult Function() recover,
@@ -542,11 +530,9 @@ class _$AppActLoginAnonymous implements AppActLoginAnonymous {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         login,
     TResult Function()? loginAnonymous,
     TResult Function()? recover,
@@ -558,11 +544,9 @@ class _$AppActLoginAnonymous implements AppActLoginAnonymous {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         login,
     TResult Function()? loginAnonymous,
     TResult Function()? recover,
@@ -661,10 +645,10 @@ class _$AppActRecover implements AppActRecover {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)
+            AuthTp authVerify, String identityStr, Password password)
         signupLogin,
     required TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)
+            AuthTp authVerify, String identityStr, Password password)
         login,
     required TResult Function() loginAnonymous,
     required TResult Function() recover,
@@ -676,11 +660,9 @@ class _$AppActRecover implements AppActRecover {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         login,
     TResult Function()? loginAnonymous,
     TResult Function()? recover,
@@ -692,11 +674,9 @@ class _$AppActRecover implements AppActRecover {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         login,
     TResult Function()? loginAnonymous,
     TResult Function()? recover,
@@ -795,10 +775,10 @@ class _$AppActLogout implements AppActLogout {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)
+            AuthTp authVerify, String identityStr, Password password)
         signupLogin,
     required TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)
+            AuthTp authVerify, String identityStr, Password password)
         login,
     required TResult Function() loginAnonymous,
     required TResult Function() recover,
@@ -810,11 +790,9 @@ class _$AppActLogout implements AppActLogout {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         login,
     TResult Function()? loginAnonymous,
     TResult Function()? recover,
@@ -826,11 +804,9 @@ class _$AppActLogout implements AppActLogout {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(
-            AuthVerify authVerify, String identityStr, Password password)?
+    TResult Function(AuthTp authVerify, String identityStr, Password password)?
         login,
     TResult Function()? loginAnonymous,
     TResult Function()? recover,

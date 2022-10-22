@@ -219,8 +219,8 @@ class DataFrameTitlePluto extends StatelessWidget {
   final OpenedWorkspace openedWorkspace;
   final PlutoGridStateManager stateManager;
   final Future<BaseException?> Function(RecordDto? dto) onSaveRecord;
-  final Future<void> Function(RecordMetaDto? dto) onSaveMeta;
-  final Future<BaseException?> Function(RecordMetaDto dto, TableView v)
+  final Future<void> Function(MetaDto? dto) onSaveMeta;
+  final Future<BaseException?> Function(MetaDto dto, TableView v)
       onUpdateView;
   final _kRecordBuilder = GlobalKey<FormBuilderState>();
   final kMetaBuilder = GlobalKey<FormBuilderState>();
@@ -313,7 +313,7 @@ class DataFrameTitlePluto extends StatelessWidget {
       );
 
   // 字段管理
-  void _fieldManager(BuildContext context, RecordMetaDto dto, TableView view) {
+  void _fieldManager(BuildContext context, MetaDto dto, TableView view) {
     const propIdField = 'propIdField';
     var columns = [
       PlutoColumn(

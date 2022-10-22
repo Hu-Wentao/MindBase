@@ -11,11 +11,11 @@ import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 import 'meta_service.dart';
 
 @lazySingleton
-class WorkspaceService {
+class SpaceService {
   final Databases _db;
   final WorkspaceEttAccessor _workspaceEttAcc;
 
-  const WorkspaceService(
+  const SpaceService(
     this._db,
     this._workspaceEttAcc,
   );
@@ -24,34 +24,34 @@ class WorkspaceService {
       RecordMetaEttAccessor(_db, workspaceId);
 
   /// 查询一个工作空间内的所有Meta
-  Stream<RecordMetaDto> queryMetasBy(String workspaceId) =>
+  Stream<MetaDto> queryMetasBy(String workspaceId) =>
       _getMetaAcc(workspaceId).findAll();
 
-  Future<Map<Team, List<WorkspaceDto>>> queryWorkspaceDtoBy(
+  Future<Map<Team, List<SpaceDto>>> queryWorkspaceDtoBy(
       List<Team> teams) async {
     final r = Map.fromIterables(
       teams,
-      List.generate(teams.length, (index) => <WorkspaceDto>[]),
+      List.generate(teams.length, (index) => <SpaceDto>[]),
     );
     for (final t in teams) {
       final w = await queryWorkspaceDto(t.$id);
       if (w.isNotEmpty) {
-        r[t] ??= <WorkspaceDto>[];
+        r[t] ??= <SpaceDto>[];
         r[t]!.addAll(w);
       }
     }
     return r;
   }
 
-  Future<List<WorkspaceDto>> queryWorkspaceDto(String teamId) async {
+  Future<List<SpaceDto>> queryWorkspaceDto(String teamId) async {
     return await _workspaceEttAcc.findAllByTeam(teamId).toList();
   }
 
-  Future<WorkspaceDto> createWorkspaceDtoBy(
+  Future<SpaceDto> createWorkspaceDtoBy(
     String teamId,
     String spaceName,
   ) async {
-    final dto = WorkspaceDto(
+    final dto = SpaceDto(
       id: ObjectIdX.createHex,
       teamId: teamId,
       name: spaceName,
@@ -88,7 +88,7 @@ class WorkspaceService {
   }
 
   Future<void> updateWorkspaceName(
-    WorkspaceDto space,
+    SpaceDto space,
     String nName,
   ) {
     final dto = space..name = nName;

@@ -25,12 +25,12 @@ main() {
 
   ///
   // final tm = TeamModel(Team($id: 'id', name: "name", $createdAt: 123, total: 1, $updatedAt: 1233), us);
-  final space = WorkspaceModel(WorkspaceDto.builder());
+  final space = WorkspaceModel(SpaceDto.builder());
   const pMetaStudentId = ('6262e2d8113f6c880d5d736b');
   const pMetaSchoolId = ('626a109fd90369d16c2fbe0e');
   const pRcdHfuId = ("626a98b14a034567ff06f2f4");
   const pRcdZsId = ('6262e3b0118f5894993d4533');
-  final pMetaSchool = MetaModel(RecordMetaDto(
+  final pMetaSchool = MetaModel(MetaDto(
       id: pMetaSchoolId,
       name: '学校表',
       memo: '学校信息',

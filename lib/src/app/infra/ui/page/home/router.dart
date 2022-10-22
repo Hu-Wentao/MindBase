@@ -1,15 +1,15 @@
 part of 'home.dart';
 
 @TypedGoRoute<HomeRoute>(path: '/home/:screen', routes: [
-  TypedGoRoute<WorkspaceRoute>(
+  TypedGoRoute<SpaceRoute>(
       path: 'team/:teamId/space/:spaceId/meta/:metaId/view/:viewId'),
 ])
 class HomeRoute extends GoRouteData {
-  final ScreenType screen;
+  final ScreenTp screen;
 
   const HomeRoute(this.screen);
 
-  const HomeRoute.auto([this.screen = ScreenType.workspaces]);
+  const HomeRoute.auto([this.screen = ScreenTp.workspaces]);
 
   @override
   Widget build(BuildContext context) => HomePage(
@@ -18,14 +18,14 @@ class HomeRoute extends GoRouteData {
       );
 }
 
-class WorkspaceRoute extends GoRouteData {
-  final ScreenType screen;
+class SpaceRoute extends GoRouteData {
+  final ScreenTp screen;
   final String teamId;
   final String spaceId;
   final String metaId;
   final int viewId;
 
-  const WorkspaceRoute(
+  const SpaceRoute(
     this.screen,
     this.teamId,
     this.spaceId,
@@ -33,12 +33,12 @@ class WorkspaceRoute extends GoRouteData {
     this.viewId,
   );
 
-  const WorkspaceRoute.auto({
+  const SpaceRoute.auto({
     required this.teamId,
     required this.spaceId,
     this.metaId = 'null',
     this.viewId = -1,
-    this.screen = ScreenType.workspaces,
+    this.screen = ScreenTp.workspaces,
   });
 
   @override

@@ -160,9 +160,9 @@ mixin MetaStateChangeMx on IMetaModel {
   }
 }
 
-abstract class IMetaModel extends ModelSidecar<RecordMetaDto, BaseException?>
-    with ModelStateChangeMx<RecordMetaDto, BaseException?> {
-  IMetaModel(RecordMetaDto data) : super(data, ExceptionAdapter.of);
+abstract class IMetaModel extends ModelSidecar<MetaDto, BaseException?>
+    with ModelStateChangeMx<MetaDto, BaseException?> {
+  IMetaModel(MetaDto data) : super(data, ExceptionAdapter.of);
 
   String get id;
 
@@ -210,7 +210,7 @@ class MetaModel extends IMetaModel with MetaStateChangeMx {
   RecordDataGridSourcePluto? _cachedDataSource;
 
   @Deprecated('data')
-  RecordMetaDto get meta => data;
+  MetaDto get meta => data;
 
   @override
   String get id => data.id;
@@ -276,7 +276,7 @@ extension MetaModelX on MetaModel {
 
   /// Meta
   Future<BaseException?> actUpdateMeta(
-    RecordMetaDto? dto,
+    MetaDto? dto,
   ) async =>
       await actWrapper(() => setDone("保存元素 [$dto]", () async {
             if (dto == null) return null;

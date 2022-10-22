@@ -2,7 +2,7 @@ part of 'model.dart';
 
 // ///
 // /// 暂不继承[ModelSidecar]
-// /// [PropertyDto]存在于[RecordMetaDto]内部, 没有独立数据表, 不需要进行状态同步
+// /// [PropertyDto]存在于[MetaDto]内部, 没有独立数据表, 不需要进行状态同步
 // abstract class PropertyModel<P extends PropertyDto> {
 //   final MetaModel at;
 //   final P data;

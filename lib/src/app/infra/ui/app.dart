@@ -46,10 +46,10 @@ class MindBaseApp extends StatelessWidget {
       // 配置Provider
       MultiProvider(
         providers: [
-          ChangeNotifierProvider<AppStateModel>(
-            create: (_) => AppStateModel(config),
+          ChangeNotifierProvider<AppModel>(
+            create: (_) => AppModel(config),
           ),
-          ChangeNotifierProxyProvider<AppStateModel, UserModel?>.value(
+          ChangeNotifierProxyProvider<AppModel, UserModel?>.value(
             update: (c, m, o) => m.state.isOrNull<AppStateLogged>()?.user,
           ),
         ],

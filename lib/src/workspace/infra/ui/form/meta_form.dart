@@ -13,7 +13,7 @@ import 'package:ndialog/ndialog.dart';
 
 class MetaForm extends StatelessWidget {
   final bool isCreate;
-  final RecordMetaDto origin;
+  final MetaDto origin;
   final Iterable<RecordMeta> Function() allMetas;
   final QueryMetaFn queryMetaFn;
   final GlobalKey<FormBuilderState> kMetaBuilder;
@@ -76,7 +76,7 @@ class MetaForm extends StatelessWidget {
   }
 
   /// 通过 k获取 MetaForm和AttrForm 中的数据, 最后转换成DTO
-  static RecordMetaDto? fetchDtoBy({
+  static MetaDto? fetchDtoBy({
     required GlobalKey<FormBuilderState> kMetaBuilder,
     required GlobalKey<FormBuilderState> kAttrBuilder,
     required GlobalKey<FormBuilderState>? kMethodBuilder,
@@ -113,7 +113,7 @@ class MetaForm extends StatelessWidget {
 
     // 为空表示当前From没有构造Method输入框
     if (methodMap == null) {
-      return RecordMetaDto.fromForm(metaMap, attrs, []);
+      return MetaDto.fromForm(metaMap, attrs, []);
     } else {
       final methodFormatMap = <int, Map<String, String>>{};
       for (final e in methodMap.entries) {
@@ -150,14 +150,14 @@ class MetaForm extends StatelessWidget {
             }).toList();
 
       // print("debug # attrs: $attrs");
-      return RecordMetaDto.fromForm(metaMap, attrs, methods);
+      return MetaDto.fromForm(metaMap, attrs, methods);
     }
   }
 }
 
 class MetaMainForm extends StatefulWidget {
   final bool isCreate;
-  final RecordMetaDto origin;
+  final MetaDto origin;
 
   final GlobalKey<FormBuilderState>? kMetaBuilder;
 
@@ -173,7 +173,7 @@ class MetaMainForm extends StatefulWidget {
 }
 
 class _MetaMainFormState extends State<MetaMainForm> {
-  late RecordMetaDto _origin;
+  late MetaDto _origin;
   late GlobalKey<FormBuilderState> _kMetaBuilder;
 
   @override
@@ -254,7 +254,7 @@ class AttributeListForm extends StatefulWidget {
   factory AttributeListForm.build({
     Key? key,
     required isCreate,
-    required RecordMetaDto origin,
+    required MetaDto origin,
     required Iterable<RecordMeta> Function() allMetas,
     GlobalKey<FormBuilderState>? kAttrBuilder,
   }) =>
@@ -443,7 +443,7 @@ class MethodListForm extends StatefulWidget {
   factory MethodListForm.build({
     Key? key,
     required isCreate,
-    required RecordMetaDto origin,
+    required MetaDto origin,
     required QueryMetaFn queryMetaFn,
     GlobalKey<FormBuilderState>? kMethodBuilder,
   }) =>

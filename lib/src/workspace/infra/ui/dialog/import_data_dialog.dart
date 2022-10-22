@@ -11,7 +11,7 @@ import 'package:ndialog/ndialog.dart';
 /// [isCreate] 为true表示更新结构与插入数据
 class TableDto {
   final bool isCreate;
-  final RecordMetaDto meta;
+  final MetaDto meta;
   final List<RecordDto> data;
 
   TableDto(this.isCreate, this.meta, this.data);
@@ -42,7 +42,7 @@ class TableDto {
   }
 
   // Map，单条record的信息
-  static _parseEleMap(JsonElement element, RecordMetaDto meta, RecordDto rcd) {
+  static _parseEleMap(JsonElement element, MetaDto meta, RecordDto rcd) {
     assert(element.valueType == JsonElementValueType.map);
     for (final JsonElement kv in (element.value as List)) {
       // print(
@@ -69,7 +69,7 @@ class TableDto {
   static TableDto? of(JsonElement? element, {String? metaId}) {
     if (element == null) return null;
     final dto = TableDto(
-        metaId == null, RecordMetaDto.builder(id: metaId, name: "未命名表"), []);
+        metaId == null, MetaDto.builder(id: metaId, name: "未命名表"), []);
     final typedNoneNameAttrs = <AttrTypeDto, AttributeDto>{};
     if (element.valueType == JsonElementValueType.array) {
       // 解析List， 即多条记录

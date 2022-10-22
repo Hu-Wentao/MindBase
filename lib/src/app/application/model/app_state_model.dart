@@ -3,13 +3,13 @@ part of 'model.dart';
 @freezed
 class AppAct with _$AppAct {
   const factory AppAct.signupLogin({
-    required AuthVerify authVerify,
+    required AuthTp authVerify,
     required String identityStr,
     required Password password,
   }) = AppActSignupLogin;
 
   const factory AppAct.login({
-    required AuthVerify authVerify,
+    required AuthTp authVerify,
     required String identityStr,
     required Password password,
   }) = AppActLogin;
@@ -40,11 +40,11 @@ class AppEvt with _$AppEvt {
   const factory AppEvt.recoverDone(String? errMsg) = AppEvtRecoverDone;
 }
 
-class AppStateModel extends BaseActEntranceModel<AppAct, AppState>
+class AppModel extends BaseActEntranceModel<AppAct, AppState>
     with EvtEntranceMx<AppEvt> {
   final MindBaseConfig config;
 
-  AppStateModel(this.config, [AppState state = const AppState.init()])
+  AppModel(this.config, [AppState state = const AppState.init()])
       : super(state: state, onCatch: ExceptionAdapter.of);
 
   @override
@@ -64,7 +64,7 @@ class AppStateModel extends BaseActEntranceModel<AppAct, AppState>
 
   /// 注册+登陆
   signupLogin(
-    AuthVerify authVerify,
+    AuthTp authVerify,
     String identityStr,
     Password password,
   ) async {
@@ -75,7 +75,7 @@ class AppStateModel extends BaseActEntranceModel<AppAct, AppState>
 
   /// 登陆
   login(
-    AuthVerify authVerify,
+    AuthTp authVerify,
     String identityStr,
     Password password, {
     aw.User? user,
@@ -113,7 +113,7 @@ class AppStateModel extends BaseActEntranceModel<AppAct, AppState>
   }
 }
 
-extension AppAccountX on AppStateModel {
+extension AppAccountX on AppModel {
   AccountService get _accountSrv => sl<AccountService>();
 
   _logout(String? sessionId) async => await _accountSrv.logout(sessionId);
@@ -142,42 +142,42 @@ extension AppAccountX on AppStateModel {
   }
 
   Future<aw.User> _onSignup(
-      AuthVerify authVerify, String identityStr, Password password) async {
+      AuthTp authVerify, String identityStr, Password password) async {
     switch (authVerify) {
-      case AuthVerify.email:
+      case AuthTp.email:
         return await _accountSrv.signup(
           name: identityStr,
           email: identityStr,
           password: password.v,
         );
-      case AuthVerify.phoneNumber:
-      case AuthVerify.wechatOfficial:
-      case AuthVerify.qqConnect:
-      case AuthVerify.qqNumber:
-      case AuthVerify.github:
+      case AuthTp.phoneNumber:
+      case AuthTp.wechatOfficial:
+      case AuthTp.qqConnect:
+      case AuthTp.qqNumber:
+      case AuthTp.github:
         throw FeatDeveloping('注册方式[$authVerify]尚未实现');
     }
   }
 
   // 登录,得到token
   Future<aw.Session> _onLogin(
-    AuthVerify authVerify,
+    AuthTp authVerify,
     String identityStr,
     Password password,
   ) async {
     aw.Session nSession;
     switch (authVerify) {
-      case AuthVerify.email:
+      case AuthTp.email:
         nSession = await _accountSrv.login(
           email: identityStr,
           password: password.v,
         );
         break;
-      case AuthVerify.phoneNumber:
-      case AuthVerify.wechatOfficial:
-      case AuthVerify.qqConnect:
-      case AuthVerify.qqNumber:
-      case AuthVerify.github:
+      case AuthTp.phoneNumber:
+      case AuthTp.wechatOfficial:
+      case AuthTp.qqConnect:
+      case AuthTp.qqNumber:
+      case AuthTp.github:
         throw BaseException('尚未支持的登录方式[$authVerify]');
     }
     return nSession;
@@ -185,7 +185,7 @@ extension AppAccountX on AppStateModel {
 }
 
 @Deprecated('')
-extension AppStateModelBizX on AppStateModel {
+extension AppStateModelBizX on AppModel {
   /// 自动登陆 (确保当前状态为 logged)
   /// 恢复登陆状态或以匿名身份登陆
   @Deprecated("recover")

@@ -32,7 +32,7 @@ part 'router.dart';
 
 part 'home.g.dart';
 
-enum ScreenType {
+enum ScreenTp {
   workspaces,
   teams,
   discover,
@@ -40,9 +40,9 @@ enum ScreenType {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key, this.screenType = ScreenType.workspaces})
+  const HomePage({Key? key, this.screenType = ScreenTp.workspaces})
       : super(key: key);
-  final ScreenType screenType;
+  final ScreenTp screenType;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -86,7 +86,7 @@ class _HomePageState extends State<HomePage>
         selectedIndex: activeIdx,
         destinations: _destinations,
         onDestinationSelected: (i) =>
-            HomeRoute(ScreenType.values[i]).go(context),
+            HomeRoute(ScreenTp.values[i]).go(context),
         // drawerHeader: _buildDrawerHeader(context),
         // navigationTypeResolver: (ctx) {
         //   if (MediaQuery.of(context).size.width > 600) {

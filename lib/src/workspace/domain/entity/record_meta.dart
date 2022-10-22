@@ -1,7 +1,7 @@
 // part of '../aggregate/aggregate.dart';
 //
 // /// Meta信息
-// /// 必须通过DTO转换 [RecordMetaDto]
+// /// 必须通过DTO转换 [MetaDto]
 // class RecordMeta implements IEtt<String> {
 //   @override
 //   final String id;

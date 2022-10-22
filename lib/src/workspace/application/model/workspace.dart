@@ -5,14 +5,14 @@ class SpaceAct with _$SpaceAct {
   /// 初始化：更新collection/metas,并watch metas变更
   const factory SpaceAct.initModel() = SpaceActInitModel;
 
-  const factory SpaceAct.updateModel(WorkspaceDto data) = SpaceActUpdateModel;
+  const factory SpaceAct.updateModel(SpaceDto data) = SpaceActUpdateModel;
 
   ///
   const factory SpaceAct.updateTableDetail(CollectionDto data) =
       SpaceActUpdateTableDetail;
 
   ///
-  const factory SpaceAct.insertMeta(RecordMetaDto data) = SpaceActInsertMeta;
+  const factory SpaceAct.insertMeta(MetaDto data) = SpaceActInsertMeta;
 
   const factory SpaceAct.deleteMeta(String metaId) = SpaceActDeleteMeta;
 
@@ -30,7 +30,7 @@ class SpaceState with _$SpaceState {
 }
 
 class SpaceModel extends BaseActEntranceModel<SpaceAct, SpaceState> {
-  WorkspaceDto data;
+  SpaceDto data;
 
   SpaceModel(this.data, {super.state = const SpaceState.init()});
 
@@ -83,7 +83,7 @@ class SpaceModel extends BaseActEntranceModel<SpaceAct, SpaceState> {
         updateByTable: updateByTable,
       );
 
-  MetaModel _addNewMetaModel(RecordMetaDto data) {
+  MetaModel _addNewMetaModel(MetaDto data) {
     final m = MetaModel(data, this)
       // 添加的同时初始化
       ..actInitSubscription();
@@ -145,13 +145,13 @@ extension SpaceModelX on SpaceModel {
     );
   }
 
-  updateModel(WorkspaceDto data) async {
+  updateModel(SpaceDto data) async {
     this.data = data;
     setState(state, '更新data');
   }
 
   @protected
-  insertMeta(RecordMetaDto meta) async {
+  insertMeta(MetaDto meta) async {
     await _metaService.insertMetaDto(meta);
     // 通过listen监听刷新
   }
@@ -173,10 +173,10 @@ extension SpaceModelX on SpaceModel {
 
   MetaService get _metaService => MetaService.withDI(sl, id)!;
 
-  WorkspaceService get _workspaceSrv => sl<WorkspaceService>();
+  SpaceService get _workspaceSrv => sl<SpaceService>();
 
   @Deprecated('updateModel')
-  Future<BaseException?> updateData(WorkspaceDto data) async =>
+  Future<BaseException?> updateData(SpaceDto data) async =>
       actEntrance(SpaceAct.updateModel(data));
 
   @Deprecated('initModel')
@@ -186,7 +186,7 @@ extension SpaceModelX on SpaceModel {
   /// 注意,[actInsertMetaDto]与[actUpdateMeta]不能混用, Insert必须使用Meta,而不是Dto
   /// 本地数据由stream事件触发更新
   @Deprecated('insertMeta')
-  Future<BaseException?> actInsertMetaDto(RecordMetaDto meta) async =>
+  Future<BaseException?> actInsertMetaDto(MetaDto meta) async =>
       actEntrance(SpaceAct.insertMeta(meta));
 
   /// 同时更新Meta与数据
@@ -235,9 +235,9 @@ extension SpaceStateChangeX on SpaceModel {
     return i;
   }
 
-  MetaModel onMetaAdd(RecordMetaDto meta) => _addNewMetaModel(meta);
+  MetaModel onMetaAdd(MetaDto meta) => _addNewMetaModel(meta);
 
-  RecordMetaDto onMetaUpdate(RecordMetaDto meta) {
+  MetaDto onMetaUpdate(MetaDto meta) {
     __indexByMetas(
       meta.id,
       onFind: (i, m) => m.updateData(meta),
@@ -262,7 +262,7 @@ extension SpaceStateChangeX on SpaceModel {
   }
 
   /// 数据同步 ===================================================================
-  Future<void> onWatchMetaEvt(AccessorEvt<RecordMetaDto> event) async {
+  Future<void> onWatchMetaEvt(AccessorEvt<MetaDto> event) async {
     log("debug 工作空间#onWatchMetaEvt: $event");
     switch (event.type) {
       case AccessorEvtTp.insert:
@@ -279,7 +279,7 @@ extension SpaceStateChangeX on SpaceModel {
     notifyListeners();
   }
 
-  Stream<RecordMetaDto> _fetchAllMetas() => _metaAcc.findAll();
+  Stream<MetaDto> _fetchAllMetas() => _metaAcc.findAll();
 // .listen((e) {
 //   onMetaAdd(e);
 //   notifyListeners();

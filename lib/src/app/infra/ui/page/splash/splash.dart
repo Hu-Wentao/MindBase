@@ -18,7 +18,7 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage>
-    with OnInitStateMx<SplashPage, AppStateModel> {
+    with OnInitStateMx<SplashPage, AppModel> {
   bool recovering = false;
 
   @override
@@ -42,7 +42,7 @@ class _SplashPageState extends State<SplashPage>
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        body: Consumer<AppStateModel>(
+        body: Consumer<AppModel>(
           builder: (c, m, _) => m.state.when(
             init: init,
             logged: logged,

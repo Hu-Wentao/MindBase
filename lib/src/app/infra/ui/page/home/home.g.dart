@@ -16,18 +16,18 @@ GoRoute get $homeRoute => GoRouteData.$route(
       routes: [
         GoRouteData.$route(
           path: 'team/:teamId/space/:spaceId/meta/:metaId/view/:viewId',
-          factory: $WorkspaceRouteExtension._fromState,
+          factory: $SpaceRouteExtension._fromState,
         ),
       ],
     );
 
 extension $HomeRouteExtension on HomeRoute {
   static HomeRoute _fromState(GoRouterState state) => HomeRoute(
-        _$ScreenTypeEnumMap._$fromName(state.params['screen']!),
+        _$ScreenTpEnumMap._$fromName(state.params['screen']!),
       );
 
   String get location => GoRouteData.$location(
-        '/home/${Uri.encodeComponent(_$ScreenTypeEnumMap[screen]!)}',
+        '/home/${Uri.encodeComponent(_$ScreenTpEnumMap[screen]!)}',
       );
 
   void go(BuildContext context) => context.go(location, extra: this);
@@ -35,9 +35,9 @@ extension $HomeRouteExtension on HomeRoute {
   void push(BuildContext context) => context.push(location, extra: this);
 }
 
-extension $WorkspaceRouteExtension on WorkspaceRoute {
-  static WorkspaceRoute _fromState(GoRouterState state) => WorkspaceRoute(
-        _$ScreenTypeEnumMap._$fromName(state.params['screen']!),
+extension $SpaceRouteExtension on SpaceRoute {
+  static SpaceRoute _fromState(GoRouterState state) => SpaceRoute(
+        _$ScreenTpEnumMap._$fromName(state.params['screen']!),
         state.params['teamId']!,
         state.params['spaceId']!,
         state.params['metaId']!,
@@ -45,7 +45,7 @@ extension $WorkspaceRouteExtension on WorkspaceRoute {
       );
 
   String get location => GoRouteData.$location(
-        '/home/${Uri.encodeComponent(_$ScreenTypeEnumMap[screen]!)}/team/${Uri.encodeComponent(teamId)}/space/${Uri.encodeComponent(spaceId)}/meta/${Uri.encodeComponent(metaId)}/view/${Uri.encodeComponent(viewId.toString())}',
+        '/home/${Uri.encodeComponent(_$ScreenTpEnumMap[screen]!)}/team/${Uri.encodeComponent(teamId)}/space/${Uri.encodeComponent(spaceId)}/meta/${Uri.encodeComponent(metaId)}/view/${Uri.encodeComponent(viewId.toString())}',
       );
 
   void go(BuildContext context) => context.go(location, extra: this);
@@ -53,11 +53,11 @@ extension $WorkspaceRouteExtension on WorkspaceRoute {
   void push(BuildContext context) => context.push(location, extra: this);
 }
 
-const _$ScreenTypeEnumMap = {
-  ScreenType.workspaces: 'workspaces',
-  ScreenType.teams: 'teams',
-  ScreenType.discover: 'discover',
-  ScreenType.settings: 'settings',
+const _$ScreenTpEnumMap = {
+  ScreenTp.workspaces: 'workspaces',
+  ScreenTp.teams: 'teams',
+  ScreenTp.discover: 'discover',
+  ScreenTp.settings: 'settings',
 };
 
 extension<T extends Enum> on Map<T, String> {

@@ -19,8 +19,8 @@ extension RecordDtoJsonX on RecordDto {
       (key, value) => MapEntry("$key", ValueDto.fromDomain(value).toJson()));
 }
 
-extension RecordMetaDtoJsonX on RecordMetaDto {
-  static RecordMetaDto fromJson(Map<String, dynamic> json) => RecordMetaDto(
+extension MetaDtoJsonX on MetaDto {
+  static MetaDto fromJson(Map<String, dynamic> json) => MetaDto(
         id: (json['id'] as String),
         name: json['name'] as String,
         memo: json['memo'] as String,
@@ -141,8 +141,8 @@ extension ValueJsonDtoJsonX on ValueJsonDto {
       };
 }
 
-extension WorkspaceDtoJsonX on WorkspaceDto {
-  static WorkspaceDto fromJson(Map<String, dynamic> json) => WorkspaceDto(
+extension WorkspaceDtoJsonX on SpaceDto {
+  static SpaceDto fromJson(Map<String, dynamic> json) => SpaceDto(
         id: json['id'] as String,
         name: json['name'] as String,
         metas:

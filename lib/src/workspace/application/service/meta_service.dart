@@ -5,7 +5,7 @@ import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 
 /// 有状态服务, 不能依赖注入
-@Deprecated("合并到WorkspaceService中")
+@Deprecated("合并到SpaceService中")
 class MetaService {
   final Databases _db;
   final MetaDtoRepo _metaDtoRepo;
@@ -16,7 +16,7 @@ class MetaService {
     return MetaService(MetaDtoRepo.withDI(sl, workspaceId), sl<Databases>());
   }
 
-  Future insertMetaDto(RecordMetaDto metaDto) {
+  Future insertMetaDto(MetaDto metaDto) {
     return _metaDtoRepo.insertDto(metaDto);
   }
 
@@ -35,20 +35,20 @@ class MetaService {
     return _metaDtoRepo.findById(metaId);
   }
 
-  updateWithRecordCollection(RecordMetaDto origin, RecordMetaDto dto) {
+  updateWithRecordCollection(MetaDto origin, MetaDto dto) {
     return _metaDtoRepo.updateWithRecordCollection(origin, dto);
   }
 
-  updateAttribute(RecordMetaDto origin, AttributeDto dto) {
+  updateAttribute(MetaDto origin, AttributeDto dto) {
     return _metaDtoRepo.updateAttribute(origin, dto);
   }
 
   /// view index==-1表示新增
-  updateTableView(RecordMetaDto origin, TableView view) {
+  updateTableView(MetaDto origin, TableView view) {
     return _metaDtoRepo.updateTableView(origin, view);
   }
 
-  deleteTableView(RecordMetaDto dto, int vId) {
+  deleteTableView(MetaDto dto, int vId) {
     return _metaDtoRepo.deleteTableView(dto,vId);
   }
 }

@@ -3,7 +3,7 @@ part of 'value.dart';
 /// 认证请求
 class AuthReq {
   final bool isRegister;
-  final AuthVerify authVerify;
+  final AuthTp authVerify;
   final String identityStr;
   final Password password;
 
@@ -25,7 +25,7 @@ class AuthRsp {
   String? get msg => err?.msg;
 }
 
-enum AuthVerify {
+enum AuthTp {
   email, // 绑定邮箱
   phoneNumber, // 绑定手机
   wechatOfficial, // 关注公众号

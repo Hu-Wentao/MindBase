@@ -33,7 +33,7 @@ Future<AuthReq?> showAuthDialog({
 
 class Body extends StatefulWidget {
   // 登录按钮及其排序(首个元素即为首选登录项)
-  final List<AuthVerify> authList;
+  final List<AuthTp> authList;
   final bool initIsRegister;
   final AuthReq? originReq;
   final AuthRsp? rsp;
@@ -42,7 +42,7 @@ class Body extends StatefulWidget {
     Key? key,
     this.initIsRegister = false,
     this.authList = const [
-      AuthVerify.email,
+      AuthTp.email,
     ],
     this.originReq,
     this.rsp,
@@ -54,7 +54,7 @@ class Body extends StatefulWidget {
 
 class _BodyState extends State<Body> {
   late GlobalKey<FormState> _formKey;
-  late AuthVerify authVerify; // identity 当前的含义
+  late AuthTp authVerify; // identity 当前的含义
   late String identityStr; //authVerify的值 可以是email, QQ号, 或者其他
 
   late String pwd;
@@ -74,54 +74,54 @@ class _BodyState extends State<Body> {
 
   String get describeAuthVerify {
     switch (authVerify) {
-      case AuthVerify.email:
+      case AuthTp.email:
         return "邮箱";
-      case AuthVerify.phoneNumber:
+      case AuthTp.phoneNumber:
         return "手机号";
-      case AuthVerify.wechatOfficial:
+      case AuthTp.wechatOfficial:
         return "微信公众号";
-      case AuthVerify.qqConnect:
+      case AuthTp.qqConnect:
         return "QQ登录";
-      case AuthVerify.qqNumber:
+      case AuthTp.qqNumber:
         return "QQ号";
-      case AuthVerify.github:
+      case AuthTp.github:
         return 'GitHub';
     }
   }
 
-  IconData _getAuthVerifyIcon(AuthVerify authVerify) {
+  IconData _getAuthVerifyIcon(AuthTp authVerify) {
     switch (authVerify) {
-      case AuthVerify.qqNumber:
+      case AuthTp.qqNumber:
         return LineIcons.qq;
-      case AuthVerify.email:
+      case AuthTp.email:
         return LineIcons.envelope;
-      case AuthVerify.phoneNumber:
+      case AuthTp.phoneNumber:
         return LineIcons.phone;
-      case AuthVerify.qqConnect:
+      case AuthTp.qqConnect:
         return LineIcons.qq;
-      case AuthVerify.wechatOfficial:
+      case AuthTp.wechatOfficial:
         return LineIcons.weixinWechat;
-      case AuthVerify.github:
+      case AuthTp.github:
         return LineIcons.github;
     }
   }
 
   String? authVerifyValidator(String? v) {
     switch (authVerify) {
-      case AuthVerify.email:
+      case AuthTp.email:
         return Email.validator(v);
-      case AuthVerify.phoneNumber:
+      case AuthTp.phoneNumber:
         return PhoneNumber.validator(v);
-      case AuthVerify.qqNumber:
+      case AuthTp.qqNumber:
         return QQNumber.validator(v);
-      case AuthVerify.qqConnect:
-      case AuthVerify.wechatOfficial:
-      case AuthVerify.github:
+      case AuthTp.qqConnect:
+      case AuthTp.wechatOfficial:
+      case AuthTp.github:
         throw BaseException('[$authVerify]无需校验', debugInfo: '逻辑错误');
     }
   }
 
-  switchAuthVerify(AuthVerify verify) {
+  switchAuthVerify(AuthTp verify) {
     if (verify != authVerify) {
       setState(() {
         authVerify = verify;
@@ -192,7 +192,7 @@ class _BodyState extends State<Body> {
     );
   }
 
-  List<Widget> _buildAuthOptionsRow(List<AuthVerify> authList) => [
+  List<Widget> _buildAuthOptionsRow(List<AuthTp> authList) => [
         const OrDivider(),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -207,8 +207,8 @@ class _BodyState extends State<Body> {
 
   List<Widget> _buildInputField(BuildContext ctx) {
     switch (authVerify) {
-      case AuthVerify.email:
-      case AuthVerify.phoneNumber:
+      case AuthTp.email:
+      case AuthTp.phoneNumber:
         return [
           RoundedInputField(
             hintText: describeAuthVerify,
@@ -234,13 +234,13 @@ class _BodyState extends State<Body> {
             color: Theme.of(context).primaryColor,
           )
         ];
-      case AuthVerify.qqNumber:
+      case AuthTp.qqNumber:
         return [const Text("尚未支持QQ号 注册/登录")];
-      case AuthVerify.wechatOfficial:
+      case AuthTp.wechatOfficial:
         return [const Text("尚未支持公众号 注册/登录")];
-      case AuthVerify.qqConnect:
+      case AuthTp.qqConnect:
         return [const Text("尚未支持QQ 注册/登录")];
-      case AuthVerify.github:
+      case AuthTp.github:
         return [const Text("尚未支持GitHub 注册/登录")];
     }
   }

@@ -6,8 +6,8 @@ import 'package:mind_base/src/workspace/infra/dto/dto_aw_impl.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 
 main() {
-  test('test RecordMetaDto', () {
-    final meta = RecordMetaDto(
+  test('test MetaDto', () {
+    final meta = MetaDto(
         id: 'asdf',
         name: 'name',
         memo: 'memo',
@@ -23,13 +23,13 @@ main() {
         methods: [
           // MethodDto(k: 1, name: 'name', memo: 'memo', ),
         ]);
-    final metaJson = RecordMetaDtoAppwriteX(meta).toJson();
+    final metaJson = MetaDtoAppwriteX(meta).toJson();
     print("metaJson = $metaJson");
     // print("metaJson.attrs = ${metaJson['attrs'].runtimeType}");
 
-    final meta2 = RecordMetaDtoAppwriteX.fromJson(metaJson);
+    final meta2 = MetaDtoAppwriteX.fromJson(metaJson);
     print("meta2 = $meta2");
-    final meta2json = RecordMetaDtoAppwriteX(meta2).toJson();
+    final meta2json = MetaDtoAppwriteX(meta2).toJson();
     print("meta2json = $meta2json");
     expect(meta2json, metaJson);
   });

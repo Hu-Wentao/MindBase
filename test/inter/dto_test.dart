@@ -87,9 +87,9 @@
 //     );
 //     print("dto: $dto");
 //   });
-//   test("RecordMetaDto json", () {
+//   test("MetaDto json", () {
 //     // todo test
-//     final dto = RecordMetaDto.builder(
+//     final dto = MetaDto.builder(
 //       // id: ('62275a65418db3d74941d6b3'),
 //       id: "62275a65418db3d74941d6b3",
 //       // metaId: ('62275a65418db3d74941d6b4'),
@@ -125,10 +125,10 @@
 //     });
 //   });
 //
-//   group("RecordMetaDto Group", () {
+//   group("MetaDto Group", () {
 //     final list = [
-//       RecordMetaDto.builder(),
-//       RecordMetaDto.builder(methods: [
+//       MetaDto.builder(),
+//       MetaDto.builder(methods: [
 //         MethodDto.builder(
 //             expr: ExprJsonDto(
 //           fn: "add",
@@ -141,10 +141,10 @@
 //       ]),
 //     ];
 //     for (var dto in list) {
-//       test("RecordMetaDto json", () {
+//       test("MetaDto json", () {
 //         final js = dto.toJson();
 //         print("dto: $js");
-//         final dto2 = RecordMetaDto.fromJson(js);
+//         final dto2 = MetaDto.fromJson(js);
 //         // print("dto2: ${dto2.toJson()}");
 //         expect(dto, dto2);
 //       });

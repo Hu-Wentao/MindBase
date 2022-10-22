@@ -91,8 +91,8 @@ class RecordDto extends IEntityDto {
 }
 
 extension RecordMetaX on MetaModel {
-  RecordMetaDto toDto() => data;
-// RecordMetaDto.fromDomain(this);
+  MetaDto toDto() => data;
+// MetaDto.fromDomain(this);
 }
 
 /// 权限类型
@@ -230,7 +230,7 @@ class CollectionDto extends IDto {
 
 ///
 /// [attrs]固定 0:表示Record的ID
-class RecordMetaDto extends IEntityDto {
+class MetaDto extends IEntityDto {
   @override
   String id;
   String name;
@@ -240,7 +240,7 @@ class RecordMetaDto extends IEntityDto {
   List<MethodDto> methods;
   List<TableView> views;
 
-  RecordMetaDto({
+  MetaDto({
     required this.id,
     required this.name,
     required this.memo,
@@ -268,7 +268,7 @@ class RecordMetaDto extends IEntityDto {
   int nextKey() => maxKey += 1;
 
   // 用于给Form提供初始值
-  factory RecordMetaDto.builder({
+  factory MetaDto.builder({
     String? id,
     String name = "",
     String memo = "",
@@ -292,7 +292,7 @@ class RecordMetaDto extends IEntityDto {
             // expr: Expression.field(metaId, 1, AttrType.objectId),
           ),
         ];
-    return RecordMetaDto(
+    return MetaDto(
       id: metaId,
       name: name,
       memo: memo,
@@ -304,13 +304,13 @@ class RecordMetaDto extends IEntityDto {
   }
 
   // 从Form中获取的Map
-  RecordMetaDto build(
+  MetaDto build(
     Map<String, String> map,
     List<AttributeDto> attributes,
     List<MethodDto> methods,
     List<TableView>? views,
   ) =>
-      RecordMetaDto(
+      MetaDto(
         id: (map['id']!),
         name: map['name']!,
         memo: map['memo']!,
@@ -320,12 +320,12 @@ class RecordMetaDto extends IEntityDto {
         views: views,
       );
 
-  factory RecordMetaDto.fromForm(
+  factory MetaDto.fromForm(
     Map<String, dynamic> map,
     List<AttributeDto> attrs,
     List<MethodDto> methods,
   ) =>
-      RecordMetaDto(
+      MetaDto(
         // form中是'id', 而不是'_id'
         id: (map['id'] as String),
         name: map['name'] as String,
@@ -342,10 +342,10 @@ class RecordMetaDto extends IEntityDto {
 
   @override
   String toString() {
-    return 'RecordMetaDto{id: $id, name: $name, memo: $memo, maxKey: $maxKey, attrs: $attrs, methods: $methods, views: $views}';
+    return 'MetaDto{id: $id, name: $name, memo: $memo, maxKey: $maxKey, attrs: $attrs, methods: $methods, views: $views}';
   }
 
-  RecordMetaDto updateView(TableView view) {
+  MetaDto updateView(TableView view) {
     // 保留meta中存在的props (view中有,但meta中已被移除的列Info 将被删除)
     view.cols.retainWhere((ele) =>
         attrs.any((at) => at.propId == ele.propId) ||
@@ -542,7 +542,7 @@ class AttributeDto extends PropertyDto {
       throw UnimplementedError("使用[$runtimeType]相关Extension的方法");
 }
 
-class WorkspaceDto extends IEntityDto {
+class SpaceDto extends IEntityDto {
   @override
   String id;
   String name;
@@ -550,14 +550,14 @@ class WorkspaceDto extends IEntityDto {
   @Deprecated("meta列表不存在这里，而是通过查询得到，考虑改为关联meta的数量")
   List<String> metas;
 
-  WorkspaceDto({
+  SpaceDto({
     required this.id,
     required this.teamId,
     required this.name,
     required this.metas,
   });
 
-  WorkspaceDto.builder({
+  SpaceDto.builder({
     this.id = '',
     this.teamId = '',
     this.name = '',

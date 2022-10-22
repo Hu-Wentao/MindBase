@@ -5,7 +5,7 @@ class WorkspacesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Consumer<UserModel>(
-      builder: (c, mUser, _) => MdMainColumn(
+      builder: (c, mUser, _) => MainColumn(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               /// Header
@@ -101,7 +101,7 @@ class _TeamPanelState extends State<TeamPanel> {
 
 class WorkspaceTile extends StatelessWidget {
   final TeamModel team;
-  final WorkspaceDto space;
+  final SpaceDto space;
 
   const WorkspaceTile({Key? key, required this.space, required this.team})
       : super(key: key);
@@ -109,7 +109,7 @@ class WorkspaceTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Link(
         uri: Uri.tryParse(
-            WorkspaceRoute.auto(teamId: team.id, spaceId: space.id).location),
+            SpaceRoute.auto(teamId: team.id, spaceId: space.id).location),
         builder: (ctx, followLink) => ListTile(
           leading: const Icon(Icons.space_dashboard_rounded),
           title: Text(space.name),
@@ -219,7 +219,7 @@ class TeamTile extends StatelessWidget {
               break;
             case "create_space":
               await team.actCreateWorkspace('新建空间', onCreated: (w) {
-                WorkspaceRoute.auto(teamId: team.id, spaceId: w.id).go(context);
+                SpaceRoute.auto(teamId: team.id, spaceId: w.id).go(context);
               }).thenDialog(context);
               break;
             case "delete":

@@ -63,7 +63,7 @@ _i1.GetIt $initGetIt(_i1.GetIt get,
   gh.lazySingleton<_i3.Teams>(() => appServerConfig.teams);
   gh.lazySingleton<_i4.Teams>(() => appClientConfig.teams);
   gh.lazySingleton<_i12.WorkspaceEttAccessor>(() => appClientConfig.wsEttAcc);
-  gh.lazySingleton<_i13.WorkspaceService>(() => _i13.WorkspaceService(
+  gh.lazySingleton<_i13.SpaceService>(() => _i13.SpaceService(
       get<_i4.Databases>(), get<_i12.WorkspaceEttAccessor>()));
   gh.lazySingleton<_i6.TeamService>(
       () => _i6.TeamService(get<_i4.Teams>(), get<_i3.Teams>()));

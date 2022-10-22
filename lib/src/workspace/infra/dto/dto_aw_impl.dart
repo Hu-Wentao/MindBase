@@ -152,7 +152,7 @@ extension RecordDtoAppwriteX on RecordDto {
       ));
 }
 
-extension RecordMetaDtoAppwriteX on RecordMetaDto {
+extension MetaDtoAppwriteX on MetaDto {
   toJson() => {
         // 'id': id, // 存储时已擦除`id`,该值应当为空
         'name': name,
@@ -168,14 +168,14 @@ extension RecordMetaDtoAppwriteX on RecordMetaDto {
             views.map((e) => TableViewAppwriteX(e).toJson()).toList()),
       };
 
-  static RecordMetaDto fromDocument(Document doc) => fromJson(doc.toFullJson());
+  static MetaDto fromDocument(Document doc) => fromJson(doc.toFullJson());
 
-  static RecordMetaDto fromJson(Map<String, dynamic> json) {
+  static MetaDto fromJson(Map<String, dynamic> json) {
     if (json['views'] != null) {
       final a = json['attrs'] as String? ?? '';
       final m = json['methods'] as String? ?? '';
       final v = json['views'] as String? ?? '';
-      return RecordMetaDto(
+      return MetaDto(
         id: (json['id'] as String?) ?? '请注入id或使用toFullJson',
         name: json['name'] as String,
         memo: json['memo'] as String? ?? '',
@@ -205,10 +205,10 @@ extension RecordMetaDtoAppwriteX on RecordMetaDto {
   }
 
   // 兼容 1.0.0版本，（实际上是兼容1.1之前的版本）
-  static RecordMetaDto _fromJson_1_0_0(Map<String, dynamic> json) {
+  static MetaDto _fromJson_1_0_0(Map<String, dynamic> json) {
     final a = json['attrs'] as String? ?? '';
     final m = json['methods'] as String? ?? '';
-    return RecordMetaDto(
+    return MetaDto(
       id: (json['id'] as String?) ?? '请注入id或使用toFullJson',
       name: json['name'] as String,
       memo: json['memo'] as String? ?? '',
@@ -327,7 +327,7 @@ extension AttributeDtoAppwriteX on AttributeDto {
       );
 }
 
-extension WorkspaceDtoAppwriteX on WorkspaceDto {
+extension WorkspaceDtoAppwriteX on SpaceDto {
   Map<String, dynamic> toJson() => {
         // 'id': id, // 没有id属性
         'teamId': teamId,
@@ -335,7 +335,7 @@ extension WorkspaceDtoAppwriteX on WorkspaceDto {
         'metas': jsonEncode(metas),
       };
 
-  static WorkspaceDto fromJson(Map<String, dynamic> json) => WorkspaceDto(
+  static SpaceDto fromJson(Map<String, dynamic> json) => SpaceDto(
         // 因为Appwrite.data 没有id属性, 不过新增 `toFullJson`方法,再次注入了id属性
         id: (json['id'] as String?) ?? '请注入ID或使用toFullJson',
         name: json['name'] as String,

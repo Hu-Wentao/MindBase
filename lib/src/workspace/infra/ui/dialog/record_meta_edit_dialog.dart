@@ -6,9 +6,9 @@ import 'package:mind_base/src/workspace/infra/ui/form/meta_form.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 import 'package:ndialog/ndialog.dart';
 
-Future<RecordMetaDto?> showRecordMetaEditDialog({
+Future<MetaDto?> showRecordMetaEditDialog({
   required BuildContext context,
-  RecordMetaDto? originMeta,
+  MetaDto? originMeta,
   required GlobalKey<FormBuilderState> kMetaBuilder,
   required GlobalKey<FormBuilderState> kAttrBuilder,
   required GlobalKey<FormBuilderState> kMethodBuilder,
@@ -28,7 +28,7 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
         kMetaBuilder: kMetaBuilder,
         kAttrBuilder: kAttrBuilder,
         kMethodBuilder: kMethodBuilder,
-        origin: originMeta ?? RecordMetaDto.builder(),
+        origin: originMeta ?? MetaDto.builder(),
       ),
       actions: <Widget>[
         TextButton(
@@ -49,7 +49,7 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
                   queryMetaFn: queryMetaFn,
                 );
                 // 仅用于修复 #490, 后续需要根据 表单视图 适配;
-                RecordMetaDto? r;
+                MetaDto? r;
                 if (originMeta != null && dto != null) {
                   r = originMeta
                     ..name = dto.name
@@ -61,7 +61,7 @@ Future<RecordMetaDto?> showRecordMetaEditDialog({
                 } else {
                   r = dto;
                 }
-                Navigator.pop<RecordMetaDto>(context, r);
+                Navigator.pop<MetaDto>(context, r);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("请检查表单")),

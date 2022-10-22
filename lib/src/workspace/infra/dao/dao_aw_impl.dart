@@ -196,8 +196,8 @@ mixin AppwriteAccessorWatchableMx<T extends IEntityDto>
 }
 
 /// 根据 Meta-v3.1C 实现
-class WorkspaceEttAccessor extends BaseAppwriteAccessor<WorkspaceDto>
-    with AppwriteAccessorWatchableMx<WorkspaceDto> {
+class WorkspaceEttAccessor extends BaseAppwriteAccessor<SpaceDto>
+    with AppwriteAccessorWatchableMx<SpaceDto> {
   @override
   final RealtimeChannelHub hub;
 
@@ -205,21 +205,21 @@ class WorkspaceEttAccessor extends BaseAppwriteAccessor<WorkspaceDto>
       : super(db, collectionId);
 
   @override
-  WorkspaceDto jsonToDto(Map<String, Object?> js) =>
+  SpaceDto jsonToDto(Map<String, Object?> js) =>
       WorkspaceDtoAppwriteX.fromJson(js);
 
   @override
-  Map<String, dynamic> dtoToJson(WorkspaceDto dto) =>
+  Map<String, dynamic> dtoToJson(SpaceDto dto) =>
       WorkspaceDtoAppwriteX(dto).toJson();
 
-  Stream<WorkspaceDto> findAllByTeam(String teamId) => findAll([
+  Stream<SpaceDto> findAllByTeam(String teamId) => findAll([
         "teamId.equal('$teamId')",
       ]);
 }
 
 /// 即Meta
-class RecordMetaEttAccessor extends BaseAppwriteAccessor<RecordMetaDto>
-    with AppwriteAccessorWatchableMx<RecordMetaDto> {
+class RecordMetaEttAccessor extends BaseAppwriteAccessor<MetaDto>
+    with AppwriteAccessorWatchableMx<MetaDto> {
   const RecordMetaEttAccessor(Databases db, String workspaceId)
       : super(db, workspaceId);
 
@@ -227,16 +227,16 @@ class RecordMetaEttAccessor extends BaseAppwriteAccessor<RecordMetaDto>
   RealtimeChannelHub get hub => sl<RealtimeChannelHub>();
 
   @override
-  RecordMetaDto jsonToDto(Map<String, Object?> mgJson) =>
-      RecordMetaDtoAppwriteX.fromJson(mgJson);
+  MetaDto jsonToDto(Map<String, Object?> mgJson) =>
+      MetaDtoAppwriteX.fromJson(mgJson);
 
-  Stream<RecordMetaDto> findAllBy(String metaName) => findAll([
+  Stream<MetaDto> findAllBy(String metaName) => findAll([
         "name.equal('$metaName')",
       ]);
 
   @override
-  Map<String, dynamic> dtoToJson(RecordMetaDto dto) =>
-      RecordMetaDtoAppwriteX(dto).toJson();
+  Map<String, dynamic> dtoToJson(MetaDto dto) =>
+      MetaDtoAppwriteX(dto).toJson();
 }
 
 class RecordEttAccessor extends BaseAppwriteAccessor<RecordDto>

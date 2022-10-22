@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class MdMainColumn extends StatelessWidget {
+class MainColumn extends StatelessWidget {
   final ScrollController? controller;
   final EdgeInsetsGeometry padding;
   final MainAxisAlignment mainAxisAlignment;
   final CrossAxisAlignment crossAxisAlignment;
   final List<Widget> children;
 
-  const MdMainColumn({
+  const MainColumn({
     Key? key,
     this.controller,
     this.padding = const EdgeInsets.all(8.0),

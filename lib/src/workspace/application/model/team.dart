@@ -31,7 +31,7 @@ class TeamState with _$TeamState {
   const factory TeamState.init() = TeamStateInit;
 
   const factory TeamState.done({
-    required List<WorkspaceModel> workspaces,
+    required List<SpaceModel> workspaces,
     required List<MemberModel> members,
   }) = TeamStateDone;
 }
@@ -54,7 +54,7 @@ class TeamModel extends BaseActEntranceModel<TeamAct, TeamState> {
 
   /// 子状态Model
   @protected
-  List<WorkspaceModel> get workspaces =>
+  List<SpaceModel> get workspaces =>
       state.isOrNull<TeamStateDone>()?.workspaces ?? const [];
 
   @protected
@@ -64,7 +64,7 @@ class TeamModel extends BaseActEntranceModel<TeamAct, TeamState> {
   MemberModel? get teamOwner =>
       members.firstWhereOrNull((mbr) => mbr.roles.contains(Role.owner.value));
 
-  WorkspaceModel? findSpace(spaceId) =>
+  SpaceModel? findSpace(spaceId) =>
       workspaces.firstWhereOrNull((s) => s.id == spaceId);
 
 
@@ -110,13 +110,13 @@ extension TeamSpaceX on TeamModel {
 
   createSpace(String name) async {
     final data = await _workspaceSrv.createWorkspaceDtoBy(id, name);
-    state.isOrNull<TeamStateDone>()?.workspaces.add(WorkspaceModel(data));
+    state.isOrNull<TeamStateDone>()?.workspaces.add(SpaceModel(data));
     setState(state, '新增space[${data.id}]');
   }
 
   updateSpaces() async {
     final dataLs = await _workspaceSrv.queryWorkspaceDto(id);
-    final rst = <WorkspaceModel>[];
+    final rst = <SpaceModel>[];
     // 以新spaceLs为基础，复用老Model
     for (final model in workspaces) {
       final nData = dataLs.removeWhereOrNull((s) => s.id == model.id);
@@ -124,13 +124,13 @@ extension TeamSpaceX on TeamModel {
       rst.add(model..updateData(nData));
     }
     for (var data in dataLs) {
-      rst.add(WorkspaceModel(data));
+      rst.add(SpaceModel(data));
     }
     setState(TeamStateDone(workspaces: rst, members: members),
         '刷新Workspaces[${rst.length}]');
   }
 
-  WorkspaceService get _workspaceSrv => sl<WorkspaceService>();
+  SpaceService get _workspaceSrv => sl<SpaceService>();
 }
 
 extension TeamMemberX on TeamModel {
@@ -160,7 +160,7 @@ extension TeamMemberX on TeamModel {
 extension TeamDeprecatedX on TeamModel {
   @Deprecated('请在SpaceModel中重命名')
   Future<BaseException?> actRenameSpaceName(
-          WorkspaceDto space, String? nName) async =>
+          SpaceDto space, String? nName) async =>
       throw '请在SpaceModel中重命名';
 
   @Deprecated('deleteSpace')
@@ -180,7 +180,7 @@ extension TeamDeprecatedX on TeamModel {
   @Deprecated('createSpace')
   Future<BaseException?> actCreateWorkspace(
     String spaceName, {
-    Function(WorkspaceDto w)? onCreated,
+    Function(SpaceDto w)? onCreated,
   }) =>
       actEntrance(TeamAct.createSpace(spaceName));
 }

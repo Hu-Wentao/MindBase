@@ -45,7 +45,7 @@ class UserInfoTile extends StatelessWidget {
               final req = await showAuthDialog(context: context);
               if (req != null) {
                 await context
-                    .read<AppStateModel>()
+                    .read<AppModel>()
                     .actAuthWithReq(req)
                     .thenDialog(context);
               }

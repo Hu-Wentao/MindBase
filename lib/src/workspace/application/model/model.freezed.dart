@@ -19,9 +19,9 @@ mixin _$SpaceAct {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(WorkspaceDto data) updateModel,
+    required TResult Function(SpaceDto data) updateModel,
     required TResult Function(CollectionDto data) updateTableDetail,
-    required TResult Function(RecordMetaDto data) insertMeta,
+    required TResult Function(MetaDto data) insertMeta,
     required TResult Function(String metaId) deleteMeta,
     required TResult Function(TableDto dto) updateByTable,
   }) =>
@@ -29,9 +29,9 @@ mixin _$SpaceAct {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(SpaceDto data)? updateModel,
     TResult Function(CollectionDto data)? updateTableDetail,
-    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
     TResult Function(TableDto dto)? updateByTable,
   }) =>
@@ -39,9 +39,9 @@ mixin _$SpaceAct {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(SpaceDto data)? updateModel,
     TResult Function(CollectionDto data)? updateTableDetail,
-    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
     TResult Function(TableDto dto)? updateByTable,
     required TResult orElse(),
@@ -138,9 +138,9 @@ class _$SpaceActInitModel implements SpaceActInitModel {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(WorkspaceDto data) updateModel,
+    required TResult Function(SpaceDto data) updateModel,
     required TResult Function(CollectionDto data) updateTableDetail,
-    required TResult Function(RecordMetaDto data) insertMeta,
+    required TResult Function(MetaDto data) insertMeta,
     required TResult Function(String metaId) deleteMeta,
     required TResult Function(TableDto dto) updateByTable,
   }) {
@@ -151,9 +151,9 @@ class _$SpaceActInitModel implements SpaceActInitModel {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(SpaceDto data)? updateModel,
     TResult Function(CollectionDto data)? updateTableDetail,
-    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
     TResult Function(TableDto dto)? updateByTable,
   }) {
@@ -164,9 +164,9 @@ class _$SpaceActInitModel implements SpaceActInitModel {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(SpaceDto data)? updateModel,
     TResult Function(CollectionDto data)? updateTableDetail,
-    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
     TResult Function(TableDto dto)? updateByTable,
     required TResult orElse(),
@@ -231,7 +231,7 @@ abstract class _$$SpaceActUpdateModelCopyWith<$Res> {
   factory _$$SpaceActUpdateModelCopyWith(_$SpaceActUpdateModel value,
           $Res Function(_$SpaceActUpdateModel) then) =
       __$$SpaceActUpdateModelCopyWithImpl<$Res>;
-  $Res call({WorkspaceDto data});
+  $Res call({SpaceDto data});
 }
 
 /// @nodoc
@@ -253,7 +253,7 @@ class __$$SpaceActUpdateModelCopyWithImpl<$Res>
       data == freezed
           ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
-              as WorkspaceDto,
+              as SpaceDto,
     ));
   }
 }
@@ -264,7 +264,7 @@ class _$SpaceActUpdateModel implements SpaceActUpdateModel {
   const _$SpaceActUpdateModel(this.data);
 
   @override
-  final WorkspaceDto data;
+  final SpaceDto data;
 
   @override
   String toString() {
@@ -293,9 +293,9 @@ class _$SpaceActUpdateModel implements SpaceActUpdateModel {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(WorkspaceDto data) updateModel,
+    required TResult Function(SpaceDto data) updateModel,
     required TResult Function(CollectionDto data) updateTableDetail,
-    required TResult Function(RecordMetaDto data) insertMeta,
+    required TResult Function(MetaDto data) insertMeta,
     required TResult Function(String metaId) deleteMeta,
     required TResult Function(TableDto dto) updateByTable,
   }) {
@@ -306,9 +306,9 @@ class _$SpaceActUpdateModel implements SpaceActUpdateModel {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(SpaceDto data)? updateModel,
     TResult Function(CollectionDto data)? updateTableDetail,
-    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
     TResult Function(TableDto dto)? updateByTable,
   }) {
@@ -319,9 +319,9 @@ class _$SpaceActUpdateModel implements SpaceActUpdateModel {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(SpaceDto data)? updateModel,
     TResult Function(CollectionDto data)? updateTableDetail,
-    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
     TResult Function(TableDto dto)? updateByTable,
     required TResult orElse(),
@@ -378,10 +378,10 @@ class _$SpaceActUpdateModel implements SpaceActUpdateModel {
 }
 
 abstract class SpaceActUpdateModel implements SpaceAct {
-  const factory SpaceActUpdateModel(final WorkspaceDto data) =
+  const factory SpaceActUpdateModel(final SpaceDto data) =
       _$SpaceActUpdateModel;
 
-  WorkspaceDto get data;
+  SpaceDto get data;
   @JsonKey(ignore: true)
   _$$SpaceActUpdateModelCopyWith<_$SpaceActUpdateModel> get copyWith =>
       throw _privateConstructorUsedError;
@@ -456,9 +456,9 @@ class _$SpaceActUpdateTableDetail implements SpaceActUpdateTableDetail {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(WorkspaceDto data) updateModel,
+    required TResult Function(SpaceDto data) updateModel,
     required TResult Function(CollectionDto data) updateTableDetail,
-    required TResult Function(RecordMetaDto data) insertMeta,
+    required TResult Function(MetaDto data) insertMeta,
     required TResult Function(String metaId) deleteMeta,
     required TResult Function(TableDto dto) updateByTable,
   }) {
@@ -469,9 +469,9 @@ class _$SpaceActUpdateTableDetail implements SpaceActUpdateTableDetail {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(SpaceDto data)? updateModel,
     TResult Function(CollectionDto data)? updateTableDetail,
-    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
     TResult Function(TableDto dto)? updateByTable,
   }) {
@@ -482,9 +482,9 @@ class _$SpaceActUpdateTableDetail implements SpaceActUpdateTableDetail {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(SpaceDto data)? updateModel,
     TResult Function(CollectionDto data)? updateTableDetail,
-    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
     TResult Function(TableDto dto)? updateByTable,
     required TResult orElse(),
@@ -555,7 +555,7 @@ abstract class _$$SpaceActInsertMetaCopyWith<$Res> {
   factory _$$SpaceActInsertMetaCopyWith(_$SpaceActInsertMeta value,
           $Res Function(_$SpaceActInsertMeta) then) =
       __$$SpaceActInsertMetaCopyWithImpl<$Res>;
-  $Res call({RecordMetaDto data});
+  $Res call({MetaDto data});
 }
 
 /// @nodoc
@@ -577,7 +577,7 @@ class __$$SpaceActInsertMetaCopyWithImpl<$Res>
       data == freezed
           ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
-              as RecordMetaDto,
+              as MetaDto,
     ));
   }
 }
@@ -588,7 +588,7 @@ class _$SpaceActInsertMeta implements SpaceActInsertMeta {
   const _$SpaceActInsertMeta(this.data);
 
   @override
-  final RecordMetaDto data;
+  final MetaDto data;
 
   @override
   String toString() {
@@ -617,9 +617,9 @@ class _$SpaceActInsertMeta implements SpaceActInsertMeta {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(WorkspaceDto data) updateModel,
+    required TResult Function(SpaceDto data) updateModel,
     required TResult Function(CollectionDto data) updateTableDetail,
-    required TResult Function(RecordMetaDto data) insertMeta,
+    required TResult Function(MetaDto data) insertMeta,
     required TResult Function(String metaId) deleteMeta,
     required TResult Function(TableDto dto) updateByTable,
   }) {
@@ -630,9 +630,9 @@ class _$SpaceActInsertMeta implements SpaceActInsertMeta {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(SpaceDto data)? updateModel,
     TResult Function(CollectionDto data)? updateTableDetail,
-    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
     TResult Function(TableDto dto)? updateByTable,
   }) {
@@ -643,9 +643,9 @@ class _$SpaceActInsertMeta implements SpaceActInsertMeta {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(SpaceDto data)? updateModel,
     TResult Function(CollectionDto data)? updateTableDetail,
-    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
     TResult Function(TableDto dto)? updateByTable,
     required TResult orElse(),
@@ -702,10 +702,9 @@ class _$SpaceActInsertMeta implements SpaceActInsertMeta {
 }
 
 abstract class SpaceActInsertMeta implements SpaceAct {
-  const factory SpaceActInsertMeta(final RecordMetaDto data) =
-      _$SpaceActInsertMeta;
+  const factory SpaceActInsertMeta(final MetaDto data) = _$SpaceActInsertMeta;
 
-  RecordMetaDto get data;
+  MetaDto get data;
   @JsonKey(ignore: true)
   _$$SpaceActInsertMetaCopyWith<_$SpaceActInsertMeta> get copyWith =>
       throw _privateConstructorUsedError;
@@ -778,9 +777,9 @@ class _$SpaceActDeleteMeta implements SpaceActDeleteMeta {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(WorkspaceDto data) updateModel,
+    required TResult Function(SpaceDto data) updateModel,
     required TResult Function(CollectionDto data) updateTableDetail,
-    required TResult Function(RecordMetaDto data) insertMeta,
+    required TResult Function(MetaDto data) insertMeta,
     required TResult Function(String metaId) deleteMeta,
     required TResult Function(TableDto dto) updateByTable,
   }) {
@@ -791,9 +790,9 @@ class _$SpaceActDeleteMeta implements SpaceActDeleteMeta {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(SpaceDto data)? updateModel,
     TResult Function(CollectionDto data)? updateTableDetail,
-    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
     TResult Function(TableDto dto)? updateByTable,
   }) {
@@ -804,9 +803,9 @@ class _$SpaceActDeleteMeta implements SpaceActDeleteMeta {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(SpaceDto data)? updateModel,
     TResult Function(CollectionDto data)? updateTableDetail,
-    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
     TResult Function(TableDto dto)? updateByTable,
     required TResult orElse(),
@@ -938,9 +937,9 @@ class _$SpaceActUpdateByTable implements SpaceActUpdateByTable {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(WorkspaceDto data) updateModel,
+    required TResult Function(SpaceDto data) updateModel,
     required TResult Function(CollectionDto data) updateTableDetail,
-    required TResult Function(RecordMetaDto data) insertMeta,
+    required TResult Function(MetaDto data) insertMeta,
     required TResult Function(String metaId) deleteMeta,
     required TResult Function(TableDto dto) updateByTable,
   }) {
@@ -951,9 +950,9 @@ class _$SpaceActUpdateByTable implements SpaceActUpdateByTable {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(SpaceDto data)? updateModel,
     TResult Function(CollectionDto data)? updateTableDetail,
-    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
     TResult Function(TableDto dto)? updateByTable,
   }) {
@@ -964,9 +963,9 @@ class _$SpaceActUpdateByTable implements SpaceActUpdateByTable {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(WorkspaceDto data)? updateModel,
+    TResult Function(SpaceDto data)? updateModel,
     TResult Function(CollectionDto data)? updateTableDetail,
-    TResult Function(RecordMetaDto data)? insertMeta,
+    TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
     TResult Function(TableDto dto)? updateByTable,
     required TResult orElse(),

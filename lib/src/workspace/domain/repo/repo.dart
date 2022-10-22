@@ -30,7 +30,7 @@ class MetaDtoRepo {
 
   /// 插入Meta记录的同时, 创建对应的Record集合;
   /// 解决监听不存在Record集合,在集合被创建后无法收到消息的问题
-  Future insertDto(RecordMetaDto dto) async {
+  Future insertDto(MetaDto dto) async {
     try {
       return await insertMetaDtoWithCreateRecordCollection(dto);
     } on AppwriteException catch (e, s) {
@@ -58,7 +58,7 @@ class MetaDtoRepo {
   /// 更新
   /// 当前只实现对新增字段的添加功能, 删除考虑后面引入视图(隐藏字段)解决
   updateWithRecordCollection(
-      RecordMetaDto originMeta, RecordMetaDto metaDto) async {
+      MetaDto originMeta, MetaDto metaDto) async {
     // 原始MetaAttrList快照
     final originAttrDtoSnap = originMeta.attrs;
     // 1. 先更新meta记录
@@ -77,7 +77,7 @@ class MetaDtoRepo {
 
   /// 更新表属性
   /// [originMetaDto]传null表示直接创建新列(请确保该列尚不存在)
-  Future updateAttribute(RecordMetaDto dto, AttributeDto attr) async {
+  Future updateAttribute(MetaDto dto, AttributeDto attr) async {
     final index = dto.attrs.indexWhere((at) => at.k == attr.k);
     if (index != -1) {
       // k已存在, 更新attr(只涉及Meta)
@@ -93,7 +93,7 @@ class MetaDtoRepo {
   }
 
   // 更新Meta记录
-  _update(RecordMetaDto dto) async {
+  _update(MetaDto dto) async {
     try {
       return await _metaAcc.update(dto);
     } on AppwriteException catch (e) {
@@ -126,7 +126,7 @@ class MetaDtoRepo {
   /// 新增一条Meta记录,同时创建一个新的Record集合(否则会导致Record监听失效)
   ///   如果没有对应的Record集合, 即使realtime配置了相关的监听参数,再Record集合创建之后,数据也不会被接收到
   ///   因此必须要再Meta记录创建的同时,创建对应的Record集合
-  Future insertMetaDtoWithCreateRecordCollection(RecordMetaDto meta) async {
+  Future insertMetaDtoWithCreateRecordCollection(MetaDto meta) async {
     final r = await _metaAcc.insert(meta);
     // 同时创建一个所有人可读写的Record集合
     await RecordDtoRepo.withDtoDI(sl, meta).createRecordCollection(null);
@@ -223,11 +223,11 @@ class MetaDtoRepo {
   deleteBy(String metaId) => _metaAcc.deleteBy(metaId);
 
   /// 更新TableView视图, [view]的index为-1表示新增
-  updateTableView(RecordMetaDto dto, TableView view) async {
+  updateTableView(MetaDto dto, TableView view) async {
     return await _update(dto.updateView(view));
   }
 
-  deleteTableView(RecordMetaDto dto, int vId) async {
+  deleteTableView(MetaDto dto, int vId) async {
     return await _update(
         dto..views.removeWhere((element) => element.vId == vId));
   }
@@ -236,7 +236,7 @@ class MetaDtoRepo {
 class RecordDtoRepo {
   final srv.Databases _serverDb;
 
-  final RecordMetaDto meta;
+  final MetaDto meta;
   final RecordEttAccessor _recordAcc;
 
   RecordEttAccessor get acc => _recordAcc;
@@ -252,7 +252,7 @@ class RecordDtoRepo {
   static RecordDtoRepo withDI(GetIt get, RecordMeta meta) =>
       withDtoDI(get, meta.toDto());
 
-  static RecordDtoRepo withDtoDI(GetIt get, RecordMetaDto meta) =>
+  static RecordDtoRepo withDtoDI(GetIt get, MetaDto meta) =>
       RecordDtoRepo(
         get<srv.Databases>(),
         RecordEttAccessor(get<Databases>(), meta.id),

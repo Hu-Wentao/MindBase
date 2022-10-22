@@ -83,7 +83,7 @@ class _SpaceViewState extends State<SpaceView>
                           metas: mSpace.metas,
                           markedMetaId: widget.markedMetaId,
                           fetchMetaViewLocation: (String metaId, int? viewId) =>
-                              WorkspaceRoute.auto(
+                              SpaceRoute.auto(
                                       teamId: mTeam.id,
                                       spaceId: mSpace.id,
                                       metaId: metaId,
@@ -134,7 +134,7 @@ class _SpaceViewState extends State<SpaceView>
                           if (value.startsWith('selectWorkspaceEvt')) {
                             final spaceId =
                                 value.substring('selectWorkspaceEvt'.length);
-                            WorkspaceRoute.auto(
+                            SpaceRoute.auto(
                               teamId: mTeam.id,
                               spaceId: spaceId,
                             ).go(context);
