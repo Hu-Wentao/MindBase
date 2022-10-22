@@ -1,7 +1,6 @@
 package com.mind.base.functions;
 
 import com.googlecode.aviator.runtime.function.AbstractFunction
-import com.googlecode.aviator.runtime.function.FunctionUtils
 import com.googlecode.aviator.runtime.type.AviatorJavaType
 import com.googlecode.aviator.runtime.type.AviatorNumber
 import com.googlecode.aviator.runtime.type.AviatorObject
@@ -15,10 +14,10 @@ class FieldFunction : AbstractFunction() {
         //db record
         val query = env["record"] as Map<String,Any>
         val dbQuery = query[(arg1 as? AviatorJavaType)?.name]?:throw IllegalArgumentException("no value of arg1")
-        when{
-            dbQuery is Number -> return AviatorNumber.valueOf(dbQuery)
-            dbQuery is String -> return AviatorString(dbQuery)
-            else-> throw IllegalArgumentException("not support type ${dbQuery::class}")
+        return when (dbQuery) {
+            is Number -> AviatorNumber.valueOf(dbQuery)
+            is String -> AviatorString(dbQuery)
+            else -> throw IllegalArgumentException("not support type ${dbQuery::class}")
         }
     }
 
