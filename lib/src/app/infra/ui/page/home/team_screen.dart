@@ -124,33 +124,34 @@ class _TeamScreenState extends State<TeamScreen> {
           onSelected: (key) async {
             switch (key) {
               case "rename":
-                await team.actRenameTeam(
-                  await showTextInputDialog(
-                    context: context,
-                    title: "重命名团队",
-                    origin: team.name,
-                    hint: team.name,
-                  ),
+                final name = await showTextInputDialog(
+                  context: context,
+                  title: "重命名团队",
+                  origin: team.name,
+                  hint: team.name,
                 );
+                if (name == null) return;
+                await team.actEntrance(TeamAct.renameTeam(name));
                 break;
               case "invite":
+                final email = await showTextInputDialog(
+                  context: context,
+                  title: "${team.name} 团队邀请成员",
+                  label: "请输入用户邮箱",
+                  hint: "被邀请人的注册邮箱",
+                );
+                if (email == null) return;
                 await team
-                    .actInviteMember(
-                      await showTextInputDialog(
-                        context: context,
-                        title: "${team.name} 团队邀请成员",
-                        label: "请输入用户邮箱",
-                        hint: "被邀请人的注册邮箱",
-                      ),
-                    )
+                    .actEntrance(TeamAct.inviteMember(email))
                     .thenDialog(c);
                 break;
               case "delete":
                 await showConfirmDialog(
                     context: context,
                     title: "确认删除团队[${team.name}]吗?",
-                    onConfirm: () =>
-                        context.read<UserModel>().actDeleteTeam(team.id));
+                    onConfirm: () => context
+                        .read<UserModel>()
+                        .actEntrance(UserAct.deleteTeam(team.id)));
                 break;
               default:
                 throw "error 未知的 key[$key]";

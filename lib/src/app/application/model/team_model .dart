@@ -158,25 +158,6 @@ extension TeamMemberX on TeamModel {
 }
 
 extension TeamDeprecatedX on TeamModel {
-  @Deprecated('请在SpaceModel中重命名')
-  Future<BaseException?> actRenameSpaceName(
-          SpaceDto space, String? nName) async =>
-      throw '请在SpaceModel中重命名';
-
-  @Deprecated('deleteSpace')
-  Future<BaseException?> actDeleteSpace(String spaceId) async =>
-      actEntrance(TeamAct.deleteSpace(spaceId));
-
-  @Deprecated('renameTeam')
-  Future<BaseException?> actRenameTeam(String? newName) async =>
-      (newName != null) ? await actEntrance(TeamAct.renameTeam(newName)) : null;
-
-  @Deprecated('inviteMember')
-  Future<BaseException?> actInviteMember(String? userEmail) async =>
-      (userEmail != null)
-          ? await actEntrance(TeamAct.inviteMember(userEmail))
-          : null;
-
   @Deprecated('createSpace')
   Future<BaseException?> actCreateSpaceModel(
     String spaceName, {

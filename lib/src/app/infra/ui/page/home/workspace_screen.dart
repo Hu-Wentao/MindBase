@@ -140,8 +140,9 @@ class SpaceModelTile extends StatelessWidget {
                   await showConfirmDialog(
                     context: context,
                     title: "确认删除空间[${space.name}]吗?",
-                    onConfirm: () =>
-                        team.actDeleteSpace(space.id).thenDialog(context),
+                    onConfirm: () => team
+                        .actEntrance(TeamAct.deleteSpace(space.id))
+                        .thenDialog(context),
                   );
                   break;
                 default:
@@ -194,25 +195,25 @@ class TeamTile extends StatelessWidget {
         onSelected: (key) async {
           switch (key) {
             case "rename":
-              await team.actRenameTeam(
-                await showTextInputDialog(
-                  context: context,
-                  title: "重命名团队",
-                  origin: team.name,
-                  hint: team.name,
-                ),
+              final newName = await showTextInputDialog(
+                context: context,
+                title: "重命名团队",
+                origin: team.name,
+                hint: team.name,
               );
+              if (newName == null) return;
+              await team.actEntrance(TeamAct.renameTeam(newName));
               break;
             case "invite":
+              final userEmail = await showTextInputDialog(
+                context: context,
+                title: "${team.name} 团队邀请成员",
+                label: "请输入用户邮箱",
+                hint: "被邀请人的注册邮箱",
+              );
+              if (userEmail == null) return;
               await team
-                  .actInviteMember(
-                    await showTextInputDialog(
-                      context: context,
-                      title: "${team.name} 团队邀请成员",
-                      label: "请输入用户邮箱",
-                      hint: "被邀请人的注册邮箱",
-                    ),
-                  )
+                  .actEntrance(TeamAct.inviteMember(userEmail))
                   .thenDialog(context);
               break;
             case "create_space":
