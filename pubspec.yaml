@@ -38,7 +38,7 @@ dependencies:
   provider_sidecar:
     git:
       url: https://github.com/Hu-Wentao/provider_sidecar
-      ref: v1.3
+      ref: v1.4
   slowly:
     git:
       url: https://github.com/GetArch/slowly.git

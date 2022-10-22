@@ -63,6 +63,16 @@ class $AssetsIconGen {
       ];
 }
 
+class $AssetsIconsGen {
+  const $AssetsIconsGen();
+
+  /// File path: assets/icons/logo.png
+  AssetGenImage get logo => const AssetGenImage('assets/icons/logo.png');
+
+  /// List of all assets
+  List<AssetGenImage> get values => [logo];
+}
+
 class $AssetsImageGen {
   const $AssetsImageGen();
 
@@ -87,6 +97,36 @@ class $AssetsImageGen {
   /// List of all assets
   List<AssetGenImage> get values =>
       [loginBottom, logo, mainBottom, mainTop, signupTop];
+}
+
+class $AssetsImagesGen {
+  const $AssetsImagesGen();
+
+  /// File path: assets/images/login.svg
+  SvgGenImage get login => const SvgGenImage('assets/images/login.svg');
+
+  /// File path: assets/images/login_bottom.png
+  AssetGenImage get loginBottom =>
+      const AssetGenImage('assets/images/login_bottom.png');
+
+  /// File path: assets/images/main_bottom.png
+  AssetGenImage get mainBottom =>
+      const AssetGenImage('assets/images/main_bottom.png');
+
+  /// File path: assets/images/main_top.png
+  AssetGenImage get mainTop =>
+      const AssetGenImage('assets/images/main_top.png');
+
+  /// File path: assets/images/signup.svg
+  SvgGenImage get signup => const SvgGenImage('assets/images/signup.svg');
+
+  /// File path: assets/images/signup_top.png
+  AssetGenImage get signupTop =>
+      const AssetGenImage('assets/images/signup_top.png');
+
+  /// List of all assets
+  List<dynamic> get values =>
+      [login, loginBottom, mainBottom, mainTop, signup, signupTop];
 }
 
 class $AssetsIconAuthGen {
@@ -237,7 +277,9 @@ class Assets {
   Assets._();
 
   static const $AssetsIconGen icon = $AssetsIconGen();
+  static const $AssetsIconsGen icons = $AssetsIconsGen();
   static const $AssetsImageGen image = $AssetsImageGen();
+  static const $AssetsImagesGen images = $AssetsImagesGen();
 }
 
 class AssetGenImage {

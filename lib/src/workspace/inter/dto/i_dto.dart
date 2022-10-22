@@ -463,6 +463,7 @@ class MethodDto extends PropertyDto {
   @override
   String toString() =>
       'MethodDto{k: $k, name: $name, memo: $memo, expr: $expr}';
+
   Map<String, dynamic> toMap() => toJson();
 
   @override
@@ -549,6 +550,7 @@ class AttributeDto extends PropertyDto {
   String toString() {
     return 'AttributeDto{k: $k, name: $name, memo: $memo, type: $type}';
   }
+
   Map<String, dynamic> toMap() => toJson();
 
   @override

@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1666434497;
+const int timestamp = 1666447323;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -95,23 +95,28 @@ const Map<String, Object> dependencies = <String, Object>{
   'flutter_localizations': <String, Object>{
     'sdk': r'flutter',
   },
-  'cupertino_icons': r'^1.0.2',
   'get_arch_core': <String, Object>{
     'git': <String, Object>{
-      'url': r'https://e.coding.net/shuttlecloud/company/get_arch_core.git',
-      'ref': r'v3.0',
+      'url': r'https://github.com/GetArch/get_arch_core.git',
+      'ref': r'v4.1',
     },
   },
   'provider_sidecar': <String, Object>{
     'git': <String, Object>{
-      'url': r'https://e.coding.net/shuttlecloud/company/provider_sidecar.git',
-      'ref': r'v1.3',
+      'url': r'https://github.com/Hu-Wentao/provider_sidecar',
+      'ref': r'v1.4',
     },
   },
   'slowly': <String, Object>{
     'git': <String, Object>{
-      'url': r'https://gitee.com/hu_wt/slowly.git',
-      'ref': r'main',
+      'url': r'https://github.com/GetArch/slowly.git',
+      'ref': r'v1.0',
+    },
+  },
+  'get_sweet': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://github.com/GetArch/get_sweet.git',
+      'ref': r'v1.0',
     },
   },
   'flutter_form_builder': r'7.1.1',
@@ -121,9 +126,6 @@ const Map<String, Object> dependencies = <String, Object>{
   'appwrite': r'8.1.0',
   'dart_appwrite': r'^7.1.0',
   'go_router': r'^5.0.5',
-  'get_sweet': <String, Object>{
-    'path': r'../get_sweet',
-  },
 };
 
 /// Developer dependencies
@@ -165,18 +167,20 @@ const Map<String, Object> source = <String, Object>{
   'dependencies': dependencies,
   'dev_dependencies': devDependencies,
   'dependency_overrides': dependencyOverrides,
+  'flutter': <String, Object>{
+    'uses-material-design': true,
+    'assets': <Object>[
+      r'assets/icons/',
+      r'assets/images/',
+      r'assets/icon/',
+      r'assets/icon/auth/',
+      r'assets/image/',
+    ],
+  },
   'flutter_gen': <String, Object>{
     'output': r'lib/src/core/config/assets/',
     'integrations': <String, Object>{
       'flutter_svg': true,
     },
-  },
-  'flutter': <String, Object>{
-    'uses-material-design': true,
-    'assets': <Object>[
-      r'assets/icon/',
-      r'assets/icon/auth/',
-      r'assets/image/',
-    ],
   },
 };
