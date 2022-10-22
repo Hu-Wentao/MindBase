@@ -192,7 +192,7 @@ extension PlutoMetaModelX on MetaModel {
         key: ValueKey<String>(record.id),
         cells: Map.fromEntries(properties.map((prop) => MapEntry(
               prop.propId,
-              PlutoCell(value: record.eval(prop, at.findRecord)),
+              PlutoCell(value: record.eval(prop)),
             ))),
       );
 
