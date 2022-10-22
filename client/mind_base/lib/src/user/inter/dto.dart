@@ -5,3 +5,5 @@ typedef User = md.User;
 
 typedef Team = md.Team;
 typedef Member = md.Membership;
+
+typedef MembershipList = md.MembershipList;

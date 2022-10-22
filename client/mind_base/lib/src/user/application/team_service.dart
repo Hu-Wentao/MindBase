@@ -44,4 +44,7 @@ class TeamService {
     final mp = tm.toMap();
     return Team.fromMap(mp);
   }
+
+  Future<MembershipList> getMemberships({required String teamId}) =>
+      _teams.getMemberships(teamId: teamId);
 }
