@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1665060496;
+const int timestamp = 1666434497;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -118,10 +118,9 @@ const Map<String, Object> dependencies = <String, Object>{
   'form_builder_validators': r'7.9.0',
   'json_annotation': r'>=4.6.0',
   'pluto_grid': r'5.0.3',
-  'appwrite': r'6.0.0',
-  'dart_appwrite': r'6.0.0',
+  'appwrite': r'8.1.0',
+  'dart_appwrite': r'^7.1.0',
   'go_router': r'^5.0.5',
-  'device_info_plus_platform_interface': r'2.3.0+1',
   'get_sweet': <String, Object>{
     'path': r'../get_sweet',
   },

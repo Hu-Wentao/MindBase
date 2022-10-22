@@ -129,11 +129,6 @@ extension UserDeprecatedX on UserModel {
   @Deprecated("避免使用")
   User loggedUser() => data;
 
-  /// 退出登录
-  /// 同时重置当前Model状态
-  @Deprecated('使用AppStateModel的logout')
-  Future<BaseException?> actLogout() async => throw '使用AppStateModel的logout';
-
   /// 尝试加载指定[TeamModel]
   /// 1. 查询当前用户名下是否存在team
   ///   1.1 如果存在, 则加载该team; 结束;
