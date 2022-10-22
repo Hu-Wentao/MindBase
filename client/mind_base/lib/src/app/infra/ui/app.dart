@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:get_sweet/get_sweet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mind_base/src/app/application/model.dart';
+import 'package:mind_base/src/app/infra/ui/page/auth/auth.dart';
+import 'package:mind_base/src/app/infra/ui/page/home/home.dart';
 import 'package:mind_base/src/app/infra/ui/page/splash/splash.dart';
 import 'package:mind_base/src/core/config/config.dart';
 import 'package:provider_sidecar/provider_sidecar_ex.dart';
+
 part 'router.dart';
 
 class MindBaseApp extends StatelessWidget {
@@ -34,6 +38,9 @@ class MindBaseApp extends StatelessWidget {
           routeInformationParser: _router.routeInformationParser,
           routerDelegate: _router.routerDelegate,
           title: 'Mind Base',
+          localizationsDelegates: const [
+            ...GlobalMaterialLocalizations.delegates,
+          ],
           supportedLocales: const [
             Locale('zh', ''),
             Locale('en', ''),
