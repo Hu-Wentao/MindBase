@@ -23,6 +23,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-jdbc")
 	implementation("io.appwrite:sdk-for-kotlin:1.1.0")
 	implementation("mysql:mysql-connector-java:8.0.15")
+	implementation("com.alibaba:druid-spring-boot-starter:1.1.24")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
