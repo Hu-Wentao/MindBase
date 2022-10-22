@@ -10,6 +10,7 @@ import 'package:mind_base/src/core/inter/i_dto.dart';
 import 'package:mind_base/src/user/inter/dto.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
+import 'package:mind_base/src/workspace/infra/ap_adapter.dart';
 import 'package:quiver/core.dart';
 
 import '../../application/model/model.dart';
@@ -204,16 +205,7 @@ class CollectionDto extends IDto {
         );
 
   // 适配新版本格式
-  List<String> get permissions => [
-        ...reads.map((e) => Permission.read(e)),
-        ...writes
-            .map((e) => [
-                  Permission.create(e),
-                  Permission.update(e),
-                  Permission.delete(e)
-                ])
-            .expand((element) => element)
-      ];
+  List<String> get permissions => ApAdapter.toPermissions(this);
 
   /// add
   CollectionDto add({Permissions? reads, Permissions? writes}) => this
@@ -232,18 +224,8 @@ class CollectionDto extends IDto {
     if (collection == null) return null;
     return CollectionDto(
       //  权限管理替换
-      reads: (collection.$permissions as List<String>?)
-              ?.where((e) => e.startsWith(RegExp(r'read')))
-              .map((e) => e.replaceAllMapped(
-                  RegExp(r'.+\(\"(.+)\"\)'), (m) => m.group(1) ?? ''))
-              .toList() ??
-          [],
-      writes: (collection.$permissions as List<String>?)
-              ?.where((e) => e.startsWith(RegExp(r'create|update|delete')))
-              .map((e) => e.replaceAllMapped(
-                  RegExp(r'.+\(\"(.+)\"\)'), (m) => m.group(1) ?? ''))
-              .toList() ??
-          [],
+      reads: ApAdapter.parsePermitToRead(collection),
+      writes: ApAdapter.parsePermitToWrite(collection),
       enabled: collection.enabled,
     );
   }
