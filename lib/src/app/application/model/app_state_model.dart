@@ -38,6 +38,8 @@ class AppEvt with _$AppEvt {
   const factory AppEvt.recovering() = AppEvtRecovering;
 
   const factory AppEvt.recoverDone(String? errMsg) = AppEvtRecoverDone;
+
+  const factory AppEvt.logged(UserModel model) = AppEvtLogged; // 登陆成功
 }
 
 class AppModel extends BaseActEntranceModel<AppAct, AppState>
@@ -59,7 +61,9 @@ class AppModel extends BaseActEntranceModel<AppAct, AppState>
   @override
   onEvent(AppEvt evt) {
     super.onEvent(evt);
-    evt.maybeWhen(orElse: () {});
+    evt.maybeWhen(
+        logged: (m) => setState(AppState.logged(user: m), '登陆成功'),
+        orElse: () {});
   }
 
   /// 注册+登陆
@@ -82,8 +86,7 @@ class AppModel extends BaseActEntranceModel<AppAct, AppState>
   }) async {
     final session = await _onLogin(authVerify, identityStr, password);
     user ??= await _recoverUser();
-    evtEntrance(const AppEvt.msg("登陆成功"));
-    setState(AppState.logged(user: UserModel(user, session)), '登陆成功');
+    evtEntrance(AppEvt.logged(UserModel(user, session)));
   }
 
   recover() async {
@@ -91,19 +94,17 @@ class AppModel extends BaseActEntranceModel<AppAct, AppState>
     try {
       final session = await _recoverSession();
       final user = await _recoverUser();
-      setState(AppState.logged(user: UserModel(user, session)), '恢复登陆成功');
+      evtEntrance(AppEvt.logged(UserModel(user, session)));
     } catch (e) {
       evtEntrance(AppEvt.recoverDone('恢复登陆失败 $e'));
       rethrow;
     }
-    evtEntrance(const AppEvt.recoverDone(null));
   }
 
   loginAnonymous() async {
     final session = await _anonymousSession();
     final user = await _recoverUser();
-    evtEntrance(const AppEvt.msg("匿名登陆成功"));
-    setState(AppState.logged(user: UserModel(user, session)), '匿名登陆成功');
+    evtEntrance(AppEvt.logged(UserModel(user, session)));
   }
 
   logout() async {
@@ -186,12 +187,6 @@ extension AppAccountX on AppModel {
 
 @Deprecated('')
 extension AppStateModelBizX on AppModel {
-  /// 自动登陆 (确保当前状态为 logged)
-  /// 恢复登陆状态或以匿名身份登陆
-  @Deprecated("recover")
-  Future<BaseException?> actUserAutoLogged() =>
-      actEntrance(const AppAct.recover());
-
 // 注册/登录
   @Deprecated("register / login")
   Future<BaseException?> actAuthWithReq(AuthReq? req) async =>

@@ -25,6 +25,11 @@ class _SplashPageState extends State<SplashPage>
   onInitState(msgr, model) => model
     ..events.listen((evt) => evt.maybeWhen(
         msg: (msg) => msgr.showSnackBar(SnackBar(content: Text(msg))),
+        logged: (m) {
+          msgr.showSnackBar(const SnackBar(content: Text('登陆成功')));
+          const HomeRoute.auto().go(context);
+          return null;
+        },
         recovering: () => setState(() => recovering = true),
         recoverDone: (msg) {
           if (msg == null) {

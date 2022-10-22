@@ -1285,6 +1285,7 @@ mixin _$AppEvt {
     required TResult Function(String msg) msg,
     required TResult Function() recovering,
     required TResult Function(String? errMsg) recoverDone,
+    required TResult Function(UserModel model) logged,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -1292,6 +1293,7 @@ mixin _$AppEvt {
     TResult? Function(String msg)? msg,
     TResult? Function()? recovering,
     TResult? Function(String? errMsg)? recoverDone,
+    TResult? Function(UserModel model)? logged,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -1299,6 +1301,7 @@ mixin _$AppEvt {
     TResult Function(String msg)? msg,
     TResult Function()? recovering,
     TResult Function(String? errMsg)? recoverDone,
+    TResult Function(UserModel model)? logged,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -1307,6 +1310,7 @@ mixin _$AppEvt {
     required TResult Function(AppEvtMsg value) msg,
     required TResult Function(AppEvtRecovering value) recovering,
     required TResult Function(AppEvtRecoverDone value) recoverDone,
+    required TResult Function(AppEvtLogged value) logged,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -1314,6 +1318,7 @@ mixin _$AppEvt {
     TResult? Function(AppEvtMsg value)? msg,
     TResult? Function(AppEvtRecovering value)? recovering,
     TResult? Function(AppEvtRecoverDone value)? recoverDone,
+    TResult? Function(AppEvtLogged value)? logged,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -1321,6 +1326,7 @@ mixin _$AppEvt {
     TResult Function(AppEvtMsg value)? msg,
     TResult Function(AppEvtRecovering value)? recovering,
     TResult Function(AppEvtRecoverDone value)? recoverDone,
+    TResult Function(AppEvtLogged value)? logged,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -1410,6 +1416,7 @@ class _$AppEvtMsg implements AppEvtMsg {
     required TResult Function(String msg) msg,
     required TResult Function() recovering,
     required TResult Function(String? errMsg) recoverDone,
+    required TResult Function(UserModel model) logged,
   }) {
     return msg(this.msg);
   }
@@ -1420,6 +1427,7 @@ class _$AppEvtMsg implements AppEvtMsg {
     TResult? Function(String msg)? msg,
     TResult? Function()? recovering,
     TResult? Function(String? errMsg)? recoverDone,
+    TResult? Function(UserModel model)? logged,
   }) {
     return msg?.call(this.msg);
   }
@@ -1430,6 +1438,7 @@ class _$AppEvtMsg implements AppEvtMsg {
     TResult Function(String msg)? msg,
     TResult Function()? recovering,
     TResult Function(String? errMsg)? recoverDone,
+    TResult Function(UserModel model)? logged,
     required TResult orElse(),
   }) {
     if (msg != null) {
@@ -1444,6 +1453,7 @@ class _$AppEvtMsg implements AppEvtMsg {
     required TResult Function(AppEvtMsg value) msg,
     required TResult Function(AppEvtRecovering value) recovering,
     required TResult Function(AppEvtRecoverDone value) recoverDone,
+    required TResult Function(AppEvtLogged value) logged,
   }) {
     return msg(this);
   }
@@ -1454,6 +1464,7 @@ class _$AppEvtMsg implements AppEvtMsg {
     TResult? Function(AppEvtMsg value)? msg,
     TResult? Function(AppEvtRecovering value)? recovering,
     TResult? Function(AppEvtRecoverDone value)? recoverDone,
+    TResult? Function(AppEvtLogged value)? logged,
   }) {
     return msg?.call(this);
   }
@@ -1464,6 +1475,7 @@ class _$AppEvtMsg implements AppEvtMsg {
     TResult Function(AppEvtMsg value)? msg,
     TResult Function(AppEvtRecovering value)? recovering,
     TResult Function(AppEvtRecoverDone value)? recoverDone,
+    TResult Function(AppEvtLogged value)? logged,
     required TResult orElse(),
   }) {
     if (msg != null) {
@@ -1523,6 +1535,7 @@ class _$AppEvtRecovering implements AppEvtRecovering {
     required TResult Function(String msg) msg,
     required TResult Function() recovering,
     required TResult Function(String? errMsg) recoverDone,
+    required TResult Function(UserModel model) logged,
   }) {
     return recovering();
   }
@@ -1533,6 +1546,7 @@ class _$AppEvtRecovering implements AppEvtRecovering {
     TResult? Function(String msg)? msg,
     TResult? Function()? recovering,
     TResult? Function(String? errMsg)? recoverDone,
+    TResult? Function(UserModel model)? logged,
   }) {
     return recovering?.call();
   }
@@ -1543,6 +1557,7 @@ class _$AppEvtRecovering implements AppEvtRecovering {
     TResult Function(String msg)? msg,
     TResult Function()? recovering,
     TResult Function(String? errMsg)? recoverDone,
+    TResult Function(UserModel model)? logged,
     required TResult orElse(),
   }) {
     if (recovering != null) {
@@ -1557,6 +1572,7 @@ class _$AppEvtRecovering implements AppEvtRecovering {
     required TResult Function(AppEvtMsg value) msg,
     required TResult Function(AppEvtRecovering value) recovering,
     required TResult Function(AppEvtRecoverDone value) recoverDone,
+    required TResult Function(AppEvtLogged value) logged,
   }) {
     return recovering(this);
   }
@@ -1567,6 +1583,7 @@ class _$AppEvtRecovering implements AppEvtRecovering {
     TResult? Function(AppEvtMsg value)? msg,
     TResult? Function(AppEvtRecovering value)? recovering,
     TResult? Function(AppEvtRecoverDone value)? recoverDone,
+    TResult? Function(AppEvtLogged value)? logged,
   }) {
     return recovering?.call(this);
   }
@@ -1577,6 +1594,7 @@ class _$AppEvtRecovering implements AppEvtRecovering {
     TResult Function(AppEvtMsg value)? msg,
     TResult Function(AppEvtRecovering value)? recovering,
     TResult Function(AppEvtRecoverDone value)? recoverDone,
+    TResult Function(AppEvtLogged value)? logged,
     required TResult orElse(),
   }) {
     if (recovering != null) {
@@ -1657,6 +1675,7 @@ class _$AppEvtRecoverDone implements AppEvtRecoverDone {
     required TResult Function(String msg) msg,
     required TResult Function() recovering,
     required TResult Function(String? errMsg) recoverDone,
+    required TResult Function(UserModel model) logged,
   }) {
     return recoverDone(errMsg);
   }
@@ -1667,6 +1686,7 @@ class _$AppEvtRecoverDone implements AppEvtRecoverDone {
     TResult? Function(String msg)? msg,
     TResult? Function()? recovering,
     TResult? Function(String? errMsg)? recoverDone,
+    TResult? Function(UserModel model)? logged,
   }) {
     return recoverDone?.call(errMsg);
   }
@@ -1677,6 +1697,7 @@ class _$AppEvtRecoverDone implements AppEvtRecoverDone {
     TResult Function(String msg)? msg,
     TResult Function()? recovering,
     TResult Function(String? errMsg)? recoverDone,
+    TResult Function(UserModel model)? logged,
     required TResult orElse(),
   }) {
     if (recoverDone != null) {
@@ -1691,6 +1712,7 @@ class _$AppEvtRecoverDone implements AppEvtRecoverDone {
     required TResult Function(AppEvtMsg value) msg,
     required TResult Function(AppEvtRecovering value) recovering,
     required TResult Function(AppEvtRecoverDone value) recoverDone,
+    required TResult Function(AppEvtLogged value) logged,
   }) {
     return recoverDone(this);
   }
@@ -1701,6 +1723,7 @@ class _$AppEvtRecoverDone implements AppEvtRecoverDone {
     TResult? Function(AppEvtMsg value)? msg,
     TResult? Function(AppEvtRecovering value)? recovering,
     TResult? Function(AppEvtRecoverDone value)? recoverDone,
+    TResult? Function(AppEvtLogged value)? logged,
   }) {
     return recoverDone?.call(this);
   }
@@ -1711,6 +1734,7 @@ class _$AppEvtRecoverDone implements AppEvtRecoverDone {
     TResult Function(AppEvtMsg value)? msg,
     TResult Function(AppEvtRecovering value)? recovering,
     TResult Function(AppEvtRecoverDone value)? recoverDone,
+    TResult Function(AppEvtLogged value)? logged,
     required TResult orElse(),
   }) {
     if (recoverDone != null) {
@@ -1726,6 +1750,151 @@ abstract class AppEvtRecoverDone implements AppEvt {
   String? get errMsg;
   @JsonKey(ignore: true)
   _$$AppEvtRecoverDoneCopyWith<_$AppEvtRecoverDone> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$AppEvtLoggedCopyWith<$Res> {
+  factory _$$AppEvtLoggedCopyWith(
+          _$AppEvtLogged value, $Res Function(_$AppEvtLogged) then) =
+      __$$AppEvtLoggedCopyWithImpl<$Res>;
+  @useResult
+  $Res call({UserModel model});
+}
+
+/// @nodoc
+class __$$AppEvtLoggedCopyWithImpl<$Res>
+    extends _$AppEvtCopyWithImpl<$Res, _$AppEvtLogged>
+    implements _$$AppEvtLoggedCopyWith<$Res> {
+  __$$AppEvtLoggedCopyWithImpl(
+      _$AppEvtLogged _value, $Res Function(_$AppEvtLogged) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? model = null,
+  }) {
+    return _then(_$AppEvtLogged(
+      null == model
+          ? _value.model
+          : model // ignore: cast_nullable_to_non_nullable
+              as UserModel,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$AppEvtLogged implements AppEvtLogged {
+  const _$AppEvtLogged(this.model);
+
+  @override
+  final UserModel model;
+
+  @override
+  String toString() {
+    return 'AppEvt.logged(model: $model)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$AppEvtLogged &&
+            (identical(other.model, model) || other.model == model));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, model);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$AppEvtLoggedCopyWith<_$AppEvtLogged> get copyWith =>
+      __$$AppEvtLoggedCopyWithImpl<_$AppEvtLogged>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String msg) msg,
+    required TResult Function() recovering,
+    required TResult Function(String? errMsg) recoverDone,
+    required TResult Function(UserModel model) logged,
+  }) {
+    return logged(model);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String msg)? msg,
+    TResult? Function()? recovering,
+    TResult? Function(String? errMsg)? recoverDone,
+    TResult? Function(UserModel model)? logged,
+  }) {
+    return logged?.call(model);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String msg)? msg,
+    TResult Function()? recovering,
+    TResult Function(String? errMsg)? recoverDone,
+    TResult Function(UserModel model)? logged,
+    required TResult orElse(),
+  }) {
+    if (logged != null) {
+      return logged(model);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(AppEvtMsg value) msg,
+    required TResult Function(AppEvtRecovering value) recovering,
+    required TResult Function(AppEvtRecoverDone value) recoverDone,
+    required TResult Function(AppEvtLogged value) logged,
+  }) {
+    return logged(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(AppEvtMsg value)? msg,
+    TResult? Function(AppEvtRecovering value)? recovering,
+    TResult? Function(AppEvtRecoverDone value)? recoverDone,
+    TResult? Function(AppEvtLogged value)? logged,
+  }) {
+    return logged?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(AppEvtMsg value)? msg,
+    TResult Function(AppEvtRecovering value)? recovering,
+    TResult Function(AppEvtRecoverDone value)? recoverDone,
+    TResult Function(AppEvtLogged value)? logged,
+    required TResult orElse(),
+  }) {
+    if (logged != null) {
+      return logged(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class AppEvtLogged implements AppEvt {
+  const factory AppEvtLogged(final UserModel model) = _$AppEvtLogged;
+
+  UserModel get model;
+  @JsonKey(ignore: true)
+  _$$AppEvtLoggedCopyWith<_$AppEvtLogged> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
