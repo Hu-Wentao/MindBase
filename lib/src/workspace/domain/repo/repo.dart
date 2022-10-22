@@ -3,12 +3,27 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:dart_appwrite/dart_appwrite.dart' as srv;
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/core/config/app_server_config.dart';
 import 'package:mind_base/src/core/config/common_config.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 
 import '../../application/model/model.dart';
+
+List<String> anyOneCrudPermit = [
+  Permission.create(Role.any()),
+  Permission.read(Role.any()),
+  Permission.update(Role.any()),
+  Permission.delete(Role.any()),
+];
+
+List<String> teamMemberCrudPermit(String teamId) => [
+      Permission.create(Role.team(teamId)),
+      Permission.read(Role.team(teamId)),
+      Permission.update(Role.team(teamId)),
+      Permission.delete(Role.team(teamId)),
+    ];
 
 // 需要传入指定集合ID, 因此无法注入
 class MetaDtoRepo {
@@ -58,7 +73,9 @@ class MetaDtoRepo {
   /// 更新
   /// 当前只实现对新增字段的添加功能, 删除考虑后面引入视图(隐藏字段)解决
   updateWithRecordCollection(
-      MetaDto originMeta, MetaDto metaDto) async {
+    MetaDto originMeta,
+    MetaDto metaDto,
+  ) async {
     // 原始MetaAttrList快照
     final originAttrDtoSnap = originMeta.attrs;
     // 1. 先更新meta记录
@@ -137,19 +154,16 @@ class MetaDtoRepo {
   /// [teamId] 为空表示"所有人可读写"
   /// 默认权限为 "团队内可读写"
   createMetaCollection(String? teamId) async {
-    final permit = teamId == null ? ['role:all'] : ['team:$teamId'];
+    final permit =
+        teamId == null ? anyOneCrudPermit : teamMemberCrudPermit(teamId);
     // 创建集合
     await _serverDb.createCollection(
-      // 集合级权限
-      documentSecurity: false,
-      databaseId: mainDataBaseId,
-      collectionId: collectionId,
-      name: 'meta_$collectionId',
-      // 集合级权限
-      permission: 'collection',
-      read: permit,
-      write: permit,
-    );
+        // 集合级权限
+        documentSecurity: false,
+        databaseId: mainDataBaseId,
+        collectionId: collectionId,
+        name: 'meta_$collectionId',
+        permissions: permit);
     for (final attr in metaStructure.keys) {
       await updateMetaDocStructure(attr);
     }
@@ -335,15 +349,15 @@ class RecordDtoRepo {
   /// [meta] 应当是固定内存地址的对象,这样可以确保meta本身是实时更新的
   Future createRecordCollection(String? teamId) async {
     // 权限
-    final permit = teamId == null ? ['role:all'] : ['team:$teamId'];
+    final permit =
+        teamId == null ? anyOneCrudPermit : teamMemberCrudPermit(teamId);
     // 创建集合
     await _serverDb.createCollection(
       databaseId: mainDataBaseId,
       collectionId: collectionId,
+      documentSecurity: false,
       name: 'rcd_$collectionId',
-      permission: 'collection',
-      read: permit,
-      write: permit,
+      permissions: permit,
     );
     // 创建属性
     for (final attr in meta.attrs) {
