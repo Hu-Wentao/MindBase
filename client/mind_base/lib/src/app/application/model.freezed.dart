@@ -3977,32 +3977,40 @@ mixin _$TeamState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() init,
+    required TResult Function(
+            List<SpaceModel> spaces, List<MemberModel> members)
+        done,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? init,
+    TResult? Function(List<SpaceModel> spaces, List<MemberModel> members)? done,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? init,
+    TResult Function(List<SpaceModel> spaces, List<MemberModel> members)? done,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(TeamStateInit value) init,
+    required TResult Function(TeamStateDone value) done,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(TeamStateInit value)? init,
+    TResult? Function(TeamStateDone value)? done,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(TeamStateInit value)? init,
+    TResult Function(TeamStateDone value)? done,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -4064,6 +4072,475 @@ class _$TeamStateInit implements TeamStateInit {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() init,
+    required TResult Function(
+            List<SpaceModel> spaces, List<MemberModel> members)
+        done,
+  }) {
+    return init();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? init,
+    TResult? Function(List<SpaceModel> spaces, List<MemberModel> members)? done,
+  }) {
+    return init?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? init,
+    TResult Function(List<SpaceModel> spaces, List<MemberModel> members)? done,
+    required TResult orElse(),
+  }) {
+    if (init != null) {
+      return init();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(TeamStateInit value) init,
+    required TResult Function(TeamStateDone value) done,
+  }) {
+    return init(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(TeamStateInit value)? init,
+    TResult? Function(TeamStateDone value)? done,
+  }) {
+    return init?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(TeamStateInit value)? init,
+    TResult Function(TeamStateDone value)? done,
+    required TResult orElse(),
+  }) {
+    if (init != null) {
+      return init(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class TeamStateInit implements TeamState {
+  const factory TeamStateInit() = _$TeamStateInit;
+}
+
+/// @nodoc
+abstract class _$$TeamStateDoneCopyWith<$Res> {
+  factory _$$TeamStateDoneCopyWith(
+          _$TeamStateDone value, $Res Function(_$TeamStateDone) then) =
+      __$$TeamStateDoneCopyWithImpl<$Res>;
+  @useResult
+  $Res call({List<SpaceModel> spaces, List<MemberModel> members});
+}
+
+/// @nodoc
+class __$$TeamStateDoneCopyWithImpl<$Res>
+    extends _$TeamStateCopyWithImpl<$Res, _$TeamStateDone>
+    implements _$$TeamStateDoneCopyWith<$Res> {
+  __$$TeamStateDoneCopyWithImpl(
+      _$TeamStateDone _value, $Res Function(_$TeamStateDone) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? spaces = null,
+    Object? members = null,
+  }) {
+    return _then(_$TeamStateDone(
+      spaces: null == spaces
+          ? _value._spaces
+          : spaces // ignore: cast_nullable_to_non_nullable
+              as List<SpaceModel>,
+      members: null == members
+          ? _value._members
+          : members // ignore: cast_nullable_to_non_nullable
+              as List<MemberModel>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$TeamStateDone implements TeamStateDone {
+  const _$TeamStateDone(
+      {required final List<SpaceModel> spaces,
+      required final List<MemberModel> members})
+      : _spaces = spaces,
+        _members = members;
+
+  final List<SpaceModel> _spaces;
+  @override
+  List<SpaceModel> get spaces {
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_spaces);
+  }
+
+  final List<MemberModel> _members;
+  @override
+  List<MemberModel> get members {
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_members);
+  }
+
+  @override
+  String toString() {
+    return 'TeamState.done(spaces: $spaces, members: $members)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$TeamStateDone &&
+            const DeepCollectionEquality().equals(other._spaces, _spaces) &&
+            const DeepCollectionEquality().equals(other._members, _members));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(_spaces),
+      const DeepCollectionEquality().hash(_members));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$TeamStateDoneCopyWith<_$TeamStateDone> get copyWith =>
+      __$$TeamStateDoneCopyWithImpl<_$TeamStateDone>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() init,
+    required TResult Function(
+            List<SpaceModel> spaces, List<MemberModel> members)
+        done,
+  }) {
+    return done(spaces, members);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? init,
+    TResult? Function(List<SpaceModel> spaces, List<MemberModel> members)? done,
+  }) {
+    return done?.call(spaces, members);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? init,
+    TResult Function(List<SpaceModel> spaces, List<MemberModel> members)? done,
+    required TResult orElse(),
+  }) {
+    if (done != null) {
+      return done(spaces, members);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(TeamStateInit value) init,
+    required TResult Function(TeamStateDone value) done,
+  }) {
+    return done(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(TeamStateInit value)? init,
+    TResult? Function(TeamStateDone value)? done,
+  }) {
+    return done?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(TeamStateInit value)? init,
+    TResult Function(TeamStateDone value)? done,
+    required TResult orElse(),
+  }) {
+    if (done != null) {
+      return done(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class TeamStateDone implements TeamState {
+  const factory TeamStateDone(
+      {required final List<SpaceModel> spaces,
+      required final List<MemberModel> members}) = _$TeamStateDone;
+
+  List<SpaceModel> get spaces;
+  List<MemberModel> get members;
+  @JsonKey(ignore: true)
+  _$$TeamStateDoneCopyWith<_$TeamStateDone> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+mixin _$SpaceAct {
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initModel,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initModel,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initModel,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(SpaceActInitModel value) initModel,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(SpaceActInitModel value)? initModel,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(SpaceActInitModel value)? initModel,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $SpaceActCopyWith<$Res> {
+  factory $SpaceActCopyWith(SpaceAct value, $Res Function(SpaceAct) then) =
+      _$SpaceActCopyWithImpl<$Res, SpaceAct>;
+}
+
+/// @nodoc
+class _$SpaceActCopyWithImpl<$Res, $Val extends SpaceAct>
+    implements $SpaceActCopyWith<$Res> {
+  _$SpaceActCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+}
+
+/// @nodoc
+abstract class _$$SpaceActInitModelCopyWith<$Res> {
+  factory _$$SpaceActInitModelCopyWith(
+          _$SpaceActInitModel value, $Res Function(_$SpaceActInitModel) then) =
+      __$$SpaceActInitModelCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$SpaceActInitModelCopyWithImpl<$Res>
+    extends _$SpaceActCopyWithImpl<$Res, _$SpaceActInitModel>
+    implements _$$SpaceActInitModelCopyWith<$Res> {
+  __$$SpaceActInitModelCopyWithImpl(
+      _$SpaceActInitModel _value, $Res Function(_$SpaceActInitModel) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$SpaceActInitModel implements SpaceActInitModel {
+  const _$SpaceActInitModel();
+
+  @override
+  String toString() {
+    return 'SpaceAct.initModel()';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$SpaceActInitModel);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initModel,
+  }) {
+    return initModel();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initModel,
+  }) {
+    return initModel?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initModel,
+    required TResult orElse(),
+  }) {
+    if (initModel != null) {
+      return initModel();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(SpaceActInitModel value) initModel,
+  }) {
+    return initModel(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(SpaceActInitModel value)? initModel,
+  }) {
+    return initModel?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(SpaceActInitModel value)? initModel,
+    required TResult orElse(),
+  }) {
+    if (initModel != null) {
+      return initModel(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class SpaceActInitModel implements SpaceAct {
+  const factory SpaceActInitModel() = _$SpaceActInitModel;
+}
+
+/// @nodoc
+mixin _$SpaceState {
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() init,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? init,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? init,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(SpaceStateInit value) init,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(SpaceStateInit value)? init,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(SpaceStateInit value)? init,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $SpaceStateCopyWith<$Res> {
+  factory $SpaceStateCopyWith(
+          SpaceState value, $Res Function(SpaceState) then) =
+      _$SpaceStateCopyWithImpl<$Res, SpaceState>;
+}
+
+/// @nodoc
+class _$SpaceStateCopyWithImpl<$Res, $Val extends SpaceState>
+    implements $SpaceStateCopyWith<$Res> {
+  _$SpaceStateCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+}
+
+/// @nodoc
+abstract class _$$SpaceStateInitCopyWith<$Res> {
+  factory _$$SpaceStateInitCopyWith(
+          _$SpaceStateInit value, $Res Function(_$SpaceStateInit) then) =
+      __$$SpaceStateInitCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$SpaceStateInitCopyWithImpl<$Res>
+    extends _$SpaceStateCopyWithImpl<$Res, _$SpaceStateInit>
+    implements _$$SpaceStateInitCopyWith<$Res> {
+  __$$SpaceStateInitCopyWithImpl(
+      _$SpaceStateInit _value, $Res Function(_$SpaceStateInit) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$SpaceStateInit implements SpaceStateInit {
+  const _$SpaceStateInit();
+
+  @override
+  String toString() {
+    return 'SpaceState.init()';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$SpaceStateInit);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() init,
   }) {
     return init();
   }
@@ -4091,7 +4568,7 @@ class _$TeamStateInit implements TeamStateInit {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(TeamStateInit value) init,
+    required TResult Function(SpaceStateInit value) init,
   }) {
     return init(this);
   }
@@ -4099,7 +4576,7 @@ class _$TeamStateInit implements TeamStateInit {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(TeamStateInit value)? init,
+    TResult? Function(SpaceStateInit value)? init,
   }) {
     return init?.call(this);
   }
@@ -4107,7 +4584,7 @@ class _$TeamStateInit implements TeamStateInit {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(TeamStateInit value)? init,
+    TResult Function(SpaceStateInit value)? init,
     required TResult orElse(),
   }) {
     if (init != null) {
@@ -4117,6 +4594,6 @@ class _$TeamStateInit implements TeamStateInit {
   }
 }
 
-abstract class TeamStateInit implements TeamState {
-  const factory TeamStateInit() = _$TeamStateInit;
+abstract class SpaceStateInit implements SpaceState {
+  const factory SpaceStateInit() = _$SpaceStateInit;
 }
