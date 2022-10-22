@@ -62,11 +62,10 @@ class TeamModel extends BaseActEntranceModel<TeamAct, TeamState> {
       state.isOrNull<TeamStateDone>()?.members ?? const [];
 
   MemberModel? get teamOwner =>
-      members.firstWhereOrNull((mbr) => mbr.roles.contains(Role.owner.value));
+      members.firstWhereOrNull((mbr) => mbr.roles.contains(RoleX.owner(id)));
 
   SpaceModel? findSpace(spaceId) =>
       workspaces.firstWhereOrNull((s) => s.id == spaceId);
-
 
   @override
   onActEntrance(TeamAct act) => act.when(
@@ -140,7 +139,7 @@ extension TeamMemberX on TeamModel {
   }
 
   updateMembers() async {
-    final dataLs = (await _tmSrv.getMemberships(teamId: id)).memberships;
+    final dataLs = (await _tmSrv.listMemberships(teamId: id)).memberships;
     final rst = <MemberModel>[];
     for (final model in members) {
       final nData = dataLs.removeWhereOrNull((_) => _.$id == model.id);

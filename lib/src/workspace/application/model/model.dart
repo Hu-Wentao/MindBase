@@ -7,6 +7,7 @@ import 'package:mind_base/src/app/application/model/base_model.dart';
 import 'package:mind_base/src/core/config/app_server_config.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/core/inter/i_dao.dart';
+import 'package:mind_base/src/user/inter/dto.dart';
 import 'package:mind_base/src/workspace/application/service/expr/expr_evaluator.dart';
 import 'package:mind_base/src/workspace/application/service/meta_service.dart';
 import 'package:mind_base/src/workspace/domain/repo/repo.dart';
