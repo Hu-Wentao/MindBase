@@ -4,7 +4,7 @@ part of '../../model.dart';
 /// 包括表级读写权限, 逻辑删除
 /// [data] collectionId, 表的Id
 class DocumentInfoModel extends ModelSidecar<String, BaseException?>
-    with ModelStateChangeMx<String, BaseException?> {
+    with StateChangeMx<String, BaseException?> {
   final _srvDb = sl<srv.Databases>();
   final _cliDb = sl<cli.Databases>();
 
@@ -43,27 +43,31 @@ class DocumentInfoModel extends ModelSidecar<String, BaseException?>
   /// === 状态更改 ===
 
   @override
-  Future<FutureOr<void>> onFetch({bool isActive = false}) async {
+  Future<bool> onFetch({bool isActive = false}) async {
     collection = await _cliDb.getDocument(
       collectionId: metaCollectionId,
       documentId: documentId,
       databaseId: mainDataBaseId,
     );
+    return true;
   }
 
   @override
-  FutureOr<void> onReset() {
+  Future<bool> onReset() async {
     collection = null;
+    return true;
   }
 
   @override
-  FutureOr<void> onSubscription() {
+  Future<bool> onSubscription() async {
     log("尚未实现 onSubscription");
+    return false;
   }
 
   @override
-  FutureOr<void> onCloseSubs() {
+  Future<bool> onCloseSubs() async {
     log("尚未实现 onCloseSubs");
+    return false;
   }
 }
 
@@ -71,7 +75,7 @@ class DocumentInfoModel extends ModelSidecar<String, BaseException?>
 /// 包括表级读写权限, 逻辑删除
 /// [data] collectionId, 表的Id
 class CollectionInfoModel extends ModelSidecar<String, BaseException?>
-    with ModelStateChangeMx<String, BaseException?> {
+    with StateChangeMx<String, BaseException?> {
   final _srvDb = sl<srv.Databases>();
   final CollectionService _srv = sl<CollectionService>();
 
@@ -111,25 +115,29 @@ class CollectionInfoModel extends ModelSidecar<String, BaseException?>
   /// === 状态更改 ===
 
   @override
-  Future<FutureOr<void>> onFetch({bool isActive = false}) async {
+  Future<bool> onFetch({bool isActive = false}) async {
     collection = await _srvDb.getCollection(
       databaseId: mainDataBaseId,
       collectionId: data,
     );
+    return true;
   }
 
   @override
-  FutureOr<void> onReset() {
+  Future<bool> onReset() async {
     collection = null;
+    return true;
   }
 
   @override
-  FutureOr<void> onSubscription() {
+  Future<bool> onSubscription() async {
     log("尚未实现 onSubscription");
+    return false;
   }
 
   @override
-  FutureOr<void> onCloseSubs() {
+  Future<bool> onCloseSubs() async {
     log("尚未实现 onCloseSubs");
+    return false;
   }
 }
