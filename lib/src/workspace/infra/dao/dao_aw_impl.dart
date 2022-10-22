@@ -228,7 +228,7 @@ class WorkspaceEttAccessor extends BaseAppwriteAccessor<SpaceDto>
       WorkspaceDtoAppwriteX(dto).toJson();
 
   Stream<SpaceDto> findAllByTeam(String teamId) => findAll([
-        "teamId.equal('$teamId')",
+        Query.equal('teamId', teamId),
       ]);
 }
 
@@ -246,7 +246,8 @@ class RecordMetaEttAccessor extends BaseAppwriteAccessor<MetaDto>
       MetaDtoAppwriteX.fromJson(mgJson);
 
   Stream<MetaDto> findAllBy(String metaName) => findAll([
-        "name.equal('$metaName')",
+        Query.equal('name', metaName),
+        // "name.equal('$metaName')",
       ]);
 
   @override
