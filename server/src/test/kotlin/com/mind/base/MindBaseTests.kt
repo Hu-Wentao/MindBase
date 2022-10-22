@@ -2,15 +2,26 @@ package com.mind.base
 
 import com.googlecode.aviator.AviatorEvaluator
 import com.mind.base.service.ExplainDBService
+import com.mind.base.service.TableExportService
+import org.apache.commons.lang3.RandomStringUtils
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.core.io.ResourceLoader
+import kotlin.random.Random
 
 @SpringBootTest(classes = [MindBaseApplication::class])
 class MindBaseTests {
 
 	@Autowired
 	private lateinit var explainDBService: ExplainDBService
+
+	@Autowired
+	private lateinit var tableExportService: TableExportService
+
+	@Autowired
+	private lateinit var resourceLoader: ResourceLoader
+
 	@Test
 	fun test() {
 		val ret = AviatorEvaluator.execute("1*2+(3*4)/5")
@@ -33,4 +44,24 @@ class MindBaseTests {
 	}
 
 
+	@Test
+	fun testInsertDB(){
+		val queryAllFields = explainDBService.queryAllFields("Student")
+		assert(queryAllFields.isNotEmpty())
+	}
+
+	@Test
+	fun testInsertDBFromXls(){
+
+		tableExportService.importDB(resourceLoader.getResource("classpath:user.xlsx").inputStream,"Student")
+	}
+
+	@Test
+	fun testInsertDBFromList(){
+		(1..100).map {
+			mapOf("name" to RandomStringUtils.random(Random.nextInt(2,10), 0x4e00, 0x9fa5, false,false),"age" to Random.nextInt(0,100).toString())
+		}.also {
+			tableExportService.importDB(it,"Student")
+		}
+	}
 }
