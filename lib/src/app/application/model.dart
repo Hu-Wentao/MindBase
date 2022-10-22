@@ -81,8 +81,6 @@ part 'model/space/meta_model.dart';
 
 part 'model/space/record_model.dart';
 
-part 'model/space/propery.dart';
-
 part 'model/team_model .dart';
 
 part 'model/space/collection_model.dart';
