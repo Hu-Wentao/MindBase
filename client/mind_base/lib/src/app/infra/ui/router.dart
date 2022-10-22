@@ -5,5 +5,7 @@ final _router = GoRouter(
   initialLocation: const SplashRoute().location,
   routes: [
     $splashRoute,
+    $authRoute,
+    $homeRoute,
   ],
 );
