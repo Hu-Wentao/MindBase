@@ -6,7 +6,6 @@ import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.da
 import 'package:mind_base/src/feedback/infra/ui/widget/feedback_btn.dart';
 import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/user/infra/ui/components/user_tile.dart';
-import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/space/infra/ui/dialog/collection_edit_dialog.dart';
 import 'package:mind_base/src/space/infra/ui/widget/data_table_grid.dart';
 import 'package:mind_base/src/space/infra/ui/widget/space_selector_bar.dart';
