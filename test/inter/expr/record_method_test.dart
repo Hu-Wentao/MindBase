@@ -58,8 +58,8 @@
 //         4: Value.of("asdf")
 //       },
 //     );
-//     final ws = WorkspaceDataHolder();
-//     GetIt.I.registerSingleton<WorkspaceDataHolder>(ws);
+//     final ws = SpaceModelDataHolder();
+//     GetIt.I.registerSingleton<SpaceModelDataHolder>(ws);
 //     ws.updateMeta(meta);
 //
 //     ws.insertRecord(rcd);

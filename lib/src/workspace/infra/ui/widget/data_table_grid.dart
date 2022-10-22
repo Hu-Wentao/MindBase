@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
@@ -161,7 +162,7 @@ class RecordDataGrid extends StatelessWidget {
           onSaveMeta: openedMeta.actUpdateMeta,
           onSaveRecord: openedMeta.actSaveRecord,
           onUpdateView: (m, v) => openedMeta.actUpdateView(v),
-          openedWorkspace: openedSpace,
+          openedSpaceModel: openedSpace,
           queryMetaFn: openedSpace.queryMeta,
           allMetas: openedSpace.allMetas,
         ),
@@ -216,7 +217,7 @@ class RecordDataGrid extends StatelessWidget {
 class DataFrameTitlePluto extends StatelessWidget {
   final OpenedMeta openedMeta;
   final TableView? view; // 当前视图，可以为空
-  final SpaceModel openedWorkspace;
+  final SpaceModel openedSpaceModel;
   final PlutoGridStateManager stateManager;
   final Future<BaseException?> Function(RecordDto? dto) onSaveRecord;
   final Future<void> Function(MetaDto? dto) onSaveMeta;
@@ -233,7 +234,7 @@ class DataFrameTitlePluto extends StatelessWidget {
     Key? key,
     required this.openedMeta,
     this.view,
-    required this.openedWorkspace,
+    required this.openedSpaceModel,
     required this.stateManager,
     required this.onSaveMeta,
     required this.onSaveRecord,
@@ -254,7 +255,7 @@ class DataFrameTitlePluto extends StatelessWidget {
                 await showRecordEditDialog(
                   context: context,
                   meta: meta,
-                  openedWorkspace: openedWorkspace,
+                  openedSpaceModel: openedSpaceModel,
                   kRecordBuilder: _kRecordBuilder,
                 ),
               ).thenDialog(context),

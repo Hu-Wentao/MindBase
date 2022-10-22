@@ -158,8 +158,8 @@
 //       5: Value.of(pRcdHfu.id)
 //     },
 //   );
-//   final ws = WorkspaceDataHolder();
-//   GetIt.I.registerSingleton<WorkspaceDataHolder>(ws);
+//   final ws = SpaceModelDataHolder();
+//   GetIt.I.registerSingleton<SpaceModelDataHolder>(ws);
 //   ws.insertMeta(pMetaStudent);
 //   ws.insertMeta(pMetaSchool);
 //   ws.insertRecord(pRcdZs);
@@ -245,7 +245,7 @@
 //       expect(str, pReadableL2);
 //
 //       /// ReadableDto -> Domain
-//       /// 注意,传入的是 [RecordMeta]实例,但存储在内部的只有MetaId :String, 实际上通过 WorkspaceDataHolder读取
+//       /// 注意,传入的是 [RecordMeta]实例,但存储在内部的只有MetaId :String, 实际上通过 SpaceModelDataHolder读取
 //       /// expr12 尝试直接传入 [RecordMeta]实例, 避免使用 sl
 //       final expr =
 //           readableDto.toDomain(pRcdZs.meta.id, (_) => pRcdZs.meta);
@@ -382,7 +382,7 @@
 //       // expect(str, pReadableL2);
 //
 //       /// ReadableDto -> Domain
-//       /// 注意,传入的是 [RecordMeta]实例,但存储在内部的只有MetaId :String, 实际上通过 WorkspaceDataHolder读取
+//       /// 注意,传入的是 [RecordMeta]实例,但存储在内部的只有MetaId :String, 实际上通过 SpaceModelDataHolder读取
 //       final expr =
 //           readableDto.toDomain(pRcdZs.meta.id, (_) => pRcdZs.meta);
 //       print("expr = $expr");

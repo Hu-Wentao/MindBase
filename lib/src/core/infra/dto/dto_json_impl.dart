@@ -141,7 +141,7 @@ extension ValueJsonDtoJsonX on ValueJsonDto {
       };
 }
 
-extension WorkspaceDtoJsonX on SpaceDto {
+extension SpaceModelDtoJsonX on SpaceDto {
   static SpaceDto fromJson(Map<String, dynamic> json) => SpaceDto(
         id: json['id'] as String,
         name: json['name'] as String,

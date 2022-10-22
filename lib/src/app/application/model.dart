@@ -6,12 +6,20 @@ import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/app/application.dart';
 import 'package:mind_base/src/app/application/service/service.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
+import 'package:mind_base/src/core/inter/i_dao.dart';
+import 'package:mind_base/src/core/inter/i_dto.dart';
 import 'package:mind_base/src/user/application/service.dart';
 import 'package:mind_base/src/user/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/user/domain/value/value.dart';
 import 'package:mind_base/src/user/inter/dto.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
+import 'package:mind_base/src/workspace/application/service/meta_service.dart';
 import 'package:mind_base/src/workspace/application/service/service.dart';
+import 'package:mind_base/src/workspace/application/service/workspace_service.dart';
+import 'package:mind_base/src/workspace/domain/entity/entity.dart';
+import 'package:mind_base/src/workspace/infra/dao/dao_aw_impl.dart';
+import 'package:mind_base/src/workspace/infra/ui/dialog/import_data_dialog.dart';
+import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 import 'package:mockito/annotations.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 import 'package:appwrite/appwrite.dart' as cli;
@@ -29,6 +37,8 @@ import 'model.mocks.dart';
 part 'model/app_model.dart';
 
 part 'model/user_model.dart';
+
+part 'model/space/space_model.dart';
 
 part 'model.freezed.dart';
 

@@ -34,8 +34,6 @@ import 'package:appwrite/models.dart' as aw;
 import 'package:dart_appwrite/dart_appwrite.dart' as srv;
 import 'package:dart_appwrite/models.dart' as da;
 
-part 'space_model.dart';
-
 part 'meta_model.dart';
 
 part 'record_model.dart';

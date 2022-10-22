@@ -14,7 +14,7 @@ import 'package:slowly/slowly.dart' as _i11;
 
 import '../../app/application.dart' as _i8;
 import '../../app/application/service/service.dart' as _i10;
-import '../../user/application/service/account_service.dart' as _i5;
+import '../../user/application/service.dart' as _i5;
 import '../../workspace/application/service/service.dart' as _i6;
 import '../../workspace/application/service/workspace_service.dart' as _i13;
 import '../../workspace/infra/dao/dao_aw_impl.dart' as _i12;
@@ -70,16 +70,16 @@ _i1.GetIt $initGetIt(
       _prod,
     },
   );
+  gh.lazySingleton<_i12.SpaceModelEttAccessor>(() => appClientConfig.wsEttAcc);
+  gh.lazySingleton<_i13.SpaceService>(() => _i13.SpaceService(
+        get<_i4.Databases>(),
+        get<_i12.SpaceModelEttAccessor>(),
+      ));
   gh.lazySingleton<_i3.Storage>(() => appServerConfig.storage);
   gh.lazySingleton<_i4.Storage>(() => appClientConfig.storage);
   gh.lazySingleton<_i3.Teams>(() => appServerConfig.teams);
   gh.lazySingleton<_i4.Teams>(() => appClientConfig.teams);
-  gh.lazySingleton<_i12.WorkspaceEttAccessor>(() => appClientConfig.wsEttAcc);
-  gh.lazySingleton<_i13.SpaceService>(() => _i13.SpaceService(
-        get<_i4.Databases>(),
-        get<_i12.WorkspaceEttAccessor>(),
-      ));
-  gh.lazySingleton<_i6.TeamService>(() => _i6.TeamService(
+  gh.lazySingleton<_i5.TeamService>(() => _i5.TeamService(
         get<_i4.Teams>(),
         get<_i3.Teams>(),
       ));

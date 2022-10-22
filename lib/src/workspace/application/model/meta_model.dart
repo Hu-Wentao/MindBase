@@ -193,7 +193,7 @@ abstract class IMetaModel extends ModelSidecar<MetaDto, BaseException?>
 class MetaModel extends IMetaModel with MetaStateChangeMx {
   MetaModel(super.data, this.at);
 
-  final WorkspaceModel at;
+  final SpaceModel at;
 
   /// 子状态
 

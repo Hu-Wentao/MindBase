@@ -1,24 +1,25 @@
-import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
+
+import 'package:mind_base/src/app/application/model.dart';
 
 abstract class Event {}
 
 // 首次打开
-class WorkspaceOpenedEvt implements Event {
-  final Workspace workspace;
+class SpaceModelOpenedEvt implements Event {
+  final SpaceModel workspace;
 
-  WorkspaceOpenedEvt(this.workspace);
+  SpaceModelOpenedEvt(this.workspace);
 
   @override
   String toString() =>
-      'WorkspaceOpenedEvt{id: [${workspace.id}], name: [${workspace.name}]}';
+      'SpaceModelOpenedEvt{id: [${workspace.id}], name: [${workspace.name}]}';
 }
 
-class WorkspaceCloseEvt implements Event {
-  final Workspace workspace;
+class SpaceModelCloseEvt implements Event {
+  final SpaceModel workspace;
 
-  WorkspaceCloseEvt(this.workspace);
+  SpaceModelCloseEvt(this.workspace);
 
   @override
   String toString() =>
-      'WorkspaceCloseEvt{id: [${workspace.id}], name: [${workspace.name}]}';
+      'SpaceModelCloseEvt{id: [${workspace.id}], name: [${workspace.name}]}';
 }

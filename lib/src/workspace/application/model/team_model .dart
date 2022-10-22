@@ -108,13 +108,13 @@ extension TeamSpaceX on TeamModel {
   }
 
   createSpace(String name) async {
-    final data = await _workspaceSrv.createWorkspaceDtoBy(id, name);
+    final data = await _workspaceSrv.createSpaceModelDtoBy(id, name);
     state.isOrNull<TeamStateDone>()?.workspaces.add(SpaceModel(data));
     setState(state, '新增space[${data.id}]');
   }
 
   updateSpaces() async {
-    final dataLs = await _workspaceSrv.queryWorkspaceDto(id);
+    final dataLs = await _workspaceSrv.querySpaceModelDto(id);
     final rst = <SpaceModel>[];
     // 以新spaceLs为基础，复用老Model
     for (final model in workspaces) {
@@ -126,7 +126,7 @@ extension TeamSpaceX on TeamModel {
       rst.add(SpaceModel(data));
     }
     setState(TeamStateDone(workspaces: rst, members: members),
-        '刷新Workspaces[${rst.length}]');
+        '刷新SpaceModels[${rst.length}]');
   }
 
   SpaceService get _workspaceSrv => sl<SpaceService>();
@@ -177,7 +177,7 @@ extension TeamDeprecatedX on TeamModel {
           : null;
 
   @Deprecated('createSpace')
-  Future<BaseException?> actCreateWorkspace(
+  Future<BaseException?> actCreateSpaceModel(
     String spaceName, {
     Function(SpaceDto w)? onCreated,
   }) =>

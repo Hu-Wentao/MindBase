@@ -314,11 +314,11 @@ class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
         returnValueForMissingStub: 0,
       ) as int);
   @override
-  List<_i4.SpaceModel> get workspaces => (super.noSuchMethod(
+  List<_i3.SpaceModel> get workspaces => (super.noSuchMethod(
         Invocation.getter(#workspaces),
-        returnValue: <_i4.SpaceModel>[],
-        returnValueForMissingStub: <_i4.SpaceModel>[],
-      ) as List<_i4.SpaceModel>);
+        returnValue: <_i3.SpaceModel>[],
+        returnValueForMissingStub: <_i3.SpaceModel>[],
+      ) as List<_i3.SpaceModel>);
   @override
   List<_i4.MemberModel> get members => (super.noSuchMethod(
         Invocation.getter(#members),

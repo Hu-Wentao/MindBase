@@ -1,7 +1,7 @@
 part of 'home.dart';
 
-class WorkspacesScreen extends StatelessWidget {
-  const WorkspacesScreen({Key? key}) : super(key: key);
+class SpaceModelsScreen extends StatelessWidget {
+  const SpaceModelsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => Consumer<UserModel>(
@@ -87,7 +87,7 @@ class _TeamPanelState extends State<TeamPanel> {
                       builder: (c, team, _) => Column(
                         children: [
                           for (final space in team.workspaces)
-                            WorkspaceTile(
+                            SpaceModelTile(
                               team: team,
                               space: space.data,
                             )
@@ -99,11 +99,11 @@ class _TeamPanelState extends State<TeamPanel> {
       );
 }
 
-class WorkspaceTile extends StatelessWidget {
+class SpaceModelTile extends StatelessWidget {
   final TeamModel team;
   final SpaceDto space;
 
-  const WorkspaceTile({Key? key, required this.space, required this.team})
+  const SpaceModelTile({Key? key, required this.space, required this.team})
       : super(key: key);
 
   @override
@@ -218,7 +218,7 @@ class TeamTile extends StatelessWidget {
                   .thenDialog(context);
               break;
             case "create_space":
-              await team.actCreateWorkspace('新建空间', onCreated: (w) {
+              await team.actCreateSpaceModel('新建空间', onCreated: (w) {
                 SpaceRoute.auto(teamId: team.id, spaceId: w.id).go(context);
               }).thenDialog(context);
               break;

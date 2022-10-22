@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/app/application/model.mocks.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/application/service/expr/expression_parser.dart';
@@ -23,7 +24,7 @@ const pMetaSchoolId = ('626a109fd90369d16c2fbe0e');
 const pRcdSchoolHfuId = ("626a98b14a034567ff06f2f4");
 const pRcdStudentZsId = ('6262e3b0118f5894993d4533');
 final tm = MockTeamModel();
-final sp = WorkspaceModel(SpaceDto.builder(), )
+final sp = SpaceModel(SpaceDto.builder(), )
   ..metas.addAll([pMetaSchool, pMetaStudent]);
 
 // Meta 2个
@@ -147,7 +148,7 @@ final pMetaStudent = MetaModel(
 //   ]),
 //   const ExprValue.build(type: AttrType.string, ag: ["~~", null])
 // ]);
-final pWs = WorkspaceModel(
+final pWs = SpaceModel(
     SpaceDto(
       id: 'wsId',
       name: 'wsName',

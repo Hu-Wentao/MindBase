@@ -327,7 +327,7 @@ extension AttributeDtoAppwriteX on AttributeDto {
       );
 }
 
-extension WorkspaceDtoAppwriteX on SpaceDto {
+extension SpaceModelDtoAppwriteX on SpaceDto {
   Map<String, dynamic> toJson() => {
         // 'id': id, // 没有id属性
         'teamId': teamId,

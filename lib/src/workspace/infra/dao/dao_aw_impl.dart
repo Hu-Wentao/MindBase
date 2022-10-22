@@ -211,21 +211,21 @@ mixin AppwriteAccessorWatchableMx<T extends IEntityDto>
 }
 
 /// 根据 Meta-v3.1C 实现
-class WorkspaceEttAccessor extends BaseAppwriteAccessor<SpaceDto>
+class SpaceModelEttAccessor extends BaseAppwriteAccessor<SpaceDto>
     with AppwriteAccessorWatchableMx<SpaceDto> {
   @override
   final RealtimeChannelHub hub;
 
-  const WorkspaceEttAccessor(Databases db, String collectionId, this.hub)
+  const SpaceModelEttAccessor(Databases db, String collectionId, this.hub)
       : super(db, collectionId);
 
   @override
   SpaceDto jsonToDto(Map<String, Object?> js) =>
-      WorkspaceDtoAppwriteX.fromJson(js);
+      SpaceModelDtoAppwriteX.fromJson(js);
 
   @override
   Map<String, dynamic> dtoToJson(SpaceDto dto) =>
-      WorkspaceDtoAppwriteX(dto).toJson();
+      SpaceModelDtoAppwriteX(dto).toJson();
 
   Stream<SpaceDto> findAllByTeam(String teamId) => findAll([
         Query.equal('teamId', teamId),

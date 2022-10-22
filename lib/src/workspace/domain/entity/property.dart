@@ -55,11 +55,11 @@ class Method extends Property {
   /// [find] record所在的SpaceModel中调用, 可空(如果Record内的方法没有引用其他类型(Meta)的话)
   ///
   /// 上下文 [AsFuncThis.ctxSign]  : 当前record(`this`)
-  /// 上下文 [Workspace.ctxFindRecordFnSign] :用于查询 [AttrType.ref] 所对应的记录值
+  /// 上下文 [SpaceModel.ctxFindRecordFnSign] :用于查询 [AttrType.ref] 所对应的记录值
   dynamic eval(Record record, FindRecordFn? find) {
     final r = exprEvaluator.eval(expr, {
       AsFuncThis.ctxSign: record,
-      Workspace.ctxFindRecordFnSign: find,
+      SpaceModel.ctxFindRecordFnSign: find,
     });
     return r.value;
   }

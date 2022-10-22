@@ -1,4 +1,5 @@
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/workspace/application/service/expr/expr_evaluator.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
@@ -67,7 +68,7 @@ class ExprDtoToDomain {
       ExprValue.build(
           type: AttrType.ref(
             ctx[AsFuncThis.ctxMetaIdSign],
-            ctx[Workspace.ctxQueryMetaSign],
+            ctx[SpaceModel.ctxQueryMetaSign],
           ),
           ag: const []);
 
@@ -85,7 +86,7 @@ class ExprDtoToDomain {
     MemberExprTokenDto expr,
     Map<String, dynamic> ctx,
   ) {
-    // `expr.object`将被识别为`VariableDto`, `this`从ctx中获取到 MetaId, 而Value本身可以从 Workspace中得到Meta
+    // `expr.object`将被识别为`VariableDto`, `this`从ctx中获取到 MetaId, 而Value本身可以从 SpaceModel中得到Meta
     // expr-v12 单独
     final objectV = convert(expr.object, ctx); // 这是This表达式
     final objectType = objectV.type; //  类型推断关键点: 通过type方法,IExpr自行返回表达式的结果类型

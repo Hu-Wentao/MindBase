@@ -1,3 +1,4 @@
+import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/workspace/application/service/expr/domain_to_token.dart';
 import 'package:mind_base/src/workspace/application/service/expr/node_to_token.dart';
 import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
@@ -50,6 +51,6 @@ extension IExprTokenX on IExpr {
 extension IExprNodeDtoTokenX on IExprNodeDto {
   // 由于Domain本身已经携带了ctx, 所以这里不许需要额外传入ctx
   String toTokenString(QueryMetaFn queryMetaFn) => nodeToToken.convert(this, {
-        Workspace.ctxQueryMetaSign: queryMetaFn,
+        SpaceModel.ctxQueryMetaSign: queryMetaFn,
       });
 }

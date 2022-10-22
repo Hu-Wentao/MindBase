@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
+import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:petitparser/petitparser.dart';
 
@@ -53,7 +53,7 @@ abstract class ExprTokenDto {
           // 由于没有`this`,只有`this`的类型(Meta)所以这里使用[ctxTypeSign]
           AsFuncThis.ctxMetaIdSign: metaId,
           // 注入当前工作空间, 用于通过metaId查询Meta
-          Workspace.ctxQueryMetaSign: queryMetaFn,
+          SpaceModel.ctxQueryMetaSign: queryMetaFn,
         }..addEntries(IFunc.allFuncMapEntry), // 注意,在Dto->Domain时,似乎仍然需要全局Func
       );
 }

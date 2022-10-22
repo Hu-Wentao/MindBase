@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/infra/ui/form/record_form.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
@@ -7,7 +8,7 @@ import 'package:ndialog/ndialog.dart';
 Future<RecordDto?> showRecordEditDialog({
   required BuildContext context,
   required RecordMeta meta,
-  required SpaceModel openedWorkspace,
+  required SpaceModel openedSpaceModel,
   required kRecordBuilder,
   RecordDto? origin,
 }) =>
@@ -16,7 +17,7 @@ Future<RecordDto?> showRecordEditDialog({
       title: origin == null ? const Text("插入新的记录") : const Text("编辑记录"),
       content: RecordForm(
         meta: meta,
-        openedWorkspace: openedWorkspace,
+        openedSpaceModel: openedSpaceModel,
         origin: origin,
         kRecordBuilder: kRecordBuilder,
       ),

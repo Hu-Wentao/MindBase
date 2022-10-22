@@ -122,7 +122,7 @@ class _HomePageState extends State<HomePage>
   _buildBody(BuildContext context) {
     switch (activeIdx) {
       case 0:
-        return const WorkspacesScreen();
+        return const SpaceModelsScreen();
       case 1:
         return const TeamScreen();
       case 2:

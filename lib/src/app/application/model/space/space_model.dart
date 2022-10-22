@@ -1,4 +1,4 @@
-part of 'model.dart';
+part of '../../model.dart';
 
 @freezed
 class SpaceAct with _$SpaceAct {
@@ -24,7 +24,7 @@ class SpaceState with _$SpaceState {
   const factory SpaceState.init() = SpaceStateInit;
 
   const factory SpaceState.done(
-    da.Collection metaTableDetail,
+    Collection metaTableDetail,
     List<MetaModel> metas,
   ) = SpaceStateDone;
 }
@@ -40,7 +40,7 @@ class SpaceModel extends BaseActEntranceModel<SpaceAct, SpaceState> {
   String get name => data.name;
 
   @protected
-  da.Collection? get metaTableDetail =>
+  Collection? get metaTableDetail =>
       state.isOrNull<SpaceStateDone>()?.metaTableDetail;
 
   CollectionDto? get metaTableDetailDto => CollectionDto.from(metaTableDetail);
@@ -100,7 +100,7 @@ class SpaceModel extends BaseActEntranceModel<SpaceAct, SpaceState> {
   /// ==== deprecated
 
   @Deprecated('metaTableInfo')
-  da.Collection? get metaCollection => metaTableDetail;
+  Collection? get metaCollection => metaTableDetail;
 
   @Deprecated('metas')
   Iterable<MetaModel> allMetas() => metas;
@@ -208,7 +208,7 @@ extension SpaceStateChangeX on SpaceModel {
 
   RecordMetaEttAccessor get _metaAcc =>
       // __metaAcc ??=
-      RecordMetaEttAccessor(sl<Databases>(), data.id);
+      RecordMetaEttAccessor(sl<cli.Databases>(), data.id);
 
   int __indexByOpenedMetas(
     String metaId, {
@@ -293,8 +293,3 @@ extension SpaceStateChangeX on SpaceModel {
 //   throw ExceptionAdapter.of(e, s);
 // });
 }
-
-@Deprecated('use SpaceModel')
-typedef WorkspaceModel = SpaceModel;
-@Deprecated('use SpaceModel')
-typedef Workspace = SpaceModel;

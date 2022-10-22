@@ -14,8 +14,8 @@ import 'package:mind_base/src/workspace/infra/ui/widget/widget.dart';
 import 'package:provider_sidecar/provider_sidecar_ex.dart';
 
 /// 工作空间页 todo 考虑该为stateless
-class WorkspacePage extends StatelessWidget {
-  const WorkspacePage({
+class SpaceModelPage extends StatelessWidget {
+  const SpaceModelPage({
     Key? key,
     required this.teamId,
     required this.spaceId,
@@ -122,7 +122,7 @@ class _SpaceViewState extends State<SpaceView>
                     itemBuilder: (ctx) => [
                       for (final space in mTeam.workspaces)
                         PopupMenuItem<String>(
-                          value: 'selectWorkspaceEvt${space.id}',
+                          value: 'selectSpaceModelEvt${space.id}',
                           child: ListTile(
                             leading: const Icon(Icons.space_dashboard_rounded),
                             title: Text(space.name),
@@ -133,9 +133,9 @@ class _SpaceViewState extends State<SpaceView>
                       // 选中Item后,在这里会被二次调用
                       switch (value) {
                         default:
-                          if (value.startsWith('selectWorkspaceEvt')) {
+                          if (value.startsWith('selectSpaceModelEvt')) {
                             final spaceId =
-                                value.substring('selectWorkspaceEvt'.length);
+                                value.substring('selectSpaceModelEvt'.length);
                             SpaceRoute.auto(
                               teamId: mTeam.id,
                               spaceId: spaceId,

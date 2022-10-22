@@ -128,7 +128,7 @@ class MetaForm extends StatelessWidget {
       // 所以在expr12中, 无法在创建Meta之前,创建方法
       final metaId = metaMap['id'] as String?;
       // 尝试查询Meta,如果查不到就取消添加方法(因为Meta还没被创建)
-      // final meta = sl<WorkspaceDataHolder>().getMetaBy(ObjectId.fromHexString(metaId));
+      // final meta = sl<SpaceModelDataHolder>().getMetaBy(ObjectId.fromHexString(metaId));
       // 注意, 由于 attr-v7.2 新增QueryMetaFn, 所以只要MetaId!=null,就可以新建方法
       final methods = (metaId == null)
           ? const <MethodDto>[]

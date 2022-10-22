@@ -32,7 +32,7 @@ class MetaMemberAccessor implements MemberAccessor<RecordMeta> {
 
 /// 记录值访问器
 class RecordMemberAccessor implements MemberAccessor<Record> {
-  // final WorkspaceDataHolder workspace;
+  // final SpaceModelDataHolder workspace;
 
   const RecordMemberAccessor();
 

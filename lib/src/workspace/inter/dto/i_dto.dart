@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'package:appwrite/appwrite.dart';
 import 'package:collection/collection.dart';
-import 'package:dart_appwrite/models.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:json_editor/json_editor.dart';
+import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/core/infra/dto/dto_json_impl.dart';
 import 'package:mind_base/src/core/inter/i_dto.dart';
 import 'package:mind_base/src/user/inter/dto.dart';
@@ -477,7 +477,7 @@ extension AttrbuteX on Attribute {
 
 extension AttrTypeDtoX on AttrTypeDto {
   // 请确保type是ref类型,否则报错
-  MetaModel fetchMeta(WorkspaceModel space) => space.queryMeta(r!);
+  MetaModel fetchMeta(SpaceModel space) => space.queryMeta(r!);
 }
 
 /// 表头/属性: 关系/表的一列叫属性
@@ -580,7 +580,7 @@ class SpaceDto extends IEntityDto {
     this.metas = const [],
   });
 
-  // Workspace toDomain(RecordMeta Function(String metaId) toMeta) => Workspace(
+  // SpaceModel toDomain(RecordMeta Function(String metaId) toMeta) => SpaceModel(
   //     id: id, name: name, metas: metas.map((e) => toMeta(e)).toList());
 
   @override
@@ -591,7 +591,7 @@ extension AttrTypeX on AttrType {
   AttrTypeDto toDto() => AttrTypeDto(tp, meta?.id);
 
   // 请确保type是ref类型,否则报错
-  MetaModel fetchMeta(WorkspaceModel space) => space.queryMeta(r!);
+  MetaModel fetchMeta(SpaceModel space) => space.queryMeta(r!);
 }
 
 /// 如果[tp]为[AttrTp.ref],则[r]不能为空

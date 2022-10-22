@@ -1,6 +1,6 @@
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/workspace/application/service/expr/expr_evaluator.dart';
-import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
+import 'package:mind_base/src/app/application/model.dart';
+import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/inter/dto/expr_token_dto.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
@@ -14,7 +14,7 @@ const nodeToToken = NodeToToken(
 class NodeToToken {
   const NodeToToken();
 
-  /// [ctx] 需要传入 [Workspace.ctxQueryMetaSign]
+  /// [ctx] 需要传入 [SpaceModel.ctxQueryMetaSign]
   String convert(IExprNodeDto expr, Map<String, dynamic> ctx) {
     late String r;
     // print("debug convert#start#  expr: $expr");
@@ -55,7 +55,7 @@ class NodeToToken {
     final main = convert(mainAg, ctx);
     // final mainMeta = mainAg.type.meta!;
     final mainMeta =
-        (ctx[Workspace.ctxQueryMetaSign] as QueryMetaFn).call(mainAg.type!.r!);
+        (ctx[SpaceModel.ctxQueryMetaSign] as QueryMetaFn).call(mainAg.type!.r!);
 
     final propId = attrAg.ag[0]; // attr必定是 propId, 不过type可能是ref,或者是String
     final attrName = mainMeta.getPropBy(propId).name;
@@ -82,7 +82,7 @@ class NodeToToken {
       ExprValue.build(
           type: AttrType.ref(
             ctx[AsFuncThis.ctxMetaIdSign],
-            ctx[Workspace.ctxQueryMetaSign],
+            ctx[SpaceModel.ctxQueryMetaSign],
           ),
           ag: const []);
 
@@ -100,7 +100,7 @@ class NodeToToken {
   //   MemberExprTokenDto expr,
   //   Map<String, dynamic> ctx,
   // ) {
-  //   // `expr.object`将被识别为`VariableDto`, `this`从ctx中获取到 MetaId, 而Value本身可以从 Workspace中得到Meta
+  //   // `expr.object`将被识别为`VariableDto`, `this`从ctx中获取到 MetaId, 而Value本身可以从 SpaceModel中得到Meta
   //   // expr-v12 单独
   //   final objectV = convert(expr.object, ctx); // 这是This表达式
   //   final objectType = objectV.type; //  类型推断关键点: 通过type方法,IExpr自行返回表达式的结果类型

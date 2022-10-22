@@ -42,7 +42,7 @@ class SpaceRoute extends GoRouteData {
   });
 
   @override
-  Widget build(BuildContext context) => WorkspacePage(
+  Widget build(BuildContext context) => SpaceModelPage(
         teamId: teamId,
         spaceId: spaceId,
         metaId: metaId,

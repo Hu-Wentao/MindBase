@@ -12,23 +12,23 @@ class TestTeam {
   }
 }
 
-class TestWorkspace {
+class TestSpaceModel {
   final String name;
   final String path;
 
-  TestWorkspace(this.name, this.path);
+  TestSpaceModel(this.name, this.path);
 
   @override
   String toString() {
-    return 'Workspace{name: $name, path: $path}';
+    return 'SpaceModel{name: $name, path: $path}';
   }
 }
 
 main() {
   final workspaces = {
     TestTeam("aaa", '132'): [
-      TestWorkspace('name', 'path'),
-      TestWorkspace('name2', 'path2')
+      TestSpaceModel('name', 'path'),
+      TestSpaceModel('name2', 'path2')
     ],
     TestTeam("bbb", '133'): [],
   };

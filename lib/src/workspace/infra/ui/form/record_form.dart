@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
@@ -10,14 +11,14 @@ import 'package:pluto_grid/pluto_grid.dart';
 /// 创建指定[RecordMeta]对应的Record
 class RecordForm extends StatefulWidget {
   final RecordMeta meta; // Record对应的Meta的Id
-  final SpaceModel openedWorkspace; // 当前工作区
+  final SpaceModel openedSpaceModel; // 当前工作区
   final RecordDto? origin;
   final GlobalKey<FormBuilderState>? kRecordBuilder;
 
   const RecordForm({
     Key? key,
     required this.meta,
-    required this.openedWorkspace,
+    required this.openedSpaceModel,
     this.origin,
     this.kRecordBuilder,
   }) : super(key: key);
@@ -66,14 +67,14 @@ class _RecordFormState extends State<RecordForm> {
           controller: ctrl,
           decoration: InputDecoration(
             // 字段名称与类型名称
-            labelText: "${attr.name} (${attr.type.fetchMeta(widget.openedWorkspace).name})",
+            labelText: "${attr.name} (${attr.type.fetchMeta(widget.openedSpaceModel).name})",
             hintText: attr.type.name,
           ),
           validator: FormBuilderValidators.compose([
             FormBuilderValidators.required(context),
           ]),
           onTap: () {
-            final refDataSource = widget.openedWorkspace.openedMetas
+            final refDataSource = widget.openedSpaceModel.openedMetas
                 .firstWhere((element) => element.id == attr.type.r)
                 .dataSource;
             // pop菜单

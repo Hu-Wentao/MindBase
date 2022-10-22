@@ -26,7 +26,7 @@ extension PropertyBizX on RecordModel {
     if (prop is MethodDto) {
       final r = exprEvaluator.eval(prop.expr.toDomain(at.at.queryMeta), {
         AsFuncThis.ctxSign: this,
-        Workspace.ctxFindRecordFnSign: at.at.findRecord,
+        SpaceModel.ctxFindRecordFnSign: at.at.findRecord,
       });
       return r.value;
     } else {

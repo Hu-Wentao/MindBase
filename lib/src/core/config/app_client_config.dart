@@ -11,7 +11,7 @@ abstract class AppClientConfig {
     ..setProject("627f35455d30081f4a5c")
     ..setSelfSigned(status: true); // 可能只适用于dev环境
   @lazySingleton
-  WorkspaceEttAccessor get wsEttAcc => WorkspaceEttAccessor(
+  SpaceModelEttAccessor get wsEttAcc => SpaceModelEttAccessor(
         sl<Databases>(),
         "627faa18b854b07aa9a8",
         sl<RealtimeChannelHub>(),

@@ -13,7 +13,7 @@ import 'meta_service.dart';
 @lazySingleton
 class SpaceService {
   final Databases _db;
-  final WorkspaceEttAccessor _workspaceEttAcc;
+  final SpaceModelEttAccessor _workspaceEttAcc;
 
   const SpaceService(
     this._db,
@@ -27,14 +27,14 @@ class SpaceService {
   Stream<MetaDto> queryMetasBy(String workspaceId) =>
       _getMetaAcc(workspaceId).findAll();
 
-  Future<Map<Team, List<SpaceDto>>> queryWorkspaceDtoBy(
+  Future<Map<Team, List<SpaceDto>>> querySpaceModelDtoBy(
       List<Team> teams) async {
     final r = Map.fromIterables(
       teams,
       List.generate(teams.length, (index) => <SpaceDto>[]),
     );
     for (final t in teams) {
-      final w = await queryWorkspaceDto(t.$id);
+      final w = await querySpaceModelDto(t.$id);
       if (w.isNotEmpty) {
         r[t] ??= <SpaceDto>[];
         r[t]!.addAll(w);
@@ -43,11 +43,11 @@ class SpaceService {
     return r;
   }
 
-  Future<List<SpaceDto>> queryWorkspaceDto(String teamId) async {
+  Future<List<SpaceDto>> querySpaceModelDto(String teamId) async {
     return await _workspaceEttAcc.findAllByTeam(teamId).toList();
   }
 
-  Future<SpaceDto> createWorkspaceDtoBy(
+  Future<SpaceDto> createSpaceModelDtoBy(
     String teamId,
     String spaceName,
   ) async {
@@ -87,7 +87,7 @@ class SpaceService {
     }
   }
 
-  Future<void> updateWorkspaceName(
+  Future<void> updateSpaceModelName(
     SpaceDto space,
     String nName,
   ) {

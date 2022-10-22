@@ -5,7 +5,7 @@ typedef QueryMetaFn = RecordMeta Function(String metaId);
 class AttrType {
   final AttrTp tp;
   final String? r;
-  // 从所在Workspace中获取Meta的函数
+  // 从所在SpaceModel中获取Meta的函数
   final QueryMetaFn? _getMeta;
 
   @Deprecated("考虑移除any类型, 默认用string")
