@@ -190,13 +190,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.2"
-  cupertino_icons:
-    dependency: "direct main"
-    description:
-      name: cupertino_icons
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.0.5"
   dart_appwrite:
     dependency: "direct main"
     description:
@@ -522,9 +515,9 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v3.0"
-      resolved-ref: "8f618ef2d8aa9e1ed28e7a278e6698b4d7536b8d"
-      url: "https://e.coding.net/shuttlecloud/company/get_arch_core.git"
+      ref: "v4.1"
+      resolved-ref: "9de1f39038099f3797ad35e6207462fddf9b058b"
+      url: "https://github.com/GetArch/get_arch_core.git"
     source: git
     version: "3.0.0"
   get_it:
@@ -537,9 +530,11 @@ packages:
   get_sweet:
     dependency: "direct main"
     description:
-      path: "../get_sweet"
-      relative: true
-    source: path
+      path: "."
+      ref: "v1.0"
+      resolved-ref: "3d68749850d4089abe7d630cfbf784ef10005873"
+      url: "https://github.com/GetArch/get_sweet.git"
+    source: git
     version: "0.0.1"
   glob:
     dependency: transitive
@@ -1007,9 +1002,9 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: main
+      ref: "v1.0"
       resolved-ref: "671043958e5cd0f9b8d2d403743f8b4fe2c4fac4"
-      url: "https://gitee.com/hu_wt/slowly.git"
+      url: "https://github.com/GetArch/slowly.git"
     source: git
     version: "0.1.0"
   source_gen:

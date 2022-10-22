@@ -9,4 +9,9 @@ abstract class IEntityDto extends IDto {
   // 避免IDto的toString调用toDto导致报错
   @override
   String toString() => "IDto[$runtimeType]toString";
+
+  @override
+  Map<String, dynamic> toMap() => toJson();
+
+  toJson();
 }

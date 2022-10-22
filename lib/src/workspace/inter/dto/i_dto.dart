@@ -235,6 +235,9 @@ class CollectionDto extends IDto {
         writes: (value['writes'] as String).split(','),
         enabled: value['enabled'] as bool?,
       );
+
+  @override
+  Map<String, dynamic> toMap() => toJson();
 }
 
 ///
@@ -460,6 +463,7 @@ class MethodDto extends PropertyDto {
   @override
   String toString() =>
       'MethodDto{k: $k, name: $name, memo: $memo, expr: $expr}';
+  Map<String, dynamic> toMap() => toJson();
 
   @override
   Map<String, dynamic> toJson() =>
@@ -545,6 +549,7 @@ class AttributeDto extends PropertyDto {
   String toString() {
     return 'AttributeDto{k: $k, name: $name, memo: $memo, type: $type}';
   }
+  Map<String, dynamic> toMap() => toJson();
 
   @override
   Map<String, dynamic> toJson() =>

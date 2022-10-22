@@ -100,6 +100,9 @@ class ExprNodeDto extends IExprNodeDto {
   @override
   String toReadableString() =>
       "$fn(${ag.map((e) => e.toReadableString()).join(', ')})";
+
+  @override
+  Map<String, dynamic> toMap() => toJson();
 }
 
 /// 不同点在于, ValueDto 的ag是 List<dynamic>
@@ -151,6 +154,9 @@ class ValueJsonDto extends IExprNodeDto {
   @override
   // TODO: implement type
   AttrTypeDto? get type => throw UnimplementedError();
+
+  @override
+  Map<String, dynamic> toMap() => toJson();
 }
 
 /// 对应[ExprValue]
@@ -200,4 +206,6 @@ class ExprValueNodeDto extends IExprNodeDto {
 
   @override
   String? get fn => throw UnimplementedError("ExprValueJsonDto不需要::fn");
+  @override
+  Map<String, dynamic> toMap() => toJson();
 }
