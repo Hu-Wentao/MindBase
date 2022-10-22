@@ -1,12 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mind_base/src/app/application/model.dart';
-import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/space/domain/entity/entity.dart';
 import 'package:mind_base/src/space/domain/value/value.dart';
 import 'package:mind_base/src/space/inter/dto/i_dto.dart';
 import 'package:pluto_grid/pluto_grid.dart';
-import 'package:provider/provider.dart';
 
 /// 用于缓存一个表格的Cell Widget, 当数据源更新时,也同步更新Widget
 abstract class IRecordDataGridSource {
@@ -103,59 +101,55 @@ class _GridRefCellWidgetState extends State<GridRefCellWidget> {
   Widget build(BuildContext context) {
     PlutoColumnRendererContext rdCtx = widget.rdCtx;
     final refMetaId = (widget.type.r!);
-    return Consumer<SpaceModel>(
-        builder: (context, spaceX, child) => TextButton(
-              onPressed: () {
-                final refDataSource = widget.meta.at.openedMetas
-                    .firstWhere((m) => m.meta.id == refMetaId)
-                    .dataSource;
+    return TextButton(
+      onPressed: () {
+        final refDataSource = widget.meta.at.findMeta(refMetaId)!.dataSource;
+        /// pop菜单
+        PlutoGridPopup(
+          context: context,
+          columns: refDataSource.cachedColumns,
+          rows: refDataSource.cachedRows,
+          width: 600,
+          mode: PlutoGridMode.select,
+          // onLoaded: (PlutoGridOnLoadedEvent event) {
+          //   // rows
+          //   //     .asMap()
+          //   //     .entries
+          //   //     .forEach((element) {
+          //   //   final cell = element.value.cells[selectFieldName]!;
+          //   //
+          //   //   if (cell.value.toString() == controller.text) {
+          //   //     event.stateManager.setCurrentCell(cell, element.key);
+          //   //     event.stateManager
+          //   //         .moveScrollByRow(PlutoMoveDirection.up, element.key + 1);
+          //   //   }
+          //   // });
+          //   // event.stateManager.setShowColumnFilter(true);
+          // },
+          onSelected: (PlutoGridOnSelectedEvent event) {
+            // 选择记录之后..
+            print("onSelected $event, ${event.row!.cells}");
+            // 选中记录的Id
+            final selectRefRecordId =
+                (event.row!.key as ValueKey<String>).value;
+            final originRecordId = rdCtx.row.key as ValueKey<String>;
 
-                /// pop菜单
-                PlutoGridPopup(
-                  context: context,
-                  columns: refDataSource.cachedColumns,
-                  rows: refDataSource.cachedRows,
-                  width: 600,
-                  mode: PlutoGridMode.select,
-                  // onLoaded: (PlutoGridOnLoadedEvent event) {
-                  //   // rows
-                  //   //     .asMap()
-                  //   //     .entries
-                  //   //     .forEach((element) {
-                  //   //   final cell = element.value.cells[selectFieldName]!;
-                  //   //
-                  //   //   if (cell.value.toString() == controller.text) {
-                  //   //     event.stateManager.setCurrentCell(cell, element.key);
-                  //   //     event.stateManager
-                  //   //         .moveScrollByRow(PlutoMoveDirection.up, element.key + 1);
-                  //   //   }
-                  //   // });
-                  //   // event.stateManager.setShowColumnFilter(true);
-                  // },
-                  onSelected: (PlutoGridOnSelectedEvent event) {
-                    // 选择记录之后..
-                    print("onSelected $event, ${event.row!.cells}");
-                    // 选中记录的Id
-                    final selectRefRecordId =
-                        (event.row!.key as ValueKey<String>).value;
-                    final originRecordId = rdCtx.row.key as ValueKey<String>;
-
-                    // 更新的Record(todo 考虑改为只更新单个字段)
-                    final dto = widget.meta.records
-                        .firstWhere((rcd) => rcd.id == originRecordId.value)
-                        .toDto()
-                        .updateOnlyBy(rdCtx.column, selectRefRecordId);
-                    widget.meta.actSaveRecord(dto);
-                  },
-                );
-              },
-              child: Text(
-                // 展示RecordId
-                '${rdCtx.row.cells[rdCtx.column.field]!.value}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ));
+            // 更新的Record(todo 考虑改为只更新单个字段)
+            final dto = widget.meta.records
+                .firstWhere((rcd) => rcd.id == originRecordId.value)
+                .toDto()
+                .updateOnlyBy(rdCtx.column, selectRefRecordId);
+            widget.meta.actSaveRecord(dto);
+          },
+        );
+      },
+      child: Text(
+        // 展示RecordId
+        '${rdCtx.row.cells[rdCtx.column.field]!.value}',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
   }
 }
 
@@ -233,7 +227,7 @@ extension PlutoRecordDtoX on RecordDto {
   /// 更新某个属性
   RecordDto updateOnlyBy(PlutoColumn col, dynamic value) {
     final propId = col.field;
-    fields[propId.parsePropK] = Value.of(value);
+    fields[propId.parsePropK] = ValueDto.of(value);
     return this;
   }
 }
