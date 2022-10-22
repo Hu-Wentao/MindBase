@@ -4,3 +4,4 @@ typedef Session = md.Session;
 typedef User = md.User;
 
 typedef Team = md.Team;
+typedef Member = md.Membership;
