@@ -1,21 +1,21 @@
-part of 'service.dart';
+part of '../service.dart';
 
 @lazySingleton
 class TeamService {
-  final Teams _teams;
+  final cli.Teams _teams;
   final srv.Teams _srvTeams;
 
   TeamService(this._teams, this._srvTeams);
 
-  Future<List<aw.Team>> getTeams() async {
+  Future<List<Team>> getTeams() async {
     return (await _teams.list()).teams;
   }
 
-  Future<aw.Team> updateNameBy(String teamId, String name) async =>
+  Future<Team> updateNameBy(String teamId, String name) async =>
       await _teams.update(teamId: teamId, name: name);
 
   @Deprecated('updateNameBy')
-  Future<aw.Team> updateName(aw.Team team, String newName) async =>
+  Future<Team> updateName(Team team, String newName) async =>
       await updateNameBy(team.$id, newName);
 
   Future<void> deleteTeam(String teamId) async =>
@@ -23,7 +23,7 @@ class TeamService {
 
   /// 直接拉取用户到团队,无需同意.
   Future<void> inviteMember(
-    aw.Team team,
+    Team team,
     String userEmail, [
     List<String> roles = const [],
   ]) async {
@@ -37,16 +37,16 @@ class TeamService {
     print("debug member ${r.toMap()}");
   }
 
-  Future<aw.Team> createTeam(String name) async {
+  Future<Team> createTeam(String name) async {
     final r = await _teams.create(teamId: ObjectIdX.createHex, name: name);
     return r;
   }
 
   /// 获取团队
-  Future<aw.Team> getTeam(String teamId) async {
+  Future<Team> getTeam(String teamId) async {
     final tm = await _srvTeams.get(teamId: teamId);
     final mp = tm.toMap();
-    return aw.Team.fromMap(mp);
+    return Team.fromMap(mp);
   }
-// Future<aw.Team> getTeam(String teamId) async => _teams.get(teamId: teamId);
+// Future<Team> getTeam(String teamId) async => _teams.get(teamId: teamId);
 }

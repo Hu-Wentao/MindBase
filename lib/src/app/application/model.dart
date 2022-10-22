@@ -6,7 +6,7 @@ import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/app/application.dart';
 import 'package:mind_base/src/app/application/service/service.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
-import 'package:mind_base/src/user/application/service/account_service.dart';
+import 'package:mind_base/src/user/application/service.dart';
 import 'package:mind_base/src/user/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/user/domain/value/value.dart';
 import 'package:mind_base/src/user/inter/dto.dart';

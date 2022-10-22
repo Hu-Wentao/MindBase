@@ -11,6 +11,4 @@ import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 @Deprecated('use cli.')
 import 'package:appwrite/appwrite.dart';
 
-part 'team_service.dart';
-
 part 'collection_service.dart';
