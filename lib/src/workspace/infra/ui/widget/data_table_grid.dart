@@ -7,7 +7,7 @@ import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
-import 'package:mind_base/src/core/infra/ui/dialog/confirm_dialog.dart';
+import 'package:mind_base/src/core/infra/ui/dialog/dialog.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/attribute_edit_dialog.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/record_edit_dialog.dart';

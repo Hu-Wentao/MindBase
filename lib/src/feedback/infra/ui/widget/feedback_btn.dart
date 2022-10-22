@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mind_base/src/core/infra/ui/dialog/confirm_dialog.dart';
+import 'package:mind_base/src/core/infra/ui/dialog/dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 ///

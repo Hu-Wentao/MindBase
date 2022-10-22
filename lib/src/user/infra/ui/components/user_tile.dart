@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/app/infra/ui/page/splash/splash.dart';
-import 'package:mind_base/src/core/infra/ui/dialog/confirm_dialog.dart';
+import 'package:mind_base/src/core/infra/ui/dialog/dialog.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/core/infra/ui/widget/RadiusInkWell.dart';
 import 'package:mind_base/src/user/infra/ui/dialog/auth_dialog.dart';
