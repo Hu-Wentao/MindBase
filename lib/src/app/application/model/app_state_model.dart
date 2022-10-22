@@ -125,21 +125,20 @@ extension AppAccountX on AppModel {
       await _accountSrv.createAnonymousSession();
 
   Future<User> _recoverUser() async {
-    try {
-      return await _accountSrv.getUser();
-    } catch (e) {
-      late AppEvt evt;
-      if (e is cli.AppwriteException &&
-          e.code == 401 &&
-          e.type == 'general_unauthorized_scope') {
-        evt = const AppEvt.msg("您尚未登录");
-        throw UnLoginException('您尚未登陆', '恢复User失败 $e');
-      } else {
-        evt = AppEvt.msg("恢复User遇到未知错误, $e");
-      }
-      evtEntrance(evt);
-      rethrow;
-    }
+    return await _accountSrv.getUser();
+    // try {
+    // } catch (e) {
+    //   late AppEvt evt;
+    //   if (e is cli.AppwriteException &&
+    //       e.code == 401 &&
+    //       e.type == 'general_unauthorized_scope') {
+    //     evt = const AppEvt.recoverDone("您尚未登录");
+    //   } else {
+    //     evt = AppEvt.recoverDone("恢复User遇到未知错误, $e");
+    //   }
+    //   evtEntrance(evt);
+    //   rethrow;
+    // }
   }
 
   Future<User> _onSignup(

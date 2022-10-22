@@ -61,8 +61,10 @@ class SpaceView extends StatefulWidget {
 class _SpaceViewState extends State<SpaceView>
     with OnInitStateMx<SpaceView, SpaceModel> {
   @override
-  onInitState(ScaffoldMessengerState msgr, SpaceModel a) =>
-      a.actEntrance(const SpaceAct.initModel());
+  onInitState(ScaffoldMessengerState msgr, SpaceModel a) {
+    a.actEntrance(const SpaceAct.initModel());
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {

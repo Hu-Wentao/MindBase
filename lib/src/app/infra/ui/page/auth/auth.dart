@@ -4,6 +4,7 @@ import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:go_router/go_router.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:mind_base/src/app/application/model/model.dart';
+import 'package:mind_base/src/app/infra/ui/page/home/home.dart';
 import 'package:mind_base/src/core/config/assets/assets.gen.dart';
 import 'package:mind_base/src/user/domain/value/value.dart';
 import 'package:mind_base/src/user/infra/ui/widget/rounded_button.dart';
@@ -32,6 +33,11 @@ class _AuthPageState extends State<AuthPage>
   @override
   onInitState(msgr, m) => m.events.listen((evt) => evt.maybeWhen(
       msg: (msg) => msgr.showSnackBar(SnackBar(content: Text(msg))),
+      logged: (m) {
+        msgr.showSnackBar(const SnackBar(content: Text('登陆成功')));
+        if (mounted) const HomeRoute.auto().go(context);
+        return null;
+      },
       orElse: () => null));
 
   @override
