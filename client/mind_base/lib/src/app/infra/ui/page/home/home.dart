@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_sweet/get_sweet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mind_base/src/app/application/model.dart';
-import 'package:mind_base/src/app/infra/ui/dialog/dialog.dart';
+import 'package:mind_base/src/core/infra/ui/dialog/dialog.dart';
 import 'package:mind_base/src/app/infra/ui/widget/widget.dart';
 import 'package:mind_base/src/space/inter/dto.dart';
 import 'package:provider_sidecar/provider_sidecar_ex.dart';
