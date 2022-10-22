@@ -71,7 +71,9 @@ class SpaceModel extends BaseActEntranceModel<SpaceAct, SpaceState> {
   /// 节流flag改用 [act] 实例
   @override
   BaseException? onBeforeActEntrance(SpaceAct act) =>
-      sl<Slowly>().seconds(act, sec: 1) ? null : BaseException('msg');
+      sl<Slowly>().seconds('${id}_${act.runtimeType}', sec: 1)
+          ? null
+          : const BaseException('msg');
 
   @override
   onActEntrance(SpaceAct act) async => await act.when(
@@ -204,7 +206,6 @@ extension SpaceModelX on SpaceModel {
 
 @Deprecated('SpaceModelX')
 extension SpaceStateChangeX on SpaceModel {
-
   MetaModelEttAccessor get _metaAcc =>
       MetaModelEttAccessor(sl<cli.Databases>(), data.id);
 

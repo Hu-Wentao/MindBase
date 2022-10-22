@@ -1,7 +1,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/core/config/app_server_config.dart';
+import 'package:mind_base/src/core/config/appwrite_config.dart';
 import 'package:mind_base/src/core/config/common_config.dart';
 import 'package:mind_base/src/space/infra/ap_adapter.dart';
 import 'package:mind_base/src/space/infra/dao/realtime_hub.dart';

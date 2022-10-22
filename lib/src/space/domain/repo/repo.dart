@@ -3,7 +3,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:dart_appwrite/dart_appwrite.dart' as srv;
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/core/config/app_server_config.dart';
+import 'package:mind_base/src/core/config/appwrite_config.dart';
 import 'package:mind_base/src/core/config/common_config.dart';
 import 'package:mind_base/src/space/domain/value/value.dart';
 import 'package:mind_base/src/space/infra/dao/dao_aw_impl.dart';

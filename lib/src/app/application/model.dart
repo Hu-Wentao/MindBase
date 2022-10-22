@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:get_sweet/get_sweet.dart';
-import 'package:mind_base/src/core/config/app_server_config.dart';
+import 'package:mind_base/src/core/config/appwrite_config.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/core/inter/i_dao.dart';
 import 'package:mind_base/src/user/application/service.dart';
@@ -28,34 +28,13 @@ import 'package:appwrite/appwrite.dart' as cli;
 import 'package:appwrite/models.dart' as aw;
 import 'package:dart_appwrite/dart_appwrite.dart' as srv;
 import 'package:dart_appwrite/models.dart' as da;
-import 'dart:async';
-
-import 'package:collection/collection.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/app/application.dart';
 import 'package:mind_base/src/app/application/service/service.dart';
-import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
-import 'package:mind_base/src/core/inter/i_dao.dart';
 import 'package:mind_base/src/core/inter/i_dto.dart';
-import 'package:mind_base/src/user/application/service.dart';
 import 'package:mind_base/src/user/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/user/domain/value/value.dart';
-import 'package:mind_base/src/user/inter/dto.dart';
-import 'package:mind_base/src/app/application/model.dart';
-import 'package:mind_base/src/space/application/service/meta_service.dart';
-import 'package:mind_base/src/space/application/service/service.dart';
-import 'package:mind_base/src/space/application/service/workspace_service.dart';
-import 'package:mind_base/src/space/domain/entity/entity.dart';
-import 'package:mind_base/src/space/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/space/infra/ui/dialog/import_data_dialog.dart';
-import 'package:mind_base/src/space/inter/dto/i_dto.dart';
 import 'package:mockito/annotations.dart';
-import 'package:provider_sidecar/provider_sidecar.dart';
-import 'package:appwrite/appwrite.dart' as cli;
-import 'package:appwrite/models.dart' as aw;
-import 'package:get_sweet/get_sweet.dart';
-import 'package:slowly/slowly.dart';
 
 // Annotation which generates the cat.mocks.dart library and the MockCat class.
 @GenerateNiceMocks([
