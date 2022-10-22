@@ -26,6 +26,7 @@ dependencies {
     implementation("com.alibaba:druid-spring-boot-starter:1.1.24")
     implementation("org.apache.poi:poi-ooxml:5.2.3")
     implementation("org.apache.commons:commons-lang3:3.12.0")
+    implementation("org.springframework.boot:spring-boot-starter-web")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
