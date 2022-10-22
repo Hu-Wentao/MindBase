@@ -2,7 +2,7 @@
 //
 // /// Meta信息
 // /// 必须通过DTO转换 [MetaDto]
-// class RecordMeta implements IEtt<String> {
+// class MetaModel implements IEtt<String> {
 //   @override
 //   final String id;
 //   String name;
@@ -17,7 +17,7 @@
 //   // 表头
 //   List<Property> get properties => [...attrs, ...methods];
 //
-//   RecordMeta({
+//   MetaModel({
 //     required this.id,
 //     required this.name,
 //     required this.memo,
@@ -30,11 +30,11 @@
 //   int nextKey() => maxKey + 1;
 //
 //   // table新增Attr
-//   RecordMeta addAttr(Attribute attr) {
+//   MetaModel addAttr(Attribute attr) {
 //     if (attr.k != nextKey()) {
 //       throw "逻辑异常! 新增的Attr::k[${attr.k}] 不等于table[$name]的maxKey[$maxKey]+1";
 //     }
-//     return RecordMeta(
+//     return MetaModel(
 //       id: id,
 //       name: name,
 //       memo: memo,
@@ -59,7 +59,7 @@
 //   bool hasPropBy(String propId) =>
 //       properties.any((prop) => prop.propId == propId);
 //
-//   void update(RecordMeta meta) {
+//   void update(MetaModel meta) {
 //     assert(id == meta.id, "Meta::update,当前ID[$id]与更新ID[${meta.id}]不一致!");
 //     name = meta.name;
 //     memo = meta.memo;
@@ -71,12 +71,12 @@
 //
 //   @override
 //   String toString() =>
-//       'RecordMeta{id: $id, name: $name, attrs: $attrs, methods: $methods}';
+//       'MetaModel{id: $id, name: $name, attrs: $attrs, methods: $methods}';
 //
 //   @override
 //   bool operator ==(Object other) =>
 //       identical(this, other) ||
-//       other is RecordMeta &&
+//       other is MetaModel &&
 //           runtimeType == other.runtimeType &&
 //           id == other.id &&
 //           name == other.name &&

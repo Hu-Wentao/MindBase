@@ -6,7 +6,7 @@ import 'package:ndialog/ndialog.dart';
 
 Future<RecordDto?> showRecordEditDialog({
   required BuildContext context,
-  required RecordMeta meta,
+  required MetaModel meta,
   required SpaceModel openedSpaceModel,
   required kRecordBuilder,
   RecordDto? origin,

@@ -14,7 +14,7 @@ import 'package:ndialog/ndialog.dart';
 class MetaForm extends StatelessWidget {
   final bool isCreate;
   final MetaDto origin;
-  final Iterable<RecordMeta> Function() allMetas;
+  final Iterable<MetaModel> Function() allMetas;
   final QueryMetaFn queryMetaFn;
   final GlobalKey<FormBuilderState> kMetaBuilder;
   final GlobalKey<FormBuilderState> kAttrBuilder;
@@ -247,7 +247,7 @@ class AttributeListForm extends StatefulWidget {
   final bool isCreate; // true:表单将会新增一个待编辑的属性
   final int nextKey; // ::nextKey()
   final List<AttributeDto> originList;
-  final Iterable<RecordMeta> Function() allMetas;
+  final Iterable<MetaModel> Function() allMetas;
 
   final GlobalKey<FormBuilderState>? kAttrBuilder;
 
@@ -255,7 +255,7 @@ class AttributeListForm extends StatefulWidget {
     Key? key,
     required isCreate,
     required MetaDto origin,
-    required Iterable<RecordMeta> Function() allMetas,
+    required Iterable<MetaModel> Function() allMetas,
     GlobalKey<FormBuilderState>? kAttrBuilder,
   }) =>
       AttributeListForm(

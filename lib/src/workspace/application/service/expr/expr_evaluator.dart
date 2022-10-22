@@ -52,10 +52,10 @@ class ExprEvaluator {
     }
     // 如果obj不是Record,而是RecordId(是一个引用对象),则需要从工作空间中查询,
 
-    late Record rcd;
+    late RecordModel rcd;
     if (exprV.value == null || (exprV.value as String).isEmpty) {
       // 识别为 `this`表达式, this是一种特殊(不指定RecordId)的RefExprValue
-      rcd = ctx[AsFuncThis.ctxSign] as Record;
+      rcd = ctx[AsFuncThis.ctxSign] as RecordModel;
     } else {
       // 识别为 Ref表达式
       final findRecordFn = ctx[SpaceModel.ctxFindRecordFnSign] as FindRecordFn;

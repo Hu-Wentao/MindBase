@@ -93,7 +93,7 @@ class _MetaTableListState extends State<MetaTableList> {
                           icon: const Icon(Icons.add),
                           onPressed: () async {
                             final space = context.read<SpaceModel>();
-                            final nMeta = (await showRecordMetaEditDialog(
+                            final nMeta = (await showMetaModelEditDialog(
                               context: context,
                               kAttrBuilder: _kAttrBuilder,
                               kMetaBuilder: _kMetaBuilder,

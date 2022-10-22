@@ -21,7 +21,7 @@
 //   // });
 //   test("recordRepo", () async {
 //     final metaId = ObjectId.fromHexString("622d8e7ab1e16c6095af8989");
-//     final meta = RecordMeta(
+//     final meta = MetaModel(
 //       id: metaId,
 //       name: 'test',
 //       memo: "..",

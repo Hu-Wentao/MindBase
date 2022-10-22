@@ -4,10 +4,10 @@ import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 import 'package:ndialog/ndialog.dart';
 
-/// 导入数据 [RecordMeta] + [Record]
+/// 导入数据 [MetaModel] + [Record]
 /// json,csv等等
 
-/// 用于表示一个[RecordMeta] + [Record]
+/// 用于表示一个[MetaModel] + [Record]
 /// [isCreate] 为true表示更新结构与插入数据
 class TableDto {
   final bool isCreate;

@@ -29,7 +29,7 @@ List<String> teamMemberCrudPermit(String teamId) => [
 class MetaDtoRepo {
   final srv.Databases _serverDb;
   final String collectionId; // 也是所在workspaceId
-  final RecordMetaEttAccessor _metaAcc;
+  final MetaModelEttAccessor _metaAcc;
 
   MetaDtoRepo(
     this._serverDb,
@@ -39,7 +39,7 @@ class MetaDtoRepo {
 
   static MetaDtoRepo withDI(GetIt get, String workspaceId) => MetaDtoRepo(
         get<srv.Databases>(),
-        RecordMetaEttAccessor(get<Databases>(), workspaceId),
+        MetaModelEttAccessor(get<Databases>(), workspaceId),
         workspaceId,
       );
 
@@ -176,7 +176,7 @@ class MetaDtoRepo {
         "updateMetaDocStructure# 更新Meta表[$collectionId]属性 $attributeName");
     final structureCallback = metaStructure[attributeName];
     if (structureCallback == null) {
-      throw '未知的RecordMeta属性名称: $attributeName';
+      throw '未知的MetaModel属性名称: $attributeName';
     } else {
       try {
         await structureCallback.call(collectionId, _serverDb);
@@ -274,7 +274,7 @@ class RecordDtoRepo {
 
   String get collectionId => meta.id; // 也是所在metaId
 
-  static RecordDtoRepo withDI(GetIt get, RecordMeta meta) =>
+  static RecordDtoRepo withDI(GetIt get, MetaModel meta) =>
       withDtoDI(get, meta.toDto());
 
   static RecordDtoRepo withDtoDI(GetIt get, MetaDto meta) => RecordDtoRepo(
@@ -342,8 +342,8 @@ class RecordDtoRepo {
     }
   }
 
-  /// 创建[Record]表
-  /// 集合id即对应的[RecordMeta]的id
+  /// 创建[RecordModel]表
+  /// 集合id即对应的[MetaModel]的id
   /// [teamId] 为空表示"所有人可读写"
   /// 默认权限为 "团队内可读写"
   /// [meta] 应当是固定内存地址的对象,这样可以确保meta本身是实时更新的

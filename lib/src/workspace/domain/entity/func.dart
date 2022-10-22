@@ -281,7 +281,7 @@ class MemberFunc implements Func {
         var propId = p[1];
         print("memberFunction#A# ${record.runtimeType} # $record");
         print("memberFunction#B# ${propId.runtimeType} # $propId");
-        if (record is RecordMeta) {
+        if (record is MetaModel) {
           return record.getPropBy(propId).name;
         }
         return record[propId] ?? (throw "找不到 propId [$propId]");
@@ -410,7 +410,7 @@ class AsFuncThis implements AsFunc {
   static const ctxSign = 'this';
 
   /// 如果上下文没有`this`,但是有`this`的类型(Meta),(如表达式convert场景)则为其key值
-  /// 对应的value,应该是[RecordMeta]类型
+  /// 对应的value,应该是[MetaModel]类型
   @Deprecated("使用ctxMetaIdSign")
   static const ctxTypeSign = 'thisType';
 

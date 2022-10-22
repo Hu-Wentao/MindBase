@@ -93,7 +93,7 @@ class RecordDto extends IEntityDto {
   String toString() => 'RecordDto{fields: $fields}';
 }
 
-extension RecordMetaX on MetaModel {
+extension MetaModelX on MetaModel {
   MetaDto toDto() => data;
 // MetaDto.fromDomain(this);
 }
@@ -580,7 +580,7 @@ class SpaceDto extends IEntityDto {
     this.metas = const [],
   });
 
-  // SpaceModel toDomain(RecordMeta Function(String metaId) toMeta) => SpaceModel(
+  // SpaceModel toDomain(MetaModel Function(String metaId) toMeta) => SpaceModel(
   //     id: id, name: name, metas: metas.map((e) => toMeta(e)).toList());
 
   @override

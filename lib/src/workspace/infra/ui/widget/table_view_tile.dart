@@ -1,7 +1,7 @@
 part of 'widget.dart';
 
 class TableViewTile extends StatelessWidget {
-  final OpenedMeta openedMeta;
+  final MetaModel openedMeta;
   final TableView view;
   final Uri viewUri;
 

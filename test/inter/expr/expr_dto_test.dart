@@ -35,7 +35,7 @@
 //   const pMetaSchoolId = ('626a109fd90369d16c2fbe0e');
 //   const pRcdHfuId = ("626a98b14a034567ff06f2f4");
 //   const pRcdZsId = ('6262e3b0118f5894993d4533');
-//   final pMetaSchool = RecordMeta(
+//   final pMetaSchool = MetaModel(
 //       id: pMetaSchoolId,
 //       name: '学校表',
 //       memo: '学校信息',
@@ -47,7 +47,7 @@
 //         Attribute(k: 3, name: 'sign', memo: '学校简称', type: AttrType.string),
 //       ],
 //       methods: []);
-//   final pMetaStudent = RecordMeta(
+//   final pMetaStudent = MetaModel(
 //       id: pMetaStudentId,
 //       name: '学生表',
 //       memo: '记录一个学生的信息',
@@ -245,8 +245,8 @@
 //       expect(str, pReadableL2);
 //
 //       /// ReadableDto -> Domain
-//       /// 注意,传入的是 [RecordMeta]实例,但存储在内部的只有MetaId :String, 实际上通过 SpaceModelDataHolder读取
-//       /// expr12 尝试直接传入 [RecordMeta]实例, 避免使用 sl
+//       /// 注意,传入的是 [MetaModel]实例,但存储在内部的只有MetaId :String, 实际上通过 SpaceModelDataHolder读取
+//       /// expr12 尝试直接传入 [MetaModel]实例, 避免使用 sl
 //       final expr =
 //           readableDto.toDomain(pRcdZs.meta.id, (_) => pRcdZs.meta);
 //       // print("expr = ${expr}");
@@ -303,22 +303,22 @@
 //       final dm = exprDto.toDomain(pRcdZs.meta.id, (_) => pRcdZs.meta);
 //       final jsDto = IExprJsonDto.fromDomain(dm); // toDTO一切正常
 //       print(
-//           "jsDto = $jsDto"); // {fn: add, ag: [{fn: asString, ag: ["My age is "]}, {fn: member, ag: [{fn: asFuncRecordMeta, ag: ["6262e2d8113f6c880d5d736b"]}, {fn: asString, ag: ["a3"]}]}]}
+//           "jsDto = $jsDto"); // {fn: add, ag: [{fn: asString, ag: ["My age is "]}, {fn: member, ag: [{fn: asFuncMetaModel, ag: ["6262e2d8113f6c880d5d736b"]}, {fn: asString, ag: ["a3"]}]}]}
 //
 //       final readableL3 = jsDto.toReadableString();
 //       print(
-//           "readableL3 = $readableL3"); // add(asString(\"My age is \"), member(asFuncRecordMeta(\"6262e2d8113f6c880d5d736b\"), asString(\"a3\")))
+//           "readableL3 = $readableL3"); // add(asString(\"My age is \"), member(asFuncMetaModel(\"6262e2d8113f6c880d5d736b\"), asString(\"a3\")))
 //
 //       ///
 //       print("==============================================");
 //
 //       final exprDtoV2 = ExpressionDto.of(parser, readableL3);
 //       print(
-//           "exprDtoV2 = $exprDtoV2"); // add(asString("My age is "), member(asFuncRecordMeta("6262e2d8113f6c880d5d736b"), asString("a3")))
+//           "exprDtoV2 = $exprDtoV2"); // add(asString("My age is "), member(asFuncMetaModel("6262e2d8113f6c880d5d736b"), asString("a3")))
 //
 //       final readableL2V2 = exprDtoV2.toReadableString();
 //       print(
-//           "readableL2V2 = $readableL2V2"); // add(asString(\"My age is \"), member(asFuncRecordMeta(\"6262e2d8113f6c880d5d736b\"), asString(\"a3\")))
+//           "readableL2V2 = $readableL2V2"); // add(asString(\"My age is \"), member(asFuncMetaModel(\"6262e2d8113f6c880d5d736b\"), asString(\"a3\")))
 //
 //       final dm2 = exprDtoV2.toDomain(
 //           pRcdZs.meta.id, (_) => pRcdZs.meta); // DTO -> Domain 可能有问题
@@ -335,11 +335,11 @@
 //       _test(origin) {
 //         final exprDtoV2 = ExpressionDto.of(parser, origin);
 //         print(
-//             "exprDtoV2 = $exprDtoV2"); // add(asString("My age is "), member(asFuncRecordMeta("6262e2d8113f6c880d5d736b"), asString("a3")))
+//             "exprDtoV2 = $exprDtoV2"); // add(asString("My age is "), member(asFuncMetaModel("6262e2d8113f6c880d5d736b"), asString("a3")))
 //
 //         final readableL2V2 = exprDtoV2.toReadableString();
 //         print(
-//             "readableL2V2 = $readableL2V2"); // add(asString(\"My age is \"), member(asFuncRecordMeta(\"6262e2d8113f6c880d5d736b\"), asString(\"a3\")))
+//             "readableL2V2 = $readableL2V2"); // add(asString(\"My age is \"), member(asFuncMetaModel(\"6262e2d8113f6c880d5d736b\"), asString(\"a3\")))
 //         ///
 //         final dm2 = exprDtoV2.toDomain(
 //             pRcdZs.meta.id, (_) => pRcdZs.meta); // DTO -> Domain 可能有问题
@@ -360,13 +360,13 @@
 //
 //       // test("单个,成员表达式", () {
 //       //   const readableL3 =
-//       //       "member(asFuncRecordMeta(\"6262e2d8113f6c880d5d736b\"), asString(\"a3\"))";
+//       //       "member(asFuncMetaModel(\"6262e2d8113f6c880d5d736b\"), asString(\"a3\"))";
 //       //   _test(readableL3);
 //       // });
 //       //
 //       // test("复合,运算-成员表达式", () {
 //       //   const readableL3 =
-//       //       "add(asString(\"My age is \"), member(asFuncRecordMeta(\"6262e2d8113f6c880d5d736b\"), asString(\"a3\")))";
+//       //       "add(asString(\"My age is \"), member(asFuncMetaModel(\"6262e2d8113f6c880d5d736b\"), asString(\"a3\")))";
 //       //   _test(readableL3);
 //       // });
 //     });
@@ -382,7 +382,7 @@
 //       // expect(str, pReadableL2);
 //
 //       /// ReadableDto -> Domain
-//       /// 注意,传入的是 [RecordMeta]实例,但存储在内部的只有MetaId :String, 实际上通过 SpaceModelDataHolder读取
+//       /// 注意,传入的是 [MetaModel]实例,但存储在内部的只有MetaId :String, 实际上通过 SpaceModelDataHolder读取
 //       final expr =
 //           readableDto.toDomain(pRcdZs.meta.id, (_) => pRcdZs.meta);
 //       print("expr = $expr");

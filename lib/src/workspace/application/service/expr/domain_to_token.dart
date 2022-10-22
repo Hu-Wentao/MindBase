@@ -1,6 +1,5 @@
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/app/application/model.dart';
-import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/inter/dto/expr_token_dto.dart';
 
@@ -9,7 +8,7 @@ const domainToToken = DomainToToken(
     );
 
 /// 可读表达式 -> Domain
-/// 注意[ctx]与Eval不同, 传入的是[RecordMeta],而不是[Record]
+/// 注意[ctx]与Eval不同, 传入的是[MetaModel],而不是[RecordModel]
 class DomainToToken {
   const DomainToToken();
 

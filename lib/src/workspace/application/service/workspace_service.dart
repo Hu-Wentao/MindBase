@@ -20,8 +20,8 @@ class SpaceService {
     this._workspaceEttAcc,
   );
 
-  RecordMetaEttAccessor _getMetaAcc(String workspaceId) =>
-      RecordMetaEttAccessor(_db, workspaceId);
+  MetaModelEttAccessor _getMetaAcc(String workspaceId) =>
+      MetaModelEttAccessor(_db, workspaceId);
 
   /// 查询一个工作空间内的所有Meta
   Stream<MetaDto> queryMetasBy(String workspaceId) =>

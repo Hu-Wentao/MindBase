@@ -233,9 +233,9 @@ class SpaceModelEttAccessor extends BaseAppwriteAccessor<SpaceDto>
 }
 
 /// 即Meta
-class RecordMetaEttAccessor extends BaseAppwriteAccessor<MetaDto>
+class MetaModelEttAccessor extends BaseAppwriteAccessor<MetaDto>
     with AppwriteAccessorWatchableMx<MetaDto> {
-  const RecordMetaEttAccessor(Databases db, String workspaceId)
+  const MetaModelEttAccessor(Databases db, String workspaceId)
       : super(db, workspaceId);
 
   @override

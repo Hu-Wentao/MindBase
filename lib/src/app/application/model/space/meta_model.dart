@@ -1,10 +1,5 @@
 part of '../../model.dart';
 
-@Deprecated("MetaModel")
-typedef OpenedMeta = MetaModel;
-@Deprecated("MetaModel")
-typedef RecordMeta = MetaModel;
-
 extension MetaModelBizX on MetaModel {
   MethodDto? tryGetMethodBy(
     int methodKey, {

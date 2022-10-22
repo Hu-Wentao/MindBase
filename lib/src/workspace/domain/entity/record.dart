@@ -8,7 +8,7 @@
 // class Record implements IEtt<String> {
 //   @override
 //   final String id;
-//   final RecordMeta meta; // Aggregate组装得到,实际只存储Id
+//   final MetaModel meta; // Aggregate组装得到,实际只存储Id
 //   Map<int, Value> fields;
 //
 //   List<Method> get methods => meta.methods; // method自带k值
@@ -21,7 +21,7 @@
 //
 //   factory Record.of({
 //     String? id,
-//     required RecordMeta meta,
+//     required MetaModel meta,
 //     required Map<int, Value> fields,
 //   }) =>
 //       Record(

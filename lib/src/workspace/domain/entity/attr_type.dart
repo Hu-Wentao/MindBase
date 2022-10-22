@@ -1,6 +1,6 @@
 part of 'entity.dart';
 
-typedef QueryMetaFn = RecordMeta Function(String metaId);
+typedef QueryMetaFn = MetaModel Function(String metaId);
 
 class AttrType {
   final AttrTp tp;
@@ -39,7 +39,7 @@ class AttrType {
 
   bool get isRef => tp == AttrTp.ref;
 
-  RecordMeta? get meta => r == null ? null : _getMeta?.call(r!);
+  MetaModel? get meta => r == null ? null : _getMeta?.call(r!);
 
   @override
   String toString() => name;

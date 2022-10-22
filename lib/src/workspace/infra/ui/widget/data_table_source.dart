@@ -12,13 +12,13 @@ import 'package:provider/provider.dart';
 abstract class IRecordDataGridSource {
   const IRecordDataGridSource();
 
-  RecordMeta get meta;
+  MetaModel get meta;
 
   // 后端插入事件
-  onInsertEvt(Record record);
+  onInsertEvt(RecordModel record);
 
   // 后端更新事件
-  onUpdateEvt(Record record, int index);
+  onUpdateEvt(RecordModel record, int index);
 
   // 后端移除事件
   onRemoveEvt(String recordId, int index);
@@ -39,55 +39,55 @@ extension TableViewX on TableView {
   }
 }
 
-extension PlutoRecordMetaX on RecordMeta {
-  List<PlutoColumn> toPlutoCols(OpenedMeta openedMeta) => properties
-      .map((prop) => PlutoColumn(
-            title: prop.name,
-            // 展示在UI的列标题
-            // titleSpan:  // 会覆盖 title参数的效果
-            field: prop.propId,
-            // 字段propId
-            type: _buildColumnTypeBy(prop),
-            // readOnly: // 某些字段需要标记为只读
-            // frozen:  // 冻结列
-            //  sort:  // 排序
-            //   renderer // 渲染为自定义Widget
-            enableColumnDrag: true,
-            enableAutoEditing: true,
-            // 自动切换编辑
-            enableEditingMode: true,
-            // 允许编辑
-            // this.hide = false,// 隐藏列
-            renderer: prop.type.isRef
-                ? (rdCtx) => GridRefCellWidget(prop.type, rdCtx, openedMeta)
-                : null,
-          ))
-      .toList()
-    ..[0].enableRowDrag = true
-    ..[0].enableRowChecked = true;
-
-  PlutoColumnType _buildColumnTypeBy(PropertyDto prop) {
-    switch (prop.type.tp) {
-      case AttrTp.any:
-      case AttrTp.objectId:
-      case AttrTp.string:
-        return PlutoColumnType.text();
-      case AttrTp.num:
-        return PlutoColumnType.number();
-      case AttrTp.bool:
-        return PlutoColumnType.select([true, false]);
-      case AttrTp.ref:
-        // todo 关系型怎么展示 ?
-        return PlutoColumnType.text();
-      // return PlutoColumnType.select(prop.type.ref.map((ref)=>ref.name).toList());
-    }
-  }
-}
+// extension PlutoMetaModelX on MetaModel {
+//   List<PlutoColumn> toPlutoCols(MetaModel openedMeta) => properties
+//       .map((prop) => PlutoColumn(
+//             title: prop.name,
+//             // 展示在UI的列标题
+//             // titleSpan:  // 会覆盖 title参数的效果
+//             field: prop.propId,
+//             // 字段propId
+//             type: _buildColumnTypeBy(prop),
+//             // readOnly: // 某些字段需要标记为只读
+//             // frozen:  // 冻结列
+//             //  sort:  // 排序
+//             //   renderer // 渲染为自定义Widget
+//             enableColumnDrag: true,
+//             enableAutoEditing: true,
+//             // 自动切换编辑
+//             enableEditingMode: true,
+//             // 允许编辑
+//             // this.hide = false,// 隐藏列
+//             renderer: prop.type.isRef
+//                 ? (rdCtx) => GridRefCellWidget(prop.type, rdCtx, openedMeta)
+//                 : null,
+//           ))
+//       .toList()
+//     ..[0].enableRowDrag = true
+//     ..[0].enableRowChecked = true;
+//
+//   PlutoColumnType _buildColumnTypeBy(PropertyDto prop) {
+//     switch (prop.type.tp) {
+//       case AttrTp.any:
+//       case AttrTp.objectId:
+//       case AttrTp.string:
+//         return PlutoColumnType.text();
+//       case AttrTp.num:
+//         return PlutoColumnType.number();
+//       case AttrTp.bool:
+//         return PlutoColumnType.select([true, false]);
+//       case AttrTp.ref:
+//         // todo 关系型怎么展示 ?
+//         return PlutoColumnType.text();
+//       // return PlutoColumnType.select(prop.type.ref.map((ref)=>ref.name).toList());
+//     }
+//   }
+// }
 
 /// Ref单元格, 可以通过弹出GridPopup来选择其他记录
 /// Ref单元格, 可以通过弹出GridPopup来选择其他记录
 class GridRefCellWidget extends StatefulWidget {
-  final OpenedMeta meta;
+  final MetaModel meta;
   final AttrTypeDto type;
   final PlutoColumnRendererContext rdCtx;
 
@@ -162,13 +162,13 @@ class _GridRefCellWidgetState extends State<GridRefCellWidget> {
 /// Pluto 表格数据源实现
 extension PlutoMetaModelX on MetaModel {
   List<PlutoColumn> toPlutoCols() => properties
-      .map((attr) => PlutoColumn(
-            title: attr.name,
+      .map((prop) => PlutoColumn(
+            title: prop.name,
             // 展示在UI的列标题
             // titleSpan:  // 会覆盖 title参数的效果
-            field: attr.propId,
+            field: prop.propId,
             // 字段propId
-            type: _buildColumnTypeBy(attr.type),
+            type: _buildColumnTypeBy(prop.type),
             // readOnly: // 某些字段需要标记为只读
             // frozen:  // 冻结列
             //  sort:  // 排序
@@ -179,8 +179,8 @@ extension PlutoMetaModelX on MetaModel {
             enableEditingMode: true,
             // 允许编辑
             // this.hide = false,// 隐藏列
-            renderer: attr.type.isRef
-                ? (rdCtx) => GridRefCellWidget(attr.type, rdCtx, this)
+            renderer: prop.type.isRef
+                ? (rdCtx) => GridRefCellWidget(prop.type, rdCtx, this)
                 : null,
           ))
       .toList()
@@ -267,7 +267,7 @@ class RecordDataGridSourcePluto extends IRecordDataGridSource {
 
   @override
   onUpdateEvt(
-    Record record,
+    RecordModel record,
     @Deprecated("已更新为通过record::id查询对应row,不再需要index") int index,
   ) {
     final rowKey = ValueKey<String>(record.id);

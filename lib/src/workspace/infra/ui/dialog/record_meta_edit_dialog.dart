@@ -6,14 +6,14 @@ import 'package:mind_base/src/workspace/infra/ui/form/meta_form.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 import 'package:ndialog/ndialog.dart';
 
-Future<MetaDto?> showRecordMetaEditDialog({
+Future<MetaDto?> showMetaModelEditDialog({
   required BuildContext context,
   MetaDto? originMeta,
   required GlobalKey<FormBuilderState> kMetaBuilder,
   required GlobalKey<FormBuilderState> kAttrBuilder,
   required GlobalKey<FormBuilderState> kMethodBuilder,
   required QueryMetaFn queryMetaFn,
-  required Iterable<RecordMeta> Function() allMetas,
+  required Iterable<MetaModel> Function() allMetas,
 }) async =>
     await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: false),

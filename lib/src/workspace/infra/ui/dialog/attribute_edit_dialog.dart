@@ -14,7 +14,7 @@ Future<AttributeDto?> showAttributeEditDialog({
   required int initKey,
   required GlobalKey<FormBuilderState> kAttrBuilder,
   required QueryMetaFn queryMetaFn,
-  required Iterable<RecordMeta> Function() allMetas,
+  required Iterable<MetaModel> Function() allMetas,
 }) async =>
     await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: false),

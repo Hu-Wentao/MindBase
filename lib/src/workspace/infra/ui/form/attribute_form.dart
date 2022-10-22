@@ -9,7 +9,7 @@ import '../../../domain/aggregate/aggregate.dart';
 /// 编辑单个AttributeDto
 class AttributeForm extends StatefulWidget {
   final AttributeDto origin;
-  final Iterable<RecordMeta> Function() allMetas;
+  final Iterable<MetaModel> Function() allMetas;
   final GlobalKey<FormBuilderState> kAttrBuilder;
 
   const AttributeForm({

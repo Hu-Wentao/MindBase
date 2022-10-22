@@ -56,7 +56,7 @@ class Method extends Property {
   ///
   /// 上下文 [AsFuncThis.ctxSign]  : 当前record(`this`)
   /// 上下文 [SpaceModel.ctxFindRecordFnSign] :用于查询 [AttrType.ref] 所对应的记录值
-  dynamic eval(Record record, FindRecordFn? find) {
+  dynamic eval(RecordModel record, FindRecordFn? find) {
     final r = exprEvaluator.eval(expr, {
       AsFuncThis.ctxSign: record,
       SpaceModel.ctxFindRecordFnSign: find,
@@ -69,7 +69,7 @@ class Attribute extends Property {
   @override
   final AttrType type; // 类型
   // @Deprecated("已将Meta集成到type中,使用 type.ref 访问MetaIdStr")
-  // final RecordMeta? meta; //如果type是"ref", 该值不为空,存储被引用的MetaId
+  // final MetaModel? meta; //如果type是"ref", 该值不为空,存储被引用的MetaId
 
   const Attribute({
     required int k,

@@ -1,6 +1,6 @@
 part of 'entity.dart';
 
-typedef FindRecordFn = Record Function(ExprValue value);
+typedef FindRecordFn = RecordModel Function(ExprValue value);
 
 abstract class IExpr with IFunctor {
   const IExpr();

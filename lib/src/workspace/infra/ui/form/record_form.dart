@@ -8,9 +8,9 @@ import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 
-/// 创建指定[RecordMeta]对应的Record
+/// 创建指定[MetaModel]对应的Record
 class RecordForm extends StatefulWidget {
-  final RecordMeta meta; // Record对应的Meta的Id
+  final MetaModel meta; // Record对应的Meta的Id
   final SpaceModel openedSpaceModel; // 当前工作区
   final RecordDto? origin;
   final GlobalKey<FormBuilderState>? kRecordBuilder;

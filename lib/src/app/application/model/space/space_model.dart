@@ -63,7 +63,7 @@ class SpaceModel extends BaseActEntranceModel<SpaceAct, SpaceState> {
   }
 
   List<RecordModel> getRecords(String metaId) =>
-      metas[__indexByOpenedMetas(metaId)].records;
+      metas[__indexByMetaModels(metaId)].records;
 
   Iterable<List<RecordModel>> allRecords() =>
       metas.map((element) => element.records);
@@ -198,19 +198,17 @@ extension SpaceModelX on SpaceModel {
   /// 移除Meta
   /// 本地数据由stream事件触发更新
   @Deprecated('actEntrance deleteMeta')
-  Future<BaseException?> actRemoveOpenedMeta(MetaModel meta) async =>
+  Future<BaseException?> actRemoveMetaModel(MetaModel meta) async =>
       actEntrance(SpaceAct.deleteMeta(meta.id));
 }
 
 @Deprecated('SpaceModelX')
 extension SpaceStateChangeX on SpaceModel {
-// RecordMetaEttAccessor? __metaAcc;
 
-  RecordMetaEttAccessor get _metaAcc =>
-      // __metaAcc ??=
-      RecordMetaEttAccessor(sl<cli.Databases>(), data.id);
+  MetaModelEttAccessor get _metaAcc =>
+      MetaModelEttAccessor(sl<cli.Databases>(), data.id);
 
-  int __indexByOpenedMetas(
+  int __indexByMetaModels(
     String metaId, {
     Function(int index, MetaModel meta)? onFind,
   }) {
@@ -243,7 +241,7 @@ extension SpaceStateChangeX on SpaceModel {
       onFind: (i, m) => m.updateData(meta),
       onNotFind: () => onMetaAdd(meta),
     );
-    __indexByOpenedMetas(
+    __indexByMetaModels(
       meta.id,
       onFind: (i, om) => om.cleanDataSourceCache(),
     );
@@ -252,7 +250,7 @@ extension SpaceStateChangeX on SpaceModel {
 
   void onMetaDelete(String metaId) {
     // 先关闭,后移除,否则会找不到Meta
-    final i = __indexByOpenedMetas(metaId, onFind: (i, m) {
+    final i = __indexByMetaModels(metaId, onFind: (i, m) {
       m.actReset();
     });
     if (i != -1) metas.removeAt(i);

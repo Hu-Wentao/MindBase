@@ -23,7 +23,7 @@ import 'data_table_source.dart';
 /// 适配Pluto表格
 class RecordDataGrid extends StatelessWidget {
   final SpaceModel openedSpace;
-  final OpenedMeta openedMeta;
+  final MetaModel openedMeta;
   final TableView? view;
 
   const RecordDataGrid({
@@ -215,7 +215,7 @@ class RecordDataGrid extends StatelessWidget {
 ///
 /// 表格标题栏
 class DataFrameTitlePluto extends StatelessWidget {
-  final OpenedMeta openedMeta;
+  final MetaModel openedMeta;
   final TableView? view; // 当前视图，可以为空
   final SpaceModel openedSpaceModel;
   final PlutoGridStateManager stateManager;
@@ -228,7 +228,7 @@ class DataFrameTitlePluto extends StatelessWidget {
   final kAttrBuilder = GlobalKey<FormBuilderState>();
   final kMethodBuilder = GlobalKey<FormBuilderState>();
   final QueryMetaFn queryMetaFn;
-  final Iterable<RecordMeta> Function() allMetas;
+  final Iterable<MetaModel> Function() allMetas;
 
   DataFrameTitlePluto({
     Key? key,
@@ -243,7 +243,7 @@ class DataFrameTitlePluto extends StatelessWidget {
     required this.onUpdateView,
   }) : super(key: key);
 
-  RecordMeta get meta => openedMeta;
+  MetaModel get meta => openedMeta;
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
@@ -296,7 +296,7 @@ class DataFrameTitlePluto extends StatelessWidget {
             ),
             TextButton.icon(
               onPressed: () async => await onSaveMeta(
-                await showRecordMetaEditDialog(
+                await showMetaModelEditDialog(
                   context: context,
                   originMeta: meta.toDto(),
                   kMetaBuilder: kMetaBuilder,

@@ -10,7 +10,7 @@ const nodeToToken = NodeToToken(
     );
 
 /// 可读表达式 -> Domain
-/// 注意[ctx]与Eval不同, 传入的是[RecordMeta],而不是[Record]
+/// 注意[ctx]与Eval不同, 传入的是[MetaModel],而不是[RecordModel]
 class NodeToToken {
   const NodeToToken();
 

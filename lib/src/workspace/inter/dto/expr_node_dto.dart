@@ -137,10 +137,10 @@ class ValueJsonDto extends IExprNodeDto {
     switch (e.runtimeType) {
       case IExprNodeDto:
         return e.toJson();
-      case Record:
-        return jsonEncode((e as Record).id);
-      case RecordMeta:
-        return jsonEncode((e as RecordMeta).id);
+      case RecordModel:
+        return jsonEncode((e as RecordModel).id);
+      case MetaModel:
+        return jsonEncode((e as MetaModel).id);
       default:
         try {
           return jsonEncode(e);
@@ -190,10 +190,10 @@ class ExprValueNodeDto extends IExprNodeDto {
     switch (e.runtimeType) {
       case IExprNodeDto:
         return e.toJson();
-      case Record:
-        return jsonEncode((e as Record).id);
-      case RecordMeta:
-        return jsonEncode((e as RecordMeta).id);
+      case RecordModel:
+        return jsonEncode((e as RecordModel).id);
+      case MetaModel:
+        return jsonEncode((e as MetaModel).id);
       default:
         try {
           return jsonEncode(e);

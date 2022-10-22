@@ -6,7 +6,7 @@
 //
 // main() {
 //   test("测试方法访问属性", () {
-//     final meta = RecordMeta(
+//     final meta = MetaModel(
 //         id: ObjectIdX.createHex,
 //         name: '学生表',
 //         memo: '记录一个学生的信息',

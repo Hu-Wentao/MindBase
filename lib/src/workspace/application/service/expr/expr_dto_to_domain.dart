@@ -1,7 +1,6 @@
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/workspace/application/service/expr/expr_evaluator.dart';
-import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/inter/dto/expr_token_dto.dart';
@@ -13,7 +12,7 @@ const exprToDomain = ExprDtoToDomain(
 );
 
 /// 可读表达式 -> Domain
-/// 注意[ctx]与Eval不同, 传入的是[RecordMeta],而不是[Record]
+/// 注意[ctx]与Eval不同, 传入的是[MetaModel],而不是[RecordModel]
 class ExprDtoToDomain {
   final List<MemberAccessor> memberAccessors;
 

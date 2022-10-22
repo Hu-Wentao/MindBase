@@ -62,7 +62,7 @@ class TableTile extends StatelessWidget {
                 context
                     .read<SpaceModel>()
                     .actEntrance(SpaceAct.deleteMeta(meta.id))
-                    // .actRemoveOpenedMeta(openedMeta)
+                    // .actRemoveMetaModel(openedMeta)
                     .thenDialog(context);
                 break;
               default:

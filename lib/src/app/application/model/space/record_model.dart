@@ -1,8 +1,11 @@
 part of '../../model.dart';
 
-@Deprecated('RecordModel')
-typedef Record = RecordModel;
+class RecordModel extends ModelSidecar<RecordDto, BaseException?> {
+  String get id => data.id;
+  final MetaModel at;
 
+  RecordModel(this.at, RecordDto data) : super(data, ExceptionAdapter.of);
+}
 extension PropertyBizX on RecordModel {
   ExprValue getField(int attrKey) {
     final pIndex = at.attrs.indexWhere((attr) => attr.k == attrKey);
@@ -20,9 +23,9 @@ extension PropertyBizX on RecordModel {
 
   /// 求值,返回值即字面量
   dynamic eval(
-    PropertyDto prop, [
-    @Deprecated('无需传入,将在记录所在工作空间内自动查询') FindRecordFn? find,
-  ]) {
+      PropertyDto prop, [
+        @Deprecated('无需传入,将在记录所在工作空间内自动查询') FindRecordFn? find,
+      ]) {
     if (prop is MethodDto) {
       final r = exprEvaluator.eval(prop.expr.toDomain(at.at.queryMeta), {
         AsFuncThis.ctxSign: this,
@@ -34,17 +37,5 @@ extension PropertyBizX on RecordModel {
       // fixme #332
       // return data.fields[prop.propId];
     }
-  }
-}
-
-class RecordModel extends ModelSidecar<RecordDto, BaseException?> {
-  String get id => data.id;
-  final MetaModel at;
-
-  RecordModel(this.at, RecordDto data) : super(data, ExceptionAdapter.of);
-
-  @Deprecated('使用RecordDto.updateData')
-  RecordDto update(RecordDto data) {
-    return updateData(data);
   }
 }

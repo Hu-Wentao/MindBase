@@ -64,7 +64,7 @@
 //   //   final r = acc.insert(dto1);
 //   // });
 //
-//   // RecordMetaAccessor acc2 = RecordMetaAccessor(db);
+//   // MetaModelAccessor acc2 = MetaModelAccessor(db);
 //   // acc2.watchAll().listen((records) {
 //   //   print("ac2 records $records");
 //   // });
