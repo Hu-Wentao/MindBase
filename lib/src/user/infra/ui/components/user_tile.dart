@@ -19,22 +19,18 @@ class UserInfoTile extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              (user.isLogged && user.isAnonymous)
+              (user.isAnonymous)
                   ? const Icon(LineIcons.userSecret)
                   // todo 展示用户头像
                   : const Icon(Icons.person),
               const SizedBox(width: 4),
               // 手机竖屏模式不展示用户名
               if (getWindowType(c) != AdaptiveWindowType.xsmall)
-                Text(user.isLogged
-                    ? user.isAnonymous
-                        ? "匿名用户"
-                        : user.data!.name
-                    : "未登录"),
+                Text(user.isAnonymous ? "匿名用户" : user.data.name),
             ],
           ),
           onTap: () async {
-            if (user.isLogged && !user.isAnonymous) {
+            if (!user.isAnonymous) {
               //  退出登录
               await showConfirmDialog(
                 context: context,

@@ -91,7 +91,7 @@ class SpaceService {
     SpaceDto space,
     String nName,
   ) {
-    final dto = space..name = nName;
+    final dto = space.copyWith(name: nName);
     return _workspaceEttAcc.update(dto);
   }
 

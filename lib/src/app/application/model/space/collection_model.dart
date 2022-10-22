@@ -5,7 +5,7 @@ part of '../../model.dart';
 /// [data] collectionId, 表的Id
 class DocumentInfoModel extends ModelSidecar<String, BaseException?>
     with StateChangeMx<String, BaseException?> {
-  final _srvDb = sl<srv.Databases>();
+  // final _srvDb = sl<srv.Databases>();
   final _cliDb = sl<cli.Databases>();
 
   DocumentInfoModel(String metaId, this.metaCollectionId)
@@ -33,7 +33,7 @@ class DocumentInfoModel extends ModelSidecar<String, BaseException?>
                       ? collection?.$permissions as List<String>?
                       : dto.permissions,
                 );
-              } catch (e, s) {
+              } catch (e) {
                 lgShot('尝试更新meta记录的读写权限, 可能因为权限级别为集合而出错');
                 rethrow;
               }

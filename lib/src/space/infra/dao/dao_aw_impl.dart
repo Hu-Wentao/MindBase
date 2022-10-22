@@ -189,13 +189,6 @@ mixin AppwriteAccessorWatchableMx<T extends IEntityDto>
     });
   }
 
-  @Deprecated('watch')
-  Stream<AccessorEvt<T>> watchById([String? id]) => watch(documentId: id);
-
-  /// 监听整个集合内的记录变更事件
-  @Deprecated('watch')
-  Stream<AccessorEvt<T>> watchAll() => watch();
-
   // todo 转换操作需要转移到其他类中, 例如[RealTimeEvtFactory]
   AccessorEvtTp _collectionEvt2AccessorEvtTp(List<String> events) {
     if (events.contains(evtCreate)) {

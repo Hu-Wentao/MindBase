@@ -44,6 +44,7 @@ class TeamModel extends BaseActEntranceModel<TeamAct, TeamState> {
 
   TeamModel(this.data, {super.state = const TeamState.init()});
 
+  @override
   String get id => data.$id;
 
   String get name => data.name;

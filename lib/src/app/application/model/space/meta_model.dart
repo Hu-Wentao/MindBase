@@ -34,9 +34,9 @@ mixin MetaStateChangeMx on IMetaModel {
 
   /// 开始监听状态
   @override
-  FutureOr<void> onSubscription() {
+  Future<bool> onSubscription() async {
     _cachedRecordSubs =
-        _recordDtoRepo.acc.watchAll().listen(_onWatchRecord, onError: (e, s) {
+        _recordDtoRepo.acc.watch().listen(_onWatchRecord, onError: (e, s) {
       if (e is cli.AppwriteException &&
           e.code == 404 &&
           e.type == "collection_not_found") {
@@ -47,30 +47,33 @@ mixin MetaStateChangeMx on IMetaModel {
         throw ExceptionAdapter.of(e, s);
       }
     });
+    return true;
   }
 
   /// 停止订阅流
   @override
-  FutureOr<void> onCloseSubs() {
+  Future<bool> onCloseSubs() async {
     _cachedRecordSubs?.cancel();
-    return null;
+    return true;
   }
 
   /// 单次刷新数据
   @override
-  FutureOr<void> onFetch({bool isActive = false}) {
+  Future<bool> onFetch({bool isActive = false}) async {
     _fetchMetaDocumentModel();
     _fetchRecordCollectionModel();
     _fetchAllRecord();
+    return true;
   }
 
   /// 重置充血数据
   @override
-  FutureOr<void> onReset() {
+  Future<bool> onReset() async {
     metaDocument = null;
     recordCollection = null;
     records.clear();
     cleanDataSourceCache();
+    return true;
   }
 
   /// 用于Meta属性被更新时
@@ -156,7 +159,7 @@ mixin MetaStateChangeMx on IMetaModel {
 }
 
 abstract class IMetaModel extends ModelSidecar<MetaDto, BaseException?>
-    with ModelStateChangeMx<MetaDto, BaseException?> {
+    with StateChangeMx<MetaDto, BaseException?> {
   IMetaModel(MetaDto data) : super(data, ExceptionAdapter.of);
 
   String get id;
@@ -273,10 +276,10 @@ extension MetaModelX on MetaModel {
   Future<BaseException?> actUpdateMeta(
     MetaDto? dto,
   ) async =>
-      await actWrapper(() => setDone("保存元素 [$dto]", () async {
+      await actWrapper(() => setState(null, "保存元素 [$dto]", before: () async {
             if (dto == null) return null;
             await _metaService.updateWithRecordCollection(data, dto);
-          }, false));
+          }));
 
   Future<BaseException?> actUpdateMetaName(String? nName) async {
     if (nName == null) return null;
@@ -289,10 +292,10 @@ extension MetaModelX on MetaModel {
   Future<BaseException?> actMetaUpdateAttr(
     AttributeDto? dto,
   ) async =>
-      await actWrapper(() => setDone("更新属性 [$dto]", () async {
+      await actWrapper(() => setState(null, "更新属性 [$dto]", before: () async {
             if (dto == null) return null;
             await _metaService.updateAttribute(data, dto);
-          }, false));
+          }));
 
   /// View
   Future<BaseException?> actNewTableView(ViewType type) async =>

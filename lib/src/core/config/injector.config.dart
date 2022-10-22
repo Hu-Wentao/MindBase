@@ -12,7 +12,6 @@ import 'package:injectable/injectable.dart' as _i2;
 import 'package:logging/logging.dart' as _i7;
 import 'package:slowly/slowly.dart' as _i11;
 
-import '../../app/application.dart' as _i8;
 import '../../app/application/service/service.dart' as _i10;
 import '../../space/application/service/service.dart' as _i6;
 import '../../space/application/service/workspace_service.dart' as _i13;
@@ -21,6 +20,7 @@ import '../../space/infra/dao/realtime_hub.dart' as _i9;
 import '../../user/application/service.dart' as _i5;
 import 'appwrite_config.dart' as _i14;
 import 'common_config.dart' as _i15;
+import 'config.dart' as _i8;
 import 'slowly_config.dart' as _i16;
 
 const String _dev = 'dev';

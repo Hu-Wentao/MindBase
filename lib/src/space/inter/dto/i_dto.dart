@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'package:appwrite/appwrite.dart';
 import 'package:collection/collection.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:json_editor/json_editor.dart';
 import 'package:mind_base/src/app/application/model.dart';
@@ -16,6 +17,10 @@ import 'package:quiver/core.dart';
 import '../../../app/application/model.dart';
 
 part 'expr_node_dto.dart';
+
+part 'i_dto.freezed.dart';
+
+part 'i_dto.g.dart';
 
 @Deprecated('ValueDto')
 typedef Value = ValueDto;
@@ -558,33 +563,22 @@ class AttributeDto extends PropertyDto {
       throw UnimplementedError("使用[$runtimeType]相关Extension的方法");
 }
 
-class SpaceDto extends IEntityDto {
-  @override
-  String id;
-  String name;
-  String teamId;
-  @Deprecated("meta列表不存在这里，而是通过查询得到，考虑改为关联meta的数量")
-  List<String> metas;
+@freezed
+class SpaceDto with _$SpaceDto implements IEntityDto {
+  const SpaceDto._();
 
-  SpaceDto({
-    required this.id,
-    required this.teamId,
-    required this.name,
-    required this.metas,
-  });
+  const factory SpaceDto({
+    @Default('') String id,
+    @Default('') String name,
+    @Default('') String teamId,
+    @Default([]) List<String> metas,
+  }) = _SpaceDto;
 
-  SpaceDto.builder({
-    this.id = '',
-    this.teamId = '',
-    this.name = '',
-    this.metas = const [],
-  });
-
-  // SpaceModel toDomain(MetaModel Function(String metaId) toMeta) => SpaceModel(
-  //     id: id, name: name, metas: metas.map((e) => toMeta(e)).toList());
+  factory SpaceDto.fromJson(Map<String, dynamic> json) =>
+      _$SpaceDtoFromJson(json);
 
   @override
-  toJson() => throw UnimplementedError("使用[$runtimeType]相关Extension的方法");
+  Map<String, dynamic> toMap() => toJson();
 }
 
 extension AttrTypeX on AttrType {

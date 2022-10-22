@@ -89,7 +89,7 @@ class _TeamPanelState extends State<TeamPanel> {
                           for (final space in team.workspaces)
                             SpaceModelTile(
                               team: team,
-                              space: space.data,
+                              space: space,
                             )
                         ],
                       ),
@@ -101,7 +101,7 @@ class _TeamPanelState extends State<TeamPanel> {
 
 class SpaceModelTile extends StatelessWidget {
   final TeamModel team;
-  final SpaceDto space;
+  final SpaceModel space;
 
   const SpaceModelTile({Key? key, required this.space, required this.team})
       : super(key: key);
@@ -128,15 +128,13 @@ class SpaceModelTile extends StatelessWidget {
             onSelected: (key) async {
               switch (key) {
                 case "rename":
-                  await team.actRenameSpaceName(
-                    space,
-                    await showTextInputDialog(
-                      context: context,
-                      title: "重命名空间",
-                      origin: space.name,
-                      hint: space.name,
-                    ),
+                  final value = await showTextInputDialog(
+                    context: context,
+                    title: "重命名空间",
+                    origin: space.name,
+                    hint: space.name,
                   );
+                  space.actEntrance(SpaceAct.updateModel(space.data));
                   break;
                 case "delete":
                   await showConfirmDialog(

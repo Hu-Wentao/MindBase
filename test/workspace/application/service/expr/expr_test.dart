@@ -24,28 +24,22 @@ const pMetaSchoolId = ('626a109fd90369d16c2fbe0e');
 const pRcdSchoolHfuId = ("626a98b14a034567ff06f2f4");
 const pRcdStudentZsId = ('6262e3b0118f5894993d4533');
 final tm = MockTeamModel();
-final sp = SpaceModel(SpaceDto.builder(), )
+final sp = SpaceModel(const SpaceDto())
   ..metas.addAll([pMetaSchool, pMetaStudent]);
 
 // Meta 2个
 /// 学校meta
 final pMetaSchool = MetaModel(
-    MetaDto(
-        id: pMetaSchoolId,
-        name: '学校表',
-        memo: '学校信息',
-        maxKey: 3,
-        attrs: [
-          AttributeDto.builder(
-              k: 0, name: 'id', memo: 'memo', type: AttrTypeDto.string),
-          AttributeDto.builder(
-              k: 1, name: 'metaId', memo: 'memo', type: AttrTypeDto.string),
-          AttributeDto.builder(
-              k: 2, name: 'name', memo: '学校的中文名称', type: AttrTypeDto.string),
-          AttributeDto.builder(
-              k: 3, name: 'sign', memo: '学校的英文简称', type: AttrTypeDto.string),
-        ],
-        methods: []),
+    MetaDto(id: pMetaSchoolId, name: '学校表', memo: '学校信息', maxKey: 3, attrs: [
+      AttributeDto.builder(
+          k: 0, name: 'id', memo: 'memo', type: AttrTypeDto.string),
+      AttributeDto.builder(
+          k: 1, name: 'metaId', memo: 'memo', type: AttrTypeDto.string),
+      AttributeDto.builder(
+          k: 2, name: 'name', memo: '学校的中文名称', type: AttrTypeDto.string),
+      AttributeDto.builder(
+          k: 3, name: 'sign', memo: '学校的英文简称', type: AttrTypeDto.string),
+    ], methods: []),
     sp);
 
 /// 学校对应的记录 (HFUU)
@@ -149,14 +143,13 @@ final pMetaStudent = MetaModel(
 //   const ExprValue.build(type: AttrType.string, ag: ["~~", null])
 // ]);
 final pWs = SpaceModel(
-    SpaceDto(
-      id: 'wsId',
-      name: 'wsName',
-      metas: [],
-      teamId: 'teamId',
-    ),
-    )
-  ..metas.addAll([pMetaSchool, pMetaStudent]);
+  SpaceDto(
+    id: 'wsId',
+    name: 'wsName',
+    metas: [],
+    teamId: 'teamId',
+  ),
+)..metas.addAll([pMetaSchool, pMetaStudent]);
 
 main() {
   test("测试Token", () {

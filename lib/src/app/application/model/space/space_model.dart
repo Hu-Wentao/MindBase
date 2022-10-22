@@ -252,7 +252,7 @@ extension SpaceStateChangeX on SpaceModel {
   void onMetaDelete(String metaId) {
     // 先关闭,后移除,否则会找不到Meta
     final i = __indexByMetaModels(metaId, onFind: (i, m) {
-      m.actReset();
+      m.actCloseReset();
     });
     if (i != -1) metas.removeAt(i);
     __indexByMetas(metaId, onFind: (i, m) => metas.remove(m));
