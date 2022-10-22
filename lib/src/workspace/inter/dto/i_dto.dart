@@ -13,7 +13,7 @@ import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/infra/ap_adapter.dart';
 import 'package:quiver/core.dart';
 
-import '../../application/model/model.dart';
+import '../../../app/application/model.dart';
 
 part 'expr_node_dto.dart';
 

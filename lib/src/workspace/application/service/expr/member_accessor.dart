@@ -1,7 +1,7 @@
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 
 import '../../../domain/entity/entity.dart';
-import '../../model/model.dart';
+import '../../../../app/application/model.dart';
 import 'expr_evaluator.dart';
 
 /// 传入 (Meta, propName), 返回 Prop

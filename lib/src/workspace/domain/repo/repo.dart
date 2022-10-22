@@ -9,7 +9,7 @@ import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 
-import '../../application/model/model.dart';
+import '../../../app/application/model.dart';
 
 List<String> anyOneCrudPermit = [
   Permission.create(Role.any()),

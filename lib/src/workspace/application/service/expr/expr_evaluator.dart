@@ -3,7 +3,7 @@ import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/inter/dto/expr_token_dto.dart';
 
-import '../../model/model.dart';
+import '../../../../app/application/model.dart';
 import 'member_accessor.dart';
 
 const exprEvaluator = ExprEvaluator(memberAccessors: [RecordMemberAccessor()]);

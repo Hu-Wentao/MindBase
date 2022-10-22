@@ -1,4 +1,4 @@
-part of 'model.dart';
+part of '../../model.dart';
 
 /// 控制记录的状态
 /// 包括表级读写权限, 逻辑删除

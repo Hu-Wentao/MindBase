@@ -11,7 +11,7 @@ import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.da
 import 'package:mind_base/src/feedback/infra/ui/widget/feedback_btn.dart';
 import 'package:mind_base/src/user/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/user/infra/ui/components/user_tile.dart';
-import 'package:mind_base/src/workspace/application/model/model.dart';
+import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/core/config/config.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/dialog.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';

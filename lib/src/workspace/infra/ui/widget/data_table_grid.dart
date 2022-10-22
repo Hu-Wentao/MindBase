@@ -6,7 +6,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
-import 'package:mind_base/src/workspace/application/model/model.dart';
+import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/dialog.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';

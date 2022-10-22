@@ -3,13 +3,12 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i6;
-import 'dart:ui' as _i7;
+import 'dart:async' as _i5;
+import 'dart:ui' as _i6;
 
 import 'package:appwrite/models.dart' as _i2;
-import 'package:get_arch_core/get_arch_core.dart' as _i5;
+import 'package:get_arch_core/get_arch_core.dart' as _i4;
 import 'package:mind_base/src/app/application/model.dart' as _i3;
-import 'package:mind_base/src/workspace/application/model/model.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -63,7 +62,7 @@ class _FakeTeam_3 extends _i1.SmartFake implements _i2.Team {
         );
 }
 
-class _FakeTeamState_4 extends _i1.SmartFake implements _i4.TeamState {
+class _FakeTeamState_4 extends _i1.SmartFake implements _i3.TeamState {
   _FakeTeamState_4(
     Object parent,
     Invocation parentInvocation,
@@ -114,11 +113,11 @@ class MockUserModel extends _i1.Mock implements _i3.UserModel {
         returnValueForMissingStub: false,
       ) as bool);
   @override
-  List<_i4.TeamModel> get teams => (super.noSuchMethod(
+  List<_i3.TeamModel> get teams => (super.noSuchMethod(
         Invocation.getter(#teams),
-        returnValue: <_i4.TeamModel>[],
-        returnValueForMissingStub: <_i4.TeamModel>[],
-      ) as List<_i4.TeamModel>);
+        returnValue: <_i3.TeamModel>[],
+        returnValueForMissingStub: <_i3.TeamModel>[],
+      ) as List<_i3.TeamModel>);
   @override
   _i3.UserState get state => (super.noSuchMethod(
         Invocation.getter(#state),
@@ -160,13 +159,13 @@ class MockUserModel extends _i1.Mock implements _i3.UserModel {
         returnValueForMissingStub: false,
       ) as bool);
   @override
-  _i4.TeamModel? findTeam(String? teamId) => (super.noSuchMethod(
+  _i3.TeamModel? findTeam(String? teamId) => (super.noSuchMethod(
         Invocation.method(
           #findTeam,
           [teamId],
         ),
         returnValueForMissingStub: null,
-      ) as _i4.TeamModel?);
+      ) as _i3.TeamModel?);
   @override
   dynamic onActEntrance(_i3.UserAct? act) => super.noSuchMethod(
         Invocation.method(
@@ -176,16 +175,16 @@ class MockUserModel extends _i1.Mock implements _i3.UserModel {
         returnValueForMissingStub: null,
       );
   @override
-  _i5.BaseException? onBeforeActEntrance(_i3.UserAct? act) =>
+  _i4.BaseException? onBeforeActEntrance(_i3.UserAct? act) =>
       (super.noSuchMethod(
         Invocation.method(
           #onBeforeActEntrance,
           [act],
         ),
         returnValueForMissingStub: null,
-      ) as _i5.BaseException?);
+      ) as _i4.BaseException?);
   @override
-  _i6.Future<_i5.BaseException?> actWrapper([
+  _i5.Future<_i4.BaseException?> actWrapper([
     Function? action,
     int? traceLine = 1,
   ]) =>
@@ -197,9 +196,9 @@ class MockUserModel extends _i1.Mock implements _i3.UserModel {
             traceLine,
           ],
         ),
-        returnValue: _i6.Future<_i5.BaseException?>.value(),
-        returnValueForMissingStub: _i6.Future<_i5.BaseException?>.value(),
-      ) as _i6.Future<_i5.BaseException?>);
+        returnValue: _i5.Future<_i4.BaseException?>.value(),
+        returnValueForMissingStub: _i5.Future<_i4.BaseException?>.value(),
+      ) as _i5.Future<_i4.BaseException?>);
   @override
   T? setState<T>(
     _i3.UserState? state,
@@ -222,7 +221,7 @@ class MockUserModel extends _i1.Mock implements _i3.UserModel {
         returnValueForMissingStub: null,
       ) as T?);
   @override
-  void addListener(_i7.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i6.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #addListener,
           [listener],
@@ -230,7 +229,7 @@ class MockUserModel extends _i1.Mock implements _i3.UserModel {
         returnValueForMissingStub: null,
       );
   @override
-  void removeListener(_i7.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i6.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #removeListener,
           [listener],
@@ -254,21 +253,21 @@ class MockUserModel extends _i1.Mock implements _i3.UserModel {
         returnValueForMissingStub: null,
       );
   @override
-  _i6.Future<_i5.BaseException?> actEntrance(_i3.UserAct? act) =>
+  _i5.Future<_i4.BaseException?> actEntrance(_i3.UserAct? act) =>
       (super.noSuchMethod(
         Invocation.method(
           #actEntrance,
           [act],
         ),
-        returnValue: _i6.Future<_i5.BaseException?>.value(),
-        returnValueForMissingStub: _i6.Future<_i5.BaseException?>.value(),
-      ) as _i6.Future<_i5.BaseException?>);
+        returnValue: _i5.Future<_i4.BaseException?>.value(),
+        returnValueForMissingStub: _i5.Future<_i4.BaseException?>.value(),
+      ) as _i5.Future<_i4.BaseException?>);
 }
 
 /// A class which mocks [TeamModel].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
+class MockTeamModel extends _i1.Mock implements _i3.TeamModel {
   @override
   _i2.Team get data => (super.noSuchMethod(
         Invocation.getter(#data),
@@ -320,13 +319,13 @@ class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
         returnValueForMissingStub: <_i3.SpaceModel>[],
       ) as List<_i3.SpaceModel>);
   @override
-  List<_i4.MemberModel> get members => (super.noSuchMethod(
+  List<_i3.MemberModel> get members => (super.noSuchMethod(
         Invocation.getter(#members),
-        returnValue: <_i4.MemberModel>[],
-        returnValueForMissingStub: <_i4.MemberModel>[],
-      ) as List<_i4.MemberModel>);
+        returnValue: <_i3.MemberModel>[],
+        returnValueForMissingStub: <_i3.MemberModel>[],
+      ) as List<_i3.MemberModel>);
   @override
-  _i4.TeamState get state => (super.noSuchMethod(
+  _i3.TeamState get state => (super.noSuchMethod(
         Invocation.getter(#state),
         returnValue: _FakeTeamState_4(
           this,
@@ -336,9 +335,9 @@ class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
           this,
           Invocation.getter(#state),
         ),
-      ) as _i4.TeamState);
+      ) as _i3.TeamState);
   @override
-  set state(_i4.TeamState? _state) => super.noSuchMethod(
+  set state(_i3.TeamState? _state) => super.noSuchMethod(
         Invocation.setter(
           #state,
           _state,
@@ -366,7 +365,7 @@ class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
         returnValueForMissingStub: false,
       ) as bool);
   @override
-  dynamic onActEntrance(_i4.TeamAct? act) => super.noSuchMethod(
+  dynamic onActEntrance(_i3.TeamAct? act) => super.noSuchMethod(
         Invocation.method(
           #onActEntrance,
           [act],
@@ -382,16 +381,16 @@ class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
         returnValueForMissingStub: null,
       );
   @override
-  _i5.BaseException? onBeforeActEntrance(_i4.TeamAct? act) =>
+  _i4.BaseException? onBeforeActEntrance(_i3.TeamAct? act) =>
       (super.noSuchMethod(
         Invocation.method(
           #onBeforeActEntrance,
           [act],
         ),
         returnValueForMissingStub: null,
-      ) as _i5.BaseException?);
+      ) as _i4.BaseException?);
   @override
-  _i6.Future<_i5.BaseException?> actWrapper([
+  _i5.Future<_i4.BaseException?> actWrapper([
     Function? action,
     int? traceLine = 1,
   ]) =>
@@ -403,12 +402,12 @@ class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
             traceLine,
           ],
         ),
-        returnValue: _i6.Future<_i5.BaseException?>.value(),
-        returnValueForMissingStub: _i6.Future<_i5.BaseException?>.value(),
-      ) as _i6.Future<_i5.BaseException?>);
+        returnValue: _i5.Future<_i4.BaseException?>.value(),
+        returnValueForMissingStub: _i5.Future<_i4.BaseException?>.value(),
+      ) as _i5.Future<_i4.BaseException?>);
   @override
   T? setState<T>(
-    _i4.TeamState? state,
+    _i3.TeamState? state,
     String? m, {
     T? Function()? before,
     int? traceLine = 2,
@@ -428,7 +427,7 @@ class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
         returnValueForMissingStub: null,
       ) as T?);
   @override
-  void addListener(_i7.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i6.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #addListener,
           [listener],
@@ -436,7 +435,7 @@ class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
         returnValueForMissingStub: null,
       );
   @override
-  void removeListener(_i7.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i6.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #removeListener,
           [listener],
@@ -460,13 +459,13 @@ class MockTeamModel extends _i1.Mock implements _i4.TeamModel {
         returnValueForMissingStub: null,
       );
   @override
-  _i6.Future<_i5.BaseException?> actEntrance(_i4.TeamAct? act) =>
+  _i5.Future<_i4.BaseException?> actEntrance(_i3.TeamAct? act) =>
       (super.noSuchMethod(
         Invocation.method(
           #actEntrance,
           [act],
         ),
-        returnValue: _i6.Future<_i5.BaseException?>.value(),
-        returnValueForMissingStub: _i6.Future<_i5.BaseException?>.value(),
-      ) as _i6.Future<_i5.BaseException?>);
+        returnValue: _i5.Future<_i4.BaseException?>.value(),
+        returnValueForMissingStub: _i5.Future<_i4.BaseException?>.value(),
+      ) as _i5.Future<_i4.BaseException?>);
 }
