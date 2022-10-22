@@ -2,9 +2,11 @@ package com.mind.base.service
 
 import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Service
+import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -18,7 +20,7 @@ class TableExportServiceImpl : TableExportService {
     private lateinit var explainDBService: ExplainDBService
 
     override fun importDB(rows: List<Map<String, String>>, table: String) {
-        rows.forEach {col->
+        rows.forEach { col ->
             val dbInsertSql = "INSERT INTO $table ${
                 col.keys.joinToString(",", "(", ")")
             } VALUES ${
@@ -74,8 +76,30 @@ class TableExportServiceImpl : TableExportService {
         }
     }
 
-    override fun exportDBToCSV(table: String): OutputStream {
-        TODO("Not yet implemented")
+    override fun exportDBToCSV(table: String, os: OutputStream) {
+        val xss = XSSFWorkbook()
+        val sheet = xss.createSheet(table)
+        val queryForRowSet = jdbcTemplate.queryForRowSet("select * from $table")
+
+        val fields = linkedSetOf<String>()
+        queryForRowSet.metaData.also { meta ->
+            val createRow = sheet.createRow(0)
+            for (index in 1..meta.columnCount) {
+                val columnName = meta.getColumnName(index)
+                createRow.createCell(index - 1).setCellValue(columnName)
+                fields.add(columnName)
+            }
+        }
+        var rowIndex = 1
+        while (queryForRowSet.next()) {
+            val row = sheet.createRow(rowIndex++)
+            fields.forEachIndexed { index, fields ->
+                val data = queryForRowSet.getString(fields)
+                row.createCell(index).setCellValue(data)
+            }
+
+        }
+        xss.write(os)
     }
 
     override fun exportDBToList(table: String): List<Map<String, String>> {

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.ResourceLoader
+import java.io.FileOutputStream
 import kotlin.random.Random
 
 @SpringBootTest(classes = [MindBaseApplication::class])
@@ -23,7 +24,7 @@ class MindBaseTests {
 	private lateinit var resourceLoader: ResourceLoader
 
 	@Test
-	fun test() {
+	fun testCompile() {
 		val ret = AviatorEvaluator.execute("1*2+(3*4)/5")
 		assert(ret is Long)
 
@@ -63,5 +64,10 @@ class MindBaseTests {
 		}.also {
 			tableExportService.importDB(it,"Student")
 		}
+	}
+
+	@Test
+	fun testExportToExcel(){
+		tableExportService.exportDBToCSV("Student",FileOutputStream("export.xlsx"))
 	}
 }
