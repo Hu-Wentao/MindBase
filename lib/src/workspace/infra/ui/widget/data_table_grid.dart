@@ -21,7 +21,7 @@ import 'data_table_source.dart';
 
 /// 适配Pluto表格
 class RecordDataGrid extends StatelessWidget {
-  final OpenedWorkspace openedSpace;
+  final SpaceModel openedSpace;
   final OpenedMeta openedMeta;
   final TableView? view;
 
@@ -216,7 +216,7 @@ class RecordDataGrid extends StatelessWidget {
 class DataFrameTitlePluto extends StatelessWidget {
   final OpenedMeta openedMeta;
   final TableView? view; // 当前视图，可以为空
-  final OpenedWorkspace openedWorkspace;
+  final SpaceModel openedWorkspace;
   final PlutoGridStateManager stateManager;
   final Future<BaseException?> Function(RecordDto? dto) onSaveRecord;
   final Future<void> Function(MetaDto? dto) onSaveMeta;

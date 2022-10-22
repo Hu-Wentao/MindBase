@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:mind_base/src/workspace/application/provider/opened_workspace.dart';
-import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
+import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
@@ -11,7 +10,7 @@ import 'package:pluto_grid/pluto_grid.dart';
 /// 创建指定[RecordMeta]对应的Record
 class RecordForm extends StatefulWidget {
   final RecordMeta meta; // Record对应的Meta的Id
-  final OpenedWorkspace openedWorkspace; // 当前工作区
+  final SpaceModel openedWorkspace; // 当前工作区
   final RecordDto? origin;
   final GlobalKey<FormBuilderState>? kRecordBuilder;
 

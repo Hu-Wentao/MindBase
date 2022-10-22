@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mind_base/src/workspace/application/provider/opened_workspace.dart';
-import 'package:mind_base/src/workspace/domain/aggregate/aggregate.dart';
+import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/infra/ui/form/record_form.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
 import 'package:ndialog/ndialog.dart';
@@ -8,7 +7,7 @@ import 'package:ndialog/ndialog.dart';
 Future<RecordDto?> showRecordEditDialog({
   required BuildContext context,
   required RecordMeta meta,
-  required OpenedWorkspace openedWorkspace,
+  required SpaceModel openedWorkspace,
   required kRecordBuilder,
   RecordDto? origin,
 }) =>

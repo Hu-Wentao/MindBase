@@ -52,7 +52,7 @@ class Method extends Property {
 
   /// 表达式求值
   /// [record] 对象实例, 必填
-  /// [find] record所在的OpenedWorkspace中调用, 可空(如果Record内的方法没有引用其他类型(Meta)的话)
+  /// [find] record所在的SpaceModel中调用, 可空(如果Record内的方法没有引用其他类型(Meta)的话)
   ///
   /// 上下文 [AsFuncThis.ctxSign]  : 当前record(`this`)
   /// 上下文 [Workspace.ctxFindRecordFnSign] :用于查询 [AttrType.ref] 所对应的记录值

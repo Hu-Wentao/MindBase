@@ -103,7 +103,7 @@ class _GridRefCellWidgetState extends State<GridRefCellWidget> {
   Widget build(BuildContext context) {
     PlutoColumnRendererContext rdCtx = widget.rdCtx;
     final refMetaId = (widget.type.r!);
-    return Consumer<OpenedWorkspace>(
+    return Consumer<SpaceModel>(
         builder: (context, spaceX, child) => TextButton(
               onPressed: () {
                 final refDataSource = widget.meta.at.openedMetas

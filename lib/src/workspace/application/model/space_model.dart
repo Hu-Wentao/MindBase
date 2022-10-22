@@ -297,6 +297,4 @@ extension SpaceStateChangeX on SpaceModel {
 @Deprecated('use SpaceModel')
 typedef WorkspaceModel = SpaceModel;
 @Deprecated('use SpaceModel')
-typedef OpenedWorkspace = SpaceModel;
-@Deprecated('use SpaceModel')
 typedef Workspace = SpaceModel;
