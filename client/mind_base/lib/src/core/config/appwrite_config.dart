@@ -25,7 +25,7 @@ abstract class AppClientConfig {
 
   @lazySingleton
   cli.Databases get database =>
-      cli.Databases(sl<cli.Client>(), databaseId: mainDataBaseId);
+      cli.Databases(sl<cli.Client>());
 
   @lazySingleton
   cli.Storage get storage => cli.Storage(sl<cli.Client>());
@@ -53,7 +53,7 @@ abstract class AppServerConfig {
 
   @lazySingleton
   srv.Databases get database =>
-      srv.Databases(sl<srv.Client>(), databaseId: mainDataBaseId);
+      srv.Databases(sl<srv.Client>());
 
   @lazySingleton
   srv.Storage get storage => srv.Storage(sl<srv.Client>());

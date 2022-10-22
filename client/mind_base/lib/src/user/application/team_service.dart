@@ -46,5 +46,5 @@ class TeamService {
   }
 
   Future<MembershipList> getMemberships({required String teamId}) =>
-      _teams.getMemberships(teamId: teamId);
+      _teams.listMemberships(teamId: teamId);
 }
