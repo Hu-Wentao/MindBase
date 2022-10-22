@@ -29,7 +29,7 @@ class UserModel extends BaseActEntranceModel<UserAct, UserState> {
 
   /// 核心状态
   final aw.Session session;
-  final aw.User data;
+  final User data;
 
   @override
   String get id => data.$id;
@@ -127,7 +127,7 @@ extension UserDeprecatedX on UserModel {
       teams.firstWhereOrNull((tm) => tm.id == teamId);
 
   @Deprecated("避免使用")
-  aw.User loggedUser() => data;
+  User loggedUser() => data;
 
   /// 退出登录
   /// 同时重置当前Model状态

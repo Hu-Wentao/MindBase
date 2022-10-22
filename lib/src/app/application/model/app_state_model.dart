@@ -78,7 +78,7 @@ class AppModel extends BaseActEntranceModel<AppAct, AppState>
     AuthTp authVerify,
     String identityStr,
     Password password, {
-    aw.User? user,
+    User? user,
   }) async {
     final session = await _onLogin(authVerify, identityStr, password);
     user ??= await _recoverUser();
@@ -123,7 +123,7 @@ extension AppAccountX on AppModel {
   Future<aw.Session> _anonymousSession() async =>
       await _accountSrv.createAnonymousSession();
 
-  Future<aw.User> _recoverUser() async {
+  Future<User> _recoverUser() async {
     try {
       return await _accountSrv.getUser();
     } catch (e) {
@@ -141,7 +141,7 @@ extension AppAccountX on AppModel {
     }
   }
 
-  Future<aw.User> _onSignup(
+  Future<User> _onSignup(
       AuthTp authVerify, String identityStr, Password password) async {
     switch (authVerify) {
       case AuthTp.email:

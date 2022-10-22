@@ -10,6 +10,7 @@ import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/user/application/service/account_service.dart';
 import 'package:mind_base/src/user/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/user/domain/value/value.dart';
+import 'package:mind_base/src/user/inter/dto.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/application/service/service.dart';
 import 'package:mockito/annotations.dart';

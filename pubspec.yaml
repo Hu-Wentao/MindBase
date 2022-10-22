@@ -64,8 +64,8 @@ dependencies:
   json_annotation: ">=4.6.0" # json_serializable 要求
   pluto_grid: "5.0.3"
   linked_scroll_controller: # pluto_grid 需要使用
-  appwrite: 6.0.0
-  dart_appwrite: 6.0.0
+  appwrite: 8.1.0
+  dart_appwrite: ^7.1.0
   flutter_svg:
   bson:
   adaptive_breakpoints:
@@ -74,7 +74,7 @@ dependencies:
   json_editor:
   collection:
   go_router: ^5.0.5
-  device_info_plus_platform_interface: '2.3.0+1'
+  device_info_plus_platform_interface:
   get_sweet:
     path: ../get_sweet
   mockito:

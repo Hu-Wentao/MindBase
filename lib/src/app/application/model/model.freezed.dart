@@ -31,13 +31,13 @@ mixin _$AppAct {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(AuthTp authVerify, String identityStr, Password password)?
+    TResult? Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(AuthTp authVerify, String identityStr, Password password)?
+    TResult? Function(AuthTp authVerify, String identityStr, Password password)?
         login,
-    TResult Function()? loginAnonymous,
-    TResult Function()? recover,
-    TResult Function()? logout,
+    TResult? Function()? loginAnonymous,
+    TResult? Function()? recover,
+    TResult? Function()? logout,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -63,11 +63,11 @@ mixin _$AppAct {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(AppActSignupLogin value)? signupLogin,
-    TResult Function(AppActLogin value)? login,
-    TResult Function(AppActLoginAnonymous value)? loginAnonymous,
-    TResult Function(AppActRecover value)? recover,
-    TResult Function(AppActLogout value)? logout,
+    TResult? Function(AppActSignupLogin value)? signupLogin,
+    TResult? Function(AppActLogin value)? login,
+    TResult? Function(AppActLoginAnonymous value)? loginAnonymous,
+    TResult? Function(AppActRecover value)? recover,
+    TResult? Function(AppActLogout value)? logout,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -85,16 +85,18 @@ mixin _$AppAct {
 /// @nodoc
 abstract class $AppActCopyWith<$Res> {
   factory $AppActCopyWith(AppAct value, $Res Function(AppAct) then) =
-      _$AppActCopyWithImpl<$Res>;
+      _$AppActCopyWithImpl<$Res, AppAct>;
 }
 
 /// @nodoc
-class _$AppActCopyWithImpl<$Res> implements $AppActCopyWith<$Res> {
+class _$AppActCopyWithImpl<$Res, $Val extends AppAct>
+    implements $AppActCopyWith<$Res> {
   _$AppActCopyWithImpl(this._value, this._then);
 
-  final AppAct _value;
   // ignore: unused_field
-  final $Res Function(AppAct) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 }
 
 /// @nodoc
@@ -102,35 +104,35 @@ abstract class _$$AppActSignupLoginCopyWith<$Res> {
   factory _$$AppActSignupLoginCopyWith(
           _$AppActSignupLogin value, $Res Function(_$AppActSignupLogin) then) =
       __$$AppActSignupLoginCopyWithImpl<$Res>;
+  @useResult
   $Res call({AuthTp authVerify, String identityStr, Password password});
 }
 
 /// @nodoc
-class __$$AppActSignupLoginCopyWithImpl<$Res> extends _$AppActCopyWithImpl<$Res>
+class __$$AppActSignupLoginCopyWithImpl<$Res>
+    extends _$AppActCopyWithImpl<$Res, _$AppActSignupLogin>
     implements _$$AppActSignupLoginCopyWith<$Res> {
   __$$AppActSignupLoginCopyWithImpl(
       _$AppActSignupLogin _value, $Res Function(_$AppActSignupLogin) _then)
-      : super(_value, (v) => _then(v as _$AppActSignupLogin));
+      : super(_value, _then);
 
-  @override
-  _$AppActSignupLogin get _value => super._value as _$AppActSignupLogin;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? authVerify = freezed,
-    Object? identityStr = freezed,
-    Object? password = freezed,
+    Object? authVerify = null,
+    Object? identityStr = null,
+    Object? password = null,
   }) {
     return _then(_$AppActSignupLogin(
-      authVerify: authVerify == freezed
+      authVerify: null == authVerify
           ? _value.authVerify
           : authVerify // ignore: cast_nullable_to_non_nullable
               as AuthTp,
-      identityStr: identityStr == freezed
+      identityStr: null == identityStr
           ? _value.identityStr
           : identityStr // ignore: cast_nullable_to_non_nullable
               as String,
-      password: password == freezed
+      password: null == password
           ? _value.password
           : password // ignore: cast_nullable_to_non_nullable
               as Password,
@@ -163,22 +165,21 @@ class _$AppActSignupLogin implements AppActSignupLogin {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$AppActSignupLogin &&
-            const DeepCollectionEquality()
-                .equals(other.authVerify, authVerify) &&
-            const DeepCollectionEquality()
-                .equals(other.identityStr, identityStr) &&
-            const DeepCollectionEquality().equals(other.password, password));
+            (identical(other.authVerify, authVerify) ||
+                other.authVerify == authVerify) &&
+            (identical(other.identityStr, identityStr) ||
+                other.identityStr == identityStr) &&
+            (identical(other.password, password) ||
+                other.password == password));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(authVerify),
-      const DeepCollectionEquality().hash(identityStr),
-      const DeepCollectionEquality().hash(password));
+  int get hashCode =>
+      Object.hash(runtimeType, authVerify, identityStr, password);
 
   @JsonKey(ignore: true)
   @override
+  @pragma('vm:prefer-inline')
   _$$AppActSignupLoginCopyWith<_$AppActSignupLogin> get copyWith =>
       __$$AppActSignupLoginCopyWithImpl<_$AppActSignupLogin>(this, _$identity);
 
@@ -201,13 +202,13 @@ class _$AppActSignupLogin implements AppActSignupLogin {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(AuthTp authVerify, String identityStr, Password password)?
+    TResult? Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(AuthTp authVerify, String identityStr, Password password)?
+    TResult? Function(AuthTp authVerify, String identityStr, Password password)?
         login,
-    TResult Function()? loginAnonymous,
-    TResult Function()? recover,
-    TResult Function()? logout,
+    TResult? Function()? loginAnonymous,
+    TResult? Function()? recover,
+    TResult? Function()? logout,
   }) {
     return signupLogin?.call(authVerify, identityStr, password);
   }
@@ -245,11 +246,11 @@ class _$AppActSignupLogin implements AppActSignupLogin {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(AppActSignupLogin value)? signupLogin,
-    TResult Function(AppActLogin value)? login,
-    TResult Function(AppActLoginAnonymous value)? loginAnonymous,
-    TResult Function(AppActRecover value)? recover,
-    TResult Function(AppActLogout value)? logout,
+    TResult? Function(AppActSignupLogin value)? signupLogin,
+    TResult? Function(AppActLogin value)? login,
+    TResult? Function(AppActLoginAnonymous value)? loginAnonymous,
+    TResult? Function(AppActRecover value)? recover,
+    TResult? Function(AppActLogout value)? logout,
   }) {
     return signupLogin?.call(this);
   }
@@ -290,35 +291,35 @@ abstract class _$$AppActLoginCopyWith<$Res> {
   factory _$$AppActLoginCopyWith(
           _$AppActLogin value, $Res Function(_$AppActLogin) then) =
       __$$AppActLoginCopyWithImpl<$Res>;
+  @useResult
   $Res call({AuthTp authVerify, String identityStr, Password password});
 }
 
 /// @nodoc
-class __$$AppActLoginCopyWithImpl<$Res> extends _$AppActCopyWithImpl<$Res>
+class __$$AppActLoginCopyWithImpl<$Res>
+    extends _$AppActCopyWithImpl<$Res, _$AppActLogin>
     implements _$$AppActLoginCopyWith<$Res> {
   __$$AppActLoginCopyWithImpl(
       _$AppActLogin _value, $Res Function(_$AppActLogin) _then)
-      : super(_value, (v) => _then(v as _$AppActLogin));
+      : super(_value, _then);
 
-  @override
-  _$AppActLogin get _value => super._value as _$AppActLogin;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? authVerify = freezed,
-    Object? identityStr = freezed,
-    Object? password = freezed,
+    Object? authVerify = null,
+    Object? identityStr = null,
+    Object? password = null,
   }) {
     return _then(_$AppActLogin(
-      authVerify: authVerify == freezed
+      authVerify: null == authVerify
           ? _value.authVerify
           : authVerify // ignore: cast_nullable_to_non_nullable
               as AuthTp,
-      identityStr: identityStr == freezed
+      identityStr: null == identityStr
           ? _value.identityStr
           : identityStr // ignore: cast_nullable_to_non_nullable
               as String,
-      password: password == freezed
+      password: null == password
           ? _value.password
           : password // ignore: cast_nullable_to_non_nullable
               as Password,
@@ -351,22 +352,21 @@ class _$AppActLogin implements AppActLogin {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$AppActLogin &&
-            const DeepCollectionEquality()
-                .equals(other.authVerify, authVerify) &&
-            const DeepCollectionEquality()
-                .equals(other.identityStr, identityStr) &&
-            const DeepCollectionEquality().equals(other.password, password));
+            (identical(other.authVerify, authVerify) ||
+                other.authVerify == authVerify) &&
+            (identical(other.identityStr, identityStr) ||
+                other.identityStr == identityStr) &&
+            (identical(other.password, password) ||
+                other.password == password));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(authVerify),
-      const DeepCollectionEquality().hash(identityStr),
-      const DeepCollectionEquality().hash(password));
+  int get hashCode =>
+      Object.hash(runtimeType, authVerify, identityStr, password);
 
   @JsonKey(ignore: true)
   @override
+  @pragma('vm:prefer-inline')
   _$$AppActLoginCopyWith<_$AppActLogin> get copyWith =>
       __$$AppActLoginCopyWithImpl<_$AppActLogin>(this, _$identity);
 
@@ -389,13 +389,13 @@ class _$AppActLogin implements AppActLogin {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(AuthTp authVerify, String identityStr, Password password)?
+    TResult? Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(AuthTp authVerify, String identityStr, Password password)?
+    TResult? Function(AuthTp authVerify, String identityStr, Password password)?
         login,
-    TResult Function()? loginAnonymous,
-    TResult Function()? recover,
-    TResult Function()? logout,
+    TResult? Function()? loginAnonymous,
+    TResult? Function()? recover,
+    TResult? Function()? logout,
   }) {
     return login?.call(authVerify, identityStr, password);
   }
@@ -433,11 +433,11 @@ class _$AppActLogin implements AppActLogin {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(AppActSignupLogin value)? signupLogin,
-    TResult Function(AppActLogin value)? login,
-    TResult Function(AppActLoginAnonymous value)? loginAnonymous,
-    TResult Function(AppActRecover value)? recover,
-    TResult Function(AppActLogout value)? logout,
+    TResult? Function(AppActSignupLogin value)? signupLogin,
+    TResult? Function(AppActLogin value)? login,
+    TResult? Function(AppActLoginAnonymous value)? loginAnonymous,
+    TResult? Function(AppActRecover value)? recover,
+    TResult? Function(AppActLogout value)? logout,
   }) {
     return login?.call(this);
   }
@@ -482,14 +482,11 @@ abstract class _$$AppActLoginAnonymousCopyWith<$Res> {
 
 /// @nodoc
 class __$$AppActLoginAnonymousCopyWithImpl<$Res>
-    extends _$AppActCopyWithImpl<$Res>
+    extends _$AppActCopyWithImpl<$Res, _$AppActLoginAnonymous>
     implements _$$AppActLoginAnonymousCopyWith<$Res> {
   __$$AppActLoginAnonymousCopyWithImpl(_$AppActLoginAnonymous _value,
       $Res Function(_$AppActLoginAnonymous) _then)
-      : super(_value, (v) => _then(v as _$AppActLoginAnonymous));
-
-  @override
-  _$AppActLoginAnonymous get _value => super._value as _$AppActLoginAnonymous;
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -530,13 +527,13 @@ class _$AppActLoginAnonymous implements AppActLoginAnonymous {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(AuthTp authVerify, String identityStr, Password password)?
+    TResult? Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(AuthTp authVerify, String identityStr, Password password)?
+    TResult? Function(AuthTp authVerify, String identityStr, Password password)?
         login,
-    TResult Function()? loginAnonymous,
-    TResult Function()? recover,
-    TResult Function()? logout,
+    TResult? Function()? loginAnonymous,
+    TResult? Function()? recover,
+    TResult? Function()? logout,
   }) {
     return loginAnonymous?.call();
   }
@@ -574,11 +571,11 @@ class _$AppActLoginAnonymous implements AppActLoginAnonymous {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(AppActSignupLogin value)? signupLogin,
-    TResult Function(AppActLogin value)? login,
-    TResult Function(AppActLoginAnonymous value)? loginAnonymous,
-    TResult Function(AppActRecover value)? recover,
-    TResult Function(AppActLogout value)? logout,
+    TResult? Function(AppActSignupLogin value)? signupLogin,
+    TResult? Function(AppActLogin value)? login,
+    TResult? Function(AppActLoginAnonymous value)? loginAnonymous,
+    TResult? Function(AppActRecover value)? recover,
+    TResult? Function(AppActLogout value)? logout,
   }) {
     return loginAnonymous?.call(this);
   }
@@ -612,14 +609,12 @@ abstract class _$$AppActRecoverCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$AppActRecoverCopyWithImpl<$Res> extends _$AppActCopyWithImpl<$Res>
+class __$$AppActRecoverCopyWithImpl<$Res>
+    extends _$AppActCopyWithImpl<$Res, _$AppActRecover>
     implements _$$AppActRecoverCopyWith<$Res> {
   __$$AppActRecoverCopyWithImpl(
       _$AppActRecover _value, $Res Function(_$AppActRecover) _then)
-      : super(_value, (v) => _then(v as _$AppActRecover));
-
-  @override
-  _$AppActRecover get _value => super._value as _$AppActRecover;
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -660,13 +655,13 @@ class _$AppActRecover implements AppActRecover {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(AuthTp authVerify, String identityStr, Password password)?
+    TResult? Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(AuthTp authVerify, String identityStr, Password password)?
+    TResult? Function(AuthTp authVerify, String identityStr, Password password)?
         login,
-    TResult Function()? loginAnonymous,
-    TResult Function()? recover,
-    TResult Function()? logout,
+    TResult? Function()? loginAnonymous,
+    TResult? Function()? recover,
+    TResult? Function()? logout,
   }) {
     return recover?.call();
   }
@@ -704,11 +699,11 @@ class _$AppActRecover implements AppActRecover {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(AppActSignupLogin value)? signupLogin,
-    TResult Function(AppActLogin value)? login,
-    TResult Function(AppActLoginAnonymous value)? loginAnonymous,
-    TResult Function(AppActRecover value)? recover,
-    TResult Function(AppActLogout value)? logout,
+    TResult? Function(AppActSignupLogin value)? signupLogin,
+    TResult? Function(AppActLogin value)? login,
+    TResult? Function(AppActLoginAnonymous value)? loginAnonymous,
+    TResult? Function(AppActRecover value)? recover,
+    TResult? Function(AppActLogout value)? logout,
   }) {
     return recover?.call(this);
   }
@@ -742,14 +737,12 @@ abstract class _$$AppActLogoutCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$AppActLogoutCopyWithImpl<$Res> extends _$AppActCopyWithImpl<$Res>
+class __$$AppActLogoutCopyWithImpl<$Res>
+    extends _$AppActCopyWithImpl<$Res, _$AppActLogout>
     implements _$$AppActLogoutCopyWith<$Res> {
   __$$AppActLogoutCopyWithImpl(
       _$AppActLogout _value, $Res Function(_$AppActLogout) _then)
-      : super(_value, (v) => _then(v as _$AppActLogout));
-
-  @override
-  _$AppActLogout get _value => super._value as _$AppActLogout;
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -790,13 +783,13 @@ class _$AppActLogout implements AppActLogout {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(AuthTp authVerify, String identityStr, Password password)?
+    TResult? Function(AuthTp authVerify, String identityStr, Password password)?
         signupLogin,
-    TResult Function(AuthTp authVerify, String identityStr, Password password)?
+    TResult? Function(AuthTp authVerify, String identityStr, Password password)?
         login,
-    TResult Function()? loginAnonymous,
-    TResult Function()? recover,
-    TResult Function()? logout,
+    TResult? Function()? loginAnonymous,
+    TResult? Function()? recover,
+    TResult? Function()? logout,
   }) {
     return logout?.call();
   }
@@ -834,11 +827,11 @@ class _$AppActLogout implements AppActLogout {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(AppActSignupLogin value)? signupLogin,
-    TResult Function(AppActLogin value)? login,
-    TResult Function(AppActLoginAnonymous value)? loginAnonymous,
-    TResult Function(AppActRecover value)? recover,
-    TResult Function(AppActLogout value)? logout,
+    TResult? Function(AppActSignupLogin value)? signupLogin,
+    TResult? Function(AppActLogin value)? login,
+    TResult? Function(AppActLoginAnonymous value)? loginAnonymous,
+    TResult? Function(AppActRecover value)? recover,
+    TResult? Function(AppActLogout value)? logout,
   }) {
     return logout?.call(this);
   }
@@ -875,9 +868,9 @@ mixin _$AppState {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? init,
-    TResult Function(UserModel user)? logged,
-    TResult Function()? unLogged,
+    TResult? Function()? init,
+    TResult? Function(UserModel user)? logged,
+    TResult? Function()? unLogged,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -897,9 +890,9 @@ mixin _$AppState {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(AppStateInit value)? init,
-    TResult Function(AppStateLogged value)? logged,
-    TResult Function(AppStateUnLogged value)? unLogged,
+    TResult? Function(AppStateInit value)? init,
+    TResult? Function(AppStateLogged value)? logged,
+    TResult? Function(AppStateUnLogged value)? unLogged,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -915,16 +908,18 @@ mixin _$AppState {
 /// @nodoc
 abstract class $AppStateCopyWith<$Res> {
   factory $AppStateCopyWith(AppState value, $Res Function(AppState) then) =
-      _$AppStateCopyWithImpl<$Res>;
+      _$AppStateCopyWithImpl<$Res, AppState>;
 }
 
 /// @nodoc
-class _$AppStateCopyWithImpl<$Res> implements $AppStateCopyWith<$Res> {
+class _$AppStateCopyWithImpl<$Res, $Val extends AppState>
+    implements $AppStateCopyWith<$Res> {
   _$AppStateCopyWithImpl(this._value, this._then);
 
-  final AppState _value;
   // ignore: unused_field
-  final $Res Function(AppState) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 }
 
 /// @nodoc
@@ -935,14 +930,12 @@ abstract class _$$AppStateInitCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$AppStateInitCopyWithImpl<$Res> extends _$AppStateCopyWithImpl<$Res>
+class __$$AppStateInitCopyWithImpl<$Res>
+    extends _$AppStateCopyWithImpl<$Res, _$AppStateInit>
     implements _$$AppStateInitCopyWith<$Res> {
   __$$AppStateInitCopyWithImpl(
       _$AppStateInit _value, $Res Function(_$AppStateInit) _then)
-      : super(_value, (v) => _then(v as _$AppStateInit));
-
-  @override
-  _$AppStateInit get _value => super._value as _$AppStateInit;
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -977,9 +970,9 @@ class _$AppStateInit implements AppStateInit {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? init,
-    TResult Function(UserModel user)? logged,
-    TResult Function()? unLogged,
+    TResult? Function()? init,
+    TResult? Function(UserModel user)? logged,
+    TResult? Function()? unLogged,
   }) {
     return init?.call();
   }
@@ -1011,9 +1004,9 @@ class _$AppStateInit implements AppStateInit {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(AppStateInit value)? init,
-    TResult Function(AppStateLogged value)? logged,
-    TResult Function(AppStateUnLogged value)? unLogged,
+    TResult? Function(AppStateInit value)? init,
+    TResult? Function(AppStateLogged value)? logged,
+    TResult? Function(AppStateUnLogged value)? unLogged,
   }) {
     return init?.call(this);
   }
@@ -1042,25 +1035,25 @@ abstract class _$$AppStateLoggedCopyWith<$Res> {
   factory _$$AppStateLoggedCopyWith(
           _$AppStateLogged value, $Res Function(_$AppStateLogged) then) =
       __$$AppStateLoggedCopyWithImpl<$Res>;
+  @useResult
   $Res call({UserModel user});
 }
 
 /// @nodoc
-class __$$AppStateLoggedCopyWithImpl<$Res> extends _$AppStateCopyWithImpl<$Res>
+class __$$AppStateLoggedCopyWithImpl<$Res>
+    extends _$AppStateCopyWithImpl<$Res, _$AppStateLogged>
     implements _$$AppStateLoggedCopyWith<$Res> {
   __$$AppStateLoggedCopyWithImpl(
       _$AppStateLogged _value, $Res Function(_$AppStateLogged) _then)
-      : super(_value, (v) => _then(v as _$AppStateLogged));
+      : super(_value, _then);
 
-  @override
-  _$AppStateLogged get _value => super._value as _$AppStateLogged;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? user = freezed,
+    Object? user = null,
   }) {
     return _then(_$AppStateLogged(
-      user: user == freezed
+      user: null == user
           ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
               as UserModel,
@@ -1086,15 +1079,15 @@ class _$AppStateLogged implements AppStateLogged {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$AppStateLogged &&
-            const DeepCollectionEquality().equals(other.user, user));
+            (identical(other.user, user) || other.user == user));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(user));
+  int get hashCode => Object.hash(runtimeType, user);
 
   @JsonKey(ignore: true)
   @override
+  @pragma('vm:prefer-inline')
   _$$AppStateLoggedCopyWith<_$AppStateLogged> get copyWith =>
       __$$AppStateLoggedCopyWithImpl<_$AppStateLogged>(this, _$identity);
 
@@ -1111,9 +1104,9 @@ class _$AppStateLogged implements AppStateLogged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? init,
-    TResult Function(UserModel user)? logged,
-    TResult Function()? unLogged,
+    TResult? Function()? init,
+    TResult? Function(UserModel user)? logged,
+    TResult? Function()? unLogged,
   }) {
     return logged?.call(user);
   }
@@ -1145,9 +1138,9 @@ class _$AppStateLogged implements AppStateLogged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(AppStateInit value)? init,
-    TResult Function(AppStateLogged value)? logged,
-    TResult Function(AppStateUnLogged value)? unLogged,
+    TResult? Function(AppStateInit value)? init,
+    TResult? Function(AppStateLogged value)? logged,
+    TResult? Function(AppStateUnLogged value)? unLogged,
   }) {
     return logged?.call(this);
   }
@@ -1186,14 +1179,11 @@ abstract class _$$AppStateUnLoggedCopyWith<$Res> {
 
 /// @nodoc
 class __$$AppStateUnLoggedCopyWithImpl<$Res>
-    extends _$AppStateCopyWithImpl<$Res>
+    extends _$AppStateCopyWithImpl<$Res, _$AppStateUnLogged>
     implements _$$AppStateUnLoggedCopyWith<$Res> {
   __$$AppStateUnLoggedCopyWithImpl(
       _$AppStateUnLogged _value, $Res Function(_$AppStateUnLogged) _then)
-      : super(_value, (v) => _then(v as _$AppStateUnLogged));
-
-  @override
-  _$AppStateUnLogged get _value => super._value as _$AppStateUnLogged;
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -1228,9 +1218,9 @@ class _$AppStateUnLogged implements AppStateUnLogged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? init,
-    TResult Function(UserModel user)? logged,
-    TResult Function()? unLogged,
+    TResult? Function()? init,
+    TResult? Function(UserModel user)? logged,
+    TResult? Function()? unLogged,
   }) {
     return unLogged?.call();
   }
@@ -1262,9 +1252,9 @@ class _$AppStateUnLogged implements AppStateUnLogged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(AppStateInit value)? init,
-    TResult Function(AppStateLogged value)? logged,
-    TResult Function(AppStateUnLogged value)? unLogged,
+    TResult? Function(AppStateInit value)? init,
+    TResult? Function(AppStateLogged value)? logged,
+    TResult? Function(AppStateUnLogged value)? unLogged,
   }) {
     return unLogged?.call(this);
   }
@@ -1299,9 +1289,9 @@ mixin _$AppEvt {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String msg)? msg,
-    TResult Function()? recovering,
-    TResult Function(String? errMsg)? recoverDone,
+    TResult? Function(String msg)? msg,
+    TResult? Function()? recovering,
+    TResult? Function(String? errMsg)? recoverDone,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -1321,9 +1311,9 @@ mixin _$AppEvt {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(AppEvtMsg value)? msg,
-    TResult Function(AppEvtRecovering value)? recovering,
-    TResult Function(AppEvtRecoverDone value)? recoverDone,
+    TResult? Function(AppEvtMsg value)? msg,
+    TResult? Function(AppEvtRecovering value)? recovering,
+    TResult? Function(AppEvtRecoverDone value)? recoverDone,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -1339,16 +1329,18 @@ mixin _$AppEvt {
 /// @nodoc
 abstract class $AppEvtCopyWith<$Res> {
   factory $AppEvtCopyWith(AppEvt value, $Res Function(AppEvt) then) =
-      _$AppEvtCopyWithImpl<$Res>;
+      _$AppEvtCopyWithImpl<$Res, AppEvt>;
 }
 
 /// @nodoc
-class _$AppEvtCopyWithImpl<$Res> implements $AppEvtCopyWith<$Res> {
+class _$AppEvtCopyWithImpl<$Res, $Val extends AppEvt>
+    implements $AppEvtCopyWith<$Res> {
   _$AppEvtCopyWithImpl(this._value, this._then);
 
-  final AppEvt _value;
   // ignore: unused_field
-  final $Res Function(AppEvt) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 }
 
 /// @nodoc
@@ -1356,25 +1348,25 @@ abstract class _$$AppEvtMsgCopyWith<$Res> {
   factory _$$AppEvtMsgCopyWith(
           _$AppEvtMsg value, $Res Function(_$AppEvtMsg) then) =
       __$$AppEvtMsgCopyWithImpl<$Res>;
+  @useResult
   $Res call({String msg});
 }
 
 /// @nodoc
-class __$$AppEvtMsgCopyWithImpl<$Res> extends _$AppEvtCopyWithImpl<$Res>
+class __$$AppEvtMsgCopyWithImpl<$Res>
+    extends _$AppEvtCopyWithImpl<$Res, _$AppEvtMsg>
     implements _$$AppEvtMsgCopyWith<$Res> {
   __$$AppEvtMsgCopyWithImpl(
       _$AppEvtMsg _value, $Res Function(_$AppEvtMsg) _then)
-      : super(_value, (v) => _then(v as _$AppEvtMsg));
+      : super(_value, _then);
 
-  @override
-  _$AppEvtMsg get _value => super._value as _$AppEvtMsg;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? msg = freezed,
+    Object? msg = null,
   }) {
     return _then(_$AppEvtMsg(
-      msg == freezed
+      null == msg
           ? _value.msg
           : msg // ignore: cast_nullable_to_non_nullable
               as String,
@@ -1400,15 +1392,15 @@ class _$AppEvtMsg implements AppEvtMsg {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$AppEvtMsg &&
-            const DeepCollectionEquality().equals(other.msg, msg));
+            (identical(other.msg, msg) || other.msg == msg));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(msg));
+  int get hashCode => Object.hash(runtimeType, msg);
 
   @JsonKey(ignore: true)
   @override
+  @pragma('vm:prefer-inline')
   _$$AppEvtMsgCopyWith<_$AppEvtMsg> get copyWith =>
       __$$AppEvtMsgCopyWithImpl<_$AppEvtMsg>(this, _$identity);
 
@@ -1425,9 +1417,9 @@ class _$AppEvtMsg implements AppEvtMsg {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String msg)? msg,
-    TResult Function()? recovering,
-    TResult Function(String? errMsg)? recoverDone,
+    TResult? Function(String msg)? msg,
+    TResult? Function()? recovering,
+    TResult? Function(String? errMsg)? recoverDone,
   }) {
     return msg?.call(this.msg);
   }
@@ -1459,9 +1451,9 @@ class _$AppEvtMsg implements AppEvtMsg {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(AppEvtMsg value)? msg,
-    TResult Function(AppEvtRecovering value)? recovering,
-    TResult Function(AppEvtRecoverDone value)? recoverDone,
+    TResult? Function(AppEvtMsg value)? msg,
+    TResult? Function(AppEvtRecovering value)? recovering,
+    TResult? Function(AppEvtRecoverDone value)? recoverDone,
   }) {
     return msg?.call(this);
   }
@@ -1498,14 +1490,12 @@ abstract class _$$AppEvtRecoveringCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$AppEvtRecoveringCopyWithImpl<$Res> extends _$AppEvtCopyWithImpl<$Res>
+class __$$AppEvtRecoveringCopyWithImpl<$Res>
+    extends _$AppEvtCopyWithImpl<$Res, _$AppEvtRecovering>
     implements _$$AppEvtRecoveringCopyWith<$Res> {
   __$$AppEvtRecoveringCopyWithImpl(
       _$AppEvtRecovering _value, $Res Function(_$AppEvtRecovering) _then)
-      : super(_value, (v) => _then(v as _$AppEvtRecovering));
-
-  @override
-  _$AppEvtRecovering get _value => super._value as _$AppEvtRecovering;
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -1540,9 +1530,9 @@ class _$AppEvtRecovering implements AppEvtRecovering {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String msg)? msg,
-    TResult Function()? recovering,
-    TResult Function(String? errMsg)? recoverDone,
+    TResult? Function(String msg)? msg,
+    TResult? Function()? recovering,
+    TResult? Function(String? errMsg)? recoverDone,
   }) {
     return recovering?.call();
   }
@@ -1574,9 +1564,9 @@ class _$AppEvtRecovering implements AppEvtRecovering {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(AppEvtMsg value)? msg,
-    TResult Function(AppEvtRecovering value)? recovering,
-    TResult Function(AppEvtRecoverDone value)? recoverDone,
+    TResult? Function(AppEvtMsg value)? msg,
+    TResult? Function(AppEvtRecovering value)? recovering,
+    TResult? Function(AppEvtRecoverDone value)? recoverDone,
   }) {
     return recovering?.call(this);
   }
@@ -1605,25 +1595,25 @@ abstract class _$$AppEvtRecoverDoneCopyWith<$Res> {
   factory _$$AppEvtRecoverDoneCopyWith(
           _$AppEvtRecoverDone value, $Res Function(_$AppEvtRecoverDone) then) =
       __$$AppEvtRecoverDoneCopyWithImpl<$Res>;
+  @useResult
   $Res call({String? errMsg});
 }
 
 /// @nodoc
-class __$$AppEvtRecoverDoneCopyWithImpl<$Res> extends _$AppEvtCopyWithImpl<$Res>
+class __$$AppEvtRecoverDoneCopyWithImpl<$Res>
+    extends _$AppEvtCopyWithImpl<$Res, _$AppEvtRecoverDone>
     implements _$$AppEvtRecoverDoneCopyWith<$Res> {
   __$$AppEvtRecoverDoneCopyWithImpl(
       _$AppEvtRecoverDone _value, $Res Function(_$AppEvtRecoverDone) _then)
-      : super(_value, (v) => _then(v as _$AppEvtRecoverDone));
+      : super(_value, _then);
 
-  @override
-  _$AppEvtRecoverDone get _value => super._value as _$AppEvtRecoverDone;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? errMsg = freezed,
   }) {
     return _then(_$AppEvtRecoverDone(
-      errMsg == freezed
+      freezed == errMsg
           ? _value.errMsg
           : errMsg // ignore: cast_nullable_to_non_nullable
               as String?,
@@ -1649,15 +1639,15 @@ class _$AppEvtRecoverDone implements AppEvtRecoverDone {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$AppEvtRecoverDone &&
-            const DeepCollectionEquality().equals(other.errMsg, errMsg));
+            (identical(other.errMsg, errMsg) || other.errMsg == errMsg));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(errMsg));
+  int get hashCode => Object.hash(runtimeType, errMsg);
 
   @JsonKey(ignore: true)
   @override
+  @pragma('vm:prefer-inline')
   _$$AppEvtRecoverDoneCopyWith<_$AppEvtRecoverDone> get copyWith =>
       __$$AppEvtRecoverDoneCopyWithImpl<_$AppEvtRecoverDone>(this, _$identity);
 
@@ -1674,9 +1664,9 @@ class _$AppEvtRecoverDone implements AppEvtRecoverDone {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String msg)? msg,
-    TResult Function()? recovering,
-    TResult Function(String? errMsg)? recoverDone,
+    TResult? Function(String msg)? msg,
+    TResult? Function()? recovering,
+    TResult? Function(String? errMsg)? recoverDone,
   }) {
     return recoverDone?.call(errMsg);
   }
@@ -1708,9 +1698,9 @@ class _$AppEvtRecoverDone implements AppEvtRecoverDone {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(AppEvtMsg value)? msg,
-    TResult Function(AppEvtRecovering value)? recovering,
-    TResult Function(AppEvtRecoverDone value)? recoverDone,
+    TResult? Function(AppEvtMsg value)? msg,
+    TResult? Function(AppEvtRecovering value)? recovering,
+    TResult? Function(AppEvtRecoverDone value)? recoverDone,
   }) {
     return recoverDone?.call(this);
   }
@@ -1751,10 +1741,10 @@ mixin _$UserAct {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initModel,
-    TResult Function()? updateTeams,
-    TResult Function(String name)? createTeam,
-    TResult Function(String teamId)? deleteTeam,
+    TResult? Function()? initModel,
+    TResult? Function()? updateTeams,
+    TResult? Function(String name)? createTeam,
+    TResult? Function(String teamId)? deleteTeam,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -1776,10 +1766,10 @@ mixin _$UserAct {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(UserActInitModel value)? initModel,
-    TResult Function(UserActUpdateTeams value)? updateTeams,
-    TResult Function(UserActCreateTeam value)? createTeam,
-    TResult Function(UserActDeleteTeam value)? deleteTeam,
+    TResult? Function(UserActInitModel value)? initModel,
+    TResult? Function(UserActUpdateTeams value)? updateTeams,
+    TResult? Function(UserActCreateTeam value)? createTeam,
+    TResult? Function(UserActDeleteTeam value)? deleteTeam,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -1796,16 +1786,18 @@ mixin _$UserAct {
 /// @nodoc
 abstract class $UserActCopyWith<$Res> {
   factory $UserActCopyWith(UserAct value, $Res Function(UserAct) then) =
-      _$UserActCopyWithImpl<$Res>;
+      _$UserActCopyWithImpl<$Res, UserAct>;
 }
 
 /// @nodoc
-class _$UserActCopyWithImpl<$Res> implements $UserActCopyWith<$Res> {
+class _$UserActCopyWithImpl<$Res, $Val extends UserAct>
+    implements $UserActCopyWith<$Res> {
   _$UserActCopyWithImpl(this._value, this._then);
 
-  final UserAct _value;
   // ignore: unused_field
-  final $Res Function(UserAct) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 }
 
 /// @nodoc
@@ -1816,14 +1808,12 @@ abstract class _$$UserActInitModelCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$UserActInitModelCopyWithImpl<$Res> extends _$UserActCopyWithImpl<$Res>
+class __$$UserActInitModelCopyWithImpl<$Res>
+    extends _$UserActCopyWithImpl<$Res, _$UserActInitModel>
     implements _$$UserActInitModelCopyWith<$Res> {
   __$$UserActInitModelCopyWithImpl(
       _$UserActInitModel _value, $Res Function(_$UserActInitModel) _then)
-      : super(_value, (v) => _then(v as _$UserActInitModel));
-
-  @override
-  _$UserActInitModel get _value => super._value as _$UserActInitModel;
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -1859,10 +1849,10 @@ class _$UserActInitModel implements UserActInitModel {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initModel,
-    TResult Function()? updateTeams,
-    TResult Function(String name)? createTeam,
-    TResult Function(String teamId)? deleteTeam,
+    TResult? Function()? initModel,
+    TResult? Function()? updateTeams,
+    TResult? Function(String name)? createTeam,
+    TResult? Function(String teamId)? deleteTeam,
   }) {
     return initModel?.call();
   }
@@ -1896,10 +1886,10 @@ class _$UserActInitModel implements UserActInitModel {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(UserActInitModel value)? initModel,
-    TResult Function(UserActUpdateTeams value)? updateTeams,
-    TResult Function(UserActCreateTeam value)? createTeam,
-    TResult Function(UserActDeleteTeam value)? deleteTeam,
+    TResult? Function(UserActInitModel value)? initModel,
+    TResult? Function(UserActUpdateTeams value)? updateTeams,
+    TResult? Function(UserActCreateTeam value)? createTeam,
+    TResult? Function(UserActDeleteTeam value)? deleteTeam,
   }) {
     return initModel?.call(this);
   }
@@ -1933,14 +1923,11 @@ abstract class _$$UserActUpdateTeamsCopyWith<$Res> {
 
 /// @nodoc
 class __$$UserActUpdateTeamsCopyWithImpl<$Res>
-    extends _$UserActCopyWithImpl<$Res>
+    extends _$UserActCopyWithImpl<$Res, _$UserActUpdateTeams>
     implements _$$UserActUpdateTeamsCopyWith<$Res> {
   __$$UserActUpdateTeamsCopyWithImpl(
       _$UserActUpdateTeams _value, $Res Function(_$UserActUpdateTeams) _then)
-      : super(_value, (v) => _then(v as _$UserActUpdateTeams));
-
-  @override
-  _$UserActUpdateTeams get _value => super._value as _$UserActUpdateTeams;
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -1976,10 +1963,10 @@ class _$UserActUpdateTeams implements UserActUpdateTeams {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initModel,
-    TResult Function()? updateTeams,
-    TResult Function(String name)? createTeam,
-    TResult Function(String teamId)? deleteTeam,
+    TResult? Function()? initModel,
+    TResult? Function()? updateTeams,
+    TResult? Function(String name)? createTeam,
+    TResult? Function(String teamId)? deleteTeam,
   }) {
     return updateTeams?.call();
   }
@@ -2013,10 +2000,10 @@ class _$UserActUpdateTeams implements UserActUpdateTeams {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(UserActInitModel value)? initModel,
-    TResult Function(UserActUpdateTeams value)? updateTeams,
-    TResult Function(UserActCreateTeam value)? createTeam,
-    TResult Function(UserActDeleteTeam value)? deleteTeam,
+    TResult? Function(UserActInitModel value)? initModel,
+    TResult? Function(UserActUpdateTeams value)? updateTeams,
+    TResult? Function(UserActCreateTeam value)? createTeam,
+    TResult? Function(UserActDeleteTeam value)? deleteTeam,
   }) {
     return updateTeams?.call(this);
   }
@@ -2046,26 +2033,25 @@ abstract class _$$UserActCreateTeamCopyWith<$Res> {
   factory _$$UserActCreateTeamCopyWith(
           _$UserActCreateTeam value, $Res Function(_$UserActCreateTeam) then) =
       __$$UserActCreateTeamCopyWithImpl<$Res>;
+  @useResult
   $Res call({String name});
 }
 
 /// @nodoc
 class __$$UserActCreateTeamCopyWithImpl<$Res>
-    extends _$UserActCopyWithImpl<$Res>
+    extends _$UserActCopyWithImpl<$Res, _$UserActCreateTeam>
     implements _$$UserActCreateTeamCopyWith<$Res> {
   __$$UserActCreateTeamCopyWithImpl(
       _$UserActCreateTeam _value, $Res Function(_$UserActCreateTeam) _then)
-      : super(_value, (v) => _then(v as _$UserActCreateTeam));
+      : super(_value, _then);
 
-  @override
-  _$UserActCreateTeam get _value => super._value as _$UserActCreateTeam;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? name = freezed,
+    Object? name = null,
   }) {
     return _then(_$UserActCreateTeam(
-      name == freezed
+      null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
@@ -2091,15 +2077,15 @@ class _$UserActCreateTeam implements UserActCreateTeam {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$UserActCreateTeam &&
-            const DeepCollectionEquality().equals(other.name, name));
+            (identical(other.name, name) || other.name == name));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(name));
+  int get hashCode => Object.hash(runtimeType, name);
 
   @JsonKey(ignore: true)
   @override
+  @pragma('vm:prefer-inline')
   _$$UserActCreateTeamCopyWith<_$UserActCreateTeam> get copyWith =>
       __$$UserActCreateTeamCopyWithImpl<_$UserActCreateTeam>(this, _$identity);
 
@@ -2117,10 +2103,10 @@ class _$UserActCreateTeam implements UserActCreateTeam {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initModel,
-    TResult Function()? updateTeams,
-    TResult Function(String name)? createTeam,
-    TResult Function(String teamId)? deleteTeam,
+    TResult? Function()? initModel,
+    TResult? Function()? updateTeams,
+    TResult? Function(String name)? createTeam,
+    TResult? Function(String teamId)? deleteTeam,
   }) {
     return createTeam?.call(name);
   }
@@ -2154,10 +2140,10 @@ class _$UserActCreateTeam implements UserActCreateTeam {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(UserActInitModel value)? initModel,
-    TResult Function(UserActUpdateTeams value)? updateTeams,
-    TResult Function(UserActCreateTeam value)? createTeam,
-    TResult Function(UserActDeleteTeam value)? deleteTeam,
+    TResult? Function(UserActInitModel value)? initModel,
+    TResult? Function(UserActUpdateTeams value)? updateTeams,
+    TResult? Function(UserActCreateTeam value)? createTeam,
+    TResult? Function(UserActDeleteTeam value)? deleteTeam,
   }) {
     return createTeam?.call(this);
   }
@@ -2192,26 +2178,25 @@ abstract class _$$UserActDeleteTeamCopyWith<$Res> {
   factory _$$UserActDeleteTeamCopyWith(
           _$UserActDeleteTeam value, $Res Function(_$UserActDeleteTeam) then) =
       __$$UserActDeleteTeamCopyWithImpl<$Res>;
+  @useResult
   $Res call({String teamId});
 }
 
 /// @nodoc
 class __$$UserActDeleteTeamCopyWithImpl<$Res>
-    extends _$UserActCopyWithImpl<$Res>
+    extends _$UserActCopyWithImpl<$Res, _$UserActDeleteTeam>
     implements _$$UserActDeleteTeamCopyWith<$Res> {
   __$$UserActDeleteTeamCopyWithImpl(
       _$UserActDeleteTeam _value, $Res Function(_$UserActDeleteTeam) _then)
-      : super(_value, (v) => _then(v as _$UserActDeleteTeam));
+      : super(_value, _then);
 
-  @override
-  _$UserActDeleteTeam get _value => super._value as _$UserActDeleteTeam;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? teamId = freezed,
+    Object? teamId = null,
   }) {
     return _then(_$UserActDeleteTeam(
-      teamId == freezed
+      null == teamId
           ? _value.teamId
           : teamId // ignore: cast_nullable_to_non_nullable
               as String,
@@ -2237,15 +2222,15 @@ class _$UserActDeleteTeam implements UserActDeleteTeam {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$UserActDeleteTeam &&
-            const DeepCollectionEquality().equals(other.teamId, teamId));
+            (identical(other.teamId, teamId) || other.teamId == teamId));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(teamId));
+  int get hashCode => Object.hash(runtimeType, teamId);
 
   @JsonKey(ignore: true)
   @override
+  @pragma('vm:prefer-inline')
   _$$UserActDeleteTeamCopyWith<_$UserActDeleteTeam> get copyWith =>
       __$$UserActDeleteTeamCopyWithImpl<_$UserActDeleteTeam>(this, _$identity);
 
@@ -2263,10 +2248,10 @@ class _$UserActDeleteTeam implements UserActDeleteTeam {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initModel,
-    TResult Function()? updateTeams,
-    TResult Function(String name)? createTeam,
-    TResult Function(String teamId)? deleteTeam,
+    TResult? Function()? initModel,
+    TResult? Function()? updateTeams,
+    TResult? Function(String name)? createTeam,
+    TResult? Function(String teamId)? deleteTeam,
   }) {
     return deleteTeam?.call(teamId);
   }
@@ -2300,10 +2285,10 @@ class _$UserActDeleteTeam implements UserActDeleteTeam {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(UserActInitModel value)? initModel,
-    TResult Function(UserActUpdateTeams value)? updateTeams,
-    TResult Function(UserActCreateTeam value)? createTeam,
-    TResult Function(UserActDeleteTeam value)? deleteTeam,
+    TResult? Function(UserActInitModel value)? initModel,
+    TResult? Function(UserActUpdateTeams value)? updateTeams,
+    TResult? Function(UserActCreateTeam value)? createTeam,
+    TResult? Function(UserActDeleteTeam value)? deleteTeam,
   }) {
     return deleteTeam?.call(this);
   }
@@ -2343,8 +2328,8 @@ mixin _$UserState {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? init,
-    TResult Function(List<TeamModel> teams)? done,
+    TResult? Function()? init,
+    TResult? Function(List<TeamModel> teams)? done,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -2362,8 +2347,8 @@ mixin _$UserState {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(UserStateInit value)? init,
-    TResult Function(UserStateDone value)? done,
+    TResult? Function(UserStateInit value)? init,
+    TResult? Function(UserStateDone value)? done,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -2378,16 +2363,18 @@ mixin _$UserState {
 /// @nodoc
 abstract class $UserStateCopyWith<$Res> {
   factory $UserStateCopyWith(UserState value, $Res Function(UserState) then) =
-      _$UserStateCopyWithImpl<$Res>;
+      _$UserStateCopyWithImpl<$Res, UserState>;
 }
 
 /// @nodoc
-class _$UserStateCopyWithImpl<$Res> implements $UserStateCopyWith<$Res> {
+class _$UserStateCopyWithImpl<$Res, $Val extends UserState>
+    implements $UserStateCopyWith<$Res> {
   _$UserStateCopyWithImpl(this._value, this._then);
 
-  final UserState _value;
   // ignore: unused_field
-  final $Res Function(UserState) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 }
 
 /// @nodoc
@@ -2398,14 +2385,12 @@ abstract class _$$UserStateInitCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$UserStateInitCopyWithImpl<$Res> extends _$UserStateCopyWithImpl<$Res>
+class __$$UserStateInitCopyWithImpl<$Res>
+    extends _$UserStateCopyWithImpl<$Res, _$UserStateInit>
     implements _$$UserStateInitCopyWith<$Res> {
   __$$UserStateInitCopyWithImpl(
       _$UserStateInit _value, $Res Function(_$UserStateInit) _then)
-      : super(_value, (v) => _then(v as _$UserStateInit));
-
-  @override
-  _$UserStateInit get _value => super._value as _$UserStateInit;
+      : super(_value, _then);
 }
 
 /// @nodoc
@@ -2439,8 +2424,8 @@ class _$UserStateInit implements UserStateInit {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? init,
-    TResult Function(List<TeamModel> teams)? done,
+    TResult? Function()? init,
+    TResult? Function(List<TeamModel> teams)? done,
   }) {
     return init?.call();
   }
@@ -2470,8 +2455,8 @@ class _$UserStateInit implements UserStateInit {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(UserStateInit value)? init,
-    TResult Function(UserStateDone value)? done,
+    TResult? Function(UserStateInit value)? init,
+    TResult? Function(UserStateDone value)? done,
   }) {
     return init?.call(this);
   }
@@ -2499,25 +2484,25 @@ abstract class _$$UserStateDoneCopyWith<$Res> {
   factory _$$UserStateDoneCopyWith(
           _$UserStateDone value, $Res Function(_$UserStateDone) then) =
       __$$UserStateDoneCopyWithImpl<$Res>;
+  @useResult
   $Res call({List<TeamModel> teams});
 }
 
 /// @nodoc
-class __$$UserStateDoneCopyWithImpl<$Res> extends _$UserStateCopyWithImpl<$Res>
+class __$$UserStateDoneCopyWithImpl<$Res>
+    extends _$UserStateCopyWithImpl<$Res, _$UserStateDone>
     implements _$$UserStateDoneCopyWith<$Res> {
   __$$UserStateDoneCopyWithImpl(
       _$UserStateDone _value, $Res Function(_$UserStateDone) _then)
-      : super(_value, (v) => _then(v as _$UserStateDone));
+      : super(_value, _then);
 
-  @override
-  _$UserStateDone get _value => super._value as _$UserStateDone;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? teams = freezed,
+    Object? teams = null,
   }) {
     return _then(_$UserStateDone(
-      teams == freezed
+      null == teams
           ? _value.teams
           : teams // ignore: cast_nullable_to_non_nullable
               as List<TeamModel>,
@@ -2552,6 +2537,7 @@ class _$UserStateDone implements UserStateDone {
 
   @JsonKey(ignore: true)
   @override
+  @pragma('vm:prefer-inline')
   _$$UserStateDoneCopyWith<_$UserStateDone> get copyWith =>
       __$$UserStateDoneCopyWithImpl<_$UserStateDone>(this, _$identity);
 
@@ -2567,8 +2553,8 @@ class _$UserStateDone implements UserStateDone {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? init,
-    TResult Function(List<TeamModel> teams)? done,
+    TResult? Function()? init,
+    TResult? Function(List<TeamModel> teams)? done,
   }) {
     return done?.call(teams);
   }
@@ -2598,8 +2584,8 @@ class _$UserStateDone implements UserStateDone {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(UserStateInit value)? init,
-    TResult Function(UserStateDone value)? done,
+    TResult? Function(UserStateInit value)? init,
+    TResult? Function(UserStateDone value)? done,
   }) {
     return done?.call(this);
   }
