@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mind_base/src/app/application/model/model.mocks.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/application/service/expr/expr_evaluator.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';

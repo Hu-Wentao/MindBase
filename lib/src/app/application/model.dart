@@ -26,8 +26,8 @@ import 'package:get_sweet/get_sweet.dart';
 ])
 import 'model.mocks.dart';
 
-part 'app_state_model.dart';
+part 'model/app_state_model.dart';
 
-part 'user_model.dart';
+part 'model/user_model.dart';
 
 part 'model.freezed.dart';

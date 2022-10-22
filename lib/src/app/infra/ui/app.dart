@@ -5,7 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:get_sweet/get_sweet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mind_base/src/app/application.dart';
-import 'package:mind_base/src/app/application/model/model.dart';
+import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/app/infra/ui/page/auth/auth.dart';
 import 'package:mind_base/src/app/infra/ui/page/home/home.dart';
 import 'package:mind_base/src/app/infra/ui/page/splash/splash.dart';

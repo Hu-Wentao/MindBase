@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:go_router/go_router.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:mind_base/src/app/application/model/model.dart';
+import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/app/infra/ui/page/home/home.dart';
 import 'package:mind_base/src/core/config/assets/assets.gen.dart';
 import 'package:mind_base/src/user/domain/value/value.dart';

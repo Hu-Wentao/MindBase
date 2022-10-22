@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mind_base/src/app/application/model/model.dart';
+import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/app/infra/ui/page/auth/auth.dart';
 import 'package:mind_base/src/app/infra/ui/page/home/home.dart';
 import 'package:provider/provider.dart';

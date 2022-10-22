@@ -4,7 +4,7 @@ import 'package:get_sweet/get_sweet.dart';
 import 'package:mind_base/src/app/infra/ui/page/home/home.dart';
 import 'package:mind_base/src/core/infra/ui/exception_router/exception_router.dart';
 import 'package:mind_base/src/feedback/infra/ui/widget/feedback_btn.dart';
-import 'package:mind_base/src/app/application/model/model.dart';
+import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/user/infra/ui/components/user_tile.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/infra/ui/dialog/collection_edit_dialog.dart';

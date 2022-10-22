@@ -1,9 +1,7 @@
 import 'dart:convert';
 
-import 'package:appwrite/models.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mind_base/src/app/application/model/model.mocks.dart';
-import 'package:mind_base/src/user/application/model/model.dart';
+import 'package:mind_base/src/app/application/model.mocks.dart';
 import 'package:mind_base/src/workspace/application/model/model.dart';
 import 'package:mind_base/src/workspace/application/service/expr/expression_parser.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
