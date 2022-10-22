@@ -5,6 +5,6 @@ import 'package:mind_base/src/user/domain/entity.dart';
 
 import '../inter/dto.dart';
 
-part 'account_service.dart';
+part 'service/account_service.dart';
 
-part 'team_service.dart';
+part 'service/team_service.dart';
