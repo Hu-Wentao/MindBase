@@ -39,6 +39,7 @@ dependencies:
   line_icons:
   bson:
   collection:
+  ndialog:
 
 dev_dependencies:
   flutter_test:

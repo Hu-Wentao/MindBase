@@ -536,6 +536,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.2"
+  ndialog:
+    dependency: "direct main"
+    description:
+      name: ndialog
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "4.2.0"
   nested:
     dependency: transitive
     description:
