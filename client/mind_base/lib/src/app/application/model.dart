@@ -1,16 +1,22 @@
+import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/app/application/service/service.dart';
 import 'package:mind_base/src/core/config/config.dart';
 import 'package:mind_base/src/user/application/service.dart';
+import 'package:mind_base/src/user/domain/exceptions.dart';
 import 'package:mind_base/src/user/inter/dto.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 import 'package:slowly/slowly.dart';
+import 'package:get_sweet/get_sweet.dart';
 
 part 'model.freezed.dart';
 
 part 'model/app_model.dart';
 
 part 'model/user_model.dart';
+
+part 'model/team_model.dart';
 
 abstract class BaseActEntranceModel<ACT, S> extends Sidecar<S, BaseException?>
     with ActEntranceMx<ACT, S, BaseException?> {

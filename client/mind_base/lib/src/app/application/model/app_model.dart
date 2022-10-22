@@ -36,7 +36,6 @@ class AppState with _$AppState {
 
 @freezed
 class AppEvt with _$AppEvt {
-  // 由于没有级联逻辑，Evt目前只承担消息通知功能
   const factory AppEvt.msg(String msg) = AppEvtMsg;
 
   const factory AppEvt.recovering() = AppEvtRecovering;
