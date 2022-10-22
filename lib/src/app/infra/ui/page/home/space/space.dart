@@ -98,8 +98,8 @@ class _SpaceViewState extends State<SpaceView>
                               ? const Expanded(
                                   child: Center(child: Text("请选择/创建 一个Meta")))
                               : RecordDataGrid(
-                                  openedSpace: mSpace,
-                                  openedMeta: meta,
+                                  space: mSpace,
+                                  meta: meta,
                                   view: widget.viewId == null
                                       ? null
                                       : meta.data.views.firstWhereOrNull(

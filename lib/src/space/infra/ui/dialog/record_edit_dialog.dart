@@ -7,7 +7,7 @@ import 'package:ndialog/ndialog.dart';
 Future<RecordDto?> showRecordEditDialog({
   required BuildContext context,
   required MetaModel meta,
-  required SpaceModel openedSpaceModel,
+  required SpaceModel space,
   required kRecordBuilder,
   RecordDto? origin,
 }) =>
@@ -16,7 +16,7 @@ Future<RecordDto?> showRecordEditDialog({
       title: origin == null ? const Text("插入新的记录") : const Text("编辑记录"),
       content: RecordForm(
         meta: meta,
-        openedSpaceModel: openedSpaceModel,
+        space: space,
         origin: origin,
         kRecordBuilder: kRecordBuilder,
       ),

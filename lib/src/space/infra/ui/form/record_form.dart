@@ -11,14 +11,14 @@ import 'package:pluto_grid/pluto_grid.dart';
 /// 创建指定[MetaModel]对应的Record
 class RecordForm extends StatefulWidget {
   final MetaModel meta; // Record对应的Meta的Id
-  final SpaceModel openedSpaceModel; // 当前工作区
+  final SpaceModel space; // 当前工作区
   final RecordDto? origin;
   final GlobalKey<FormBuilderState>? kRecordBuilder;
 
   const RecordForm({
     Key? key,
     required this.meta,
-    required this.openedSpaceModel,
+    required this.space,
     this.origin,
     this.kRecordBuilder,
   }) : super(key: key);
@@ -67,16 +67,16 @@ class _RecordFormState extends State<RecordForm> {
           controller: ctrl,
           decoration: InputDecoration(
             // 字段名称与类型名称
-            labelText: "${attr.name} (${attr.type.fetchMeta(widget.openedSpaceModel).name})",
+            labelText:
+                "${attr.name} (${attr.type.fetchMeta(widget.space).name})",
             hintText: attr.type.name,
           ),
           validator: FormBuilderValidators.compose([
             FormBuilderValidators.required(context),
           ]),
           onTap: () {
-            final refDataSource = widget.openedSpaceModel.openedMetas
-                .firstWhere((element) => element.id == attr.type.r)
-                .dataSource;
+            final refDataSource =
+                widget.space.findMeta(attr.type.r)!.dataSource;
             // pop菜单
             PlutoGridPopup(
               context: context,

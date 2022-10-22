@@ -22,25 +22,25 @@ import 'data_table_source.dart';
 
 /// 适配Pluto表格
 class RecordDataGrid extends StatelessWidget {
-  final SpaceModel openedSpace;
-  final MetaModel openedMeta;
+  final SpaceModel space;
+  final MetaModel meta;
   final TableView? view;
 
   const RecordDataGrid({
     Key? key,
-    required this.openedSpace,
-    required this.openedMeta,
+    required this.space,
+    required this.meta,
     this.view,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final data = openedMeta.dataSource;
-    final originMeta = openedMeta.meta;
+    final data = meta.dataSource;
+    final metaDto = meta.data;
     return Expanded(
       child: PlutoGrid(
         // key不一致的时候才会刷新UI
-        key: ValueKey("${openedMeta.ver}-${view?.vId}"),
+        key: ValueKey("${meta.ver}-${view?.vId}"),
         rows: data.cachedRows,
         columns: view?.transformCols(data.cachedColumns) ?? data.cachedColumns,
         onLoaded: (loadedEvt) {
@@ -53,12 +53,12 @@ class RecordDataGrid extends StatelessWidget {
                 onInsertCol: (context, stateManager, column, isInsertLeft) {
                   showAttributeEditDialog(
                     context: context,
-                    initKey: originMeta.nextKey(),
+                    initKey: metaDto.nextKey(),
                     kAttrBuilder: GlobalKey<FormBuilderState>(),
-                    queryMetaFn: openedSpace.queryMeta,
-                    allMetas: openedSpace.allMetas,
+                    queryMetaFn: space.queryMeta,
+                    allMetas: space.allMetas,
                   ).then((value) =>
-                      openedMeta.actMetaUpdateAttr(value).thenDialog(context));
+                      meta.actMetaUpdateAttr(value).thenDialog(context));
                 },
                 // 隐藏列
                 onHideCol: view == null
@@ -71,7 +71,7 @@ class RecordDataGrid extends StatelessWidget {
                         final nCol = originCol.copyWith(visible: false);
                         final nCols = view!.cols
                           ..replaceRange(originIndex, originIndex + 1, [nCol]);
-                        openedMeta
+                        meta
                             .actUpdateView(view!.copyWith(cols: nCols))
                             .thenDialog(context);
                       }));
@@ -95,7 +95,7 @@ class RecordDataGrid extends StatelessWidget {
                 final nCol = originCol.copyWith(width: nWidth);
                 final nCols = view!.cols
                   ..replaceRange(originIndex, originIndex + 1, [nCol]);
-                openedMeta.actUpdateView(
+                meta.actUpdateView(
                   view!.copyWith(cols: nCols),
                 );
               },
@@ -122,7 +122,7 @@ class RecordDataGrid extends StatelessWidget {
 
                 final nInfo = view!.cols.removeAt(startInfoIndex);
                 final nCols = view!.cols..insert(destInfoIndex, nInfo);
-                openedMeta.actUpdateView(
+                meta.actUpdateView(
                   view!.copyWith(cols: nCols),
                 );
               },
@@ -132,11 +132,11 @@ class RecordDataGrid extends StatelessWidget {
           final ettId = row.key as ValueKey<String>;
 
           // 更新的DTO
-          final dto = openedMeta.records
+          final dto = meta.records
               .firstWhere((element) => element.id == ettId.value)
               .toDto()
               .updateBy(row);
-          openedMeta.actSaveRecord(dto).thenDialog(context);
+          meta.actSaveRecord(dto).thenDialog(context);
           // widget.onSaveRecord(dto); // 同步到服务器
         },
         onSelected: (_) {
@@ -156,15 +156,15 @@ class RecordDataGrid extends StatelessWidget {
           print("#debug #onRowsMoved $_");
         },
         createHeader: (manager) => DataFrameTitlePluto(
-          openedMeta: openedMeta,
+          meta: meta,
           view: view,
           stateManager: manager,
-          onSaveMeta: openedMeta.actUpdateMeta,
-          onSaveRecord: openedMeta.actSaveRecord,
-          onUpdateView: (m, v) => openedMeta.actUpdateView(v),
-          openedSpaceModel: openedSpace,
-          queryMetaFn: openedSpace.queryMeta,
-          allMetas: openedSpace.allMetas,
+          onSaveMeta: meta.actUpdateMeta,
+          onSaveRecord: meta.actSaveRecord,
+          onUpdateView: (m, v) => meta.actUpdateView(v),
+          space: space,
+          queryMetaFn: space.queryMeta,
+          allMetas: space.allMetas,
         ),
         // createFooter: (_) {             },
         // rowColorCallback: (_) {},
@@ -215,9 +215,9 @@ class RecordDataGrid extends StatelessWidget {
 ///
 /// 表格标题栏
 class DataFrameTitlePluto extends StatelessWidget {
-  final MetaModel openedMeta;
+  final MetaModel meta;
   final TableView? view; // 当前视图，可以为空
-  final SpaceModel openedSpaceModel;
+  final SpaceModel space;
   final PlutoGridStateManager stateManager;
   final Future<BaseException?> Function(RecordDto? dto) onSaveRecord;
   final Future<void> Function(MetaDto? dto) onSaveMeta;
@@ -232,9 +232,9 @@ class DataFrameTitlePluto extends StatelessWidget {
 
   DataFrameTitlePluto({
     Key? key,
-    required this.openedMeta,
+    required this.meta,
     this.view,
-    required this.openedSpaceModel,
+    required this.space,
     required this.stateManager,
     required this.onSaveMeta,
     required this.onSaveRecord,
@@ -242,8 +242,6 @@ class DataFrameTitlePluto extends StatelessWidget {
     required this.allMetas,
     required this.onUpdateView,
   }) : super(key: key);
-
-  MetaModel get meta => openedMeta;
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
@@ -255,7 +253,7 @@ class DataFrameTitlePluto extends StatelessWidget {
                 await showRecordEditDialog(
                   context: context,
                   meta: meta,
-                  openedSpaceModel: openedSpaceModel,
+                  space: space,
                   kRecordBuilder: _kRecordBuilder,
                 ),
               ).thenDialog(context),
@@ -284,7 +282,7 @@ class DataFrameTitlePluto extends StatelessWidget {
                     final recordIds =
                         checked.map((e) => (e.key as ValueKey<String>).value);
                     for (final recordId in recordIds) {
-                      await openedMeta
+                      await meta
                           .actRemoveRecord(recordId)
                           .thenDialog(context);
                     }

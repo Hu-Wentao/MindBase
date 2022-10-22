@@ -207,9 +207,6 @@ class MetaModel extends IMetaModel with MetaStateChangeMx {
   @override
   RecordDataGridSourcePluto? _cachedDataSource;
 
-  @Deprecated('data')
-  MetaDto get meta => data;
-
   @override
   String get id => data.id;
 
