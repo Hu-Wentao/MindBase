@@ -4,11 +4,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/app/application/model.mocks.dart';
 import 'package:mind_base/src/app/application/model.dart';
-import 'package:mind_base/src/workspace/application/service/expr/expression_parser.dart';
-import 'package:mind_base/src/workspace/domain/entity/entity.dart';
-import 'package:mind_base/src/workspace/infra/dto/dto_aw_impl.dart';
-import 'package:mind_base/src/workspace/inter/dto/expr_token_dto.dart';
-import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
+import 'package:mind_base/src/space/application/service/expr/expression_parser.dart';
+import 'package:mind_base/src/space/domain/entity/entity.dart';
+import 'package:mind_base/src/space/infra/dto/dto_aw_impl.dart';
+import 'package:mind_base/src/space/inter/dto/expr_token_dto.dart';
+import 'package:mind_base/src/space/inter/dto/i_dto.dart';
 
 /// 测试 Domain 与 TokenString 之间的转换
 /// Domain -> Token

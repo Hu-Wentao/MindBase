@@ -14,7 +14,7 @@ import 'package:mind_base/src/user/infra/ui/components/user_tile.dart';
 import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/core/config/config.dart';
 import 'package:mind_base/src/core/infra/ui/dialog/dialog.dart';
-import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
+import 'package:mind_base/src/space/inter/dto/i_dto.dart';
 import 'package:provider/provider.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 import 'package:url_launcher/link.dart';

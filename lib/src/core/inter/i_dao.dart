@@ -1,5 +1,5 @@
 import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/workspace/domain/value/event.dart';
+import 'package:mind_base/src/space/domain/value/event.dart';
 
 enum AccessorEvtTp {
   insert, // 元素插入

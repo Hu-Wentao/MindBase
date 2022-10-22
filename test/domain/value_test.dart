@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
+import 'package:mind_base/src/space/inter/dto/i_dto.dart';
 
 main() {
   group("AttrType", () {

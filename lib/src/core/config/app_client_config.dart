@@ -1,7 +1,7 @@
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:appwrite/appwrite.dart';
-import 'package:mind_base/src/workspace/infra/dao/dao_aw_impl.dart';
-import 'package:mind_base/src/workspace/infra/dao/realtime_hub.dart';
+import 'package:mind_base/src/space/infra/dao/dao_aw_impl.dart';
+import 'package:mind_base/src/space/infra/dao/realtime_hub.dart';
 
 @module
 abstract class AppClientConfig {

@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mind_base/src/workspace/application/service/expr/domain_to_token.dart';
-import 'package:mind_base/src/workspace/application/service/expr/expression_parser.dart';
-import 'package:mind_base/src/workspace/domain/entity/entity.dart';
-import 'package:mind_base/src/workspace/inter/dto/expr_token_dto.dart';
+import 'package:mind_base/src/space/application/service/expr/domain_to_token.dart';
+import 'package:mind_base/src/space/application/service/expr/expression_parser.dart';
+import 'package:mind_base/src/space/domain/entity/entity.dart';
+import 'package:mind_base/src/space/inter/dto/expr_token_dto.dart';
 
 import 'expr_test.dart';
 

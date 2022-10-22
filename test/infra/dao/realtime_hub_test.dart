@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mind_base/src/workspace/infra/dao/realtime_hub.dart';
+import 'package:mind_base/src/space/infra/dao/realtime_hub.dart';
 
 main() {
   test("test SubChannel", () {

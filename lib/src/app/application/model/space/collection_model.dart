@@ -6,7 +6,7 @@ part of '../../model.dart';
 class DocumentInfoModel extends ModelSidecar<String, BaseException?>
     with ModelStateChangeMx<String, BaseException?> {
   final _srvDb = sl<srv.Databases>();
-  final _cliDb = sl<Databases>();
+  final _cliDb = sl<cli.Databases>();
 
   DocumentInfoModel(String metaId, this.metaCollectionId)
       : super(metaId, ExceptionAdapter.of);

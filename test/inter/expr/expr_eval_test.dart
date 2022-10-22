@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/app/application/model.dart';
-import 'package:mind_base/src/workspace/application/service/expr/expr_evaluator.dart';
-import 'package:mind_base/src/workspace/domain/entity/entity.dart';
-import 'package:mind_base/src/workspace/infra/dto/dto_aw_impl.dart';
-import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
+import 'package:mind_base/src/space/application/service/expr/expr_evaluator.dart';
+import 'package:mind_base/src/space/domain/entity/entity.dart';
+import 'package:mind_base/src/space/infra/dto/dto_aw_impl.dart';
+import 'package:mind_base/src/space/inter/dto/i_dto.dart';
 
 main() {
   /// 求值器

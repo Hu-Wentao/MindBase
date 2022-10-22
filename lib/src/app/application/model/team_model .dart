@@ -153,7 +153,7 @@ extension TeamMemberX on TeamModel {
         '刷新Members[${rst.length}]');
   }
 
-  Teams get _tmSrv => sl<Teams>();
+  cli.Teams get _tmSrv => sl<cli.Teams>();
 }
 
 extension TeamDeprecatedX on TeamModel {

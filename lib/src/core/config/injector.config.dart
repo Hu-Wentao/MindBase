@@ -14,11 +14,11 @@ import 'package:slowly/slowly.dart' as _i11;
 
 import '../../app/application.dart' as _i8;
 import '../../app/application/service/service.dart' as _i10;
+import '../../space/application/service/service.dart' as _i6;
+import '../../space/application/service/workspace_service.dart' as _i13;
+import '../../space/infra/dao/dao_aw_impl.dart' as _i12;
+import '../../space/infra/dao/realtime_hub.dart' as _i9;
 import '../../user/application/service.dart' as _i5;
-import '../../workspace/application/service/service.dart' as _i6;
-import '../../workspace/application/service/workspace_service.dart' as _i13;
-import '../../workspace/infra/dao/dao_aw_impl.dart' as _i12;
-import '../../workspace/infra/dao/realtime_hub.dart' as _i9;
 import 'app_client_config.dart' as _i15;
 import 'app_server_config.dart' as _i14;
 import 'common_config.dart' as _i16;

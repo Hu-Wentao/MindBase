@@ -37,7 +37,7 @@ mixin MetaStateChangeMx on IMetaModel {
   FutureOr<void> onSubscription() {
     _cachedRecordSubs =
         _recordDtoRepo.acc.watchAll().listen(_onWatchRecord, onError: (e, s) {
-      if (e is AppwriteException &&
+      if (e is cli.AppwriteException &&
           e.code == 404 &&
           e.type == "collection_not_found") {
         // 不存在则无需抛出异常
@@ -91,7 +91,7 @@ mixin MetaStateChangeMx on IMetaModel {
         _onEvtInsertRecord(dto);
       }
     } catch (e, s) {
-      if (e is AppwriteException) {
+      if (e is cli.AppwriteException) {
         if (e.code == 404 && e.type == "collection_not_found") {
           // 不存在则无需抛出异常
           log("debug MetaModel.openBy: [$e], 由推测的`Record集合`尚未创建导致的,无需抛出异常");
