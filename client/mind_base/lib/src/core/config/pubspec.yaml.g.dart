@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'1'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1666364600;
+const int timestamp = 1666431502;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -91,6 +91,9 @@ const Map<String, Object> dependencies = <String, Object>{
   'flutter': <String, Object>{
     'sdk': r'flutter',
   },
+  'flutter_localizations': <String, Object>{
+    'sdk': r'flutter',
+  },
   'get_arch_core': <String, Object>{
     'git': <String, Object>{
       'url': r'https://github.com/GetArch/get_arch_core.git',
@@ -115,8 +118,6 @@ const Map<String, Object> dependencies = <String, Object>{
       'ref': r'v1.0',
     },
   },
-  'appwrite': r'6.0.0',
-  'dart_appwrite': r'6.0.0',
 };
 
 /// Developer dependencies
@@ -149,5 +150,15 @@ const Map<String, Object> source = <String, Object>{
   'dependency_overrides': dependencyOverrides,
   'flutter': <String, Object>{
     'uses-material-design': true,
+    'assets': <Object>[
+      r'assets/icons/',
+      r'assets/images/',
+    ],
+  },
+  'flutter_gen': <String, Object>{
+    'output': r'lib/src/core/config/assets/',
+    'integrations': <String, Object>{
+      'flutter_svg': true,
+    },
   },
 };
