@@ -4,7 +4,6 @@ import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/app/application.dart';
-import 'package:mind_base/src/app/application/model/base_model.dart';
 import 'package:mind_base/src/app/application/service/service.dart';
 import 'package:mind_base/src/core/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/user/application/service/account_service.dart';
@@ -27,7 +26,7 @@ import 'package:slowly/slowly.dart';
 ])
 import 'model.mocks.dart';
 
-part 'model/app_state_model.dart';
+part 'model/app_model.dart';
 
 part 'model/user_model.dart';
 
