@@ -157,7 +157,7 @@ class _SpaceViewState extends State<SpaceView>
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text("集合权限信息正在加载中,请稍后再试"),
                     ));
-                    mSpace.actRefresh().thenDialog(context);
+                    mSpace.actEntrance(const SpaceAct.initModel()).thenDialog(context);
                     return;
                   } else {
                     final dto =

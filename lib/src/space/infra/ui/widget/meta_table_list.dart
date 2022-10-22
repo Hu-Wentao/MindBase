@@ -124,7 +124,7 @@ class _MetaTableListState extends State<MetaTableList> {
                                 if (dto == null) return;
                                 return await context
                                     .read<SpaceModel>()
-                                    .actUpdateByTable(dto)
+                                    .actEntrance(SpaceAct.updateByTable(dto))
                                     .thenDialog(context);
                             }
                           },
