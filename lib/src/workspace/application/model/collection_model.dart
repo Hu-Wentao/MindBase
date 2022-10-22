@@ -29,8 +29,9 @@ class DocumentInfoModel extends ModelSidecar<String, BaseException?>
                   collectionId: metaCollectionId,
                   documentId: documentId,
                   // 访问级别, 表或者记录
-                  read: dto.reads.isEmpty ? collection!.$read : dto.reads,
-                  write: dto.writes.isEmpty ? collection!.$write : dto.writes,
+                  permissions: dto.permissions.isEmpty
+                      ? collection?.$permissions as List<String>?
+                      : dto.permissions,
                 );
               } catch (e, s) {
                 lgShot('尝试更新meta记录的读写权限, 可能因为权限级别为集合而出错');

@@ -34,12 +34,13 @@ class CollectionService {
   Future<da.Collection> updateCollectionNoCheck(
           da.Collection collection, CollectionDto dto) async =>
       await _srvDb.updateCollection(
+        // 行级权限控制
+        documentSecurity: collection.documentSecurity,
         collectionId: collection.$id,
         name: collection.name,
-        permission: collection.permission,
-        // 访问级别, 表或者记录
-        read: dto.reads.isEmpty ? collection.$read : dto.reads,
-        write: dto.writes.isEmpty ? collection.$write : dto.writes,
+        permissions: dto.permissions.isEmpty
+            ? (collection.$permissions as List<String>?)
+            : dto.permissions,
         enabled: dto.enabled ?? collection.enabled,
         databaseId: mainDataBaseId,
       );

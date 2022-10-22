@@ -3,6 +3,7 @@ import 'package:appwrite/models.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/core/config/app_server_config.dart';
 import 'package:mind_base/src/core/config/common_config.dart';
+import 'package:mind_base/src/workspace/infra/ap_adapter.dart';
 import 'package:mind_base/src/workspace/infra/dao/realtime_hub.dart';
 import 'package:mind_base/src/workspace/infra/dto/dto_aw_impl.dart';
 import 'package:mind_base/src/core/inter/i_dao.dart';
@@ -93,13 +94,14 @@ abstract class BaseAppwriteAccessor<T extends IEntityDto>
     List<String>? write,
   }) async =>
       await db.createDocument(
-        databaseId: mainDataBaseId,
-        collectionId: collectionId,
-        documentId: dto.id,
-        data: dtoToJson(dto),
-        read: read,
-        write: write,
-      );
+          databaseId: mainDataBaseId,
+          collectionId: collectionId,
+          documentId: dto.id,
+          data: dtoToJson(dto),
+          permissions: [
+            ...ApAdapter.toPermitBy(reads: read),
+            ...ApAdapter.toPermitBy(writes: write)
+          ]);
 
   // /// 如果已存在,
   // Future<Document> save(String id, T dto) async {

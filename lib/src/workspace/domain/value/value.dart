@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:appwrite/appwrite.dart';
 import 'package:bson/bson.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -139,14 +140,6 @@ class TableView {
       'TableView{vId: $vId, name: $name, type: $type, cols: $cols}';
 }
 
-class Role {
-  final String value;
-
-  const Role(this.value);
-
-  static const owner = Role('owner');
-}
-
 class Permissions {
   final List<String> value;
 
@@ -176,10 +169,8 @@ class Permissions {
   /// 以 团队 为单位授权权限
   /// 给予特定团队[teamId]内指定角色[role]成员权限;
   /// [role] 为empty表示 团队内全部成员
-  Permissions.team({required String teamId, List<Role> roles = const []})
-      : this(roles.isEmpty
-            ? ['team:$teamId']
-            : roles.map((role) => 'team:$teamId/${role.value}').toList());
+  Permissions.team({required String teamId, List<String> roles = const []})
+      : this(roles.isEmpty ? [Role.team(teamId)] : roles);
 
   /// 以 成员 为单位授权权限
   /// 给予特定团队成员[memberId]权限
