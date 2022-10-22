@@ -83,10 +83,15 @@ class AppModel extends BaseActEntranceModel<AppAct, AppState>
     String password, {
     User? user,
   }) async {
-    final session = await _onLogin(authVerify, identityStr, password);
-    user ??= await _recoverUser();
-    evtEntrance(const AppEvt.msg("登陆成功"));
-    setState(AppState.logged(user: UserModel(user, session)), '登陆成功');
+    try {
+      final session = await _onLogin(authVerify, identityStr, password);
+      user ??= await _recoverUser();
+      evtEntrance(const AppEvt.msg("登陆成功"));
+      setState(AppState.logged(user: UserModel(user, session)), '登陆成功');
+    } catch (e) {
+      evtEntrance(AppEvt.msg("登陆失败, $e"));
+      rethrow;
+    }
   }
 
   recover() async {
@@ -103,10 +108,15 @@ class AppModel extends BaseActEntranceModel<AppAct, AppState>
   }
 
   loginAnonymous() async {
-    final session = await _anonymousSession();
-    final user = await _recoverUser();
-    evtEntrance(const AppEvt.msg("匿名登陆成功"));
-    setState(AppState.logged(user: UserModel(user, session)), '匿名登陆成功');
+    try {
+      final session = await _anonymousSession();
+      final user = await _recoverUser();
+      evtEntrance(const AppEvt.msg("匿名登陆成功"));
+      setState(AppState.logged(user: UserModel(user, session)), '匿名登陆成功');
+    } catch (e) {
+      evtEntrance(AppEvt.msg("匿名登陆失败, $e"));
+      rethrow;
+    }
   }
 
   logout() async {
@@ -127,12 +137,7 @@ extension AppAccountX on AppModel {
       await _actSrv.createAnonymousSession();
 
   Future<User> _recoverUser() async {
-    try {
-      return await _actSrv.getUser();
-    } catch (e) {
-      evtEntrance(AppEvt.msg("恢复User失败, $e"));
-      rethrow;
-    }
+    return await _actSrv.getUser();
   }
 
   Future<User> _onSignup(
