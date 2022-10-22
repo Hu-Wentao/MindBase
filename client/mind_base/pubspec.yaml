@@ -35,6 +35,8 @@ dependencies:
   adaptive_breakpoints:
   flutter_svg:
   line_icons:
+  bson:
+  collection:
 
 dev_dependencies:
   flutter_test:
