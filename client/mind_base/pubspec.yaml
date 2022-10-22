@@ -27,8 +27,8 @@ dependencies:
     git:
       url: https://github.com/GetArch/get_sweet.git
       ref: v1.0
-  appwrite: 6.0.0
-  dart_appwrite: 6.0.0
+  appwrite:
+  dart_appwrite:
   freezed_annotation:
   go_router:
   adaptive_navigation:
