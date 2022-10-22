@@ -18,6 +18,7 @@ import 'package:provider_sidecar/provider_sidecar.dart';
 import 'package:appwrite/appwrite.dart' as cli;
 import 'package:appwrite/models.dart' as aw;
 import 'package:get_sweet/get_sweet.dart';
+import 'package:slowly/slowly.dart';
 
 // Annotation which generates the cat.mocks.dart library and the MockCat class.
 @GenerateNiceMocks([
@@ -31,3 +32,21 @@ part 'model/app_state_model.dart';
 part 'model/user_model.dart';
 
 part 'model.freezed.dart';
+
+abstract class BaseActEntranceModel<ACT, S> extends Sidecar<S, BaseException?>
+    with ActEntranceMx<ACT, S, BaseException?> {
+  BaseActEntranceModel({
+    required super.state,
+    super.msg = 'Init with Constructor',
+    super.onCatch = ExceptionAdapter.of,
+  });
+
+  // 如果实现类在程序中不是单例，则应当覆写该字段，避免被全局Slowly过滤掉Act
+  String get id => 'singleton';
+
+  @override
+  BaseException? onBeforeActEntrance(ACT act) =>
+      sl<Slowly>().seconds('${id}_${act.runtimeType}', sec: 1)
+          ? null
+          : const BaseException('Slowly error');
+}
