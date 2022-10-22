@@ -20,6 +20,9 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("com.googlecode.aviator:aviator:5.3.2")
+	implementation("org.springframework.boot:spring-boot-starter-jdbc")
+	implementation("io.appwrite:sdk-for-kotlin:1.1.0")
+	implementation("mysql:mysql-connector-java:8.0.15")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

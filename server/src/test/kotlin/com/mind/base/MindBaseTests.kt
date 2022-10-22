@@ -1,12 +1,16 @@
 package com.mind.base
 
 import com.googlecode.aviator.AviatorEvaluator
+import com.mind.base.service.ExplainDBService
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest(classes = [MindBaseApplication::class])
 class MindBaseTests {
 
+	@Autowired
+	private lateinit var explainDBService: ExplainDBService
 	@Test
 	fun test() {
 		val ret = AviatorEvaluator.execute("1*2+(3*4)/5")
@@ -21,5 +25,12 @@ class MindBaseTests {
 
 		assert(223 == retInt)
 	}
+
+	@Test
+	fun testQueryDB(){
+		val queryAllFields = explainDBService.queryAllFields("Student")
+		assert(queryAllFields.isNotEmpty())
+	}
+
 
 }
