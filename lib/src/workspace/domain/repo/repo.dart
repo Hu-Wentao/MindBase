@@ -140,6 +140,9 @@ class MetaDtoRepo {
     final permit = teamId == null ? ['role:all'] : ['team:$teamId'];
     // 创建集合
     await _serverDb.createCollection(
+      // 集合级权限
+      documentSecurity: false,
+      databaseId: mainDataBaseId,
       collectionId: collectionId,
       name: 'meta_$collectionId',
       // 集合级权限
@@ -179,12 +182,14 @@ class MetaDtoRepo {
   final metaStructure = {
     'name': (String collectionId, srv.Databases _serverDb) async =>
         await _serverDb.createStringAttribute(
+            databaseId: mainDataBaseId,
             collectionId: collectionId,
             key: 'name',
             size: 127,
             xrequired: true),
     'memo': (String collectionId, srv.Databases _serverDb) async =>
         await _serverDb.createStringAttribute(
+            databaseId: mainDataBaseId,
             collectionId: collectionId,
             key: 'memo',
             size: 255,
@@ -192,9 +197,13 @@ class MetaDtoRepo {
             xdefault: ''),
     'maxKey': (String collectionId, srv.Databases _serverDb) async =>
         await _serverDb.createIntegerAttribute(
-            collectionId: collectionId, key: 'maxKey', xrequired: true),
+            databaseId: mainDataBaseId,
+            collectionId: collectionId,
+            key: 'maxKey',
+            xrequired: true),
     'attrs': (String collectionId, srv.Databases _serverDb) async =>
         await _serverDb.createStringAttribute(
+            databaseId: mainDataBaseId,
             collectionId: collectionId,
             key: 'attrs',
             size: 65535,
@@ -202,6 +211,7 @@ class MetaDtoRepo {
             xdefault: ''),
     'methods': (String collectionId, srv.Databases _serverDb) async =>
         await _serverDb.createStringAttribute(
+            databaseId: mainDataBaseId,
             collectionId: collectionId,
             key: 'methods',
             size: 65535,
@@ -209,6 +219,7 @@ class MetaDtoRepo {
             xdefault: ''),
     'views': (String collectionId, srv.Databases _serverDb) async =>
         await _serverDb.createStringAttribute(
+            databaseId: mainDataBaseId,
             collectionId: collectionId,
             key: 'views',
             size: 65535,
@@ -252,8 +263,7 @@ class RecordDtoRepo {
   static RecordDtoRepo withDI(GetIt get, RecordMeta meta) =>
       withDtoDI(get, meta.toDto());
 
-  static RecordDtoRepo withDtoDI(GetIt get, MetaDto meta) =>
-      RecordDtoRepo(
+  static RecordDtoRepo withDtoDI(GetIt get, MetaDto meta) => RecordDtoRepo(
         get<srv.Databases>(),
         RecordEttAccessor(get<Databases>(), meta.id),
         meta,
@@ -328,6 +338,7 @@ class RecordDtoRepo {
     final permit = teamId == null ? ['role:all'] : ['team:$teamId'];
     // 创建集合
     await _serverDb.createCollection(
+      databaseId: mainDataBaseId,
       collectionId: collectionId,
       name: 'rcd_$collectionId',
       permission: 'collection',
@@ -392,8 +403,11 @@ Future _createCollectionAttr(
 }) async {
   slLogger.info("_createCollectionAttr 集合[$collectionId]创建属性# [$attrKey]");
   return await _db.createStringAttribute(
-    collectionId: collectionId, // MetaId即==Record集合的Id
-    key: attrKey, // Appwrite BUG,属性名称不能用纯数字
+    databaseId: mainDataBaseId,
+    collectionId: collectionId,
+    // MetaId即==Record集合的Id
+    key: attrKey,
+    // Appwrite BUG,属性名称不能用纯数字
     size: size,
     xrequired: required,
   );

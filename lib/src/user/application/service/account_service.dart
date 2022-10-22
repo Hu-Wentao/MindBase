@@ -1,10 +1,11 @@
-import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/appwrite.dart' as cli;
 import 'package:appwrite/models.dart';
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/user/inter/dto.dart';
 
 @lazySingleton
 class AccountService {
-  final Account account;
+  final cli.Account account;
 
   AccountService(this.account);
 

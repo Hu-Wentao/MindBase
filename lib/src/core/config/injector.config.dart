@@ -30,9 +30,16 @@ const String _prod = 'prod';
 // ignore_for_file: unnecessary_lambdas
 // ignore_for_file: lines_longer_than_80_chars
 /// initializes the registration of provided dependencies inside of [GetIt]
-_i1.GetIt $initGetIt(_i1.GetIt get,
-    {String? environment, _i2.EnvironmentFilter? environmentFilter}) {
-  final gh = _i2.GetItHelper(get, environment, environmentFilter);
+_i1.GetIt $initGetIt(
+  _i1.GetIt get, {
+  String? environment,
+  _i2.EnvironmentFilter? environmentFilter,
+}) {
+  final gh = _i2.GetItHelper(
+    get,
+    environment,
+    environmentFilter,
+  );
   final appServerConfig = _$AppServerConfig();
   final appClientConfig = _$AppClientConfig();
   final configCommon = _$ConfigCommon();
@@ -55,18 +62,27 @@ _i1.GetIt $initGetIt(_i1.GetIt get,
       () => _i9.RealtimeChannelHub(get<_i4.Realtime>()));
   gh.lazySingleton<_i10.RealtimeSrv>(
       () => _i10.RealtimeSrv(get<_i9.RealtimeChannelHub>()));
-  gh.lazySingleton<_i11.Slowly<dynamic>>(() => slowlyConfig.slowly,
-      registerFor: {_dev, _test, _prod});
+  gh.lazySingleton<_i11.Slowly<dynamic>>(
+    () => slowlyConfig.slowly,
+    registerFor: {
+      _dev,
+      _test,
+      _prod,
+    },
+  );
   gh.lazySingleton<_i3.Storage>(() => appServerConfig.storage);
   gh.lazySingleton<_i4.Storage>(() => appClientConfig.storage);
-  gh.factory<String>(() => appClientConfig.mainDataBaseId);
   gh.lazySingleton<_i3.Teams>(() => appServerConfig.teams);
   gh.lazySingleton<_i4.Teams>(() => appClientConfig.teams);
   gh.lazySingleton<_i12.WorkspaceEttAccessor>(() => appClientConfig.wsEttAcc);
   gh.lazySingleton<_i13.SpaceService>(() => _i13.SpaceService(
-      get<_i4.Databases>(), get<_i12.WorkspaceEttAccessor>()));
-  gh.lazySingleton<_i6.TeamService>(
-      () => _i6.TeamService(get<_i4.Teams>(), get<_i3.Teams>()));
+        get<_i4.Databases>(),
+        get<_i12.WorkspaceEttAccessor>(),
+      ));
+  gh.lazySingleton<_i6.TeamService>(() => _i6.TeamService(
+        get<_i4.Teams>(),
+        get<_i3.Teams>(),
+      ));
   return get;
 }
 

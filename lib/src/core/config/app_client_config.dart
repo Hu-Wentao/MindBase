@@ -5,8 +5,6 @@ import 'package:mind_base/src/workspace/infra/dao/realtime_hub.dart';
 
 @module
 abstract class AppClientConfig {
-  final mainDataBaseId = 'default';
-
   @lazySingleton
   Client get client => Client()
     ..setEndpoint("http://app.shuttlecloud.cn/v1")
@@ -31,7 +29,7 @@ abstract class AppClientConfig {
   Teams get teams => Teams(sl<Client>());
 
   @lazySingleton
-  Databases get database => Databases(sl<Client>(), databaseId: mainDataBaseId);
+  Databases get database => Databases(sl<Client>());
 
   @lazySingleton
   Storage get storage => Storage(sl<Client>());

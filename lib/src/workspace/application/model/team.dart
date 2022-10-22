@@ -48,7 +48,7 @@ class TeamModel extends BaseActEntranceModel<TeamAct, TeamState> {
 
   String get name => data.name;
 
-  int get createAt => data.$createdAt;
+  int get createAt => int.parse(data.$createdAt);
 
   int get total => data.total;
 
@@ -206,8 +206,8 @@ class MemberModel extends IMemberModel {
 
   String get email => data.userEmail;
 
-  int get invited => data.invited; // ts
-  int get joined => data.joined; // ts
+  String get invited => data.invited; // ts
+  String get joined => data.joined; // ts
   bool get confirm => data.confirm;
 
   List get roles => data.roles;

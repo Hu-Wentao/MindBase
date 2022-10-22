@@ -21,7 +21,7 @@ abstract class AppServerConfig {
   Teams get teams => Teams(sl<Client>());
 
   @lazySingleton
-  Databases get database => Databases(sl<Client>(), databaseId: mainDataBaseId);
+  Databases get database => Databases(sl<Client>());
 
   @lazySingleton
   Storage get storage => Storage(sl<Client>());

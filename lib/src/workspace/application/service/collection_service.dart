@@ -7,7 +7,10 @@ class CollectionService {
   final _srvDb = sl<srv.Databases>();
 
   Future<da.Collection> findCollection(String collectionId) =>
-      _srvDb.getCollection(collectionId: collectionId);
+      _srvDb.getCollection(
+        collectionId: collectionId,
+        databaseId: mainDataBaseId,
+      );
 
   Future<da.Collection?> updateCollection(String? userId, String? teamOwnerId,
       da.Collection collection, CollectionDto? dto) async {
@@ -38,5 +41,6 @@ class CollectionService {
         read: dto.reads.isEmpty ? collection.$read : dto.reads,
         write: dto.writes.isEmpty ? collection.$write : dto.writes,
         enabled: dto.enabled ?? collection.enabled,
+        databaseId: mainDataBaseId,
       );
 }

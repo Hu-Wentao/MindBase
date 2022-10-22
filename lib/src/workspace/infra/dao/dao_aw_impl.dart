@@ -1,6 +1,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/core/config/app_server_config.dart';
 import 'package:mind_base/src/core/config/common_config.dart';
 import 'package:mind_base/src/workspace/infra/dao/realtime_hub.dart';
 import 'package:mind_base/src/workspace/infra/dto/dto_aw_impl.dart';
@@ -64,13 +65,20 @@ abstract class BaseAppwriteAccessor<T extends IEntityDto>
 
   @override
   Future<T?> findById(String id) => db
-      .getDocument(collectionId: collectionId, documentId: id)
+      .getDocument(
+        databaseId: mainDataBaseId,
+        collectionId: collectionId,
+        documentId: id,
+      )
       .then((e) => jsonToDtoOr(e.toFullJson()));
 
   @override
   Stream<T> findAll([List<String>? queries]) async* {
-    final r =
-        await db.listDocuments(collectionId: collectionId, queries: queries);
+    final r = await db.listDocuments(
+      databaseId: mainDataBaseId,
+      collectionId: collectionId,
+      queries: queries,
+    );
     for (final e in r.documents) {
       yield jsonToDto(e.toFullJson());
     }
@@ -85,6 +93,7 @@ abstract class BaseAppwriteAccessor<T extends IEntityDto>
     List<String>? write,
   }) async =>
       await db.createDocument(
+        databaseId: mainDataBaseId,
         collectionId: collectionId,
         documentId: dto.id,
         data: dtoToJson(dto),
@@ -111,6 +120,7 @@ abstract class BaseAppwriteAccessor<T extends IEntityDto>
 
   @override
   Future<Document> update(T dto) async => await db.updateDocument(
+        databaseId: mainDataBaseId,
         collectionId: collectionId,
         documentId: dto.id,
         data: dtoToJson(dto),
@@ -120,8 +130,11 @@ abstract class BaseAppwriteAccessor<T extends IEntityDto>
   Future<Document> replace(T dto) => update(dto);
 
   @override
-  Future deleteBy(String id) =>
-      db.deleteDocument(collectionId: collectionId, documentId: id);
+  Future deleteBy(String id) => db.deleteDocument(
+        databaseId: mainDataBaseId,
+        collectionId: collectionId,
+        documentId: id,
+      );
 
   // todo
   @override
@@ -235,8 +248,7 @@ class RecordMetaEttAccessor extends BaseAppwriteAccessor<MetaDto>
       ]);
 
   @override
-  Map<String, dynamic> dtoToJson(MetaDto dto) =>
-      MetaDtoAppwriteX(dto).toJson();
+  Map<String, dynamic> dtoToJson(MetaDto dto) => MetaDtoAppwriteX(dto).toJson();
 }
 
 class RecordEttAccessor extends BaseAppwriteAccessor<RecordDto>

@@ -25,6 +25,7 @@ class DocumentInfoModel extends ModelSidecar<String, BaseException?>
               if (dto == null) return;
               try {
                 await _cliDb.updateDocument(
+                  databaseId: mainDataBaseId,
                   collectionId: metaCollectionId,
                   documentId: documentId,
                   // 访问级别, 表或者记录
@@ -43,7 +44,10 @@ class DocumentInfoModel extends ModelSidecar<String, BaseException?>
   @override
   Future<FutureOr<void>> onFetch({bool isActive = false}) async {
     collection = await _cliDb.getDocument(
-        collectionId: metaCollectionId, documentId: documentId);
+      collectionId: metaCollectionId,
+      documentId: documentId,
+      databaseId: mainDataBaseId,
+    );
   }
 
   @override
@@ -81,13 +85,22 @@ class CollectionInfoModel extends ModelSidecar<String, BaseException?>
   CollectionDto? get dto => CollectionDto.from(collection);
 
   /// === 业务逻辑 ===
-  Future<BaseException?> actUpdateCollection(String? userId, String? teamOwnerId, CollectionDto? dto) async =>
+  Future<BaseException?> actUpdateCollection(
+    String? userId,
+    String? teamOwnerId,
+    CollectionDto? dto,
+  ) async =>
       await actWrapper(() => reqWrapper(
             accWhen: () => state != ModelState.init,
             () async {
               if (dto == null) return;
               // 判断是否有权限更新
-              final r = await _srv.updateCollection(userId, teamOwnerId, collection!, dto);
+              final r = await _srv.updateCollection(
+                userId,
+                teamOwnerId,
+                collection!,
+                dto,
+              );
               // 非响应式, 必须手动更新状态
               collection = r;
               setDone();
@@ -98,7 +111,10 @@ class CollectionInfoModel extends ModelSidecar<String, BaseException?>
 
   @override
   Future<FutureOr<void>> onFetch({bool isActive = false}) async {
-    collection = await _srvDb.getCollection(collectionId: data);
+    collection = await _srvDb.getCollection(
+      databaseId: mainDataBaseId,
+      collectionId: data,
+    );
   }
 
   @override

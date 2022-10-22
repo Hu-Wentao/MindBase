@@ -1,5 +1,6 @@
 import 'package:dart_appwrite/dart_appwrite.dart';
 import 'package:get_arch_core/get_arch_core.dart';
+import 'package:mind_base/src/core/config/app_server_config.dart';
 import 'package:mind_base/src/workspace/domain/repo/repo.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:mind_base/src/workspace/inter/dto/i_dto.dart';
@@ -28,7 +29,10 @@ class MetaService {
   deleteBy(String metaId) async {
     await _metaDtoRepo.deleteBy(metaId);
     // 从数据库中删除 Meta对应的Record集合
-    await _db.deleteCollection(collectionId: metaId);
+    await _db.deleteCollection(
+      databaseId: mainDataBaseId,
+      collectionId: metaId,
+    );
   }
 
   findById(String metaId) {
@@ -49,6 +53,6 @@ class MetaService {
   }
 
   deleteTableView(MetaDto dto, int vId) {
-    return _metaDtoRepo.deleteTableView(dto,vId);
+    return _metaDtoRepo.deleteTableView(dto, vId);
   }
 }
