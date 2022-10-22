@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:math' as math;
+import 'package:appwrite/appwrite.dart';
 import 'package:collection/collection.dart';
 import 'package:dart_appwrite/models.dart';
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:json_editor/json_editor.dart';
 import 'package:mind_base/src/core/infra/dto/dto_json_impl.dart';
 import 'package:mind_base/src/core/inter/i_dto.dart';
+import 'package:mind_base/src/user/inter/dto.dart';
 import 'package:mind_base/src/workspace/domain/entity/entity.dart';
 import 'package:mind_base/src/workspace/domain/value/value.dart';
 import 'package:quiver/core.dart';
@@ -166,8 +168,10 @@ extension CollectionX on CollectionDto {
     return PermsType.unknown;
   }
 
-  static _owner(String teamId) =>
-      Permissions.team(teamId: teamId, roles: [Role.owner]).value;
+  static _owner(String teamId) => Permissions.team(
+        teamId: teamId,
+        roles: [RoleX.owner(teamId)],
+      ).value;
 
   static _member(String teamId) => Permissions.team(teamId: teamId).value;
 }
@@ -199,6 +203,18 @@ class CollectionDto extends IDto {
           writes: writes?.value ?? const [],
         );
 
+  // 适配新版本格式
+  List<String> get permissions => [
+        ...reads.map((e) => Permission.read(e)),
+        ...writes
+            .map((e) => [
+                  Permission.create(e),
+                  Permission.update(e),
+                  Permission.delete(e)
+                ])
+            .expand((element) => element)
+      ];
+
   /// add
   CollectionDto add({Permissions? reads, Permissions? writes}) => this
     ..reads.addAll(reads?.value ?? const [])
@@ -215,8 +231,19 @@ class CollectionDto extends IDto {
   static from(Collection? collection) {
     if (collection == null) return null;
     return CollectionDto(
-      reads: collection.$read.map((e) => e as String).toList(),
-      writes: collection.$write.map((e) => e as String).toList(),
+      //  权限管理替换
+      reads: (collection.$permissions as List<String>?)
+              ?.where((e) => e.startsWith(RegExp(r'read')))
+              .map((e) => e.replaceAllMapped(
+                  RegExp(r'.+\(\"(.+)\"\)'), (m) => m.group(1) ?? ''))
+              .toList() ??
+          [],
+      writes: (collection.$permissions as List<String>?)
+              ?.where((e) => e.startsWith(RegExp(r'create|update|delete')))
+              .map((e) => e.replaceAllMapped(
+                  RegExp(r'.+\(\"(.+)\"\)'), (m) => m.group(1) ?? ''))
+              .toList() ??
+          [],
       enabled: collection.enabled,
     );
   }
