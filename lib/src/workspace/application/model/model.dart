@@ -36,13 +36,13 @@ import 'package:dart_appwrite/models.dart' as da;
 
 part 'space_model.dart';
 
-part 'meta.dart';
+part 'meta_model.dart';
 
-part 'record.dart';
+part 'record_model.dart';
 
 part 'propery.dart';
 
-part 'team.dart';
+part 'team_model .dart';
 
 part 'collection_model.dart';
 
