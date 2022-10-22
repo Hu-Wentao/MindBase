@@ -1,6 +1,6 @@
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:logging/logging.dart';
-import 'package:mind_base/src/app/application.dart';
+import 'package:mind_base/src/core/config/config.dart';
 
 Logger get slLogger => _logger ??  Logger("Logger_For_Test");
 

@@ -4,12 +4,12 @@ import 'package:form_builder_validators/localization/l10n.dart';
 import 'package:get_it/get_it.dart';
 import 'package:get_sweet/get_sweet.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mind_base/src/app/application.dart';
 import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/app/infra/ui/page/auth/auth.dart';
 import 'package:mind_base/src/app/infra/ui/page/home/home.dart';
 import 'package:mind_base/src/app/infra/ui/page/splash/splash.dart';
 import 'package:mind_base/src/app/infra/ui/page/user/user.dart';
+import 'package:mind_base/src/core/config/config.dart';
 import 'package:provider_sidecar/provider_sidecar_ex.dart';
 
 /// 由于路由参数可能从 地址栏 直接传入,因此入参必须是 String? 类型
