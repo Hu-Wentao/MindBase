@@ -12,14 +12,9 @@ class _TeamScreenState extends State<TeamScreen> {
   bool _expandedAll = false;
 
   @override
-  Widget build(BuildContext context) =>
-      Consumer<UserModel>(builder: (c, pUser, _) {
-        if (pUser.isLogged) {
-          return _buildTeamPanel(c);
-        } else {
-          return _buildUnLogged(c);
-        }
-      });
+  Widget build(BuildContext context) => Consumer<UserModel?>(
+      builder: (c, pUser, _) =>
+          (pUser != null) ? _buildTeamPanel(c) : _buildUnLogged(c));
 
   Widget _buildUnLogged(BuildContext c) => Center(
         child: OutlinedButton(

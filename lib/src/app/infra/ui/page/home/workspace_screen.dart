@@ -227,7 +227,7 @@ class TeamTile extends StatelessWidget {
                 title: "确认删除团队[${team.name}]吗?",
                 onConfirm: () => context
                     .read<UserModel>()
-                    .actDeleteTeam(team.id)
+                    .actEntrance(UserAct.deleteTeam(team.id))
                     .thenDialog(context),
               );
               break;

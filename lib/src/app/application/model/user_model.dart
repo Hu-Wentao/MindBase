@@ -116,32 +116,3 @@ extension UserTeamX on UserModel {
 
   TeamService get _teamSrv => sl<TeamService>();
 }
-
-@Deprecated('')
-extension UserDeprecatedX on UserModel {
-  @Deprecated('存在即登陆')
-  bool get isLogged => true;
-
-  @Deprecated('判断状态')
-  TeamModel? getTeam(String teamId) =>
-      teams.firstWhereOrNull((tm) => tm.id == teamId);
-
-  @Deprecated("避免使用")
-  User loggedUser() => data;
-
-  /// 尝试加载指定[TeamModel]
-  /// 1. 查询当前用户名下是否存在team
-  ///   1.1 如果存在, 则加载该team; 结束;
-  ///   1.2 如果不存在, 则尝试以访客身份加入team; 结束;
-  @Deprecated('refreshTeams')
-  Future<BaseException?> actLoadTeam(String teamId) =>
-      actEntrance(const UserAct.updateTeams());
-
-  @Deprecated('deleteTeam')
-  Future<BaseException?> actDeleteTeam(String teamId) =>
-      actEntrance(UserAct.deleteTeam(teamId));
-
-  @Deprecated('createTeam')
-  Future<BaseException?> actCreateTeam(String name) async =>
-      actEntrance(UserAct.createTeam(name));
-}
