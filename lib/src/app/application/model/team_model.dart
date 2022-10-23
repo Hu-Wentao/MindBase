@@ -120,6 +120,10 @@ extension TeamModelX on TeamModel {
 extension TeamSpaceX on TeamModel {
   deleteSpace(String spaceId) async {
     await _workspaceSrv.deleteSpace(spaceId);
+    // setState(state, "删除工作空间[$spaceId]完成");
+    // fixme 删除未在UI生效，似乎也没有收到realtime事件
+    // 先手动删除
+    this.workspaces.removeWhereOrNull((s) => s.id ==spaceId);
     setState(state, "删除工作空间[$spaceId]完成");
   }
 
