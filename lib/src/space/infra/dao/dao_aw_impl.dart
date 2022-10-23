@@ -163,15 +163,18 @@ mixin AppwriteAccessorWatchableMx<T extends IEntityDto>
         : SubChannel.collection(collectionId);
     hub.actAddChannel(channel);
     return hub.stream
-        .where(
-          // todo 转换操作需要转移到其他类中, 例如[RealTimeEvtFactory]
-          //这里的events是各种可能性的排列组合, 这里假定[0]是最完整的事件, 仅限 appwrite 0.15.3
-          (event) => event.events[0].split('.').contains(documentsEvtTag) &&
-                  event.payload['\$collection'] == collectionId &&
-                  (documentId == null)
-              ? true
-              : event.payload['\$id'] == documentId,
-        )
+    // v1.0.3
+    // databases.default.collections.6354d209b832016b29204b2c.documents
+        .where((event) => event.channels.contains(channel.channel))
+    // .where(
+        //   // todo 转换操作需要转移到其他类中, 例如[RealTimeEvtFactory]
+        //   //这里的events是各种可能性的排列组合, 这里假定[0]是最完整的事件, 仅限 appwrite 0.15.3
+        //   (event) => event.events[0].split('.').contains(documentsEvtTag) &&
+        //           event.payload['\$collection'] == collectionId &&
+        //           (documentId == null)
+        //       ? true
+        //       : event.payload['\$id'] == documentId,
+        // )
         .map((event) => AccessorEvt<T>(
               //这里的events是各种可能性的排列组合, 这里假定[0]是最完整的事件, 仅限 appwrite 0.15.3
               _collectionEvt2AccessorEvtTp(event.events[0].split('.')),
