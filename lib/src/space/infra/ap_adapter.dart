@@ -13,9 +13,7 @@ class ApAdapter {
         if (writes != null)
           ...writes
               .map((e) => [
-                    Permission.create(e),
-                    Permission.update(e),
-                    Permission.delete(e)
+                    Permission.write(e),
                   ])
               .expand((element) => element)
       ];
@@ -30,7 +28,7 @@ class ApAdapter {
 
   static List<String> parsePermitToWrite(srv.Collection collection) =>
       (collection.$permissions as List<String>?)
-          ?.where((e) => e.startsWith(RegExp(r'create|update|delete')))
+          ?.where((e) => e.startsWith(RegExp(r'write|create|update|delete')))
           .map((e) => e.replaceAllMapped(
               RegExp(r'.+\(\"(.+)\"\)'), (m) => m.group(1) ?? ''))
           .toList() ??
