@@ -21,7 +21,7 @@ part 'model/user_model.dart';
 
 part 'model/team_model.dart';
 
-part 'model/space_model.dart';
+part 'model/space/space_model.dart';
 
 abstract class BaseActEntranceModel<ACT, S> extends Sidecar<S, BaseException?>
     with ActEntranceMx<ACT, S, BaseException?> {
