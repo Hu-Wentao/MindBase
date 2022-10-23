@@ -207,7 +207,9 @@ extension SpaceModelX on SpaceModel {
     // 后fetch
     final metaTableInfo = await _collectionSrv.findCollection(metaCollectionId);
     final metaDtoLs = await _fetchAllMetas().toList();
-    final metas = metaDtoLs.map((e) => MetaModel(e, this)..actInitSubscription()).toList();
+    final metas = metaDtoLs
+        .map((e) => MetaModel(e, this)..actInitSubscription())
+        .toList();
     setState(
       SpaceStateDone(metaTableInfo, metas),
       '初始化Space[$id],metas[${metas.length}]',

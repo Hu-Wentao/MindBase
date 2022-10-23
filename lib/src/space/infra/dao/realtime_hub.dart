@@ -18,7 +18,12 @@ class RealtimeChannelHub {
   StreamSubscription<RealtimeMessage>? _cachedRealTimeSubListen;
 
   final StreamController<RealtimeMessage> _messageStreamController =
-      StreamController.broadcast();
+      StreamController.broadcast()
+
+      // ..stream.listen((event) {
+      //   print("debug RealtimeChannelHub [${event.toMap()}]");
+      // })
+      ;
 
   RealtimeChannelHub(this._realtime);
 
