@@ -1,9 +1,5 @@
 part of '../model.dart';
 
-enum AuthTp {
-  email,
-}
-
 @freezed
 class AppAct with _$AppAct {
   const factory AppAct.signupLogin({

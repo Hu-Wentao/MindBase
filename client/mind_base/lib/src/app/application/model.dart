@@ -8,6 +8,7 @@ import 'package:mind_base/src/space/inter/dto.dart';
 import 'package:mind_base/src/user/application/service.dart';
 import 'package:mind_base/src/user/domain/exceptions.dart';
 import 'package:mind_base/src/user/domain/value.dart';
+import 'package:mind_base/src/user/domain/value/value.dart';
 import 'package:mind_base/src/user/inter/dto.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 import 'package:slowly/slowly.dart';

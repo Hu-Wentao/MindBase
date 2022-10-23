@@ -1,58 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get_arch_core/get_arch_core_interface.dart';
-import 'package:go_router/go_router.dart';
+import 'package:get_arch_core/get_arch_core.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:mind_base/src/app/application/model.dart';
-import 'package:mind_base/src/core/config/config.dart';
+import 'package:mind_base/src/core/config/assets/assets.gen.dart';
+import 'package:mind_base/src/user/infra/ui/widget/rounded_button.dart';
+import 'package:mind_base/src/user/infra/ui/widget/rounded_input_field.dart';
+import 'package:mind_base/src/user/infra/ui/widget/rounded_password_field.dart';
 import 'package:mind_base/src/user/domain/value/value.dart';
 import 'dart:math' as m;
 
-import 'package:provider_sidecar/provider_sidecar_ex.dart';
-
-part 'auth.g.dart';
-
-@TypedGoRoute<AuthRoute>(path: '/auth/:login', routes: [])
-class AuthRoute extends GoRouteData {
-  final bool login;
-
-  const AuthRoute(this.login);
-
-  const AuthRoute.auto([this.login = true]);
-
-  @override
-  Widget build(BuildContext context) => AuthPage(login: login);
-}
-
-class AuthPage extends StatefulWidget {
-  final bool login;
-
-  const AuthPage({Key? key, this.login = true}) : super(key: key);
-
-  @override
-  State<AuthPage> createState() => _AuthPageState();
-}
-
-class _AuthPageState extends State<AuthPage>
-    with OnInitStateMx<AuthPage, AppModel> {
-  @override
-  onInitState(msgr, m) => m.events.listen((evt) => evt.maybeWhen(
-      msg: (msg) => msgr.showSnackBar(SnackBar(content: Text(msg))),
-      orElse: () => null));
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        body: Body(
-      initIsRegister: !widget.login,
-    ));
-  }
+Future<AuthReq?> showAuthDialog({
+  required BuildContext context,
+  AuthReq? origin,
+  AuthRsp? withRsp,
+}) {
+  // 获取窗口宽高
+  final height = m.min(MediaQuery.of(context).size.width, 720.0);
+  final width = height * 0.62;
+  return showDialog(
+      context: context,
+      builder: (c) => Dialog(
+            child: SizedBox(
+              child: Body(originReq: origin, rsp: withRsp),
+              height: height,
+              width: width,
+            ),
+            clipBehavior: Clip.hardEdge, // 确保内容不超出Dialog之外(特指圆角部分)
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+          ));
 }
 
 class Body extends StatefulWidget {
   // 登录按钮及其排序(首个元素即为首选登录项)
   final List<AuthTp> authList;
   final bool initIsRegister;
+  final AuthReq? originReq;
+  final AuthRsp? rsp;
 
   const Body({
     Key? key,
@@ -60,10 +44,12 @@ class Body extends StatefulWidget {
     this.authList = const [
       AuthTp.email,
     ],
+    this.originReq,
+    this.rsp,
   }) : super(key: key);
 
   @override
-  State<Body> createState() => _BodyState();
+  _BodyState createState() => _BodyState();
 }
 
 class _BodyState extends State<Body> {
@@ -86,28 +72,56 @@ class _BodyState extends State<Body> {
     super.initState();
   }
 
-  String get describeAuthTp {
+  String get describeAuthVerify {
     switch (authVerify) {
       case AuthTp.email:
         return "邮箱";
+      // case AuthTp.phoneNumber:
+      //   return "手机号";
+      // case AuthTp.wechatOfficial:
+      //   return "微信公众号";
+      // case AuthTp.qqConnect:
+      //   return "QQ登录";
+      // case AuthTp.qqNumber:
+      //   return "QQ号";
+      // case AuthTp.github:
+      //   return 'GitHub';
     }
   }
 
-  IconData _getAuthTpIcon(AuthTp authVerify) {
+  IconData _getAuthVerifyIcon(AuthTp authVerify) {
     switch (authVerify) {
+      // case AuthTp.qqNumber:
+      //   return LineIcons.qq;
       case AuthTp.email:
         return LineIcons.envelope;
+      // case AuthTp.phoneNumber:
+      //   return LineIcons.phone;
+      // case AuthTp.qqConnect:
+      //   return LineIcons.qq;
+      // case AuthTp.wechatOfficial:
+      //   return LineIcons.weixinWechat;
+      // case AuthTp.github:
+      //   return LineIcons.github;
     }
   }
 
   String? authVerifyValidator(String? v) {
     switch (authVerify) {
       case AuthTp.email:
-        return const EmailValidator(errorMsg: '请填写正确的邮箱地址').call(v);
+        return Email.validator(v);
+      // case AuthTp.phoneNumber:
+      //   return PhoneNumber.validator(v);
+      // case AuthTp.qqNumber:
+      //   return QQNumber.validator(v);
+      // case AuthTp.qqConnect:
+      // case AuthTp.wechatOfficial:
+      // case AuthTp.github:
+      //   throw BaseException('[$authVerify]无需校验', debugInfo: '逻辑错误');
     }
   }
 
-  switchAuthTp(AuthTp verify) {
+  switchAuthVerify(AuthTp verify) {
     if (verify != authVerify) {
       setState(() {
         authVerify = verify;
@@ -119,6 +133,16 @@ class _BodyState extends State<Body> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Background(
+      secondChild: Positioned(
+          top: 0,
+          right: 0,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 16),
+            child: TextButton(
+              child: const Icon(Icons.close),
+              onPressed: Navigator.of(context).pop,
+            ),
+          )),
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -128,10 +152,29 @@ class _BodyState extends State<Body> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                Text(
+                  isRegister ? "注册" : "登录",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 SizedBox(height: size.height * 0.03),
                 isRegister
                     ? Assets.images.login.svg(height: size.height * 0.35)
                     : Assets.images.signup.svg(height: size.height * 0.35),
+                // 展示上次请求的错误信息
+                if (widget.rsp != null)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FutureBuilder(
+                        future: Future.delayed(const Duration(seconds: 5)),
+                        builder: (c, s) =>
+                            (s.connectionState == ConnectionState.done)
+                                ? const SizedBox()
+                                : Text(
+                                    "${widget.rsp!.msg}",
+                                    style: const TextStyle(
+                                        color: Colors.red, fontSize: 18),
+                                  )),
+                  ),
                 ..._buildInputField(context),
                 SizedBox(height: size.height * 0.03),
                 AlreadyHaveAnAccountCheck(
@@ -155,8 +198,8 @@ class _BodyState extends State<Body> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: authList
               .map((auth) => IconButton(
-                    onPressed: () => switchAuthTp(auth),
-                    icon: Icon(_getAuthTpIcon(auth)),
+                    onPressed: () => switchAuthVerify(auth),
+                    icon: Icon(_getAuthVerifyIcon(auth)),
                   ))
               .toList(),
         )
@@ -165,38 +208,40 @@ class _BodyState extends State<Body> {
   List<Widget> _buildInputField(BuildContext ctx) {
     switch (authVerify) {
       case AuthTp.email:
+        // case AuthTp.phoneNumber:
         return [
           RoundedInputField(
-            hintText: describeAuthTp,
+            hintText: describeAuthVerify,
             validator: authVerifyValidator,
             onChanged: setIdentityStr,
           ),
           RoundedPasswordField(
-            validator: (v) => const LengthRangeValidator(
-                    min: 8, max: 64, errorMsg: '密码长度只能在8到64个字符之间')
-                .call(v),
+            validator: (v) => Password.validator(v),
             onChanged: setPwd,
           ),
           RoundedButton(
             text: isRegister ? "注册" : "登陆",
             press: () async {
               if (_formKey.currentState!.validate()) {
-                context.read<AppModel>().actEntrance(
-                      isRegister
-                          ? AppAct.signupLogin(
-                              authVerify: authVerify,
-                              identityStr: identityStr,
-                              password: pwd)
-                          : AppAct.login(
-                              authVerify: authVerify,
-                              identityStr: identityStr,
-                              password: pwd),
-                    );
+                Navigator.of(context).pop(AuthReq(
+                  isRegister,
+                  authVerify,
+                  identityStr,
+                  pwd,
+                ));
               }
             },
             color: Theme.of(context).primaryColor,
           )
         ];
+      // case AuthTp.qqNumber:
+      //   return [const Text("尚未支持QQ号 注册/登录")];
+      // case AuthTp.wechatOfficial:
+      //   return [const Text("尚未支持公众号 注册/登录")];
+      // case AuthTp.qqConnect:
+      //   return [const Text("尚未支持QQ 注册/登录")];
+      // case AuthTp.github:
+      //   return [const Text("尚未支持GitHub 注册/登录")];
     }
   }
 
@@ -227,13 +272,21 @@ class Background extends StatelessWidget {
         alignment: Alignment.center,
         children: <Widget>[
           Positioned(
-              top: 0,
-              left: 0,
-              child: Assets.images.signupTop.image(width: widthFactor * 0.35)),
+            top: 0,
+            left: 0,
+            child: Image.asset(
+              Assets.images.signupTop.path,
+              width: widthFactor * 0.35,
+            ),
+          ),
           Positioned(
-              bottom: 0,
-              left: 0,
-              child: Assets.images.mainBottom.image(width: widthFactor * 0.25)),
+            bottom: 0,
+            left: 0,
+            child: Image.asset(
+              Assets.images.mainBottom.path,
+              width: widthFactor * 0.25,
+            ),
+          ),
           child,
           if (secondChild != null) secondChild!,
         ],
@@ -343,152 +396,5 @@ class AlreadyHaveAnAccountCheck extends StatelessWidget {
             ),
           )
         ],
-      );
-}
-
-class TextFieldContainer extends StatelessWidget {
-  final Widget? child;
-  final double radius;
-
-  const TextFieldContainer({
-    Key? key,
-    this.child,
-    this.radius = 29,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-      width: size.width * 0.8,
-      decoration: BoxDecoration(
-        color: Theme.of(context).primaryColorLight,
-        borderRadius: BorderRadius.circular(radius),
-      ),
-      child: child,
-    );
-  }
-}
-
-class RoundedInputField extends StatelessWidget {
-  final String? hintText;
-  final IconData icon;
-  final ValueChanged<String>? onChanged;
-  final FormFieldValidator<String>? validator;
-  final double radius;
-
-  const RoundedInputField({
-    Key? key,
-    this.hintText,
-    this.icon = Icons.person,
-    this.onChanged,
-    this.validator,
-    this.radius = 19,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) => TextFieldContainer(
-        radius: radius,
-        child: TextFormField(
-          onChanged: onChanged,
-          cursorColor: Theme.of(context).primaryColor,
-          validator: validator,
-          decoration: InputDecoration(
-            icon: Icon(
-              icon,
-              color: Theme.of(context).primaryColor,
-            ),
-            hintText: hintText,
-            border: InputBorder.none,
-          ),
-        ),
-      );
-}
-
-class RoundedPasswordField extends StatefulWidget {
-  final String? hintText;
-  final ValueChanged<String>? onChanged;
-  final FormFieldValidator<String>? validator;
-
-  const RoundedPasswordField({
-    Key? key,
-    this.hintText,
-    this.validator,
-    this.onChanged,
-  }) : super(key: key);
-
-  @override
-  State<RoundedPasswordField> createState() => _RoundedPasswordFieldState();
-}
-
-class _RoundedPasswordFieldState extends State<RoundedPasswordField> {
-  bool canObs = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFieldContainer(
-      child: TextFormField(
-        obscureText: !canObs,
-        onChanged: widget.onChanged,
-        cursorColor: Theme.of(context).primaryColor,
-        validator: widget.validator,
-        decoration: InputDecoration(
-          hintText: widget.hintText,
-          icon: Icon(
-            Icons.lock,
-            color: Theme.of(context).primaryColor,
-          ),
-          suffixIcon: IconButton(
-            icon: const Icon(Icons.visibility),
-            color: Theme.of(context).primaryColor,
-            onPressed: () => setState(() => canObs = !canObs),
-          ),
-          border: InputBorder.none,
-        ),
-      ),
-    );
-  }
-}
-
-class RoundedButton extends StatelessWidget {
-  final String text;
-  final VoidCallback? press;
-  final Color color, textColor;
-
-  const RoundedButton({
-    Key? key,
-    required this.text,
-    this.press,
-    required this.color, // Theme.of(context).primaryColor
-    this.textColor = Colors.white,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width * 0.8,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(29),
-            child: TextButton(
-              style: ButtonStyle(
-                padding: MaterialStateProperty.resolveWith<EdgeInsetsGeometry>(
-                  (s) =>
-                      const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-                ),
-                backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                  (states) => color,
-                ),
-              ),
-              onPressed: press,
-              child: Text(
-                text,
-                style: TextStyle(color: textColor),
-              ),
-            ),
-          ),
-        ),
       );
 }
