@@ -15,14 +15,13 @@ import 'package:slowly/slowly.dart' as _i11;
 import '../../app/application/service/service.dart' as _i10;
 import '../../space/application/service/service.dart' as _i6;
 import '../../space/application/service/workspace_service.dart' as _i13;
-import '../../space/domain/repo/repo.dart' as _i14;
 import '../../space/infra/dao/dao_aw_impl.dart' as _i12;
 import '../../space/infra/dao/realtime_hub.dart' as _i9;
 import '../../user/application/service.dart' as _i5;
-import 'appwrite_config.dart' as _i15;
-import 'common_config.dart' as _i16;
+import 'appwrite_config.dart' as _i14;
+import 'common_config.dart' as _i15;
 import 'config.dart' as _i8;
-import 'slowly_config.dart' as _i17;
+import 'slowly_config.dart' as _i16;
 
 const String _dev = 'dev';
 const String _test = 'test';
@@ -72,9 +71,7 @@ _i1.GetIt $initGetIt(
   );
   gh.lazySingleton<_i12.SpaceModelEttAccessor>(() => appClientConfig.wsEttAcc);
   gh.lazySingleton<_i13.SpaceService>(() => _i13.SpaceService(
-        get<_i3.Databases>(),
         get<_i12.SpaceModelEttAccessor>(),
-        get<_i14.MetaDtoRepo>(),
         get<_i4.Databases>(),
       ));
   gh.lazySingleton<_i3.Storage>(() => appClientConfig.storage);
@@ -88,10 +85,10 @@ _i1.GetIt $initGetIt(
   return get;
 }
 
-class _$AppClientConfig extends _i15.AppClientConfig {}
+class _$AppClientConfig extends _i14.AppClientConfig {}
 
-class _$AppServerConfig extends _i15.AppServerConfig {}
+class _$AppServerConfig extends _i14.AppServerConfig {}
 
-class _$ConfigCommon extends _i16.ConfigCommon {}
+class _$ConfigCommon extends _i15.ConfigCommon {}
 
-class _$SlowlyConfig extends _i17.SlowlyConfig {}
+class _$SlowlyConfig extends _i16.SlowlyConfig {}

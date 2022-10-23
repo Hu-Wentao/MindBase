@@ -5,6 +5,7 @@ import 'package:dart_appwrite/dart_appwrite.dart' as srv;
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/core/config/appwrite_config.dart';
 import 'package:mind_base/src/core/config/common_config.dart';
+import 'package:mind_base/src/core/inter/i_dao.dart';
 import 'package:mind_base/src/space/domain/value/value.dart';
 import 'package:mind_base/src/space/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/space/inter/dto/i_dto.dart';
@@ -256,6 +257,10 @@ class MetaDtoRepo {
     return await _update(
         dto..views.removeWhere((element) => element.vId == vId));
   }
+
+  Stream<MetaDto>  findAll() => _metaAcc.findAll();
+
+  Stream<AccessorEvt<MetaDto>>  watch() => _metaAcc.watch();
 }
 
 class RecordDtoRepo {

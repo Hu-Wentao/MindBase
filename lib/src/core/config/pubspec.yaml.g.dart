@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1666447323;
+const int timestamp = 1666491933;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -121,7 +121,7 @@ const Map<String, Object> dependencies = <String, Object>{
   },
   'flutter_form_builder': r'7.1.1',
   'form_builder_validators': r'7.9.0',
-  'json_annotation': r'>=4.6.0',
+  'json_annotation': r'>=4.7.0',
   'pluto_grid': r'5.0.3',
   'appwrite': r'8.1.0',
   'dart_appwrite': r'^7.1.0',

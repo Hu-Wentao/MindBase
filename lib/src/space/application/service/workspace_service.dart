@@ -1,4 +1,3 @@
-import 'package:appwrite/appwrite.dart' as cli;
 import 'package:dart_appwrite/dart_appwrite.dart' as srv;
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:mind_base/src/core/config/appwrite_config.dart';
@@ -12,27 +11,23 @@ import 'package:mind_base/src/user/inter/dto.dart';
 
 @lazySingleton
 class SpaceService {
-  final cli.Databases _cliDb;
   final srv.Databases _srvDb;
   final SpaceModelEttAccessor _spaceEttAcc;
-  final MetaDtoRepo _metaDtoRepo;
 
-  const SpaceService(
-    this._cliDb,
+  SpaceService(
     this._spaceEttAcc,
-    this._metaDtoRepo,
     this._srvDb,
   );
 
-  MetaModelEttAccessor _getMetaAcc(String workspaceId) =>
-      MetaModelEttAccessor(_cliDb, workspaceId);
+  MetaDtoRepo _metaDtoRepo(String workspaceId) =>
+      MetaDtoRepo.withDI(sl, workspaceId);
 
   /// 查询一个工作空间内的所有Meta
   Stream<MetaDto> findMetasBy(String workspaceId) =>
-      _getMetaAcc(workspaceId).findAll();
+      _metaDtoRepo(workspaceId).findAll();
 
   Stream<AccessorEvt<MetaDto>> watchMetasBy(String workspaceId) =>
-      _getMetaAcc(workspaceId).watch();
+      _metaDtoRepo(workspaceId).watch();
 
   Future<Map<Team, List<SpaceDto>>> querySpaceModelDtoBy(
       List<Team> teams) async {
@@ -65,7 +60,6 @@ class SpaceService {
       metas: [],
     );
     // 行级别的读写权限控制
-    //"team:$teamId"
     final readPermit = [RoleX.team(teamId)]; // 团队成员可读
     final writePermit = [RoleX.owner(teamId)]; // 团队所有者可写(指`owner`可以更改工作空间名称等字段)
     final r = await _spaceEttAcc.insert(
@@ -80,10 +74,11 @@ class SpaceService {
   Future insertTable(TableDto table) async {
     // 创建或更新Meta
     if (table.isCreate) {
-      await _metaDtoRepo.insertDto(table.meta);
+      await _metaDtoRepo(table.meta.id).insertDto(table.meta);
     } else {
-      final origin = _metaDtoRepo.findById(table.meta.id);
-      await _metaDtoRepo.updateWithRecordCollection(origin, table.meta);
+      final origin = _metaDtoRepo(table.meta.id).findById(table.meta.id);
+      await _metaDtoRepo(table.meta.id)
+          .updateWithRecordCollection(origin, table.meta);
     }
     // 插入数据
     final RecordDtoRepo rcdRepo = RecordDtoRepo.withDtoDI(sl, table.meta);
@@ -104,7 +99,7 @@ class SpaceService {
   Future<void> deleteSpace(String id) => _spaceEttAcc.deleteBy(id);
 
   deleteMeta(String metaId) async {
-    await _metaDtoRepo.deleteBy(metaId);
+    await _metaDtoRepo(metaId).deleteBy(metaId);
     await _srvDb.deleteCollection(
       databaseId: mainDataBaseId,
       collectionId: metaId,
