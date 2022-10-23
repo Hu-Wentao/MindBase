@@ -46,6 +46,8 @@ dependencies:
   form_builder_extra_fields:
   form_builder_validators: "7.9.0"
   mockito:
+  json_annotation:
+  quiver:
 
 dev_dependencies:
   flutter_test:
@@ -57,6 +59,7 @@ dev_dependencies:
   freezed:
   go_router_builder:
   flutter_gen_runner:
+  json_serializable:
 
 flutter:
   uses-material-design: true
