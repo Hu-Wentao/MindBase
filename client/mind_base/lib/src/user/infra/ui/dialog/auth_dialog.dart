@@ -139,8 +139,8 @@ class _BodyState extends State<Body> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 16),
             child: TextButton(
-              child: const Icon(Icons.close),
               onPressed: Navigator.of(context).pop,
+              child: const Icon(Icons.close),
             ),
           )),
       child: SingleChildScrollView(

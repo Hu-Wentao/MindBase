@@ -41,6 +41,7 @@ dependencies:
   collection:
   ndialog:
   url_launcher:
+  logging:
 
 dev_dependencies:
   flutter_test:
