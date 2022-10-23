@@ -5,13 +5,13 @@ class AppAct with _$AppAct {
   const factory AppAct.signupLogin({
     required AuthTp authVerify,
     required String identityStr,
-    required Password password,
+    required String password,
   }) = AppActSignupLogin;
 
   const factory AppAct.login({
     required AuthTp authVerify,
     required String identityStr,
-    required Password password,
+    required String password,
   }) = AppActLogin;
 
   const factory AppAct.loginAnonymous() = AppActLoginAnonymous;
@@ -70,7 +70,7 @@ class AppModel extends BaseActEntranceModel<AppAct, AppState>
   signupLogin(
     AuthTp authVerify,
     String identityStr,
-    Password password,
+    String password,
   ) async {
     final user = await _onSignup(authVerify, identityStr, password);
     evtEntrance(const AppEvt.msg("注册成功"));
@@ -81,7 +81,7 @@ class AppModel extends BaseActEntranceModel<AppAct, AppState>
   login(
     AuthTp authVerify,
     String identityStr,
-    Password password, {
+    String password, {
     User? user,
   }) async {
     final session = await _onLogin(authVerify, identityStr, password);
@@ -142,20 +142,20 @@ extension AppAccountX on AppModel {
   }
 
   Future<User> _onSignup(
-      AuthTp authVerify, String identityStr, Password password) async {
+      AuthTp authVerify, String identityStr, String password) async {
     switch (authVerify) {
       case AuthTp.email:
         return await _accountSrv.signup(
           name: identityStr,
           email: identityStr,
-          password: password.v,
+          password: password,
         );
-      case AuthTp.phoneNumber:
-      case AuthTp.wechatOfficial:
-      case AuthTp.qqConnect:
-      case AuthTp.qqNumber:
-      case AuthTp.github:
-        throw FeatDeveloping('注册方式[$authVerify]尚未实现');
+      // case AuthTp.phoneNumber:
+      // case AuthTp.wechatOfficial:
+      // case AuthTp.qqConnect:
+      // case AuthTp.qqNumber:
+      // case AuthTp.github:
+      //   throw FeatDeveloping('注册方式[$authVerify]尚未实现');
     }
   }
 
@@ -163,22 +163,22 @@ extension AppAccountX on AppModel {
   Future<Session> _onLogin(
     AuthTp authVerify,
     String identityStr,
-    Password password,
+    String password,
   ) async {
     Session nSession;
     switch (authVerify) {
       case AuthTp.email:
         nSession = await _accountSrv.login(
           email: identityStr,
-          password: password.v,
+          password: password,
         );
         break;
-      case AuthTp.phoneNumber:
-      case AuthTp.wechatOfficial:
-      case AuthTp.qqConnect:
-      case AuthTp.qqNumber:
-      case AuthTp.github:
-        throw BaseException('尚未支持的登录方式[$authVerify]');
+      // case AuthTp.phoneNumber:
+      // case AuthTp.wechatOfficial:
+      // case AuthTp.qqConnect:
+      // case AuthTp.qqNumber:
+      // case AuthTp.github:
+      //   throw BaseException('尚未支持的登录方式[$authVerify]');
     }
     return nSession;
   }

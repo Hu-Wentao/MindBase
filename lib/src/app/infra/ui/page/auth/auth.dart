@@ -15,9 +15,19 @@ import 'dart:math' as m;
 import 'package:provider/provider.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
-part 'router.dart';
-
 part 'auth.g.dart';
+
+@TypedGoRoute<AuthRoute>(path: '/auth/:login', routes: [])
+class AuthRoute extends GoRouteData {
+  final bool login;
+
+  const AuthRoute(this.login);
+
+  const AuthRoute.auto([this.login = true]);
+
+  @override
+  Widget build(BuildContext context) => AuthPage(login: login);
+}
 
 class AuthPage extends StatefulWidget {
   final bool login;
@@ -53,8 +63,6 @@ class Body extends StatefulWidget {
   // 登录按钮及其排序(首个元素即为首选登录项)
   final List<AuthTp> authList;
   final bool initIsRegister;
-  final AuthReq? originReq;
-  final AuthRsp? rsp;
 
   const Body({
     Key? key,
@@ -62,12 +70,10 @@ class Body extends StatefulWidget {
     this.authList = const [
       AuthTp.email,
     ],
-    this.originReq,
-    this.rsp,
   }) : super(key: key);
 
   @override
-  _BodyState createState() => _BodyState();
+  State<Body> createState() => _BodyState();
 }
 
 class _BodyState extends State<Body> {
@@ -90,56 +96,28 @@ class _BodyState extends State<Body> {
     super.initState();
   }
 
-  String get describeAuthVerify {
+  String get describeAuthTp {
     switch (authVerify) {
       case AuthTp.email:
         return "邮箱";
-      case AuthTp.phoneNumber:
-        return "手机号";
-      case AuthTp.wechatOfficial:
-        return "微信公众号";
-      case AuthTp.qqConnect:
-        return "QQ登录";
-      case AuthTp.qqNumber:
-        return "QQ号";
-      case AuthTp.github:
-        return 'GitHub';
     }
   }
 
-  IconData _getAuthVerifyIcon(AuthTp authVerify) {
+  IconData _getAuthTpIcon(AuthTp authVerify) {
     switch (authVerify) {
-      case AuthTp.qqNumber:
-        return LineIcons.qq;
       case AuthTp.email:
         return LineIcons.envelope;
-      case AuthTp.phoneNumber:
-        return LineIcons.phone;
-      case AuthTp.qqConnect:
-        return LineIcons.qq;
-      case AuthTp.wechatOfficial:
-        return LineIcons.weixinWechat;
-      case AuthTp.github:
-        return LineIcons.github;
     }
   }
 
   String? authVerifyValidator(String? v) {
     switch (authVerify) {
       case AuthTp.email:
-        return Email.validator(v);
-      case AuthTp.phoneNumber:
-        return PhoneNumber.validator(v);
-      case AuthTp.qqNumber:
-        return QQNumber.validator(v);
-      case AuthTp.qqConnect:
-      case AuthTp.wechatOfficial:
-      case AuthTp.github:
-        throw BaseException('[$authVerify]无需校验', debugInfo: '逻辑错误');
+        return const EmailValidator(errorMsg: '请填写正确的邮箱地址').call(v);
     }
   }
 
-  switchAuthVerify(AuthTp verify) {
+  switchAuthTp(AuthTp verify) {
     if (verify != authVerify) {
       setState(() {
         authVerify = verify;
@@ -162,23 +140,8 @@ class _BodyState extends State<Body> {
               children: <Widget>[
                 SizedBox(height: size.height * 0.03),
                 isRegister
-                    ? Assets.icon.auth.login.svg(height: size.height * 0.35)
-                    : Assets.icon.auth.signup.svg(height: size.height * 0.35),
-                // 展示上次请求的错误信息
-                if (widget.rsp != null)
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: FutureBuilder(
-                        future: Future.delayed(const Duration(seconds: 5)),
-                        builder: (c, s) =>
-                            (s.connectionState == ConnectionState.done)
-                                ? const SizedBox()
-                                : Text(
-                                    "${widget.rsp!.msg}",
-                                    style: const TextStyle(
-                                        color: Colors.red, fontSize: 18),
-                                  )),
-                  ),
+                    ? Assets.images.login.svg(height: size.height * 0.35)
+                    : Assets.images.signup.svg(height: size.height * 0.35),
                 ..._buildInputField(context),
                 SizedBox(height: size.height * 0.03),
                 AlreadyHaveAnAccountCheck(
@@ -202,8 +165,8 @@ class _BodyState extends State<Body> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: authList
               .map((auth) => IconButton(
-                    onPressed: () => switchAuthVerify(auth),
-                    icon: Icon(_getAuthVerifyIcon(auth)),
+                    onPressed: () => switchAuthTp(auth),
+                    icon: Icon(_getAuthTpIcon(auth)),
                   ))
               .toList(),
         )
@@ -212,15 +175,16 @@ class _BodyState extends State<Body> {
   List<Widget> _buildInputField(BuildContext ctx) {
     switch (authVerify) {
       case AuthTp.email:
-      case AuthTp.phoneNumber:
         return [
           RoundedInputField(
-            hintText: describeAuthVerify,
+            hintText: describeAuthTp,
             validator: authVerifyValidator,
             onChanged: setIdentityStr,
           ),
           RoundedPasswordField(
-            validator: (v) => Password.validator(v),
+            validator: (v) => const LengthRangeValidator(
+                    min: 8, max: 64, errorMsg: '密码长度只能在8到64个字符之间')
+                .call(v),
             onChanged: setPwd,
           ),
           RoundedButton(
@@ -232,25 +196,17 @@ class _BodyState extends State<Body> {
                           ? AppAct.signupLogin(
                               authVerify: authVerify,
                               identityStr: identityStr,
-                              password: Password(pwd))
+                              password: pwd)
                           : AppAct.login(
                               authVerify: authVerify,
                               identityStr: identityStr,
-                              password: Password(pwd)),
+                              password: pwd),
                     );
               }
             },
             color: Theme.of(context).primaryColor,
           )
         ];
-      case AuthTp.qqNumber:
-        return [const Text("尚未支持QQ号 注册/登录")];
-      case AuthTp.wechatOfficial:
-        return [const Text("尚未支持公众号 注册/登录")];
-      case AuthTp.qqConnect:
-        return [const Text("尚未支持QQ 注册/登录")];
-      case AuthTp.github:
-        return [const Text("尚未支持GitHub 注册/登录")];
     }
   }
 
@@ -283,11 +239,11 @@ class Background extends StatelessWidget {
           Positioned(
               top: 0,
               left: 0,
-              child: Assets.image.signupTop.image(width: widthFactor * 0.35)),
+              child: Assets.images.signupTop.image(width: widthFactor * 0.35)),
           Positioned(
               bottom: 0,
               left: 0,
-              child: Assets.image.mainBottom.image(width: widthFactor * 0.25)),
+              child: Assets.images.mainBottom.image(width: widthFactor * 0.25)),
           child,
           if (secondChild != null) secondChild!,
         ],

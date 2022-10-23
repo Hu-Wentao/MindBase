@@ -5,7 +5,7 @@ class AuthReq {
   final bool isRegister;
   final AuthTp authVerify;
   final String identityStr;
-  final Password password;
+  final String password;
 
   AuthReq(this.isRegister, this.authVerify, this.identityStr, this.password);
 
@@ -27,11 +27,11 @@ class AuthRsp {
 
 enum AuthTp {
   email, // 绑定邮箱
-  phoneNumber, // 绑定手机
-  wechatOfficial, // 关注公众号
-  qqConnect, // QQ互联
-  qqNumber, // QQ号, 用于QQ机器人
-  github,
+  // phoneNumber, // 绑定手机
+  // wechatOfficial, // 关注公众号
+  // qqConnect, // QQ互联
+  // qqNumber, // QQ号, 用于QQ机器人
+  // github,
 }
 
 @JsonSerializable()

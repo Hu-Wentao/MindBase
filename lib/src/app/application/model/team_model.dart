@@ -123,7 +123,7 @@ extension TeamSpaceX on TeamModel {
     // setState(state, "删除工作空间[$spaceId]完成");
     // fixme 删除未在UI生效，似乎也没有收到realtime事件
     // 先手动删除
-    this.workspaces.removeWhereOrNull((s) => s.id ==spaceId);
+    this.workspaces.removeWhereOrNull((s) => s.id == spaceId);
     setState(state, "删除工作空间[$spaceId]完成");
   }
 
@@ -158,7 +158,7 @@ extension TeamMemberX on TeamModel {
   }
 
   updateMembers() async {
-    final dataLs = (await _tmSrv.listMemberships(teamId: id)).memberships;
+    final dataLs = (await _tmSrv.getMemberships(teamId: id)).memberships;
     final rst = <MemberModel>[];
     for (final model in members) {
       final nData = dataLs.removeWhereOrNull((_) => _.$id == model.id);
@@ -172,7 +172,7 @@ extension TeamMemberX on TeamModel {
         '刷新Members[${rst.length}]');
   }
 
-  cli.Teams get _tmSrv => sl<cli.Teams>();
+  TeamService get _tmSrv => sl<TeamService>();
 }
 
 extension TeamDeprecatedX on TeamModel {
@@ -186,8 +186,7 @@ extension TeamDeprecatedX on TeamModel {
 
 /// ============================================================================
 
-abstract class IMemberModel
-    extends ModelSidecar<Member, BaseException?> {
+abstract class IMemberModel extends ModelSidecar<Member, BaseException?> {
   IMemberModel(Member data) : super(data, ExceptionAdapter.of);
 }
 

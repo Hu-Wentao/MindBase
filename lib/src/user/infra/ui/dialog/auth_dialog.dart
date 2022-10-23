@@ -76,33 +76,33 @@ class _BodyState extends State<Body> {
     switch (authVerify) {
       case AuthTp.email:
         return "邮箱";
-      case AuthTp.phoneNumber:
-        return "手机号";
-      case AuthTp.wechatOfficial:
-        return "微信公众号";
-      case AuthTp.qqConnect:
-        return "QQ登录";
-      case AuthTp.qqNumber:
-        return "QQ号";
-      case AuthTp.github:
-        return 'GitHub';
+      // case AuthTp.phoneNumber:
+      //   return "手机号";
+      // case AuthTp.wechatOfficial:
+      //   return "微信公众号";
+      // case AuthTp.qqConnect:
+      //   return "QQ登录";
+      // case AuthTp.qqNumber:
+      //   return "QQ号";
+      // case AuthTp.github:
+      //   return 'GitHub';
     }
   }
 
   IconData _getAuthVerifyIcon(AuthTp authVerify) {
     switch (authVerify) {
-      case AuthTp.qqNumber:
-        return LineIcons.qq;
+      // case AuthTp.qqNumber:
+      //   return LineIcons.qq;
       case AuthTp.email:
         return LineIcons.envelope;
-      case AuthTp.phoneNumber:
-        return LineIcons.phone;
-      case AuthTp.qqConnect:
-        return LineIcons.qq;
-      case AuthTp.wechatOfficial:
-        return LineIcons.weixinWechat;
-      case AuthTp.github:
-        return LineIcons.github;
+      // case AuthTp.phoneNumber:
+      //   return LineIcons.phone;
+      // case AuthTp.qqConnect:
+      //   return LineIcons.qq;
+      // case AuthTp.wechatOfficial:
+      //   return LineIcons.weixinWechat;
+      // case AuthTp.github:
+      //   return LineIcons.github;
     }
   }
 
@@ -110,14 +110,14 @@ class _BodyState extends State<Body> {
     switch (authVerify) {
       case AuthTp.email:
         return Email.validator(v);
-      case AuthTp.phoneNumber:
-        return PhoneNumber.validator(v);
-      case AuthTp.qqNumber:
-        return QQNumber.validator(v);
-      case AuthTp.qqConnect:
-      case AuthTp.wechatOfficial:
-      case AuthTp.github:
-        throw BaseException('[$authVerify]无需校验', debugInfo: '逻辑错误');
+      // case AuthTp.phoneNumber:
+      //   return PhoneNumber.validator(v);
+      // case AuthTp.qqNumber:
+      //   return QQNumber.validator(v);
+      // case AuthTp.qqConnect:
+      // case AuthTp.wechatOfficial:
+      // case AuthTp.github:
+      //   throw BaseException('[$authVerify]无需校验', debugInfo: '逻辑错误');
     }
   }
 
@@ -208,7 +208,7 @@ class _BodyState extends State<Body> {
   List<Widget> _buildInputField(BuildContext ctx) {
     switch (authVerify) {
       case AuthTp.email:
-      case AuthTp.phoneNumber:
+        // case AuthTp.phoneNumber:
         return [
           RoundedInputField(
             hintText: describeAuthVerify,
@@ -227,21 +227,21 @@ class _BodyState extends State<Body> {
                   isRegister,
                   authVerify,
                   identityStr,
-                  Password(pwd),
+                  pwd,
                 ));
               }
             },
             color: Theme.of(context).primaryColor,
           )
         ];
-      case AuthTp.qqNumber:
-        return [const Text("尚未支持QQ号 注册/登录")];
-      case AuthTp.wechatOfficial:
-        return [const Text("尚未支持公众号 注册/登录")];
-      case AuthTp.qqConnect:
-        return [const Text("尚未支持QQ 注册/登录")];
-      case AuthTp.github:
-        return [const Text("尚未支持GitHub 注册/登录")];
+      // case AuthTp.qqNumber:
+      //   return [const Text("尚未支持QQ号 注册/登录")];
+      // case AuthTp.wechatOfficial:
+      //   return [const Text("尚未支持公众号 注册/登录")];
+      // case AuthTp.qqConnect:
+      //   return [const Text("尚未支持QQ 注册/登录")];
+      // case AuthTp.github:
+      //   return [const Text("尚未支持GitHub 注册/登录")];
     }
   }
 
