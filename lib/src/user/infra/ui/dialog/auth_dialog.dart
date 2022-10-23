@@ -158,8 +158,8 @@ class _BodyState extends State<Body> {
                 ),
                 SizedBox(height: size.height * 0.03),
                 isRegister
-                    ? Assets.icon.auth.login.svg(height: size.height * 0.35)
-                    : Assets.icon.auth.signup.svg(height: size.height * 0.35),
+                    ? Assets.images.login.svg(height: size.height * 0.35)
+                    : Assets.images.signup.svg(height: size.height * 0.35),
                 // 展示上次请求的错误信息
                 if (widget.rsp != null)
                   Padding(
@@ -275,7 +275,7 @@ class Background extends StatelessWidget {
             top: 0,
             left: 0,
             child: Image.asset(
-              Assets.image.signupTop.path,
+              Assets.images.signupTop.path,
               width: widthFactor * 0.35,
             ),
           ),
@@ -283,7 +283,7 @@ class Background extends StatelessWidget {
             bottom: 0,
             left: 0,
             child: Image.asset(
-              Assets.image.mainBottom.path,
+              Assets.images.mainBottom.path,
               width: widthFactor * 0.25,
             ),
           ),
