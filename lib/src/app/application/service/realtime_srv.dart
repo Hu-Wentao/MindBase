@@ -66,6 +66,9 @@ class RealtimeSrv {
   @protected
   Stream<aw.RealtimeMessage> watchBy(SubChannel channel) {
     _hub.actAddChannel(channel);
-    return _hub.stream.doOnCancel(() => _hub.actRemoveChannel(channel));
+    return _hub.stream
+        .doOnCancel(() => _hub.actRemoveChannel(channel))
+        // 过滤得到特定channel的Stream
+        .where((event) => event.channels.contains(channel.channel));
   }
 }
