@@ -2,6 +2,7 @@ part of '../model.dart';
 
 @freezed
 class UserAct with _$UserAct {
+  // 此处已监听Team变更，但未生效，需要测试
   const factory UserAct.initModel() = UserActInitModel;
 
   const factory UserAct.updateTeams() = UserActUpdateTeams;
@@ -80,7 +81,8 @@ extension UserTeamX on UserModel {
       throw UnLoginException('当前以匿名身份登录, 无法创建团队', '请先注册或登录新账号');
     }
     final tm = await _teamSrv.createTeam(name);
-    setState(state, '创建team[${tm.$id}]');
+    // 刷新团队列表；避免监听失效导致列表不刷新问题
+    await updateTeams();
   }
 
   @protected
