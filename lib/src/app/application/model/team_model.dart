@@ -31,7 +31,7 @@ class TeamState with _$TeamState {
   const factory TeamState.init() = TeamStateInit;
 
   const factory TeamState.done({
-    required List<SpaceModel> workspaces,
+    required List<SpaceModel> spaces,
     required List<MemberModel> members,
   }) = TeamStateDone;
 }
@@ -62,7 +62,7 @@ class TeamModel extends BaseActEntranceModel<TeamAct, TeamState>
   /// 子状态Model
   @protected
   List<SpaceModel> get workspaces =>
-      state.isOrNull<TeamStateDone>()?.workspaces ?? const [];
+      state.isOrNull<TeamStateDone>()?.spaces ?? const [];
 
   @protected
   List<MemberModel> get members =>
@@ -90,7 +90,7 @@ class TeamModel extends BaseActEntranceModel<TeamAct, TeamState>
   void onEvent(TeamEvt evt) {
     super.onEvent(evt);
     evt.when(spaceCreated: (data) {
-      state.isOrNull<TeamStateDone>()?.workspaces.add(SpaceModel(data));
+      state.isOrNull<TeamStateDone>()?.spaces.add(SpaceModel(data));
       setState(state, '新增space[${data.id}]');
     });
   }
@@ -144,7 +144,7 @@ extension TeamSpaceX on TeamModel {
     for (var data in dataLs) {
       rst.add(SpaceModel(data));
     }
-    setState(TeamStateDone(workspaces: rst, members: members),
+    setState(TeamStateDone(spaces: rst, members: members),
         '刷新SpaceModels[${rst.length}]');
   }
 
@@ -168,7 +168,7 @@ extension TeamMemberX on TeamModel {
     for (var data in dataLs) {
       rst.add(MemberModel(data, this));
     }
-    setState(TeamStateDone(workspaces: workspaces, members: rst),
+    setState(TeamStateDone(spaces: workspaces, members: rst),
         '刷新Members[${rst.length}]');
   }
 

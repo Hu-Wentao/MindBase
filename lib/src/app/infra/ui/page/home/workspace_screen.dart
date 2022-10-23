@@ -181,7 +181,7 @@ class TeamTile extends StatelessWidget {
         style: Theme.of(context).textTheme.titleMedium,
       ),
       subtitle: Text(
-          "成员: ${team.total}  工作空间: ${team.state.isOrNull<TeamStateDone>()?.workspaces.length ?? '--'}"),
+          "成员: ${team.total}  工作空间: ${team.state.isOrNull<TeamStateDone>()?.spaces.length ?? '--'}"),
       trailing: PopupMenuButton<String>(
         itemBuilder: (ctx) => [
           const PopupMenuItem(

@@ -5467,22 +5467,20 @@ mixin _$TeamState {
   TResult when<TResult extends Object?>({
     required TResult Function() init,
     required TResult Function(
-            List<SpaceModel> workspaces, List<MemberModel> members)
+            List<SpaceModel> spaces, List<MemberModel> members)
         done,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? init,
-    TResult? Function(List<SpaceModel> workspaces, List<MemberModel> members)?
-        done,
+    TResult? Function(List<SpaceModel> spaces, List<MemberModel> members)? done,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(List<SpaceModel> workspaces, List<MemberModel> members)?
-        done,
+    TResult Function(List<SpaceModel> spaces, List<MemberModel> members)? done,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -5564,7 +5562,7 @@ class _$TeamStateInit implements TeamStateInit {
   TResult when<TResult extends Object?>({
     required TResult Function() init,
     required TResult Function(
-            List<SpaceModel> workspaces, List<MemberModel> members)
+            List<SpaceModel> spaces, List<MemberModel> members)
         done,
   }) {
     return init();
@@ -5574,8 +5572,7 @@ class _$TeamStateInit implements TeamStateInit {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? init,
-    TResult? Function(List<SpaceModel> workspaces, List<MemberModel> members)?
-        done,
+    TResult? Function(List<SpaceModel> spaces, List<MemberModel> members)? done,
   }) {
     return init?.call();
   }
@@ -5584,8 +5581,7 @@ class _$TeamStateInit implements TeamStateInit {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(List<SpaceModel> workspaces, List<MemberModel> members)?
-        done,
+    TResult Function(List<SpaceModel> spaces, List<MemberModel> members)? done,
     required TResult orElse(),
   }) {
     if (init != null) {
@@ -5636,7 +5632,7 @@ abstract class _$$TeamStateDoneCopyWith<$Res> {
           _$TeamStateDone value, $Res Function(_$TeamStateDone) then) =
       __$$TeamStateDoneCopyWithImpl<$Res>;
   @useResult
-  $Res call({List<SpaceModel> workspaces, List<MemberModel> members});
+  $Res call({List<SpaceModel> spaces, List<MemberModel> members});
 }
 
 /// @nodoc
@@ -5650,13 +5646,13 @@ class __$$TeamStateDoneCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? workspaces = null,
+    Object? spaces = null,
     Object? members = null,
   }) {
     return _then(_$TeamStateDone(
-      workspaces: null == workspaces
-          ? _value.workspaces
-          : workspaces // ignore: cast_nullable_to_non_nullable
+      spaces: null == spaces
+          ? _value.spaces
+          : spaces // ignore: cast_nullable_to_non_nullable
               as List<SpaceModel>,
       members: null == members
           ? _value.members
@@ -5669,16 +5665,16 @@ class __$$TeamStateDoneCopyWithImpl<$Res>
 /// @nodoc
 
 class _$TeamStateDone implements TeamStateDone {
-  const _$TeamStateDone({required this.workspaces, required this.members});
+  const _$TeamStateDone({required this.spaces, required this.members});
 
   @override
-  final List<SpaceModel> workspaces;
+  final List<SpaceModel> spaces;
   @override
   final List<MemberModel> members;
 
   @override
   String toString() {
-    return 'TeamState.done(workspaces: $workspaces, members: $members)';
+    return 'TeamState.done(spaces: $spaces, members: $members)';
   }
 
   @override
@@ -5686,15 +5682,14 @@ class _$TeamStateDone implements TeamStateDone {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$TeamStateDone &&
-            const DeepCollectionEquality()
-                .equals(other.workspaces, workspaces) &&
+            const DeepCollectionEquality().equals(other.spaces, spaces) &&
             const DeepCollectionEquality().equals(other.members, members));
   }
 
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      const DeepCollectionEquality().hash(workspaces),
+      const DeepCollectionEquality().hash(spaces),
       const DeepCollectionEquality().hash(members));
 
   @JsonKey(ignore: true)
@@ -5708,32 +5703,30 @@ class _$TeamStateDone implements TeamStateDone {
   TResult when<TResult extends Object?>({
     required TResult Function() init,
     required TResult Function(
-            List<SpaceModel> workspaces, List<MemberModel> members)
+            List<SpaceModel> spaces, List<MemberModel> members)
         done,
   }) {
-    return done(workspaces, members);
+    return done(spaces, members);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? init,
-    TResult? Function(List<SpaceModel> workspaces, List<MemberModel> members)?
-        done,
+    TResult? Function(List<SpaceModel> spaces, List<MemberModel> members)? done,
   }) {
-    return done?.call(workspaces, members);
+    return done?.call(spaces, members);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(List<SpaceModel> workspaces, List<MemberModel> members)?
-        done,
+    TResult Function(List<SpaceModel> spaces, List<MemberModel> members)? done,
     required TResult orElse(),
   }) {
     if (done != null) {
-      return done(workspaces, members);
+      return done(spaces, members);
     }
     return orElse();
   }
@@ -5772,10 +5765,10 @@ class _$TeamStateDone implements TeamStateDone {
 
 abstract class TeamStateDone implements TeamState {
   const factory TeamStateDone(
-      {required final List<SpaceModel> workspaces,
+      {required final List<SpaceModel> spaces,
       required final List<MemberModel> members}) = _$TeamStateDone;
 
-  List<SpaceModel> get workspaces;
+  List<SpaceModel> get spaces;
   List<MemberModel> get members;
   @JsonKey(ignore: true)
   _$$TeamStateDoneCopyWith<_$TeamStateDone> get copyWith =>
