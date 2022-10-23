@@ -6,9 +6,15 @@ import 'package:mind_base/src/app/infra/ui/page/home/home.dart';
 import 'package:provider/provider.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
 
-part 'router.dart';
-
 part 'splash.g.dart';
+
+@TypedGoRoute<SplashRoute>(path: '/splash')
+class SplashRoute extends GoRouteData {
+  const SplashRoute();
+
+  @override
+  Widget build(BuildContext context) => const SplashPage();
+}
 
 class SplashPage extends StatefulWidget {
   const SplashPage({Key? key}) : super(key: key);
