@@ -1,9 +1,10 @@
-part of 'config.dart';
+part of 'exceptions.dart';
 
 /// 异常适配器
 abstract class ExceptionAdapter {
   static BaseException of(dynamic e, [StackTrace? s]) {
-    log("ExceptionAdapter.of: ${e.runtimeType}# ${e?.toString()} \n${s?.toString()}");
+    slLogger.info(
+        "ExceptionAdapter.of: ${e.runtimeType}# ${e?.toString()} \n${s?.toString()}");
     switch (e.runtimeType) {
       case AppwriteException:
         return _adapterAppwriteException(e);

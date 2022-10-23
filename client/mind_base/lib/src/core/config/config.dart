@@ -12,8 +12,6 @@ export './assets/assets.gen.dart';
 
 part 'const.dart';
 
-part 'exception_adapter.dart';
-
 class MindBaseConfig extends BaseConfig {
   MindBaseConfig({
     required EnvSign sign,
