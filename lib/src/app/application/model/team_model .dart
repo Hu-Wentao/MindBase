@@ -26,7 +26,7 @@ class TeamAct with _$TeamAct {
   const factory TeamAct.inviteMember(String userEmail) = TeamActInviteMember;
 }
 
-@freezed
+@Freezed(makeCollectionsUnmodifiable: false)
 class TeamState with _$TeamState {
   const factory TeamState.init() = TeamStateInit;
 
@@ -36,10 +36,16 @@ class TeamState with _$TeamState {
   }) = TeamStateDone;
 }
 
+@freezed
+class TeamEvt with _$TeamEvt {
+  const factory TeamEvt.spaceCreated(SpaceDto data) = TeamEvtSpaceCreated;
+}
+
 /// Team
 /// todo 实时刷新用户数据
 /// todo #517 没有字段用于存储roles枚举, 如果member过多,可能会导致某些roles不能立即加载
-class TeamModel extends BaseActEntranceModel<TeamAct, TeamState> {
+class TeamModel extends BaseActEntranceModel<TeamAct, TeamState>
+    with EvtEntranceMx<TeamEvt> {
   aw.Team data; // 可变
 
   TeamModel(this.data, {super.state = const TeamState.init()});
@@ -80,6 +86,15 @@ class TeamModel extends BaseActEntranceModel<TeamAct, TeamState> {
         inviteMember: inviteMember,
       );
 
+  @override
+  void onEvent(TeamEvt evt) {
+    super.onEvent(evt);
+    evt.when(spaceCreated: (data) {
+      state.isOrNull<TeamStateDone>()?.workspaces.add(SpaceModel(data));
+      setState(state, '新增space[${data.id}]');
+    });
+  }
+
   initModel() async {
     // todo 订阅 member + space变更
     // 刷新数据
@@ -110,8 +125,7 @@ extension TeamSpaceX on TeamModel {
 
   createSpace(String name) async {
     final data = await _workspaceSrv.createSpaceModelDtoBy(id, name);
-    state.isOrNull<TeamStateDone>()?.workspaces.add(SpaceModel(data));
-    setState(state, '新增space[${data.id}]');
+    evtEntrance(TeamEvt.spaceCreated(data));
   }
 
   updateSpaces() async {

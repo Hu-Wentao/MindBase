@@ -217,9 +217,7 @@ class TeamTile extends StatelessWidget {
                   .thenDialog(context);
               break;
             case "create_space":
-              await team.actCreateSpaceModel('新建空间', onCreated: (w) {
-                SpaceRoute.auto(teamId: team.id, spaceId: w.id).go(context);
-              }).thenDialog(context);
+              await team.actEntrance(const TeamAct.createSpace('New Space'));
               break;
             case "delete":
               await showConfirmDialog(

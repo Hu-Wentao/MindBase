@@ -5675,11 +5675,11 @@ class __$$TeamStateDoneCopyWithImpl<$Res>
   }) {
     return _then(_$TeamStateDone(
       workspaces: null == workspaces
-          ? _value._workspaces
+          ? _value.workspaces
           : workspaces // ignore: cast_nullable_to_non_nullable
               as List<SpaceModel>,
       members: null == members
-          ? _value._members
+          ? _value.members
           : members // ignore: cast_nullable_to_non_nullable
               as List<MemberModel>,
     ));
@@ -5689,25 +5689,12 @@ class __$$TeamStateDoneCopyWithImpl<$Res>
 /// @nodoc
 
 class _$TeamStateDone implements TeamStateDone {
-  const _$TeamStateDone(
-      {required final List<SpaceModel> workspaces,
-      required final List<MemberModel> members})
-      : _workspaces = workspaces,
-        _members = members;
+  const _$TeamStateDone({required this.workspaces, required this.members});
 
-  final List<SpaceModel> _workspaces;
   @override
-  List<SpaceModel> get workspaces {
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_workspaces);
-  }
-
-  final List<MemberModel> _members;
+  final List<SpaceModel> workspaces;
   @override
-  List<MemberModel> get members {
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_members);
-  }
+  final List<MemberModel> members;
 
   @override
   String toString() {
@@ -5720,15 +5707,15 @@ class _$TeamStateDone implements TeamStateDone {
         (other.runtimeType == runtimeType &&
             other is _$TeamStateDone &&
             const DeepCollectionEquality()
-                .equals(other._workspaces, _workspaces) &&
-            const DeepCollectionEquality().equals(other._members, _members));
+                .equals(other.workspaces, workspaces) &&
+            const DeepCollectionEquality().equals(other.members, members));
   }
 
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      const DeepCollectionEquality().hash(_workspaces),
-      const DeepCollectionEquality().hash(_members));
+      const DeepCollectionEquality().hash(workspaces),
+      const DeepCollectionEquality().hash(members));
 
   @JsonKey(ignore: true)
   @override
@@ -5812,5 +5799,223 @@ abstract class TeamStateDone implements TeamState {
   List<MemberModel> get members;
   @JsonKey(ignore: true)
   _$$TeamStateDoneCopyWith<_$TeamStateDone> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+mixin _$TeamEvt {
+  SpaceDto get data => throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(SpaceDto data) spaceCreated,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(SpaceDto data)? spaceCreated,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(SpaceDto data)? spaceCreated,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(TeamEvtSpaceCreated value) spaceCreated,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(TeamEvtSpaceCreated value)? spaceCreated,
+  }) =>
+      throw _privateConstructorUsedError;
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(TeamEvtSpaceCreated value)? spaceCreated,
+    required TResult orElse(),
+  }) =>
+      throw _privateConstructorUsedError;
+
+  @JsonKey(ignore: true)
+  $TeamEvtCopyWith<TeamEvt> get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $TeamEvtCopyWith<$Res> {
+  factory $TeamEvtCopyWith(TeamEvt value, $Res Function(TeamEvt) then) =
+      _$TeamEvtCopyWithImpl<$Res, TeamEvt>;
+  @useResult
+  $Res call({SpaceDto data});
+
+  $SpaceDtoCopyWith<$Res> get data;
+}
+
+/// @nodoc
+class _$TeamEvtCopyWithImpl<$Res, $Val extends TeamEvt>
+    implements $TeamEvtCopyWith<$Res> {
+  _$TeamEvtCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = null,
+  }) {
+    return _then(_value.copyWith(
+      data: null == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as SpaceDto,
+    ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $SpaceDtoCopyWith<$Res> get data {
+    return $SpaceDtoCopyWith<$Res>(_value.data, (value) {
+      return _then(_value.copyWith(data: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$TeamEvtSpaceCreatedCopyWith<$Res>
+    implements $TeamEvtCopyWith<$Res> {
+  factory _$$TeamEvtSpaceCreatedCopyWith(_$TeamEvtSpaceCreated value,
+          $Res Function(_$TeamEvtSpaceCreated) then) =
+      __$$TeamEvtSpaceCreatedCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({SpaceDto data});
+
+  @override
+  $SpaceDtoCopyWith<$Res> get data;
+}
+
+/// @nodoc
+class __$$TeamEvtSpaceCreatedCopyWithImpl<$Res>
+    extends _$TeamEvtCopyWithImpl<$Res, _$TeamEvtSpaceCreated>
+    implements _$$TeamEvtSpaceCreatedCopyWith<$Res> {
+  __$$TeamEvtSpaceCreatedCopyWithImpl(
+      _$TeamEvtSpaceCreated _value, $Res Function(_$TeamEvtSpaceCreated) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = null,
+  }) {
+    return _then(_$TeamEvtSpaceCreated(
+      null == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as SpaceDto,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$TeamEvtSpaceCreated implements TeamEvtSpaceCreated {
+  const _$TeamEvtSpaceCreated(this.data);
+
+  @override
+  final SpaceDto data;
+
+  @override
+  String toString() {
+    return 'TeamEvt.spaceCreated(data: $data)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$TeamEvtSpaceCreated &&
+            (identical(other.data, data) || other.data == data));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, data);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$TeamEvtSpaceCreatedCopyWith<_$TeamEvtSpaceCreated> get copyWith =>
+      __$$TeamEvtSpaceCreatedCopyWithImpl<_$TeamEvtSpaceCreated>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(SpaceDto data) spaceCreated,
+  }) {
+    return spaceCreated(data);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(SpaceDto data)? spaceCreated,
+  }) {
+    return spaceCreated?.call(data);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(SpaceDto data)? spaceCreated,
+    required TResult orElse(),
+  }) {
+    if (spaceCreated != null) {
+      return spaceCreated(data);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(TeamEvtSpaceCreated value) spaceCreated,
+  }) {
+    return spaceCreated(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(TeamEvtSpaceCreated value)? spaceCreated,
+  }) {
+    return spaceCreated?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(TeamEvtSpaceCreated value)? spaceCreated,
+    required TResult orElse(),
+  }) {
+    if (spaceCreated != null) {
+      return spaceCreated(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class TeamEvtSpaceCreated implements TeamEvt {
+  const factory TeamEvtSpaceCreated(final SpaceDto data) =
+      _$TeamEvtSpaceCreated;
+
+  @override
+  SpaceDto get data;
+  @override
+  @JsonKey(ignore: true)
+  _$$TeamEvtSpaceCreatedCopyWith<_$TeamEvtSpaceCreated> get copyWith =>
       throw _privateConstructorUsedError;
 }

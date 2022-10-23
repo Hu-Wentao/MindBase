@@ -365,10 +365,24 @@ class MockTeamModel extends _i1.Mock implements _i3.TeamModel {
         returnValueForMissingStub: false,
       ) as bool);
   @override
+  _i5.Stream<_i3.TeamEvt> get events => (super.noSuchMethod(
+        Invocation.getter(#events),
+        returnValue: _i5.Stream<_i3.TeamEvt>.empty(),
+        returnValueForMissingStub: _i5.Stream<_i3.TeamEvt>.empty(),
+      ) as _i5.Stream<_i3.TeamEvt>);
+  @override
   dynamic onActEntrance(_i3.TeamAct? act) => super.noSuchMethod(
         Invocation.method(
           #onActEntrance,
           [act],
+        ),
+        returnValueForMissingStub: null,
+      );
+  @override
+  void onEvent(_i3.TeamEvt? evt) => super.noSuchMethod(
+        Invocation.method(
+          #onEvent,
+          [evt],
         ),
         returnValueForMissingStub: null,
       );
@@ -468,4 +482,12 @@ class MockTeamModel extends _i1.Mock implements _i3.TeamModel {
         returnValue: _i5.Future<_i4.BaseException?>.value(),
         returnValueForMissingStub: _i5.Future<_i4.BaseException?>.value(),
       ) as _i5.Future<_i4.BaseException?>);
+  @override
+  void evtEntrance(_i3.TeamEvt? evt) => super.noSuchMethod(
+        Invocation.method(
+          #evtEntrance,
+          [evt],
+        ),
+        returnValueForMissingStub: null,
+      );
 }
