@@ -135,7 +135,7 @@ extension TeamSpaceX on TeamModel {
     for (final model in workspaces) {
       final nData = dataLs.removeWhereOrNull((s) => s.id == model.id);
       if (nData == null) continue;
-      rst.add(model..actEntrance(SpaceAct.updateModel(nData)));
+      rst.add(model..updateData(nData));
     }
     for (var data in dataLs) {
       rst.add(SpaceModel(data));

@@ -88,8 +88,11 @@ class _TeamPanelState extends State<TeamPanel> {
                         children: [
                           for (final space in team.workspaces)
                             SpaceModelTile(
-                              team: team,
-                              space: space,
+                              teamId: team.id,
+                              spaceId: space.id,
+                              spaceName: space.name,
+                              onSpaceAct: space.actEntrance,
+                              onTeamAct: team.actEntrance,
                             )
                         ],
                       ),
@@ -100,19 +103,28 @@ class _TeamPanelState extends State<TeamPanel> {
 }
 
 class SpaceModelTile extends StatelessWidget {
-  final TeamModel team;
-  final SpaceModel space;
+  final String teamId;
+  final String spaceId;
+  final String spaceName;
+  final void Function(SpaceAct act) onSpaceAct;
+  final void Function(TeamAct act) onTeamAct;
 
-  const SpaceModelTile({Key? key, required this.space, required this.team})
-      : super(key: key);
+  const SpaceModelTile({
+    Key? key,
+    required this.teamId,
+    required this.spaceId,
+    required this.spaceName,
+    required this.onSpaceAct,
+    required this.onTeamAct,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) => Link(
         uri: Uri.tryParse(
-            SpaceRoute.auto(teamId: team.id, spaceId: space.id).location),
+            SpaceRoute.auto(teamId: teamId, spaceId: spaceId).location),
         builder: (ctx, followLink) => ListTile(
           leading: const Icon(Icons.space_dashboard_rounded),
-          title: Text(space.name),
+          title: Text(spaceName),
           trailing: PopupMenuButton<String>(
             itemBuilder: (ctx) => [
               const PopupMenuItem(
@@ -131,19 +143,17 @@ class SpaceModelTile extends StatelessWidget {
                   final value = await showTextInputDialog(
                     context: context,
                     title: "重命名空间",
-                    origin: space.name,
-                    hint: space.name,
+                    origin: spaceName,
+                    hint: spaceName,
                   );
-                  space.actEntrance(SpaceAct.updateModel(space.data));
+                  if (value == null) return;
+                  onSpaceAct(SpaceAct.updateName(value));
                   break;
                 case "delete":
                   await showConfirmDialog(
-                    context: context,
-                    title: "确认删除空间[${space.name}]吗?",
-                    onConfirm: () => team
-                        .actEntrance(TeamAct.deleteSpace(space.id))
-                        .thenDialog(context),
-                  );
+                      context: context,
+                      title: "确认删除空间[$spaceName]吗?",
+                      onConfirm: () => onTeamAct(TeamAct.deleteSpace(spaceId)));
                   break;
                 default:
                   throw "error 未知的 key[$key]";

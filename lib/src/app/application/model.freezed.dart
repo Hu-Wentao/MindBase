@@ -2787,7 +2787,7 @@ mixin _$SpaceAct {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(SpaceDto data) updateModel,
+    required TResult Function(String name) updateName,
     required TResult Function(CollectionDto data) updateTableDetail,
     required TResult Function(MetaDto data) insertMeta,
     required TResult Function(String metaId) deleteMeta,
@@ -2797,7 +2797,7 @@ mixin _$SpaceAct {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initModel,
-    TResult? Function(SpaceDto data)? updateModel,
+    TResult? Function(String name)? updateName,
     TResult? Function(CollectionDto data)? updateTableDetail,
     TResult? Function(MetaDto data)? insertMeta,
     TResult? Function(String metaId)? deleteMeta,
@@ -2807,7 +2807,7 @@ mixin _$SpaceAct {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(SpaceDto data)? updateModel,
+    TResult Function(String name)? updateName,
     TResult Function(CollectionDto data)? updateTableDetail,
     TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
@@ -2818,7 +2818,7 @@ mixin _$SpaceAct {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(SpaceActInitModel value) initModel,
-    required TResult Function(SpaceActUpdateModel value) updateModel,
+    required TResult Function(SpaceActUpdateName value) updateName,
     required TResult Function(SpaceActUpdateTableDetail value)
         updateTableDetail,
     required TResult Function(SpaceActInsertMeta value) insertMeta,
@@ -2829,7 +2829,7 @@ mixin _$SpaceAct {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(SpaceActInitModel value)? initModel,
-    TResult? Function(SpaceActUpdateModel value)? updateModel,
+    TResult? Function(SpaceActUpdateName value)? updateName,
     TResult? Function(SpaceActUpdateTableDetail value)? updateTableDetail,
     TResult? Function(SpaceActInsertMeta value)? insertMeta,
     TResult? Function(SpaceActDeleteMeta value)? deleteMeta,
@@ -2839,7 +2839,7 @@ mixin _$SpaceAct {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(SpaceActInitModel value)? initModel,
-    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActUpdateName value)? updateName,
     TResult Function(SpaceActUpdateTableDetail value)? updateTableDetail,
     TResult Function(SpaceActInsertMeta value)? insertMeta,
     TResult Function(SpaceActDeleteMeta value)? deleteMeta,
@@ -2905,7 +2905,7 @@ class _$SpaceActInitModel implements SpaceActInitModel {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(SpaceDto data) updateModel,
+    required TResult Function(String name) updateName,
     required TResult Function(CollectionDto data) updateTableDetail,
     required TResult Function(MetaDto data) insertMeta,
     required TResult Function(String metaId) deleteMeta,
@@ -2918,7 +2918,7 @@ class _$SpaceActInitModel implements SpaceActInitModel {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initModel,
-    TResult? Function(SpaceDto data)? updateModel,
+    TResult? Function(String name)? updateName,
     TResult? Function(CollectionDto data)? updateTableDetail,
     TResult? Function(MetaDto data)? insertMeta,
     TResult? Function(String metaId)? deleteMeta,
@@ -2931,7 +2931,7 @@ class _$SpaceActInitModel implements SpaceActInitModel {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(SpaceDto data)? updateModel,
+    TResult Function(String name)? updateName,
     TResult Function(CollectionDto data)? updateTableDetail,
     TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
@@ -2948,7 +2948,7 @@ class _$SpaceActInitModel implements SpaceActInitModel {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(SpaceActInitModel value) initModel,
-    required TResult Function(SpaceActUpdateModel value) updateModel,
+    required TResult Function(SpaceActUpdateName value) updateName,
     required TResult Function(SpaceActUpdateTableDetail value)
         updateTableDetail,
     required TResult Function(SpaceActInsertMeta value) insertMeta,
@@ -2962,7 +2962,7 @@ class _$SpaceActInitModel implements SpaceActInitModel {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(SpaceActInitModel value)? initModel,
-    TResult? Function(SpaceActUpdateModel value)? updateModel,
+    TResult? Function(SpaceActUpdateName value)? updateName,
     TResult? Function(SpaceActUpdateTableDetail value)? updateTableDetail,
     TResult? Function(SpaceActInsertMeta value)? insertMeta,
     TResult? Function(SpaceActDeleteMeta value)? deleteMeta,
@@ -2975,7 +2975,7 @@ class _$SpaceActInitModel implements SpaceActInitModel {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(SpaceActInitModel value)? initModel,
-    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActUpdateName value)? updateName,
     TResult Function(SpaceActUpdateTableDetail value)? updateTableDetail,
     TResult Function(SpaceActInsertMeta value)? insertMeta,
     TResult Function(SpaceActDeleteMeta value)? deleteMeta,
@@ -2994,116 +2994,106 @@ abstract class SpaceActInitModel implements SpaceAct {
 }
 
 /// @nodoc
-abstract class _$$SpaceActUpdateModelCopyWith<$Res> {
-  factory _$$SpaceActUpdateModelCopyWith(_$SpaceActUpdateModel value,
-          $Res Function(_$SpaceActUpdateModel) then) =
-      __$$SpaceActUpdateModelCopyWithImpl<$Res>;
+abstract class _$$SpaceActUpdateNameCopyWith<$Res> {
+  factory _$$SpaceActUpdateNameCopyWith(_$SpaceActUpdateName value,
+          $Res Function(_$SpaceActUpdateName) then) =
+      __$$SpaceActUpdateNameCopyWithImpl<$Res>;
   @useResult
-  $Res call({SpaceDto data});
-
-  $SpaceDtoCopyWith<$Res> get data;
+  $Res call({String name});
 }
 
 /// @nodoc
-class __$$SpaceActUpdateModelCopyWithImpl<$Res>
-    extends _$SpaceActCopyWithImpl<$Res, _$SpaceActUpdateModel>
-    implements _$$SpaceActUpdateModelCopyWith<$Res> {
-  __$$SpaceActUpdateModelCopyWithImpl(
-      _$SpaceActUpdateModel _value, $Res Function(_$SpaceActUpdateModel) _then)
+class __$$SpaceActUpdateNameCopyWithImpl<$Res>
+    extends _$SpaceActCopyWithImpl<$Res, _$SpaceActUpdateName>
+    implements _$$SpaceActUpdateNameCopyWith<$Res> {
+  __$$SpaceActUpdateNameCopyWithImpl(
+      _$SpaceActUpdateName _value, $Res Function(_$SpaceActUpdateName) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? data = null,
+    Object? name = null,
   }) {
-    return _then(_$SpaceActUpdateModel(
-      null == data
-          ? _value.data
-          : data // ignore: cast_nullable_to_non_nullable
-              as SpaceDto,
+    return _then(_$SpaceActUpdateName(
+      null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
-  }
-
-  @override
-  @pragma('vm:prefer-inline')
-  $SpaceDtoCopyWith<$Res> get data {
-    return $SpaceDtoCopyWith<$Res>(_value.data, (value) {
-      return _then(_value.copyWith(data: value));
-    });
   }
 }
 
 /// @nodoc
 
-class _$SpaceActUpdateModel implements SpaceActUpdateModel {
-  const _$SpaceActUpdateModel(this.data);
+class _$SpaceActUpdateName implements SpaceActUpdateName {
+  const _$SpaceActUpdateName(this.name);
 
   @override
-  final SpaceDto data;
+  final String name;
 
   @override
   String toString() {
-    return 'SpaceAct.updateModel(data: $data)';
+    return 'SpaceAct.updateName(name: $name)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SpaceActUpdateModel &&
-            (identical(other.data, data) || other.data == data));
+            other is _$SpaceActUpdateName &&
+            (identical(other.name, name) || other.name == name));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, data);
+  int get hashCode => Object.hash(runtimeType, name);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$SpaceActUpdateModelCopyWith<_$SpaceActUpdateModel> get copyWith =>
-      __$$SpaceActUpdateModelCopyWithImpl<_$SpaceActUpdateModel>(
+  _$$SpaceActUpdateNameCopyWith<_$SpaceActUpdateName> get copyWith =>
+      __$$SpaceActUpdateNameCopyWithImpl<_$SpaceActUpdateName>(
           this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(SpaceDto data) updateModel,
+    required TResult Function(String name) updateName,
     required TResult Function(CollectionDto data) updateTableDetail,
     required TResult Function(MetaDto data) insertMeta,
     required TResult Function(String metaId) deleteMeta,
     required TResult Function(TableDto dto) updateByTable,
   }) {
-    return updateModel(data);
+    return updateName(name);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initModel,
-    TResult? Function(SpaceDto data)? updateModel,
+    TResult? Function(String name)? updateName,
     TResult? Function(CollectionDto data)? updateTableDetail,
     TResult? Function(MetaDto data)? insertMeta,
     TResult? Function(String metaId)? deleteMeta,
     TResult? Function(TableDto dto)? updateByTable,
   }) {
-    return updateModel?.call(data);
+    return updateName?.call(name);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(SpaceDto data)? updateModel,
+    TResult Function(String name)? updateName,
     TResult Function(CollectionDto data)? updateTableDetail,
     TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
     TResult Function(TableDto dto)? updateByTable,
     required TResult orElse(),
   }) {
-    if (updateModel != null) {
-      return updateModel(data);
+    if (updateName != null) {
+      return updateName(name);
     }
     return orElse();
   }
@@ -3112,54 +3102,53 @@ class _$SpaceActUpdateModel implements SpaceActUpdateModel {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(SpaceActInitModel value) initModel,
-    required TResult Function(SpaceActUpdateModel value) updateModel,
+    required TResult Function(SpaceActUpdateName value) updateName,
     required TResult Function(SpaceActUpdateTableDetail value)
         updateTableDetail,
     required TResult Function(SpaceActInsertMeta value) insertMeta,
     required TResult Function(SpaceActDeleteMeta value) deleteMeta,
     required TResult Function(SpaceActUpdateByTable value) updateByTable,
   }) {
-    return updateModel(this);
+    return updateName(this);
   }
 
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(SpaceActInitModel value)? initModel,
-    TResult? Function(SpaceActUpdateModel value)? updateModel,
+    TResult? Function(SpaceActUpdateName value)? updateName,
     TResult? Function(SpaceActUpdateTableDetail value)? updateTableDetail,
     TResult? Function(SpaceActInsertMeta value)? insertMeta,
     TResult? Function(SpaceActDeleteMeta value)? deleteMeta,
     TResult? Function(SpaceActUpdateByTable value)? updateByTable,
   }) {
-    return updateModel?.call(this);
+    return updateName?.call(this);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(SpaceActInitModel value)? initModel,
-    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActUpdateName value)? updateName,
     TResult Function(SpaceActUpdateTableDetail value)? updateTableDetail,
     TResult Function(SpaceActInsertMeta value)? insertMeta,
     TResult Function(SpaceActDeleteMeta value)? deleteMeta,
     TResult Function(SpaceActUpdateByTable value)? updateByTable,
     required TResult orElse(),
   }) {
-    if (updateModel != null) {
-      return updateModel(this);
+    if (updateName != null) {
+      return updateName(this);
     }
     return orElse();
   }
 }
 
-abstract class SpaceActUpdateModel implements SpaceAct {
-  const factory SpaceActUpdateModel(final SpaceDto data) =
-      _$SpaceActUpdateModel;
+abstract class SpaceActUpdateName implements SpaceAct {
+  const factory SpaceActUpdateName(final String name) = _$SpaceActUpdateName;
 
-  SpaceDto get data;
+  String get name;
   @JsonKey(ignore: true)
-  _$$SpaceActUpdateModelCopyWith<_$SpaceActUpdateModel> get copyWith =>
+  _$$SpaceActUpdateNameCopyWith<_$SpaceActUpdateName> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -3230,7 +3219,7 @@ class _$SpaceActUpdateTableDetail implements SpaceActUpdateTableDetail {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(SpaceDto data) updateModel,
+    required TResult Function(String name) updateName,
     required TResult Function(CollectionDto data) updateTableDetail,
     required TResult Function(MetaDto data) insertMeta,
     required TResult Function(String metaId) deleteMeta,
@@ -3243,7 +3232,7 @@ class _$SpaceActUpdateTableDetail implements SpaceActUpdateTableDetail {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initModel,
-    TResult? Function(SpaceDto data)? updateModel,
+    TResult? Function(String name)? updateName,
     TResult? Function(CollectionDto data)? updateTableDetail,
     TResult? Function(MetaDto data)? insertMeta,
     TResult? Function(String metaId)? deleteMeta,
@@ -3256,7 +3245,7 @@ class _$SpaceActUpdateTableDetail implements SpaceActUpdateTableDetail {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(SpaceDto data)? updateModel,
+    TResult Function(String name)? updateName,
     TResult Function(CollectionDto data)? updateTableDetail,
     TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
@@ -3273,7 +3262,7 @@ class _$SpaceActUpdateTableDetail implements SpaceActUpdateTableDetail {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(SpaceActInitModel value) initModel,
-    required TResult Function(SpaceActUpdateModel value) updateModel,
+    required TResult Function(SpaceActUpdateName value) updateName,
     required TResult Function(SpaceActUpdateTableDetail value)
         updateTableDetail,
     required TResult Function(SpaceActInsertMeta value) insertMeta,
@@ -3287,7 +3276,7 @@ class _$SpaceActUpdateTableDetail implements SpaceActUpdateTableDetail {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(SpaceActInitModel value)? initModel,
-    TResult? Function(SpaceActUpdateModel value)? updateModel,
+    TResult? Function(SpaceActUpdateName value)? updateName,
     TResult? Function(SpaceActUpdateTableDetail value)? updateTableDetail,
     TResult? Function(SpaceActInsertMeta value)? insertMeta,
     TResult? Function(SpaceActDeleteMeta value)? deleteMeta,
@@ -3300,7 +3289,7 @@ class _$SpaceActUpdateTableDetail implements SpaceActUpdateTableDetail {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(SpaceActInitModel value)? initModel,
-    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActUpdateName value)? updateName,
     TResult Function(SpaceActUpdateTableDetail value)? updateTableDetail,
     TResult Function(SpaceActInsertMeta value)? insertMeta,
     TResult Function(SpaceActDeleteMeta value)? deleteMeta,
@@ -3390,7 +3379,7 @@ class _$SpaceActInsertMeta implements SpaceActInsertMeta {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(SpaceDto data) updateModel,
+    required TResult Function(String name) updateName,
     required TResult Function(CollectionDto data) updateTableDetail,
     required TResult Function(MetaDto data) insertMeta,
     required TResult Function(String metaId) deleteMeta,
@@ -3403,7 +3392,7 @@ class _$SpaceActInsertMeta implements SpaceActInsertMeta {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initModel,
-    TResult? Function(SpaceDto data)? updateModel,
+    TResult? Function(String name)? updateName,
     TResult? Function(CollectionDto data)? updateTableDetail,
     TResult? Function(MetaDto data)? insertMeta,
     TResult? Function(String metaId)? deleteMeta,
@@ -3416,7 +3405,7 @@ class _$SpaceActInsertMeta implements SpaceActInsertMeta {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(SpaceDto data)? updateModel,
+    TResult Function(String name)? updateName,
     TResult Function(CollectionDto data)? updateTableDetail,
     TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
@@ -3433,7 +3422,7 @@ class _$SpaceActInsertMeta implements SpaceActInsertMeta {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(SpaceActInitModel value) initModel,
-    required TResult Function(SpaceActUpdateModel value) updateModel,
+    required TResult Function(SpaceActUpdateName value) updateName,
     required TResult Function(SpaceActUpdateTableDetail value)
         updateTableDetail,
     required TResult Function(SpaceActInsertMeta value) insertMeta,
@@ -3447,7 +3436,7 @@ class _$SpaceActInsertMeta implements SpaceActInsertMeta {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(SpaceActInitModel value)? initModel,
-    TResult? Function(SpaceActUpdateModel value)? updateModel,
+    TResult? Function(SpaceActUpdateName value)? updateName,
     TResult? Function(SpaceActUpdateTableDetail value)? updateTableDetail,
     TResult? Function(SpaceActInsertMeta value)? insertMeta,
     TResult? Function(SpaceActDeleteMeta value)? deleteMeta,
@@ -3460,7 +3449,7 @@ class _$SpaceActInsertMeta implements SpaceActInsertMeta {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(SpaceActInitModel value)? initModel,
-    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActUpdateName value)? updateName,
     TResult Function(SpaceActUpdateTableDetail value)? updateTableDetail,
     TResult Function(SpaceActInsertMeta value)? insertMeta,
     TResult Function(SpaceActDeleteMeta value)? deleteMeta,
@@ -3549,7 +3538,7 @@ class _$SpaceActDeleteMeta implements SpaceActDeleteMeta {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(SpaceDto data) updateModel,
+    required TResult Function(String name) updateName,
     required TResult Function(CollectionDto data) updateTableDetail,
     required TResult Function(MetaDto data) insertMeta,
     required TResult Function(String metaId) deleteMeta,
@@ -3562,7 +3551,7 @@ class _$SpaceActDeleteMeta implements SpaceActDeleteMeta {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initModel,
-    TResult? Function(SpaceDto data)? updateModel,
+    TResult? Function(String name)? updateName,
     TResult? Function(CollectionDto data)? updateTableDetail,
     TResult? Function(MetaDto data)? insertMeta,
     TResult? Function(String metaId)? deleteMeta,
@@ -3575,7 +3564,7 @@ class _$SpaceActDeleteMeta implements SpaceActDeleteMeta {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(SpaceDto data)? updateModel,
+    TResult Function(String name)? updateName,
     TResult Function(CollectionDto data)? updateTableDetail,
     TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
@@ -3592,7 +3581,7 @@ class _$SpaceActDeleteMeta implements SpaceActDeleteMeta {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(SpaceActInitModel value) initModel,
-    required TResult Function(SpaceActUpdateModel value) updateModel,
+    required TResult Function(SpaceActUpdateName value) updateName,
     required TResult Function(SpaceActUpdateTableDetail value)
         updateTableDetail,
     required TResult Function(SpaceActInsertMeta value) insertMeta,
@@ -3606,7 +3595,7 @@ class _$SpaceActDeleteMeta implements SpaceActDeleteMeta {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(SpaceActInitModel value)? initModel,
-    TResult? Function(SpaceActUpdateModel value)? updateModel,
+    TResult? Function(SpaceActUpdateName value)? updateName,
     TResult? Function(SpaceActUpdateTableDetail value)? updateTableDetail,
     TResult? Function(SpaceActInsertMeta value)? insertMeta,
     TResult? Function(SpaceActDeleteMeta value)? deleteMeta,
@@ -3619,7 +3608,7 @@ class _$SpaceActDeleteMeta implements SpaceActDeleteMeta {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(SpaceActInitModel value)? initModel,
-    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActUpdateName value)? updateName,
     TResult Function(SpaceActUpdateTableDetail value)? updateTableDetail,
     TResult Function(SpaceActInsertMeta value)? insertMeta,
     TResult Function(SpaceActDeleteMeta value)? deleteMeta,
@@ -3708,7 +3697,7 @@ class _$SpaceActUpdateByTable implements SpaceActUpdateByTable {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(SpaceDto data) updateModel,
+    required TResult Function(String name) updateName,
     required TResult Function(CollectionDto data) updateTableDetail,
     required TResult Function(MetaDto data) insertMeta,
     required TResult Function(String metaId) deleteMeta,
@@ -3721,7 +3710,7 @@ class _$SpaceActUpdateByTable implements SpaceActUpdateByTable {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initModel,
-    TResult? Function(SpaceDto data)? updateModel,
+    TResult? Function(String name)? updateName,
     TResult? Function(CollectionDto data)? updateTableDetail,
     TResult? Function(MetaDto data)? insertMeta,
     TResult? Function(String metaId)? deleteMeta,
@@ -3734,7 +3723,7 @@ class _$SpaceActUpdateByTable implements SpaceActUpdateByTable {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(SpaceDto data)? updateModel,
+    TResult Function(String name)? updateName,
     TResult Function(CollectionDto data)? updateTableDetail,
     TResult Function(MetaDto data)? insertMeta,
     TResult Function(String metaId)? deleteMeta,
@@ -3751,7 +3740,7 @@ class _$SpaceActUpdateByTable implements SpaceActUpdateByTable {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(SpaceActInitModel value) initModel,
-    required TResult Function(SpaceActUpdateModel value) updateModel,
+    required TResult Function(SpaceActUpdateName value) updateName,
     required TResult Function(SpaceActUpdateTableDetail value)
         updateTableDetail,
     required TResult Function(SpaceActInsertMeta value) insertMeta,
@@ -3765,7 +3754,7 @@ class _$SpaceActUpdateByTable implements SpaceActUpdateByTable {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(SpaceActInitModel value)? initModel,
-    TResult? Function(SpaceActUpdateModel value)? updateModel,
+    TResult? Function(SpaceActUpdateName value)? updateName,
     TResult? Function(SpaceActUpdateTableDetail value)? updateTableDetail,
     TResult? Function(SpaceActInsertMeta value)? insertMeta,
     TResult? Function(SpaceActDeleteMeta value)? deleteMeta,
@@ -3778,7 +3767,7 @@ class _$SpaceActUpdateByTable implements SpaceActUpdateByTable {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(SpaceActInitModel value)? initModel,
-    TResult Function(SpaceActUpdateModel value)? updateModel,
+    TResult Function(SpaceActUpdateName value)? updateName,
     TResult Function(SpaceActUpdateTableDetail value)? updateTableDetail,
     TResult Function(SpaceActInsertMeta value)? insertMeta,
     TResult Function(SpaceActDeleteMeta value)? deleteMeta,

@@ -5,7 +5,7 @@ class SpaceAct with _$SpaceAct {
   /// 初始化：更新collection/metas,并watch metas变更
   const factory SpaceAct.initModel() = SpaceActInitModel;
 
-  const factory SpaceAct.updateModel(SpaceDto data) = SpaceActUpdateModel;
+  const factory SpaceAct.updateName(String name) = SpaceActUpdateName;
 
   ///
   const factory SpaceAct.updateTableDetail(CollectionDto data) =
@@ -78,11 +78,11 @@ class SpaceModel extends BaseActEntranceModel<SpaceAct, SpaceState> {
   @override
   onActEntrance(SpaceAct act) async => await act.when(
         initModel: initModel,
-        updateModel: updateModel,
         updateTableDetail: updateTableDetail,
         insertMeta: insertMeta,
         deleteMeta: deleteMeta,
         updateByTable: updateByTable,
+        updateName: updateName,
       );
 
   MetaModel _addNewMetaModel(MetaDto data) {
@@ -91,6 +91,11 @@ class SpaceModel extends BaseActEntranceModel<SpaceAct, SpaceState> {
       ..actInitSubscription();
     state.isOrNull<SpaceStateDone>((s) => s.metas.add(m));
     return m;
+  }
+
+  updateData(SpaceDto nData) {
+    data = nData;
+    setState(null, '更新data');
   }
 
   /// ==== deprecated
@@ -214,6 +219,11 @@ extension SpaceModelX on SpaceModel {
     setState(state, '更新data');
   }
 
+  updateName(String name) async {
+    if (data.name == name) return;
+    await _spaceSrv.updateSpaceModelName(data, name);
+  }
+
   @protected
   insertMeta(MetaDto meta) async {
     await _metaDtoRepo.insertDto(meta);
@@ -238,5 +248,6 @@ extension SpaceModelX on SpaceModel {
   // MetaService get _metaService => MetaService.withDI(sl, id)!;
 
   SpaceService get _spaceSrv => sl<SpaceService>();
-  MetaDtoRepo get _metaDtoRepo => MetaDtoRepo.withDI(sl, id );
+
+  MetaDtoRepo get _metaDtoRepo => MetaDtoRepo.withDI(sl, id);
 }

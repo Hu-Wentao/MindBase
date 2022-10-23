@@ -12,7 +12,6 @@ import 'package:mind_base/src/user/inter/dto.dart';
 import 'package:mind_base/src/space/application/service/expr/expr_evaluator.dart';
 import 'package:mind_base/src/space/domain/repo/repo.dart';
 import 'package:mind_base/src/space/domain/value/value.dart';
-import 'package:mind_base/src/space/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/space/infra/ui/widget/data_table_source.dart';
 import 'package:mind_base/src/space/inter/dto/i_dto.dart';
 import 'package:provider_sidecar/provider_sidecar.dart';
@@ -54,7 +53,7 @@ part 'model/space/meta_model.dart';
 
 part 'model/space/record_model.dart';
 
-part 'model/team_model .dart';
+part 'model/team_model.dart';
 
 part 'model/space/collection_model.dart';
 
