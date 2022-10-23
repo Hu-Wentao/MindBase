@@ -1,8 +1,4 @@
-import 'package:appwrite/appwrite.dart' as ap;
-import 'package:get_arch_core/get_arch_core.dart';
-import 'package:mind_base/src/core/infra/dao.dart';
-import 'package:mind_base/src/user/inter/dto.dart';
-
+part of '../service.dart';
 
 Pattern _ptn = RegExp(r'.*\.(create|update|delete)$');
 
@@ -59,19 +55,20 @@ class RealtimeSrv {
 
   RealtimeSrv(this._hub);
 
-  Stream<DataEvt<Team>> watchTeams() =>
-      watchBy(const SubChannel.watchTeams()).map((event) => DataEvt<Team>(
+  Stream<DataEvt<md.Team>> watchTeams() =>
+      watchBy(const SubChannel.watchTeams()).map((event) => DataEvt<md.Team>(
             DataEvtTp.ofEvents(event.events),
-            Team.fromMap(event.payload
+            md.Team.fromMap(event.payload
               // 修复属性值缺失问题
               ..['total'] = 0),
           ));
 
   @protected
-  Stream<RealtimeMessage> watchBy(SubChannel channel) {
+  Stream<aw.RealtimeMessage> watchBy(SubChannel channel) {
     _hub.actAddChannel(channel);
-    return _hub.stream.doOnCancel(() => _hub.actRemoveChannel(channel));
+    return _hub.stream
+        .doOnCancel(() => _hub.actRemoveChannel(channel))
+        // 过滤得到特定channel的Stream
+        .where((event) => event.channels.contains(channel.channel));
   }
 }
-
-typedef RealtimeMessage = ap.RealtimeMessage;
