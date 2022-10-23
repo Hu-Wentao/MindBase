@@ -55,7 +55,7 @@ class TeamModel extends BaseActEntranceModel<TeamAct, TeamState>
 
   String get name => data.name;
 
-  int get createAt => int.parse(data.$createdAt);
+  DateTime get createAt => DateTime.parse(data.$createdAt);
 
   int get total => data.total;
 

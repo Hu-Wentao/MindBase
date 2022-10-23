@@ -62,8 +62,18 @@ class _FakeTeam_3 extends _i1.SmartFake implements _i2.Team {
         );
 }
 
-class _FakeTeamState_4 extends _i1.SmartFake implements _i3.TeamState {
-  _FakeTeamState_4(
+class _FakeDateTime_4 extends _i1.SmartFake implements DateTime {
+  _FakeDateTime_4(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeTeamState_5 extends _i1.SmartFake implements _i3.TeamState {
+  _FakeTeamState_5(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -301,11 +311,17 @@ class MockTeamModel extends _i1.Mock implements _i3.TeamModel {
         returnValueForMissingStub: '',
       ) as String);
   @override
-  int get createAt => (super.noSuchMethod(
+  DateTime get createAt => (super.noSuchMethod(
         Invocation.getter(#createAt),
-        returnValue: 0,
-        returnValueForMissingStub: 0,
-      ) as int);
+        returnValue: _FakeDateTime_4(
+          this,
+          Invocation.getter(#createAt),
+        ),
+        returnValueForMissingStub: _FakeDateTime_4(
+          this,
+          Invocation.getter(#createAt),
+        ),
+      ) as DateTime);
   @override
   int get total => (super.noSuchMethod(
         Invocation.getter(#total),
@@ -327,11 +343,11 @@ class MockTeamModel extends _i1.Mock implements _i3.TeamModel {
   @override
   _i3.TeamState get state => (super.noSuchMethod(
         Invocation.getter(#state),
-        returnValue: _FakeTeamState_4(
+        returnValue: _FakeTeamState_5(
           this,
           Invocation.getter(#state),
         ),
-        returnValueForMissingStub: _FakeTeamState_4(
+        returnValueForMissingStub: _FakeTeamState_5(
           this,
           Invocation.getter(#state),
         ),
