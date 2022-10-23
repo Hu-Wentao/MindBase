@@ -1,7 +1,7 @@
 part of 'home.dart';
 
-class WorkspacesScreen extends StatelessWidget {
-  const WorkspacesScreen({Key? key}) : super(key: key);
+class SpaceModelsScreen extends StatelessWidget {
+  const SpaceModelsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => Consumer<UserModel>(
@@ -29,8 +29,7 @@ class WorkspacesScreen extends StatelessWidget {
               origin: "${mUser.name}'s Team",
             );
             if (name == null) return;
-            await mUser.actEntrance(UserAct.createTeam(name));
-            // .thenDialog(context);
+            mUser.actEntrance(UserAct.createTeam(name)).thenDialog(context);
           },
           icon: const Icon(Icons.add),
           label: const Padding(
@@ -88,9 +87,12 @@ class _TeamPanelState extends State<TeamPanel> {
                       builder: (c, team, _) => Column(
                         children: [
                           for (final space in team.workspaces)
-                            WorkspaceTile(
-                              team: team,
-                              space: space.data,
+                            SpaceModelTile(
+                              teamId: team.id,
+                              spaceId: space.id,
+                              spaceName: space.name,
+                              onSpaceAct: space.actEntrance,
+                              onTeamAct: team.actEntrance,
                             )
                         ],
                       ),
@@ -100,22 +102,29 @@ class _TeamPanelState extends State<TeamPanel> {
       );
 }
 
-class WorkspaceTile extends StatelessWidget {
-  final TeamModel team;
-  final SpaceDto space;
+class SpaceModelTile extends StatelessWidget {
+  final String teamId;
+  final String spaceId;
+  final String spaceName;
+  final void Function(SpaceAct act) onSpaceAct;
+  final void Function(TeamAct act) onTeamAct;
 
-  const WorkspaceTile({Key? key, required this.space, required this.team})
-      : super(key: key);
+  const SpaceModelTile({
+    Key? key,
+    required this.teamId,
+    required this.spaceId,
+    required this.spaceName,
+    required this.onSpaceAct,
+    required this.onTeamAct,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) => Link(
         uri: Uri.tryParse(
-          'un implements space route'
-            // SpaceRoute.auto(teamId: team.id, spaceId: space.id).location
-        ),
+            SpaceRoute.auto(teamId: teamId, spaceId: spaceId).location),
         builder: (ctx, followLink) => ListTile(
           leading: const Icon(Icons.space_dashboard_rounded),
-          title: Text(space.name),
+          title: Text(spaceName),
           trailing: PopupMenuButton<String>(
             itemBuilder: (ctx) => [
               const PopupMenuItem(
@@ -131,24 +140,20 @@ class WorkspaceTile extends StatelessWidget {
             onSelected: (key) async {
               switch (key) {
                 case "rename":
-                  throw UnimplementedError();
-
-                  // await team.actRenameSpaceName(
-                  //   space,
-                  //   await showTextInputDialog(
-                  //     context: context,
-                  //     title: "重命名空间",
-                  //     origin: space.name,
-                  //     hint: space.name,
-                  //   ),
-                  // );
+                  final value = await showTextInputDialog(
+                    context: context,
+                    title: "重命名空间",
+                    origin: spaceName,
+                    hint: spaceName,
+                  );
+                  if (value == null) return;
+                  onSpaceAct(SpaceAct.updateName(value));
                   break;
                 case "delete":
                   await showConfirmDialog(
                       context: context,
-                      title: "确认删除空间[${space.name}]吗?",
-                      onConfirm: () =>
-                          team.actEntrance(TeamAct.deleteSpace(space.id)));
+                      title: "确认删除空间[$spaceName]吗?",
+                      onConfirm: () => onTeamAct(TeamAct.deleteSpace(spaceId)));
                   break;
                 default:
                   throw "error 未知的 key[$key]";
@@ -200,31 +205,29 @@ class TeamTile extends StatelessWidget {
         onSelected: (key) async {
           switch (key) {
             case "rename":
-              final value = (await showTextInputDialog(
+              final newName = await showTextInputDialog(
                 context: context,
                 title: "重命名团队",
                 origin: team.name,
                 hint: team.name,
-              ));
-              if (value == null) return;
-              await team.actEntrance(TeamAct.renameTeam(value));
+              );
+              if (newName == null) return;
+              await team.actEntrance(TeamAct.renameTeam(newName));
               break;
             case "invite":
-              final value = (await showTextInputDialog(
+              final userEmail = await showTextInputDialog(
                 context: context,
                 title: "${team.name} 团队邀请成员",
                 label: "请输入用户邮箱",
                 hint: "被邀请人的注册邮箱",
-              ));
-              if (value == null) return;
-              await team.actEntrance(TeamAct.inviteMember(value));
+              );
+              if (userEmail == null) return;
+              await team
+                  .actEntrance(TeamAct.inviteMember(userEmail))
+                  .thenDialog(context);
               break;
             case "create_space":
-              await team.actEntrance(TeamAct.createSpace('New Space'));
-              // todo 创建成功后自动跳转
-              // await team.actCreateWorkspace('新建空间', onCreated: (w) {
-              //   SpaceRoute.auto(teamId: team.id, spaceId: w.id).go(context);
-              // }).thenDialog(context);
+              await team.actEntrance(const TeamAct.createSpace('New Space'));
               break;
             case "delete":
               await showConfirmDialog(
@@ -232,7 +235,8 @@ class TeamTile extends StatelessWidget {
                 title: "确认删除团队[${team.name}]吗?",
                 onConfirm: () => context
                     .read<UserModel>()
-                    .actEntrance(UserAct.deleteTeam(team.id)),
+                    .actEntrance(UserAct.deleteTeam(team.id))
+                    .thenDialog(context),
               );
               break;
             default:
