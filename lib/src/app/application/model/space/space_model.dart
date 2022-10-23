@@ -90,12 +90,6 @@ class SpaceModel extends BaseActEntranceModel<SpaceAct, SpaceState> {
       // 添加的同时初始化
       ..actInitSubscription();
     state.isOrNull<SpaceStateDone>((s) => s.metas.add(m));
-    // setState(
-    //     state.map(
-    //       init: (_) => _,
-    //       done: (s) => s.copyWith(metas: [...s.metas, m]),
-    //     ),
-    //     '插入MetaModel[${m.id}]');
     return m;
   }
 
@@ -118,69 +112,6 @@ class SpaceModel extends BaseActEntranceModel<SpaceAct, SpaceState> {
 }
 
 extension SpaceModelX on SpaceModel {
-  updateTableDetail(CollectionDto dto) async {
-    // 判断是否有权限更新
-    final tableDetail =
-        await _collectionSrv.updateCollectionNoCheck(metaTableDetail!, dto);
-    // 非响应式, 必须手动更新状态
-    setState(SpaceStateDone(tableDetail, metas), '更新TableDetail');
-  }
-
-  @protected
-  initModel() async {
-    // 暂不允许重复初始化
-    if (state is SpaceStateDone) return;
-
-    // 先watch fixme 没有close
-    _metaAcc.watch().listen(onWatchMetaEvt);
-
-    // 后fetch
-    final metaTableInfo = await _collectionSrv.findCollection(metaCollectionId);
-    final metaDtoLs = await _fetchAllMetas().toList();
-    final metas = metaDtoLs.map((e) => MetaModel(e, this)).toList();
-    setState(
-      SpaceStateDone(metaTableInfo, metas),
-      '初始化Space[$id],metas[${metas.length}]',
-    );
-  }
-
-  updateModel(SpaceDto data) async {
-    this.data = data;
-    setState(state, '更新data');
-  }
-
-  @protected
-  insertMeta(MetaDto meta) async {
-    await _metaService.insertMetaDto(meta);
-    // 通过listen监听刷新
-  }
-
-  @protected
-  deleteMeta(String metaId) async {
-    // 从数据库中删除 Meta记录和Record集合
-    await _metaService.deleteBy(metaId);
-    // 通过listen监听刷新
-  }
-
-  @protected
-  updateByTable(TableDto dto) async {
-    await _workspaceSrv.insertTable(_metaService, dto);
-    // 通过listen监听刷新
-  }
-
-  CollectionService get _collectionSrv => sl<CollectionService>();
-
-  MetaService get _metaService => MetaService.withDI(sl, id)!;
-
-  SpaceService get _workspaceSrv => sl<SpaceService>();
-
-}
-
-@Deprecated('SpaceModelX')
-extension SpaceStateChangeX on SpaceModel {
-  MetaModelEttAccessor get _metaAcc =>
-      MetaModelEttAccessor(sl<cli.Databases>(), data.id);
-
   int __indexByMetaModels(
     String metaId, {
     Function(int index, MetaModel meta)? onFind,
@@ -205,6 +136,8 @@ extension SpaceStateChangeX on SpaceModel {
     }
     return i;
   }
+
+  Stream<MetaDto> _fetchAllMetas() => _spaceSrv.findMetasBy(id);
 
   MetaModel onMetaAdd(MetaDto meta) => _addNewMetaModel(meta);
 
@@ -250,17 +183,59 @@ extension SpaceStateChangeX on SpaceModel {
     notifyListeners();
   }
 
-  Stream<MetaDto> _fetchAllMetas() => _metaAcc.findAll();
-// .listen((e) {
-//   onMetaAdd(e);
-//   notifyListeners();
-// }, onError: (e, s) {
-//   if (e is AppwriteException &&
-//       e.code == 404 &&
-//       e.type == "collection_not_found") {
-//     // 不存在则无需抛出异常
-//     log("debug MetaModel.openBy: [$e], 由推测的`Meta集合`尚未创建导致的,无需抛出异常");
-//   }
-//   throw ExceptionAdapter.of(e, s);
-// });
+  updateTableDetail(CollectionDto dto) async {
+    // 判断是否有权限更新
+    final tableDetail =
+        await _collectionSrv.updateCollectionNoCheck(metaTableDetail!, dto);
+    // 非响应式, 必须手动更新状态
+    setState(SpaceStateDone(tableDetail, metas), '更新TableDetail');
+  }
+
+  @protected
+  initModel() async {
+    // 暂不允许重复初始化
+    if (state is SpaceStateDone) return;
+
+    // 先watch fixme 没有close
+    _spaceSrv.watchMetasBy(id).listen(onWatchMetaEvt);
+
+    // 后fetch
+    final metaTableInfo = await _collectionSrv.findCollection(metaCollectionId);
+    final metaDtoLs = await _fetchAllMetas().toList();
+    final metas = metaDtoLs.map((e) => MetaModel(e, this)).toList();
+    setState(
+      SpaceStateDone(metaTableInfo, metas),
+      '初始化Space[$id],metas[${metas.length}]',
+    );
+  }
+
+  updateModel(SpaceDto data) async {
+    this.data = data;
+    setState(state, '更新data');
+  }
+
+  @protected
+  insertMeta(MetaDto meta) async {
+    await _metaService.insertMetaDto(meta);
+    // 通过listen监听刷新
+  }
+
+  @protected
+  deleteMeta(String metaId) async {
+    // 从数据库中删除 Meta记录和Record集合
+    await _metaService.deleteBy(metaId);
+    // 通过listen监听刷新
+  }
+
+  @protected
+  updateByTable(TableDto dto) async {
+    await _spaceSrv.insertTable(_metaService, dto);
+    // 通过listen监听刷新
+  }
+
+  CollectionService get _collectionSrv => sl<CollectionService>();
+
+  MetaService get _metaService => MetaService.withDI(sl, id)!;
+
+  SpaceService get _spaceSrv => sl<SpaceService>();
 }
