@@ -1,0 +1,33 @@
+server:
+    port: 9668
+#    ssl:
+#     protocol: TLS
+#     enabled-protocols: TLSv1.2
+#     key-store-type: PKCS12
+spring:
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQLDialect
+   ## hibernate: 
+##      ddl-auto: create-drop 
+##此处选择的 create-drop 将会在程序开始时创建表，退出时删除表。请勿在正式环境使用，但此处为示例程序，希望尽量不影响数据库数据，因此选择了此选项
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://gateway01.ap-southeast-1.prod.aws.tidbcloud.com:4000/test?useSSL=false
+    username: wTEpyhVg7pSnwFk.root
+    password: sxXEWXx5oPaSYoch
+    name: test
+    hikari:
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+    time-between-eviction-runs-millis: 18800
+
+springdoc:
+  swagger-ui:
+    path: /openApi-ui
+  packages-to-scan: com.mindbase.controller
+  disable-i18n: true
+  api-docs:
+    enabled: true
