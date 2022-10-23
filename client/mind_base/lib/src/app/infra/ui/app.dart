@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:get_arch_core/get_arch_core_interface.dart';
 import 'package:get_sweet/get_sweet.dart';
 import 'package:go_router/go_router.dart';
@@ -40,6 +41,7 @@ class MindBaseApp extends StatelessWidget {
           title: 'Mind Base',
           localizationsDelegates: const [
             ...GlobalMaterialLocalizations.delegates,
+            FormBuilderLocalizations.delegate,
           ],
           supportedLocales: const [
             Locale('zh', ''),
