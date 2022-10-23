@@ -98,21 +98,13 @@ class SpaceModel extends BaseActEntranceModel<SpaceAct, SpaceState> {
     setState(null, '更新data');
   }
 
-  /// ==== deprecated
-
-  @Deprecated('metaTableInfo')
-  Collection? get metaCollection => metaTableDetail;
-
-  @Deprecated('metas')
   Iterable<MetaModel> allMetas() => metas;
 
   //   /// 开头`>>`用于防止用户自己设置同名变量
   //   /// 用于DTO->Domain转换: 对应Value类型为 [QueryMetaFn] 将`MetaId->Meta查询`注入到ctx中, 以便读取meta,同时解决循环依赖问题
-  @Deprecated("转移位置..")
   static const ctxQueryMetaSign = ">>_ctxQueryMetaSign";
 
   /// 用于表达式求值: 在工作空间内查询Record的实例(参见[AttrType.ref], [AsFuncThis])
-  @Deprecated("转移位置..")
   static const ctxFindRecordFnSign = ">>_ctxFindRecordFnSign";
 }
 
