@@ -1,4 +1,4 @@
-part of 'service.dart';
+part of '../service.dart';
 
 Pattern _ptn = RegExp(r'.*\.(create|update|delete)$');
 

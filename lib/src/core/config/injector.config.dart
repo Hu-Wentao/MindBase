@@ -12,7 +12,7 @@ import 'package:injectable/injectable.dart' as _i2;
 import 'package:logging/logging.dart' as _i7;
 import 'package:slowly/slowly.dart' as _i11;
 
-import '../../app/application/service/service.dart' as _i10;
+import '../../app/application/service.dart' as _i10;
 import '../../space/application/service/service.dart' as _i6;
 import '../../space/application/service/workspace_service.dart' as _i13;
 import '../../space/infra/dao/dao_aw_impl.dart' as _i12;

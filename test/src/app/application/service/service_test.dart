@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mind_base/src/app/application/service/service.dart';
+import 'package:mind_base/src/app/application/service.dart';
 
 main() {
   group("realtime_srv", () {

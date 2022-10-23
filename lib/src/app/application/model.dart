@@ -25,7 +25,7 @@ import 'package:mind_base/src/space/application/service/service.dart';
 
 import 'package:appwrite/appwrite.dart' as cli;
 import 'package:dart_appwrite/dart_appwrite.dart' as srv;
-import 'package:mind_base/src/app/application/service/service.dart';
+import 'package:mind_base/src/app/application/service.dart';
 import 'package:mind_base/src/core/inter/i_dto.dart';
 import 'package:mind_base/src/user/domain/exceptions/exceptions.dart';
 import 'package:mind_base/src/user/domain/value/value.dart';
