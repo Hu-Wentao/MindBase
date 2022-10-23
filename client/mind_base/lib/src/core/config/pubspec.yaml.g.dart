@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'1'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1666509027;
+const int timestamp = 1666509554;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -136,6 +136,12 @@ const Map<String, Object> devDependencies = <String, Object>{
 const Map<String, Object> dependencyOverrides = <String, Object>{
   'provider_sidecar': <String, Object>{
     'path': r'../../../provider_sidecar',
+  },
+  'pluto_grid': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://gitee.com/hu_wt/pluto_grid.git',
+      'ref': r'feat_on_col_moved_evt',
+    },
   },
 };
 
