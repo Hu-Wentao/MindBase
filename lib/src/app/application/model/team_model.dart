@@ -8,7 +8,7 @@ class TeamAct with _$TeamAct {
   // const factory TeamAct.closeModel() = TeamActCloseSpaces;
 
   ///
-  const factory TeamAct.updateTeam(aw.Team team) = TeamActUpdateTeam;
+  const factory TeamAct.updateTeam(Team team) = TeamActUpdateTeam;
 
   const factory TeamAct.renameTeam(String name) = TeamActRenameTeam;
 
@@ -46,7 +46,7 @@ class TeamEvt with _$TeamEvt {
 /// todo #517 没有字段用于存储roles枚举, 如果member过多,可能会导致某些roles不能立即加载
 class TeamModel extends BaseActEntranceModel<TeamAct, TeamState>
     with EvtEntranceMx<TeamEvt> {
-  aw.Team data; // 可变
+  Team data; // 可变
 
   TeamModel(this.data, {super.state = const TeamState.init()});
 
@@ -102,7 +102,7 @@ class TeamModel extends BaseActEntranceModel<TeamAct, TeamState>
     await updateMembers();
   }
 
-  updateTeam(aw.Team team) async {
+  updateTeam(Team team) async {
     data = team;
     setState(state, '更新team[$id]');
   }
@@ -183,8 +183,8 @@ extension TeamDeprecatedX on TeamModel {
 /// ============================================================================
 
 abstract class IMemberModel
-    extends ModelSidecar<aw.Membership, BaseException?> {
-  IMemberModel(aw.Membership data) : super(data, ExceptionAdapter.of);
+    extends ModelSidecar<Member, BaseException?> {
+  IMemberModel(Member data) : super(data, ExceptionAdapter.of);
 }
 
 class MemberModel extends IMemberModel {

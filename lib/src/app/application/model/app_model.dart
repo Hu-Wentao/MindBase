@@ -119,9 +119,9 @@ extension AppAccountX on AppModel {
 
   _logout(String? sessionId) async => await _accountSrv.logout(sessionId);
 
-  Future<aw.Session> _recoverSession() async => await _accountSrv.getSession();
+  Future<Session> _recoverSession() async => await _accountSrv.getSession();
 
-  Future<aw.Session> _anonymousSession() async =>
+  Future<Session> _anonymousSession() async =>
       await _accountSrv.createAnonymousSession();
 
   Future<User> _recoverUser() async {
@@ -160,12 +160,12 @@ extension AppAccountX on AppModel {
   }
 
   // 登录,得到token
-  Future<aw.Session> _onLogin(
+  Future<Session> _onLogin(
     AuthTp authVerify,
     String identityStr,
     Password password,
   ) async {
-    aw.Session nSession;
+    Session nSession;
     switch (authVerify) {
       case AuthTp.email:
         nSession = await _accountSrv.login(

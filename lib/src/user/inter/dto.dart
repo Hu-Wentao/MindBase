@@ -15,3 +15,5 @@ typedef Team = md.Team;
 typedef Member = md.Membership;
 
 typedef MembershipList = md.MembershipList;
+
+typedef Document = md.Document;

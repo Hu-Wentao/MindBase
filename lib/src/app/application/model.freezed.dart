@@ -3796,23 +3796,20 @@ mixin _$SpaceState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() init,
-    required TResult Function(
-            da.Collection metaTableDetail, List<MetaModel> metas)
+    required TResult Function(Collection metaTableDetail, List<MetaModel> metas)
         done,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? init,
-    TResult? Function(da.Collection metaTableDetail, List<MetaModel> metas)?
-        done,
+    TResult? Function(Collection metaTableDetail, List<MetaModel> metas)? done,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(da.Collection metaTableDetail, List<MetaModel> metas)?
-        done,
+    TResult Function(Collection metaTableDetail, List<MetaModel> metas)? done,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -3894,8 +3891,7 @@ class _$SpaceStateInit implements SpaceStateInit {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() init,
-    required TResult Function(
-            da.Collection metaTableDetail, List<MetaModel> metas)
+    required TResult Function(Collection metaTableDetail, List<MetaModel> metas)
         done,
   }) {
     return init();
@@ -3905,8 +3901,7 @@ class _$SpaceStateInit implements SpaceStateInit {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? init,
-    TResult? Function(da.Collection metaTableDetail, List<MetaModel> metas)?
-        done,
+    TResult? Function(Collection metaTableDetail, List<MetaModel> metas)? done,
   }) {
     return init?.call();
   }
@@ -3915,8 +3910,7 @@ class _$SpaceStateInit implements SpaceStateInit {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(da.Collection metaTableDetail, List<MetaModel> metas)?
-        done,
+    TResult Function(Collection metaTableDetail, List<MetaModel> metas)? done,
     required TResult orElse(),
   }) {
     if (init != null) {
@@ -3967,7 +3961,7 @@ abstract class _$$SpaceStateDoneCopyWith<$Res> {
           _$SpaceStateDone value, $Res Function(_$SpaceStateDone) then) =
       __$$SpaceStateDoneCopyWithImpl<$Res>;
   @useResult
-  $Res call({da.Collection metaTableDetail, List<MetaModel> metas});
+  $Res call({Collection metaTableDetail, List<MetaModel> metas});
 }
 
 /// @nodoc
@@ -3988,7 +3982,7 @@ class __$$SpaceStateDoneCopyWithImpl<$Res>
       null == metaTableDetail
           ? _value.metaTableDetail
           : metaTableDetail // ignore: cast_nullable_to_non_nullable
-              as da.Collection,
+              as Collection,
       null == metas
           ? _value.metas
           : metas // ignore: cast_nullable_to_non_nullable
@@ -4003,7 +3997,7 @@ class _$SpaceStateDone implements SpaceStateDone {
   const _$SpaceStateDone(this.metaTableDetail, this.metas);
 
   @override
-  final da.Collection metaTableDetail;
+  final Collection metaTableDetail;
   @override
   final List<MetaModel> metas;
 
@@ -4036,8 +4030,7 @@ class _$SpaceStateDone implements SpaceStateDone {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() init,
-    required TResult Function(
-            da.Collection metaTableDetail, List<MetaModel> metas)
+    required TResult Function(Collection metaTableDetail, List<MetaModel> metas)
         done,
   }) {
     return done(metaTableDetail, metas);
@@ -4047,8 +4040,7 @@ class _$SpaceStateDone implements SpaceStateDone {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? init,
-    TResult? Function(da.Collection metaTableDetail, List<MetaModel> metas)?
-        done,
+    TResult? Function(Collection metaTableDetail, List<MetaModel> metas)? done,
   }) {
     return done?.call(metaTableDetail, metas);
   }
@@ -4057,8 +4049,7 @@ class _$SpaceStateDone implements SpaceStateDone {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? init,
-    TResult Function(da.Collection metaTableDetail, List<MetaModel> metas)?
-        done,
+    TResult Function(Collection metaTableDetail, List<MetaModel> metas)? done,
     required TResult orElse(),
   }) {
     if (done != null) {
@@ -4101,10 +4092,10 @@ class _$SpaceStateDone implements SpaceStateDone {
 
 abstract class SpaceStateDone implements SpaceState {
   const factory SpaceStateDone(
-          final da.Collection metaTableDetail, final List<MetaModel> metas) =
+          final Collection metaTableDetail, final List<MetaModel> metas) =
       _$SpaceStateDone;
 
-  da.Collection get metaTableDetail;
+  Collection get metaTableDetail;
   List<MetaModel> get metas;
   @JsonKey(ignore: true)
   _$$SpaceStateDoneCopyWith<_$SpaceStateDone> get copyWith =>
@@ -4116,7 +4107,7 @@ mixin _$TeamAct {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(aw.Team team) updateTeam,
+    required TResult Function(Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
     required TResult Function(String name) createSpace,
@@ -4128,7 +4119,7 @@ mixin _$TeamAct {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initModel,
-    TResult? Function(aw.Team team)? updateTeam,
+    TResult? Function(Team team)? updateTeam,
     TResult? Function(String name)? renameTeam,
     TResult? Function()? updateSpaces,
     TResult? Function(String name)? createSpace,
@@ -4140,7 +4131,7 @@ mixin _$TeamAct {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(aw.Team team)? updateTeam,
+    TResult Function(Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
     TResult Function(String name)? createSpace,
@@ -4245,7 +4236,7 @@ class _$TeamActInitModel implements TeamActInitModel {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(aw.Team team) updateTeam,
+    required TResult Function(Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
     required TResult Function(String name) createSpace,
@@ -4260,7 +4251,7 @@ class _$TeamActInitModel implements TeamActInitModel {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initModel,
-    TResult? Function(aw.Team team)? updateTeam,
+    TResult? Function(Team team)? updateTeam,
     TResult? Function(String name)? renameTeam,
     TResult? Function()? updateSpaces,
     TResult? Function(String name)? createSpace,
@@ -4275,7 +4266,7 @@ class _$TeamActInitModel implements TeamActInitModel {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(aw.Team team)? updateTeam,
+    TResult Function(Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
     TResult Function(String name)? createSpace,
@@ -4350,7 +4341,7 @@ abstract class _$$TeamActUpdateTeamCopyWith<$Res> {
           _$TeamActUpdateTeam value, $Res Function(_$TeamActUpdateTeam) then) =
       __$$TeamActUpdateTeamCopyWithImpl<$Res>;
   @useResult
-  $Res call({aw.Team team});
+  $Res call({Team team});
 }
 
 /// @nodoc
@@ -4370,7 +4361,7 @@ class __$$TeamActUpdateTeamCopyWithImpl<$Res>
       null == team
           ? _value.team
           : team // ignore: cast_nullable_to_non_nullable
-              as aw.Team,
+              as Team,
     ));
   }
 }
@@ -4381,7 +4372,7 @@ class _$TeamActUpdateTeam implements TeamActUpdateTeam {
   const _$TeamActUpdateTeam(this.team);
 
   @override
-  final aw.Team team;
+  final Team team;
 
   @override
   String toString() {
@@ -4409,7 +4400,7 @@ class _$TeamActUpdateTeam implements TeamActUpdateTeam {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(aw.Team team) updateTeam,
+    required TResult Function(Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
     required TResult Function(String name) createSpace,
@@ -4424,7 +4415,7 @@ class _$TeamActUpdateTeam implements TeamActUpdateTeam {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initModel,
-    TResult? Function(aw.Team team)? updateTeam,
+    TResult? Function(Team team)? updateTeam,
     TResult? Function(String name)? renameTeam,
     TResult? Function()? updateSpaces,
     TResult? Function(String name)? createSpace,
@@ -4439,7 +4430,7 @@ class _$TeamActUpdateTeam implements TeamActUpdateTeam {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(aw.Team team)? updateTeam,
+    TResult Function(Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
     TResult Function(String name)? createSpace,
@@ -4505,9 +4496,9 @@ class _$TeamActUpdateTeam implements TeamActUpdateTeam {
 }
 
 abstract class TeamActUpdateTeam implements TeamAct {
-  const factory TeamActUpdateTeam(final aw.Team team) = _$TeamActUpdateTeam;
+  const factory TeamActUpdateTeam(final Team team) = _$TeamActUpdateTeam;
 
-  aw.Team get team;
+  Team get team;
   @JsonKey(ignore: true)
   _$$TeamActUpdateTeamCopyWith<_$TeamActUpdateTeam> get copyWith =>
       throw _privateConstructorUsedError;
@@ -4578,7 +4569,7 @@ class _$TeamActRenameTeam implements TeamActRenameTeam {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(aw.Team team) updateTeam,
+    required TResult Function(Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
     required TResult Function(String name) createSpace,
@@ -4593,7 +4584,7 @@ class _$TeamActRenameTeam implements TeamActRenameTeam {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initModel,
-    TResult? Function(aw.Team team)? updateTeam,
+    TResult? Function(Team team)? updateTeam,
     TResult? Function(String name)? renameTeam,
     TResult? Function()? updateSpaces,
     TResult? Function(String name)? createSpace,
@@ -4608,7 +4599,7 @@ class _$TeamActRenameTeam implements TeamActRenameTeam {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(aw.Team team)? updateTeam,
+    TResult Function(Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
     TResult Function(String name)? createSpace,
@@ -4721,7 +4712,7 @@ class _$TeamActUpdateSpaces implements TeamActUpdateSpaces {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(aw.Team team) updateTeam,
+    required TResult Function(Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
     required TResult Function(String name) createSpace,
@@ -4736,7 +4727,7 @@ class _$TeamActUpdateSpaces implements TeamActUpdateSpaces {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initModel,
-    TResult? Function(aw.Team team)? updateTeam,
+    TResult? Function(Team team)? updateTeam,
     TResult? Function(String name)? renameTeam,
     TResult? Function()? updateSpaces,
     TResult? Function(String name)? createSpace,
@@ -4751,7 +4742,7 @@ class _$TeamActUpdateSpaces implements TeamActUpdateSpaces {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(aw.Team team)? updateTeam,
+    TResult Function(Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
     TResult Function(String name)? createSpace,
@@ -4886,7 +4877,7 @@ class _$TeamActCreateSpace implements TeamActCreateSpace {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(aw.Team team) updateTeam,
+    required TResult Function(Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
     required TResult Function(String name) createSpace,
@@ -4901,7 +4892,7 @@ class _$TeamActCreateSpace implements TeamActCreateSpace {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initModel,
-    TResult? Function(aw.Team team)? updateTeam,
+    TResult? Function(Team team)? updateTeam,
     TResult? Function(String name)? renameTeam,
     TResult? Function()? updateSpaces,
     TResult? Function(String name)? createSpace,
@@ -4916,7 +4907,7 @@ class _$TeamActCreateSpace implements TeamActCreateSpace {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(aw.Team team)? updateTeam,
+    TResult Function(Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
     TResult Function(String name)? createSpace,
@@ -5056,7 +5047,7 @@ class _$TeamActDeleteSpace implements TeamActDeleteSpace {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(aw.Team team) updateTeam,
+    required TResult Function(Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
     required TResult Function(String name) createSpace,
@@ -5071,7 +5062,7 @@ class _$TeamActDeleteSpace implements TeamActDeleteSpace {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initModel,
-    TResult? Function(aw.Team team)? updateTeam,
+    TResult? Function(Team team)? updateTeam,
     TResult? Function(String name)? renameTeam,
     TResult? Function()? updateSpaces,
     TResult? Function(String name)? createSpace,
@@ -5086,7 +5077,7 @@ class _$TeamActDeleteSpace implements TeamActDeleteSpace {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(aw.Team team)? updateTeam,
+    TResult Function(Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
     TResult Function(String name)? createSpace,
@@ -5199,7 +5190,7 @@ class _$TeamActUpdateMembers implements TeamActUpdateMembers {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(aw.Team team) updateTeam,
+    required TResult Function(Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
     required TResult Function(String name) createSpace,
@@ -5214,7 +5205,7 @@ class _$TeamActUpdateMembers implements TeamActUpdateMembers {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initModel,
-    TResult? Function(aw.Team team)? updateTeam,
+    TResult? Function(Team team)? updateTeam,
     TResult? Function(String name)? renameTeam,
     TResult? Function()? updateSpaces,
     TResult? Function(String name)? createSpace,
@@ -5229,7 +5220,7 @@ class _$TeamActUpdateMembers implements TeamActUpdateMembers {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(aw.Team team)? updateTeam,
+    TResult Function(Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
     TResult Function(String name)? createSpace,
@@ -5365,7 +5356,7 @@ class _$TeamActInviteMember implements TeamActInviteMember {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() initModel,
-    required TResult Function(aw.Team team) updateTeam,
+    required TResult Function(Team team) updateTeam,
     required TResult Function(String name) renameTeam,
     required TResult Function() updateSpaces,
     required TResult Function(String name) createSpace,
@@ -5380,7 +5371,7 @@ class _$TeamActInviteMember implements TeamActInviteMember {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initModel,
-    TResult? Function(aw.Team team)? updateTeam,
+    TResult? Function(Team team)? updateTeam,
     TResult? Function(String name)? renameTeam,
     TResult? Function()? updateSpaces,
     TResult? Function(String name)? createSpace,
@@ -5395,7 +5386,7 @@ class _$TeamActInviteMember implements TeamActInviteMember {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initModel,
-    TResult Function(aw.Team team)? updateTeam,
+    TResult Function(Team team)? updateTeam,
     TResult Function(String name)? renameTeam,
     TResult Function()? updateSpaces,
     TResult Function(String name)? createSpace,

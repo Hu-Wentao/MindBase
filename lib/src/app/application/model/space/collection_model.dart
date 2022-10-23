@@ -5,7 +5,6 @@ part of '../../model.dart';
 /// [data] collectionId, 表的Id
 class DocumentInfoModel extends ModelSidecar<String, BaseException?>
     with StateChangeMx<String, BaseException?> {
-  // final _srvDb = sl<srv.Databases>();
   final _cliDb = sl<cli.Databases>();
 
   DocumentInfoModel(String metaId, this.metaCollectionId)
@@ -13,7 +12,7 @@ class DocumentInfoModel extends ModelSidecar<String, BaseException?>
   final String metaCollectionId;
 
   // 子状态
-  aw.Document? collection;
+  Document? collection;
 
   get documentId => data; // at.id
 
@@ -83,7 +82,7 @@ class CollectionInfoModel extends ModelSidecar<String, BaseException?>
       : super(data, ExceptionAdapter.of);
 
   // 子状态
-  da.Collection? collection;
+  Collection? collection;
 
   get collectionId => data;
 

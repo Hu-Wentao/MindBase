@@ -28,7 +28,7 @@ class UserModel extends BaseActEntranceModel<UserAct, UserState> {
   });
 
   /// 核心状态
-  final aw.Session session;
+  final Session session;
   final User data;
 
   @override
@@ -64,7 +64,7 @@ extension UserTeamX on UserModel {
   @protected
   initModel() async {
     _realtimeSrv.watchTeams().listen((event) async {
-      final nState = UserStateDone(teams.updateDataSet<aw.Team>(
+      final nState = UserStateDone(teams.updateDataSet<Team>(
         event,
         equals: (a, b) => a.id == b.id,
         transform: TeamModel.new,
