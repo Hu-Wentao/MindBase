@@ -49,10 +49,14 @@ class SpaceService {
     return await _spaceEttAcc.findAllByTeam(teamId).toList();
   }
 
+  /// 创建工作空间，
+  /// 1. 在 workspace表，新增一条workspace记录
+  /// 2. 新建 meta_xxx表，用于存储Meta记录
   Future<SpaceDto> createSpaceModelDtoBy(
     String teamId,
     String spaceName,
   ) async {
+    /// 1. 新增space记录
     final dto = SpaceDto(
       id: ObjectIdX.createHex,
       teamId: teamId,
@@ -67,6 +71,8 @@ class SpaceService {
       read: readPermit,
       write: writePermit,
     );
+    /// 2 建 meta表
+    await _metaDtoRepo(dto.id).createMetaCollection(teamId);
     return dto;
   }
 
