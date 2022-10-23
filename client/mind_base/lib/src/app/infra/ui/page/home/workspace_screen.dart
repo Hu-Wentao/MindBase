@@ -5,7 +5,7 @@ class SpaceModelsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Consumer<UserModel>(
-      builder: (c, mUser, _) => MainColumn(
+      builder: (c, mUser, _) => MainColumn.dense(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               /// Header
