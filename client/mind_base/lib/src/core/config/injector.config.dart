@@ -13,10 +13,10 @@ import 'package:logging/logging.dart' as _i7;
 import 'package:slowly/slowly.dart' as _i12;
 
 import '../../app/application/service.dart' as _i11;
-import '../../space/application/service.dart' as _i13;
+import '../../space/application/service.dart' as _i14;
 import '../../space/application/service/service.dart' as _i6;
-import '../../space/application/service/workspace_service.dart' as _i14;
-import '../../space/infra/dao/dao_aw_impl.dart' as _i15;
+import '../../space/application/service/workspace_service.dart' as _i15;
+import '../../space/infra/dao/dao_aw_impl.dart' as _i13;
 import '../../space/infra/dao/realtime_hub.dart' as _i10;
 import '../../user/application/service.dart' as _i5;
 import '../infra/dao.dart' as _i9;
@@ -73,9 +73,10 @@ _i1.GetIt $initGetIt(
       _prod,
     },
   );
-  gh.lazySingleton<_i13.SpaceService>(() => _i13.SpaceService());
-  gh.lazySingleton<_i14.SpaceService>(() => _i14.SpaceService(
-        get<_i15.SpaceModelEttAccessor>(),
+  gh.lazySingleton<_i13.SpaceModelEttAccessor>(() => appClientConfig.wsEttAcc);
+  gh.lazySingleton<_i14.SpaceService>(() => _i14.SpaceService());
+  gh.lazySingleton<_i15.SpaceService>(() => _i15.SpaceService(
+        get<_i13.SpaceModelEttAccessor>(),
         get<_i4.Databases>(),
       ));
   gh.lazySingleton<_i3.Storage>(() => appClientConfig.storage);

@@ -96,7 +96,7 @@ class AppModel extends BaseActEntranceModel<AppAct, AppState>
       final user = await _recoverUser();
       evtEntrance(AppEvt.logged(UserModel(user, session)));
     } catch (e) {
-      evtEntrance(AppEvt.recoverDone('恢复登陆失败 $e'));
+      evtEntrance(AppEvt.recoverDone('请重新登陆 $e'));
       rethrow;
     }
   }

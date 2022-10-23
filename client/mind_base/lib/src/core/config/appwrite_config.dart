@@ -1,6 +1,8 @@
 import 'package:get_arch_core/get_arch_core.dart';
 import 'package:appwrite/appwrite.dart' as cli;
 import 'package:dart_appwrite/dart_appwrite.dart' as srv;
+import 'package:mind_base/src/space/infra/dao/dao_aw_impl.dart';
+import 'package:mind_base/src/space/infra/dao/realtime_hub.dart';
 
 const mainDataBaseId = 'default';
 
@@ -11,6 +13,12 @@ abstract class AppClientConfig {
     ..setEndpoint("http://app.shuttlecloud.cn/v1")
     ..setProject("627f35455d30081f4a5c")
     ..setSelfSigned(status: true); // 可能只适用于dev环境
+  @lazySingleton
+  SpaceModelEttAccessor get wsEttAcc => SpaceModelEttAccessor(
+        sl<cli.Databases>(),
+        "627faa18b854b07aa9a8",
+        sl<RealtimeChannelHub>(),
+      );
 
   // Register User
   @lazySingleton
@@ -24,8 +32,7 @@ abstract class AppClientConfig {
   cli.Teams get teams => cli.Teams(sl<cli.Client>());
 
   @lazySingleton
-  cli.Databases get database =>
-      cli.Databases(sl<cli.Client>());
+  cli.Databases get database => cli.Databases(sl<cli.Client>());
 
   @lazySingleton
   cli.Storage get storage => cli.Storage(sl<cli.Client>());
@@ -52,8 +59,7 @@ abstract class AppServerConfig {
   srv.Teams get teams => srv.Teams(sl<srv.Client>());
 
   @lazySingleton
-  srv.Databases get database =>
-      srv.Databases(sl<srv.Client>());
+  srv.Databases get database => srv.Databases(sl<srv.Client>());
 
   @lazySingleton
   srv.Storage get storage => srv.Storage(sl<srv.Client>());
