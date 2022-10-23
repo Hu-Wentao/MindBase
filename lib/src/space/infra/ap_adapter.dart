@@ -4,6 +4,16 @@ import 'package:mind_base/src/space/inter/dto/i_dto.dart';
 
 /// 适配 0.15.x > 1.0.x
 class ApAdapter {
+  static List<String> anyOneCrudPermit = [
+    Permission.read(Role.any()),
+    Permission.write(Role.any()),
+  ];
+
+  static List<String> teamMemberCrudPermit(String teamId) => [
+        Permission.read(Role.team(teamId)),
+        Permission.write(Role.team(teamId)),
+      ];
+
   static List<String> toPermissions(CollectionDto collection) =>
       toPermitBy(reads: collection.reads, writes: collection.writes);
 

@@ -7,24 +7,11 @@ import 'package:mind_base/src/core/config/appwrite_config.dart';
 import 'package:mind_base/src/core/config/common_config.dart';
 import 'package:mind_base/src/core/inter/i_dao.dart';
 import 'package:mind_base/src/space/domain/value/value.dart';
+import 'package:mind_base/src/space/infra/ap_adapter.dart';
 import 'package:mind_base/src/space/infra/dao/dao_aw_impl.dart';
 import 'package:mind_base/src/space/inter/dto/i_dto.dart';
 
 import '../../../app/application/model.dart';
-
-List<String> anyOneCrudPermit = [
-  Permission.create(Role.any()),
-  Permission.read(Role.any()),
-  Permission.update(Role.any()),
-  Permission.delete(Role.any()),
-];
-
-List<String> teamMemberCrudPermit(String teamId) => [
-      Permission.create(Role.team(teamId)),
-      Permission.read(Role.team(teamId)),
-      Permission.update(Role.team(teamId)),
-      Permission.delete(Role.team(teamId)),
-    ];
 
 // 需要传入指定集合ID, 因此无法注入
 class MetaDtoRepo {
@@ -155,8 +142,9 @@ class MetaDtoRepo {
   /// [teamId] 为空表示"所有人可读写"
   /// 默认权限为 "团队内可读写"
   createMetaCollection(String? teamId) async {
-    final permit =
-        teamId == null ? anyOneCrudPermit : teamMemberCrudPermit(teamId);
+    final permit = teamId == null
+        ? ApAdapter.anyOneCrudPermit
+        : ApAdapter.teamMemberCrudPermit(teamId);
     // 创建集合
     await _serverDb.createCollection(
         // 集合级权限
@@ -258,9 +246,9 @@ class MetaDtoRepo {
         dto..views.removeWhere((element) => element.vId == vId));
   }
 
-  Stream<MetaDto>  findAll() => _metaAcc.findAll();
+  Stream<MetaDto> findAll() => _metaAcc.findAll();
 
-  Stream<AccessorEvt<MetaDto>>  watch() => _metaAcc.watch();
+  Stream<AccessorEvt<MetaDto>> watch() => _metaAcc.watch();
 }
 
 class RecordDtoRepo {
@@ -354,8 +342,9 @@ class RecordDtoRepo {
   /// [meta] 应当是固定内存地址的对象,这样可以确保meta本身是实时更新的
   Future createRecordCollection(String? teamId) async {
     // 权限
-    final permit =
-        teamId == null ? anyOneCrudPermit : teamMemberCrudPermit(teamId);
+    final permit = teamId == null
+        ? ApAdapter.anyOneCrudPermit
+        : ApAdapter.teamMemberCrudPermit(teamId);
     // 创建集合
     await _serverDb.createCollection(
       databaseId: mainDataBaseId,
