@@ -26,7 +26,7 @@ class TeamAct with _$TeamAct {
   const factory TeamAct.inviteMember(String userEmail) = TeamActInviteMember;
 }
 
-@freezed
+@Freezed(makeCollectionsUnmodifiable: false)
 class TeamState with _$TeamState {
   const factory TeamState.init() = TeamStateInit;
 
@@ -36,10 +36,16 @@ class TeamState with _$TeamState {
   }) = TeamStateDone;
 }
 
+@freezed
+class TeamEvt with _$TeamEvt {
+  const factory TeamEvt.spaceCreated(SpaceDto data) = TeamEvtSpaceCreated;
+}
+
 /// Team
 /// todo 实时刷新用户数据
-/// todo 没有字段用于存储roles枚举, 如果member过多,可能会导致某些roles不能立即加载
-class TeamModel extends BaseActEntranceModel<TeamAct, TeamState> {
+/// todo #517 没有字段用于存储roles枚举, 如果member过多,可能会导致某些roles不能立即加载
+class TeamModel extends BaseActEntranceModel<TeamAct, TeamState>
+    with EvtEntranceMx<TeamEvt> {
   Team data; // 可变
 
   TeamModel(this.data, {super.state = const TeamState.init()});
@@ -49,21 +55,21 @@ class TeamModel extends BaseActEntranceModel<TeamAct, TeamState> {
 
   String get name => data.name;
 
-  int get createAt => int.parse(data.$createdAt);
+  DateTime get createAt => DateTime.parse(data.$createdAt);
 
   int get total => data.total;
 
   /// 子状态Model
   @protected
   List<SpaceModel> get workspaces =>
-      state.isOrNull<TeamStateDone>()?.spaces ?? [];
+      state.isOrNull<TeamStateDone>()?.spaces ?? const [];
 
   @protected
   List<MemberModel> get members =>
-      state.isOrNull<TeamStateDone>()?.members ?? [];
+      state.isOrNull<TeamStateDone>()?.members ?? const [];
 
   MemberModel? get teamOwner =>
-      members.firstWhereOrNull((mbr) => mbr.roles.contains(Role.owner.value));
+      members.firstWhereOrNull((mbr) => mbr.roles.contains(RoleX.owner(id)));
 
   SpaceModel? findSpace(spaceId) =>
       workspaces.firstWhereOrNull((s) => s.id == spaceId);
@@ -79,6 +85,15 @@ class TeamModel extends BaseActEntranceModel<TeamAct, TeamState> {
         updateMembers: updateMembers,
         inviteMember: inviteMember,
       );
+
+  @override
+  void onEvent(TeamEvt evt) {
+    super.onEvent(evt);
+    evt.when(spaceCreated: (data) {
+      state.isOrNull<TeamStateDone>()?.spaces.add(SpaceModel(data));
+      setState(state, '新增space[${data.id}]');
+    });
+  }
 
   initModel() async {
     // todo 订阅 member + space变更
@@ -105,31 +120,32 @@ extension TeamModelX on TeamModel {
 extension TeamSpaceX on TeamModel {
   deleteSpace(String spaceId) async {
     await _workspaceSrv.deleteSpace(spaceId);
+    // setState(state, "删除工作空间[$spaceId]完成");
+    // fixme 删除未在UI生效，似乎也没有收到realtime事件
+    // 先手动删除
+    this.workspaces.removeWhereOrNull((s) => s.id == spaceId);
     setState(state, "删除工作空间[$spaceId]完成");
   }
 
   createSpace(String name) async {
-    throw UnimplementedError();
-    // final data = await _workspaceSrv.createSpaceDtoBy(id, name);
-    // state.isOrNull<TeamStateDone>()?.spaces.add(SpaceModel(data));
-    // setState(state, '新增space[${data.id}]');
+    final data = await _workspaceSrv.createSpaceModelDtoBy(id, name);
+    evtEntrance(TeamEvt.spaceCreated(data));
   }
 
   updateSpaces() async {
-    throw UnimplementedError();
-    // final dataLs = await _workspaceSrv.querySpaceDto(id);
-    // final rst = <SpaceModel>[];
-    // // 以新spaceLs为基础，复用老Model
-    // for (final model in workspaces) {
-    //   final nData = dataLs.removeWhereOrNull((s) => s.id == model.id);
-    //   if (nData == null) continue;
-    //   rst.add(model..updateData(nData));
-    // }
-    // for (var data in dataLs) {
-    //   rst.add(SpaceModel(state: data));
-    // }
-    // setState(TeamStateDone(spaces: rst, members: members),
-    //     '刷新Workspaces[${rst.length}]');
+    final dataLs = await _workspaceSrv.querySpaceModelDto(id);
+    final rst = <SpaceModel>[];
+    // 以新spaceLs为基础，复用老Model
+    for (final model in workspaces) {
+      final nData = dataLs.removeWhereOrNull((s) => s.id == model.id);
+      if (nData == null) continue;
+      rst.add(model..updateData(nData));
+    }
+    for (var data in dataLs) {
+      rst.add(SpaceModel(data));
+    }
+    setState(TeamStateDone(spaces: rst, members: members),
+        '刷新SpaceModels[${rst.length}]');
   }
 
   SpaceService get _workspaceSrv => sl<SpaceService>();
@@ -150,7 +166,7 @@ extension TeamMemberX on TeamModel {
       rst.add(model..updateData(nData));
     }
     for (var data in dataLs) {
-      rst.add(MemberModel(data));
+      rst.add(MemberModel(data, this));
     }
     setState(TeamStateDone(spaces: workspaces, members: rst),
         '刷新Members[${rst.length}]');
@@ -159,12 +175,41 @@ extension TeamMemberX on TeamModel {
   TeamService get _tmSrv => sl<TeamService>();
 }
 
-class MemberModel extends Sidecar<Member, BaseException?> {
-  MemberModel(Member m) : super(state: m);
+extension TeamDeprecatedX on TeamModel {
+  @Deprecated('createSpace')
+  Future<BaseException?> actCreateSpaceModel(
+    String spaceName, {
+    Function(SpaceDto w)? onCreated,
+  }) =>
+      actEntrance(TeamAct.createSpace(spaceName));
+}
 
-  String get id => state.$id;
+/// ============================================================================
 
-  List get roles => state.roles;
+abstract class IMemberModel extends ModelSidecar<Member, BaseException?> {
+  IMemberModel(Member data) : super(data, ExceptionAdapter.of);
+}
 
-  updateData(Member data) => state = data;
+class MemberModel extends IMemberModel {
+  MemberModel(super.data, this.at);
+
+  String get id => data.$id;
+
+  String get userId => data.userId;
+
+  String get userName => data.userName;
+
+  // String get teamId => data.teamId;
+  String get name => data.teamName;
+
+  String get email => data.userEmail;
+
+  String get invited => data.invited; // ts
+  String get joined => data.joined; // ts
+  bool get confirm => data.confirm;
+
+  List get roles => data.roles;
+
+  // 上层状态
+  final TeamModel at;
 }

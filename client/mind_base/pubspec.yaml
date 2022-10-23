@@ -20,7 +20,7 @@ dependencies:
   provider_sidecar:
     git:
       url: https://github.com/Hu-Wentao/provider_sidecar
-      ref: v1.3
+      ref: v1.4
   slowly:
     git:
       url: https://github.com/GetArch/slowly.git
@@ -42,6 +42,10 @@ dependencies:
   ndialog:
   url_launcher:
   logging:
+  flutter_form_builder: "7.1.1"
+  form_builder_extra_fields:
+  form_builder_validators: "7.9.0"
+  mockito:
 
 dev_dependencies:
   flutter_test:
@@ -64,3 +68,7 @@ flutter_gen:
   output: lib/src/core/config/assets/
   integrations:
     flutter_svg: true
+
+dependency_overrides:
+  provider_sidecar:
+    path: ../../../provider_sidecar
