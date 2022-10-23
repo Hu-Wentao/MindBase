@@ -9,14 +9,21 @@ import 'package:appwrite/appwrite.dart' as _i3;
 import 'package:dart_appwrite/dart_appwrite.dart' as _i4;
 import 'package:get_it/get_it.dart' as _i1;
 import 'package:injectable/injectable.dart' as _i2;
-import 'package:slowly/slowly.dart' as _i8;
+import 'package:logging/logging.dart' as _i7;
+import 'package:slowly/slowly.dart' as _i12;
 
-import '../../app/application/service/service.dart' as _i7;
-import '../../space/application/service.dart' as _i9;
+import '../../app/application/service.dart' as _i11;
+import '../../space/application/service.dart' as _i13;
+import '../../space/application/service/service.dart' as _i6;
+import '../../space/application/service/workspace_service.dart' as _i14;
+import '../../space/infra/dao/dao_aw_impl.dart' as _i15;
+import '../../space/infra/dao/realtime_hub.dart' as _i10;
 import '../../user/application/service.dart' as _i5;
-import '../infra/dao.dart' as _i6;
-import 'appwrite_config.dart' as _i10;
-import 'slowly_config.dart' as _i11;
+import '../infra/dao.dart' as _i9;
+import 'appwrite_config.dart' as _i16;
+import 'common_config.dart' as _i17;
+import 'config.dart' as _i8;
+import 'slowly_config.dart' as _i18;
 
 const String _dev = 'dev';
 const String _test = 'test';
@@ -36,6 +43,7 @@ _i1.GetIt $initGetIt(
   );
   final appClientConfig = _$AppClientConfig();
   final appServerConfig = _$AppServerConfig();
+  final configCommon = _$ConfigCommon();
   final slowlyConfig = _$SlowlyConfig();
   gh.lazySingleton<_i3.Account>(() => appClientConfig.account);
   gh.lazySingleton<_i4.Account>(() => appServerConfig.account);
@@ -45,14 +53,19 @@ _i1.GetIt $initGetIt(
   gh.lazySingleton<_i4.Avatars>(() => appServerConfig.avatars);
   gh.lazySingleton<_i3.Client>(() => appClientConfig.client);
   gh.lazySingleton<_i4.Client>(() => appServerConfig.client);
+  gh.lazySingleton<_i6.CollectionService>(() => _i6.CollectionService());
   gh.lazySingleton<_i3.Databases>(() => appClientConfig.database);
   gh.lazySingleton<_i4.Databases>(() => appServerConfig.database);
+  gh.lazySingleton<_i7.Logger>(
+      () => configCommon.logger(get<_i8.MindBaseConfig>()));
   gh.lazySingleton<_i3.Realtime>(() => appClientConfig.realtime);
-  gh.lazySingleton<_i6.RealtimeChannelHub>(
-      () => _i6.RealtimeChannelHub(get<_i3.Realtime>()));
-  gh.lazySingleton<_i7.RealtimeSrv>(
-      () => _i7.RealtimeSrv(get<_i6.RealtimeChannelHub>()));
-  gh.lazySingleton<_i8.Slowly<dynamic>>(
+  gh.lazySingleton<_i9.RealtimeChannelHub>(
+      () => _i9.RealtimeChannelHub(get<_i3.Realtime>()));
+  gh.lazySingleton<_i10.RealtimeChannelHub>(
+      () => _i10.RealtimeChannelHub(get<_i3.Realtime>()));
+  gh.lazySingleton<_i11.RealtimeSrv>(
+      () => _i11.RealtimeSrv(get<_i10.RealtimeChannelHub>()));
+  gh.lazySingleton<_i12.Slowly<dynamic>>(
     () => slowlyConfig.slowly,
     registerFor: {
       _dev,
@@ -60,7 +73,11 @@ _i1.GetIt $initGetIt(
       _prod,
     },
   );
-  gh.lazySingleton<_i9.SpaceService>(() => _i9.SpaceService());
+  gh.lazySingleton<_i13.SpaceService>(() => _i13.SpaceService());
+  gh.lazySingleton<_i14.SpaceService>(() => _i14.SpaceService(
+        get<_i15.SpaceModelEttAccessor>(),
+        get<_i4.Databases>(),
+      ));
   gh.lazySingleton<_i3.Storage>(() => appClientConfig.storage);
   gh.lazySingleton<_i4.Storage>(() => appServerConfig.storage);
   gh.lazySingleton<_i3.Teams>(() => appClientConfig.teams);
@@ -72,8 +89,10 @@ _i1.GetIt $initGetIt(
   return get;
 }
 
-class _$AppClientConfig extends _i10.AppClientConfig {}
+class _$AppClientConfig extends _i16.AppClientConfig {}
 
-class _$AppServerConfig extends _i10.AppServerConfig {}
+class _$AppServerConfig extends _i16.AppServerConfig {}
 
-class _$SlowlyConfig extends _i11.SlowlyConfig {}
+class _$ConfigCommon extends _i17.ConfigCommon {}
+
+class _$SlowlyConfig extends _i18.SlowlyConfig {}

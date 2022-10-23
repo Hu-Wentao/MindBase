@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'1'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1666446373;
+const int timestamp = 1666509027;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -103,7 +103,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'provider_sidecar': <String, Object>{
     'git': <String, Object>{
       'url': r'https://github.com/Hu-Wentao/provider_sidecar',
-      'ref': r'v1.3',
+      'ref': r'v1.4',
     },
   },
   'slowly': <String, Object>{
@@ -120,6 +120,8 @@ const Map<String, Object> dependencies = <String, Object>{
   },
   'appwrite': r'8.1.0',
   'dart_appwrite': r'^7.1.0',
+  'flutter_form_builder': r'7.1.1',
+  'form_builder_validators': r'7.9.0',
 };
 
 /// Developer dependencies
@@ -131,7 +133,11 @@ const Map<String, Object> devDependencies = <String, Object>{
 };
 
 /// Dependency overrides
-const Map<String, Object> dependencyOverrides = <String, Object>{};
+const Map<String, Object> dependencyOverrides = <String, Object>{
+  'provider_sidecar': <String, Object>{
+    'path': r'../../../provider_sidecar',
+  },
+};
 
 /// Executables
 const Map<String, Object> executables = <String, Object>{};

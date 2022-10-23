@@ -627,6 +627,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.7.0"
+  json_editor:
+    dependency: "direct main"
+    description:
+      name: json_editor
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.0.8"
   json_serializable:
     dependency: "direct dev"
     description:
@@ -648,6 +655,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.0.1"
+  logger:
+    dependency: transitive
+    description:
+      name: logger
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.1.0"
   logging:
     dependency: "direct main"
     description:
@@ -858,6 +872,15 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.1.3"
+  pluto_grid:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: feat_on_col_moved_evt
+      resolved-ref: "510a14fe8fe4b327288b77c3d179b569a0f4619e"
+      url: "https://gitee.com/hu_wt/pluto_grid.git"
+    source: git
+    version: "5.0.3"
   pool:
     dependency: transitive
     description:

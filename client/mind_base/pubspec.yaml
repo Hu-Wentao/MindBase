@@ -48,6 +48,8 @@ dependencies:
   mockito:
   json_annotation:
   quiver:
+  json_editor:
+  pluto_grid:
 
 dev_dependencies:
   flutter_test:
@@ -75,3 +77,7 @@ flutter_gen:
 dependency_overrides:
   provider_sidecar:
     path: ../../../provider_sidecar
+  pluto_grid:
+    git:
+      url: https://gitee.com/hu_wt/pluto_grid.git
+      ref: feat_on_col_moved_evt
