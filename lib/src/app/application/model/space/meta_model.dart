@@ -265,7 +265,7 @@ class MetaModel extends IMetaModel with MetaStateChangeMx {
 }
 
 extension MetaModelX on MetaModel {
-  MetaService get _metaService => MetaService.withDI(sl, at.id)!;
+  MetaDtoRepo get _metaDtoRepo => MetaDtoRepo.withDI(sl, at.id);
 
   RecordDtoRepo get _recordDtoRepo => RecordDtoRepo.withDI(sl, this);
 
@@ -275,7 +275,7 @@ extension MetaModelX on MetaModel {
   ) async =>
       await actWrapper(() => setState(null, "保存元素 [$dto]", before: () async {
             if (dto == null) return null;
-            await _metaService.updateWithRecordCollection(data, dto);
+            await _metaDtoRepo.updateWithRecordCollection(data, dto);
           }));
 
   Future<BaseException?> actUpdateMetaName(String? nName) async {
@@ -291,12 +291,12 @@ extension MetaModelX on MetaModel {
   ) async =>
       await actWrapper(() => setState(null, "更新属性 [$dto]", before: () async {
             if (dto == null) return null;
-            await _metaService.updateAttribute(data, dto);
+            await _metaDtoRepo.updateAttribute(data, dto);
           }));
 
   /// View
   Future<BaseException?> actNewTableView(ViewType type) async =>
-      await actWrapper(() async => await _metaService.updateTableView(
+      await actWrapper(() async => await _metaDtoRepo.updateTableView(
             data,
             TableView.builder(
                 name: "未命名[${type.name}]视图",
@@ -308,7 +308,7 @@ extension MetaModelX on MetaModel {
 
   Future<BaseException?> actUpdateView(TableView v) async =>
       await actWrapper(() async {
-        await _metaService.updateTableView(data, v);
+        await _metaDtoRepo.updateTableView(data, v);
       });
 
   Future<BaseException?> actUpdateViewName(
@@ -320,7 +320,7 @@ extension MetaModelX on MetaModel {
 
   Future<BaseException?> actDeleteView(int vId) async =>
       await actWrapper(() async {
-        await _metaService.deleteTableView(data, vId);
+        await _metaDtoRepo.deleteTableView(data, vId);
       });
 
   /// Record

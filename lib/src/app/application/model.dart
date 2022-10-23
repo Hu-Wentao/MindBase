@@ -10,7 +10,6 @@ import 'package:mind_base/src/core/inter/i_dao.dart';
 import 'package:mind_base/src/user/application/service.dart';
 import 'package:mind_base/src/user/inter/dto.dart';
 import 'package:mind_base/src/space/application/service/expr/expr_evaluator.dart';
-import 'package:mind_base/src/space/application/service/meta_service.dart';
 import 'package:mind_base/src/space/domain/repo/repo.dart';
 import 'package:mind_base/src/space/domain/value/value.dart';
 import 'package:mind_base/src/space/infra/dao/dao_aw_impl.dart';

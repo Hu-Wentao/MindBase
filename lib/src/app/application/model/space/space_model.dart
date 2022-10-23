@@ -216,26 +216,27 @@ extension SpaceModelX on SpaceModel {
 
   @protected
   insertMeta(MetaDto meta) async {
-    await _metaService.insertMetaDto(meta);
+    await _metaDtoRepo.insertDto(meta);
     // 通过listen监听刷新
   }
 
   @protected
   deleteMeta(String metaId) async {
     // 从数据库中删除 Meta记录和Record集合
-    await _metaService.deleteBy(metaId);
+    await _spaceSrv.deleteMeta(metaId);
     // 通过listen监听刷新
   }
 
   @protected
   updateByTable(TableDto dto) async {
-    await _spaceSrv.insertTable(_metaService, dto);
+    await _spaceSrv.insertTable(dto);
     // 通过listen监听刷新
   }
 
   CollectionService get _collectionSrv => sl<CollectionService>();
 
-  MetaService get _metaService => MetaService.withDI(sl, id)!;
+  // MetaService get _metaService => MetaService.withDI(sl, id)!;
 
   SpaceService get _spaceSrv => sl<SpaceService>();
+  MetaDtoRepo get _metaDtoRepo => MetaDtoRepo.withDI(sl, id );
 }
