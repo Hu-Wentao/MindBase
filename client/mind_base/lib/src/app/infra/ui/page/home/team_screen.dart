@@ -23,66 +23,75 @@ class _TeamScreenState extends State<TeamScreen> {
             child: const Text('请先登录')),
       );
 
-  Widget _buildTeamPanel(BuildContext c) => Column(
-        children: [
-          _buildTitleBar(c),
-          Consumer<UserModel>(
-              builder: (c, model, _) => Expanded(
-                    child: SingleChildScrollView(
-                      controller: ScrollController(),
-                      child: ExpansionPanelList(
-                        expansionCallback: _switchExpanded,
-                        children: List.generate(model.teams.length, (index) {
-                          final team = model.teams[index];
-                          return ExpansionPanel(
-                            canTapOnHeader: true,
-                            isExpanded: _panelExpanded[index] ??= false,
-                            headerBuilder:
-                                (BuildContext context, bool isExpanded) =>
-                                    _buildTeamTile(context, isExpanded, team),
-                            body: ListView.separated(
-                              itemCount: team.workspaces.length,
-                              itemBuilder: (BuildContext context, int i) {
-                                final space = team.workspaces[i];
-                                return Link(
-                                  uri: Uri.tryParse('/workspace/${space.id}'),
-                                  builder: (ctx, followLink) => ListTile(
-                                    leading: const Icon(
-                                        Icons.space_dashboard_rounded),
-                                    title: Text(space.name),
-                                    onTap: followLink,
-                                  ),
-                                );
-                              },
-                              separatorBuilder: (context, int index) =>
-                                  const Divider(),
-                              shrinkWrap: true,
-                              // physics: const Neve
-                              // physics: const NeverScrollableScrollPhysics(),
-                            ),
-                          );
-                        }),
-                        animationDuration: const Duration(microseconds: 50),
-                      ),
-                    ),
-                  )),
-        ],
-      );
+  Widget _buildTeamPanel(BuildContext c) => Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Column(
+          children: [
+            _buildTitleBar(c),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Consumer<UserModel>(
+                  builder: (c, model, _) => Expanded(
+                        child: SingleChildScrollView(
+                          controller: ScrollController(),
+                          child: ExpansionPanelList(
+                            expansionCallback: _switchExpanded,
+                            children: List.generate(model.teams.length, (index) {
+                              final team = model.teams[index];
+                              return ExpansionPanel(
+                                canTapOnHeader: true,
+                                isExpanded: _panelExpanded[index] ??= false,
+                                headerBuilder:
+                                    (BuildContext context, bool isExpanded) =>
+                                        _buildTeamTile(context, isExpanded, team),
+                                body: ListView.separated(
+                                  itemCount: team.workspaces.length,
+                                  itemBuilder: (BuildContext context, int i) {
+                                    final space = team.workspaces[i];
+                                    return Link(
+                                      uri: Uri.tryParse('/workspace/${space.id}'),
+                                      builder: (ctx, followLink) => ListTile(
+                                        leading: const Icon(
+                                            Icons.space_dashboard_rounded),
+                                        title: Text(space.name),
+                                        onTap: followLink,
+                                      ),
+                                    );
+                                  },
+                                  separatorBuilder: (context, int index) =>
+                                      const Divider(),
+                                  shrinkWrap: true,
+                                  // physics: const Neve
+                                  // physics: const NeverScrollableScrollPhysics(),
+                                ),
+                              );
+                            }),
+                            animationDuration: const Duration(microseconds: 50),
+                          ),
+                        ),
+                      )),
+            ),
+          ],
+        ),
+  );
 
-  _buildTitleBar(c) => Row(
-        children: [
-          OutlinedButton(
-              onPressed: () {
-                setState(() {
-                  _expandedAll = !_expandedAll;
-                  _panelExpanded.forEach((k, v) {
-                    _panelExpanded[k] = _expandedAll;
+  _buildTitleBar(c) => Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Row(
+          children: [
+            OutlinedButton(
+                onPressed: () {
+                  setState(() {
+                    _expandedAll = !_expandedAll;
+                    _panelExpanded.forEach((k, v) {
+                      _panelExpanded[k] = _expandedAll;
+                    });
                   });
-                });
-              },
-              child: const Text("展开/收缩"))
-        ],
-      );
+                },
+                child: const Text("展开/收缩"))
+          ],
+        ),
+  );
 
   void _switchExpanded(int panelIndex, bool isExpanded) => setState(() {
         _panelExpanded[panelIndex] = !isExpanded;
