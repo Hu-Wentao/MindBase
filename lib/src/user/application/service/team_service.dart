@@ -14,10 +14,6 @@ class TeamService {
   Future<Team> updateNameBy(String teamId, String name) async =>
       await _teams.update(teamId: teamId, name: name);
 
-  @Deprecated('updateNameBy')
-  Future<Team> updateName(Team team, String newName) async =>
-      await updateNameBy(team.$id, newName);
-
   Future<void> deleteTeam(String teamId) async =>
       await _teams.delete(teamId: teamId);
 
@@ -34,7 +30,7 @@ class TeamService {
       // roles: roles ?? ["team:${team.$id}"], // 默认角色为 "团队成员"
       url: 'http://app.shuttlecloud.cn',
     );
-    print("debug member ${r.toMap()}");
+    // print("debug member ${r.toMap()}");
   }
 
   Future<Team> createTeam(String name) async {
@@ -48,5 +44,7 @@ class TeamService {
     final mp = tm.toMap();
     return Team.fromMap(mp);
   }
-// Future<Team> getTeam(String teamId) async => _teams.get(teamId: teamId);
+
+  Future<MembershipList> getMemberships({required String teamId}) =>
+      _teams.listMemberships(teamId: teamId);
 }
