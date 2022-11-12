@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/core/config/config.dart';
+import 'package:mind_base/src/user/domain/value/value.dart';
 import 'dart:math' as m;
 
 import 'package:provider_sidecar/provider_sidecar_ex.dart';

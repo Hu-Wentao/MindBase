@@ -3,7 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:mind_base/src/app/application/model.dart';
 import 'package:mind_base/src/app/infra/ui/page/auth/auth.dart';
 import 'package:mind_base/src/app/infra/ui/page/home/home.dart';
-import 'package:provider_sidecar/provider_sidecar_ex.dart';
+import 'package:provider/provider.dart';
+import 'package:provider_sidecar/provider_sidecar.dart';
 
 part 'splash.g.dart';
 
@@ -27,9 +28,16 @@ class _SplashPageState extends State<SplashPage>
   bool recovering = false;
 
   @override
-  onInitState(msgr, model) => model
-    ..events.listen((evt) => evt.maybeWhen(
+  onInitState(msgr, model) {
+    // 尝试恢复登陆状态
+    model.actEntrance(const AppAct.recover());
+    return model.events.listen((evt) => evt.maybeWhen(
         msg: (msg) => msgr.showSnackBar(SnackBar(content: Text(msg))),
+        logged: (m) {
+          msgr.showSnackBar(const SnackBar(content: Text('登陆成功')));
+          if (mounted) const HomeRoute.auto().go(context);
+          return null;
+        },
         recovering: () => setState(() => recovering = true),
         recoverDone: (msg) {
           if (msg == null) {
@@ -41,9 +49,8 @@ class _SplashPageState extends State<SplashPage>
           }
           return null;
         },
-        orElse: () => null))
-    // 尝试恢复登陆状态
-    ..actEntrance(const AppAct.recover());
+        orElse: () => null));
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -83,9 +90,11 @@ class _SplashPageState extends State<SplashPage>
       );
 
   /// 恢复登陆成功，展示用户头像
-  Widget logged(UserModel user) => Center(
-        child: Text("欢迎回来 ${user.name}"),
-      );
+  Widget logged(UserModel user) {
+    return Center(
+      child: Text("欢迎回来 ${user.name}"),
+    );
+  }
 
   /// 恢复登陆失败，展示错误信息
   Widget unLogged() {

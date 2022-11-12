@@ -11,6 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   get_arch_core:
     git:
       url: https://github.com/GetArch/get_arch_core.git
@@ -18,7 +20,7 @@ dependencies:
   provider_sidecar:
     git:
       url: https://github.com/Hu-Wentao/provider_sidecar
-      ref: v1.3
+      ref: v1.4
   slowly:
     git:
       url: https://github.com/GetArch/slowly.git
@@ -27,8 +29,8 @@ dependencies:
     git:
       url: https://github.com/GetArch/get_sweet.git
       ref: v1.0
-  appwrite: 6.0.0
-  dart_appwrite: 6.0.0
+  appwrite: 8.1.0
+  dart_appwrite: ^7.1.0
   freezed_annotation:
   go_router:
   adaptive_navigation:
@@ -37,6 +39,17 @@ dependencies:
   line_icons:
   bson:
   collection:
+  ndialog:
+  url_launcher:
+  logging:
+  flutter_form_builder: "7.1.1"
+  form_builder_extra_fields:
+  form_builder_validators: "7.9.0"
+  mockito:
+  json_annotation:
+  quiver:
+  json_editor:
+  pluto_grid:
 
 dev_dependencies:
   flutter_test:
@@ -48,6 +61,7 @@ dev_dependencies:
   freezed:
   go_router_builder:
   flutter_gen_runner:
+  json_serializable:
 
 flutter:
   uses-material-design: true
@@ -59,3 +73,11 @@ flutter_gen:
   output: lib/src/core/config/assets/
   integrations:
     flutter_svg: true
+
+dependency_overrides:
+  provider_sidecar:
+    path: ../../../provider_sidecar
+  pluto_grid:
+    git:
+      url: https://gitee.com/hu_wt/pluto_grid.git
+      ref: feat_on_col_moved_evt

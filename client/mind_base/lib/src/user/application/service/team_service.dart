@@ -1,4 +1,4 @@
-part of 'service.dart';
+part of '../service.dart';
 
 @lazySingleton
 class TeamService {
@@ -44,4 +44,7 @@ class TeamService {
     final mp = tm.toMap();
     return Team.fromMap(mp);
   }
+
+  Future<MembershipList> getMemberships({required String teamId}) =>
+      _teams.listMemberships(teamId: teamId);
 }

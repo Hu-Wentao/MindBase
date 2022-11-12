@@ -93,8 +93,8 @@ class TableExportServiceImpl : TableExportService {
         var rowIndex = 1
         while (queryForRowSet.next()) {
             val row = sheet.createRow(rowIndex++)
-            fields.forEachIndexed { index, fields ->
-                val data = queryForRowSet.getString(fields)
+            fields.forEachIndexed { index, field ->
+                val data = queryForRowSet.getString(field)
                 row.createCell(index).setCellValue(data)
             }
 

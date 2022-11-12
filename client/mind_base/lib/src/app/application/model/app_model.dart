@@ -1,9 +1,5 @@
 part of '../model.dart';
 
-enum AuthTp {
-  email,
-}
-
 @freezed
 class AppAct with _$AppAct {
   const factory AppAct.signupLogin({
@@ -36,11 +32,14 @@ class AppState with _$AppState {
 
 @freezed
 class AppEvt with _$AppEvt {
+  // 由于没有级联逻辑，Evt目前只承担消息通知功能
   const factory AppEvt.msg(String msg) = AppEvtMsg;
 
   const factory AppEvt.recovering() = AppEvtRecovering;
 
   const factory AppEvt.recoverDone(String? errMsg) = AppEvtRecoverDone;
+
+  const factory AppEvt.logged(UserModel model) = AppEvtLogged; // 登陆成功
 }
 
 class AppModel extends BaseActEntranceModel<AppAct, AppState>
@@ -48,7 +47,7 @@ class AppModel extends BaseActEntranceModel<AppAct, AppState>
   final MindBaseConfig config;
 
   AppModel(this.config, [AppState state = const AppState.init()])
-      : super(state: state);
+      : super(state: state, onCatch: ExceptionAdapter.of);
 
   @override
   onActEntrance(AppAct act) async => await act.when(
@@ -62,7 +61,9 @@ class AppModel extends BaseActEntranceModel<AppAct, AppState>
   @override
   onEvent(AppEvt evt) {
     super.onEvent(evt);
-    evt.maybeWhen(orElse: () {});
+    evt.maybeWhen(
+        logged: (m) => setState(AppState.logged(user: m), '登陆成功'),
+        orElse: () {});
   }
 
   /// 注册+登陆
@@ -85,8 +86,7 @@ class AppModel extends BaseActEntranceModel<AppAct, AppState>
   }) async {
     final session = await _onLogin(authVerify, identityStr, password);
     user ??= await _recoverUser();
-    evtEntrance(const AppEvt.msg("登陆成功"));
-    setState(AppState.logged(user: UserModel(user, session)), '登陆成功');
+    evtEntrance(AppEvt.logged(UserModel(user, session)));
   }
 
   recover() async {
@@ -94,19 +94,17 @@ class AppModel extends BaseActEntranceModel<AppAct, AppState>
     try {
       final session = await _recoverSession();
       final user = await _recoverUser();
-      setState(AppState.logged(user: UserModel(user, session)), '恢复登陆成功');
+      evtEntrance(AppEvt.logged(UserModel(user, session)));
     } catch (e) {
-      evtEntrance(AppEvt.recoverDone('恢复登陆失败 $e'));
+      evtEntrance(AppEvt.recoverDone('请重新登陆 $e'));
       rethrow;
     }
-    evtEntrance(const AppEvt.recoverDone(null));
   }
 
   loginAnonymous() async {
     final session = await _anonymousSession();
     final user = await _recoverUser();
-    evtEntrance(const AppEvt.msg("匿名登陆成功"));
-    setState(AppState.logged(user: UserModel(user, session)), '匿名登陆成功');
+    evtEntrance(AppEvt.logged(UserModel(user, session)));
   }
 
   logout() async {
@@ -117,37 +115,51 @@ class AppModel extends BaseActEntranceModel<AppAct, AppState>
 }
 
 extension AppAccountX on AppModel {
-  AccountService get _actSrv => sl<AccountService>();
+  AccountService get _accountSrv => sl<AccountService>();
 
-  _logout(String? sessionId) async => await _actSrv.logout(sessionId);
+  _logout(String? sessionId) async => await _accountSrv.logout(sessionId);
 
-  Future<Session> _recoverSession() async => await _actSrv.getSession();
+  Future<Session> _recoverSession() async => await _accountSrv.getSession();
 
   Future<Session> _anonymousSession() async =>
-      await _actSrv.createAnonymousSession();
+      await _accountSrv.createAnonymousSession();
 
   Future<User> _recoverUser() async {
-    try {
-      return await _actSrv.getUser();
-    } catch (e) {
-      evtEntrance(AppEvt.msg("恢复User失败, $e"));
-      rethrow;
-    }
+    return await _accountSrv.getUser();
+    // try {
+    // } catch (e) {
+    //   late AppEvt evt;
+    //   if (e is cli.AppwriteException &&
+    //       e.code == 401 &&
+    //       e.type == 'general_unauthorized_scope') {
+    //     evt = const AppEvt.recoverDone("您尚未登录");
+    //   } else {
+    //     evt = AppEvt.recoverDone("恢复User遇到未知错误, $e");
+    //   }
+    //   evtEntrance(evt);
+    //   rethrow;
+    // }
   }
 
   Future<User> _onSignup(
       AuthTp authVerify, String identityStr, String password) async {
     switch (authVerify) {
       case AuthTp.email:
-        return await _actSrv.signup(
+        return await _accountSrv.signup(
           name: identityStr,
           email: identityStr,
           password: password,
         );
+      // case AuthTp.phoneNumber:
+      // case AuthTp.wechatOfficial:
+      // case AuthTp.qqConnect:
+      // case AuthTp.qqNumber:
+      // case AuthTp.github:
+      //   throw FeatDeveloping('注册方式[$authVerify]尚未实现');
     }
   }
 
-// 登录,得到token
+  // 登录,得到token
   Future<Session> _onLogin(
     AuthTp authVerify,
     String identityStr,
@@ -156,12 +168,38 @@ extension AppAccountX on AppModel {
     Session nSession;
     switch (authVerify) {
       case AuthTp.email:
-        nSession = await _actSrv.login(
+        nSession = await _accountSrv.login(
           email: identityStr,
           password: password,
         );
         break;
+      // case AuthTp.phoneNumber:
+      // case AuthTp.wechatOfficial:
+      // case AuthTp.qqConnect:
+      // case AuthTp.qqNumber:
+      // case AuthTp.github:
+      //   throw BaseException('尚未支持的登录方式[$authVerify]');
     }
     return nSession;
   }
+}
+
+@Deprecated('')
+extension AppStateModelBizX on AppModel {
+// 注册/登录
+  @Deprecated("register / login")
+  Future<BaseException?> actAuthWithReq(AuthReq? req) async =>
+      await actWrapper(() async {
+        if (req == null) return null;
+        if (req.isRegister) {
+          return await actEntrance(AppAct.signupLogin(
+              authVerify: req.authVerify,
+              identityStr: req.identityStr,
+              password: req.password));
+        }
+        return await actEntrance(AppAct.login(
+            authVerify: req.authVerify,
+            identityStr: req.identityStr,
+            password: req.password));
+      });
 }

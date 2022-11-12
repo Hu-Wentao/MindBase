@@ -58,7 +58,7 @@ const List<String> pre = <String>[];
 const List<String> build = <String>[r'1'];
 
 /// Build date in Unix Time (in seconds)
-const int timestamp = 1666364600;
+const int timestamp = 1666509554;
 
 /// Name [name]
 const String name = r'mind_base';
@@ -91,6 +91,9 @@ const Map<String, Object> dependencies = <String, Object>{
   'flutter': <String, Object>{
     'sdk': r'flutter',
   },
+  'flutter_localizations': <String, Object>{
+    'sdk': r'flutter',
+  },
   'get_arch_core': <String, Object>{
     'git': <String, Object>{
       'url': r'https://github.com/GetArch/get_arch_core.git',
@@ -100,7 +103,7 @@ const Map<String, Object> dependencies = <String, Object>{
   'provider_sidecar': <String, Object>{
     'git': <String, Object>{
       'url': r'https://github.com/Hu-Wentao/provider_sidecar',
-      'ref': r'v1.3',
+      'ref': r'v1.4',
     },
   },
   'slowly': <String, Object>{
@@ -115,8 +118,10 @@ const Map<String, Object> dependencies = <String, Object>{
       'ref': r'v1.0',
     },
   },
-  'appwrite': r'6.0.0',
-  'dart_appwrite': r'6.0.0',
+  'appwrite': r'8.1.0',
+  'dart_appwrite': r'^7.1.0',
+  'flutter_form_builder': r'7.1.1',
+  'form_builder_validators': r'7.9.0',
 };
 
 /// Developer dependencies
@@ -128,7 +133,17 @@ const Map<String, Object> devDependencies = <String, Object>{
 };
 
 /// Dependency overrides
-const Map<String, Object> dependencyOverrides = <String, Object>{};
+const Map<String, Object> dependencyOverrides = <String, Object>{
+  'provider_sidecar': <String, Object>{
+    'path': r'../../../provider_sidecar',
+  },
+  'pluto_grid': <String, Object>{
+    'git': <String, Object>{
+      'url': r'https://gitee.com/hu_wt/pluto_grid.git',
+      'ref': r'feat_on_col_moved_evt',
+    },
+  },
+};
 
 /// Executables
 const Map<String, Object> executables = <String, Object>{};
@@ -149,5 +164,15 @@ const Map<String, Object> source = <String, Object>{
   'dependency_overrides': dependencyOverrides,
   'flutter': <String, Object>{
     'uses-material-design': true,
+    'assets': <Object>[
+      r'assets/icons/',
+      r'assets/images/',
+    ],
+  },
+  'flutter_gen': <String, Object>{
+    'output': r'lib/src/core/config/assets/',
+    'integrations': <String, Object>{
+      'flutter_svg': true,
+    },
   },
 };

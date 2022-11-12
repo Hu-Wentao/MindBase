@@ -24,6 +24,10 @@ class $AssetsIconsGen {
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
+  /// File path: assets/images/discover_fake.png
+  AssetGenImage get discoverFake =>
+      const AssetGenImage('assets/images/discover_fake.png');
+
   /// File path: assets/images/login.svg
   SvgGenImage get login => const SvgGenImage('assets/images/login.svg');
 
@@ -47,8 +51,15 @@ class $AssetsImagesGen {
       const AssetGenImage('assets/images/signup_top.png');
 
   /// List of all assets
-  List<dynamic> get values =>
-      [login, loginBottom, mainBottom, mainTop, signup, signupTop];
+  List<dynamic> get values => [
+        discoverFake,
+        login,
+        loginBottom,
+        mainBottom,
+        mainTop,
+        signup,
+        signupTop
+      ];
 }
 
 class Assets {
